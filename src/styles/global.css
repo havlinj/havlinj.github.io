@@ -1,0 +1,108 @@
+
+/* ===============================
+   RESET A BOX-SIZING
+================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===============================
+   ZÁKLADNÍ TYPOGRAFIE
+================================ */
+html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px; /* 1rem = 16px */
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    color: #111;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+    background-color: #e0f7fa; /* jemné pastelové pozadí */
+}
+
+/* ===============================
+   CELÝ LAYOUT - unifikované okraje a max-width
+================================ */
+main, .content {
+    max-width: 65ch;      /* čitelná šířka textu */
+    margin: 0 auto;       /* horizontální centrování */
+    padding: 2rem;        /* vnitřní odsazení od okrajů obrazovky */
+}
+
+/* ===============================
+   ODSTAVCE A NADPISY
+================================ */
+p {
+    margin-bottom: 1.25rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: #111;
+}
+
+h1 {
+    font-weight: 600; /* semi-bold */
+}
+
+h2, h3 {
+    font-weight: 500; /* medium */
+}
+
+h4, h5, h6 {
+    font-weight: 400; /* regular */
+}
+
+/* ===============================
+   ODKAZY
+================================ */
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   SEZNAMY
+================================ */
+ul, ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Pro blog list – bez bulletů */
+ul.post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ===============================
+   ČAS A MENŠÍ TEXTY
+================================ */
+time {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* ===============================
+   DOPORUČENÉ BARVY
+================================ */
+/* Jemné pastelové barvy, moderní: */
+/* #fdf7f0 → jemný krémový (neutral pastel) */
+/* #e0f7fa → světle modrá / aqua */
+/* #fff0f5 → velmi světlá levandule */

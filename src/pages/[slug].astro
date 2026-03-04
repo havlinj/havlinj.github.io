@@ -1,0 +1,26 @@
+
+---
+import {getCollection, getEntry} from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+    const pages = await getCollection('pages');
+    return pages.map((page) => ({
+        params: { slug: page.id.replace(/\.md$/, '') },
+        props: { page },
+    }));
+}
+
+const { slug } = Astro.params;
+const page = await getEntry('pages', slug);
+const { Content } = await page.render();
+---
+
+<Layout title={page.data.title}>
+    <article>
+        <h1>{page.data.title}</h1>
+        <Content />
+    </article>
+</Layout>
+
+
