@@ -1,41 +1,40 @@
-
 .hero {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 80vh;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 80vh;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .hero h1 {
-    font-size: 3rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
 }
 
 .tagline {
-    font-size: 1.5rem;
-    color: var(--color-accent);
-    margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--color-accent);
+  margin-bottom: 1.5rem;
 }
 
 .sub {
-    font-size: 1rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
 }
 
 .pages {
-    display: flex;
-    /* gap: 1rem; */
+  display: flex;
+  /* gap: 1rem; */
 }
 
 .post-list {
-    padding-left: 0;
-    list-style: none;
+  padding-left: 0;
+  list-style: none;
 }
 
 /*.hero {*/
@@ -71,4 +70,3 @@
 /*.post-list li {*/
 /*    margin-bottom: 0.5rem;*/
 /*}*/
-

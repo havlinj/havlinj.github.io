@@ -1,9 +1,9 @@
-
 ---
-title: "About Me"
+title: 'About Me'
 ---
 
 ## Intro
+
 Senior backend engineer focused on system design, distributed architectures and building software that carries real structural weight.
 
 I work primarily at the level where technical decisions shape long-term product direction — defining boundaries, designing data flows, reasoning about failure modes, latency, scalability and operational complexity. My background includes deep hands-on experience with performance-oriented systems (with strong expertise in Rust), but I do not define myself by a single language.
@@ -16,25 +16,27 @@ While Rust has been a significant part of my professional journey, I am equally 
 
 ## What I Optimize For
 
-**Clarity over trendiness**   
+**Clarity over trendiness**  
 Elegant systems are not those using the newest tools, but those whose constraints and trade-offs are well understood.
 
-**Scalability as a design property**   
+**Scalability as a design property**  
 Scalability is not added later. It is embedded in data modeling, communication patterns and failure strategy from the start.
 
-**Testing as structural integrity**    
+**Testing as structural integrity**  
 Testing is not a safety net; it is part of the architecture. A system that cannot be tested properly is rarely well designed.
 
-**Performance with purpose**   
+**Performance with purpose**  
 Low latency and resource efficiency matter when they create real product value — not as vanity metrics.
 
-**Maintainability as a strategic asset**   
+**Maintainability as a strategic asset**  
 Robust systems are those that survive team changes, shifting requirements and growth.
 
 ## Professional Direction
+
 I am intentionally moving toward roles with broader architectural ownership — Staff / Lead / Solutions Architect trajectory.
 
 I am particularly motivated by:
+
 - Designing systems without an existing blueprint
 - Translating new or ambiguous ideas into production-grade architecture
 - Combining technologies in unconventional but pragmatic ways

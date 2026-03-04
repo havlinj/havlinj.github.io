@@ -1,27 +1,26 @@
-
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-    const posts = await getCollection('blog');
-    return posts.map(post => ({
-        params: { slug: post.slug },
-        props: { post },
-    }));
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
 
 const { slug } = Astro.params;
 const posts = await getCollection('blog');
-const post = posts.find(p => p.slug === slug);
+const post = posts.find((p) => p.slug === slug);
 const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title}>
-    <main class="content">
-        <article>
-            <h1>{post.data.title}</h1>
-            <Content />
-        </article>
-    </main>
+  <main class="content">
+    <article>
+      <h1>{post.data.title}</h1>
+      <Content />
+    </article>
+  </main>
 </Layout>

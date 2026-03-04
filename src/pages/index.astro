@@ -1,36 +1,38 @@
-
 ---
 import { getCollection, getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import "../styles/home.css";
+import '../styles/home.css';
 
-const aboutMe = await getEntry('pages', 'about')
+const aboutMe = await getEntry('pages', 'about');
 console.log(aboutMe);
 const posts = await getCollection('blog');
 posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <Layout title="Jan Havlín">
-	<main>
-		<section class="hero">
-			<h1>Jan Havlín</h1>
-			<p class="tagline">
-				Creating reliable, fast, and thoughtful systems from the ground up.
-			</p>
-			<p class="sub">
-				Architecturally driven backend engineer building high-impact systems with creativity and discipline.
-			</p>
-			<div class="pages">
-				<!-- <a href="/projects">See my work</a> -->
-				<a href={`/${aboutMe.id.replace(/\.md$/, "")}`}>{aboutMe.data.title}</a>
-			</div>
-			<ul class="post-list">
-				{posts.map(post => (
-					<li>
-						<a href={`/blog/${post.slug}`}>{post.data.title}</a>
-					</li>
-				))}
-			</ul>
-		</section>
-	</main>
+  <main>
+    <section class="hero">
+      <h1>Jan Havlín</h1>
+      <p class="tagline">
+        Creating reliable, fast, and thoughtful systems from the ground up.
+      </p>
+      <p class="sub">
+        Architecturally driven backend engineer building high-impact systems
+        with creativity and discipline.
+      </p>
+      <div class="pages">
+        <!-- <a href="/projects">See my work</a> -->
+        <a href={`/${aboutMe.id.replace(/\.md$/, '')}`}>{aboutMe.data.title}</a>
+      </div>
+      <ul class="post-list">
+        {
+          posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
 </Layout>

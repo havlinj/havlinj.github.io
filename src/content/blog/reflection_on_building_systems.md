@@ -1,6 +1,5 @@
-
 ---
-title: "Reflection on Building Systems"
+title: 'Reflection on Building Systems'
 date: 2026-03-03
 ---
 

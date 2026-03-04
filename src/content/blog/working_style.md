@@ -1,6 +1,5 @@
-
 ---
-title: "Working Style"
+title: 'Working Style'
 date: 2026-03-03
 ---
 
