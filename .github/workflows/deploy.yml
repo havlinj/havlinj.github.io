@@ -66,6 +66,19 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
+      # ESLint & Prettier come from devDependencies above. Playwright needs browser binaries + system deps.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Verify lint, format and test tooling
+        run: |
+          npx eslint --version
+          npx prettier --version
+          npx playwright --version
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Lint, format and test
+        run: bash ./scripts/all.sh
+        working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \

@@ -13,7 +13,8 @@
    CSS VARIABLES
 ================================ */
 :root {
-  --content-width: 70ch;
+  --content-min-width: 40ch; /* floor: don't squeeze below readable width */
+  --content-width: 70ch; /* max readable line length */
 }
 
 /* ===============================
@@ -50,7 +51,8 @@ body {
 ================================ */
 main,
 .content {
-  max-width: var(--content-width); /* readable text width */
+  min-width: var(--content-min-width);
+  max-width: var(--content-width);
   margin: 0 auto; /* horizontal centering */
   padding: 2rem; /* padding from viewport edges */
 }

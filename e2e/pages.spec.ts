@@ -10,18 +10,28 @@ test.describe('Profile page (/profile, /intro)', () => {
     await page.goto('/profile');
     await expect(page.locator('.site-header')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Jan Havlín' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(/site-nav__link--active/);
+    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
+      /site-nav__link--active/,
+    );
   });
 
-  test('has placeholder image and Intro, Professional, Personal links', async ({ page }) => {
+  test('has placeholder image and Intro, Professional, Personal links', async ({
+    page,
+  }) => {
     await page.goto('/profile');
-    await expect(page.getByRole('img', { name: /Profile photo placeholder/i })).toBeVisible();
+    await expect(
+      page.getByRole('img', { name: /Profile photo placeholder/i }),
+    ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Intro' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Professional' })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Professional' }),
+    ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Personal' })).toBeVisible();
   });
 
-  test('site-header: Jan Havlín left, Profile Writing Contact spread across', async ({ page }) => {
+  test('site-header: Jan Havlín left, Profile Writing Contact spread across', async ({
+    page,
+  }) => {
     await page.goto('/profile');
     const inner = page.locator('.site-header__inner');
     await expect(inner).toBeVisible();
@@ -43,10 +53,14 @@ test.describe('Profile page (/profile, /intro)', () => {
     expect(bBox!.x).toBeLessThanOrEqual(pBox!.x + LAYOUT_TOLERANCE);
     expect(pBox!.x).toBeLessThanOrEqual(wBox!.x + LAYOUT_TOLERANCE);
     expect(wBox!.x).toBeLessThanOrEqual(cBox!.x + LAYOUT_TOLERANCE);
-    expect(cBox!.x + cBox!.width).toBeGreaterThanOrEqual(box!.x + box!.width - LAYOUT_TOLERANCE);
+    expect(cBox!.x + cBox!.width).toBeGreaterThanOrEqual(
+      box!.x + box!.width - LAYOUT_TOLERANCE,
+    );
   });
 
-  test('navbar contains Profile, Writing, Contact links and name links to /', async ({ page }) => {
+  test('navbar contains Profile, Writing, Contact links and name links to /', async ({
+    page,
+  }) => {
     await page.goto('/profile');
     await expect(page.locator('.site-header a[href="/"]')).toBeVisible();
     await expect(page.locator('.site-header a[href="/profile"]')).toBeVisible();
@@ -81,14 +95,20 @@ test.describe('Profile page (/profile, /intro)', () => {
       articleBox!.x + articleBox!.width - LAYOUT_TOLERANCE,
     );
     const mid = articleBox!.x + articleBox!.width / 2;
-    expect(pBox!.x + pBox!.width / 2).toBeGreaterThanOrEqual(mid - articleBox!.width / 3);
-    expect(pBox!.x + pBox!.width / 2).toBeLessThanOrEqual(mid + articleBox!.width / 3);
+    expect(pBox!.x + pBox!.width / 2).toBeGreaterThanOrEqual(
+      mid - articleBox!.width / 3,
+    );
+    expect(pBox!.x + pBox!.width / 2).toBeLessThanOrEqual(
+      mid + articleBox!.width / 3,
+    );
   });
 
   test('Intro (/intro) has active Profile in navbar', async ({ page }) => {
     await page.goto('/intro');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(/site-nav__link--active/);
+    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
+      /site-nav__link--active/,
+    );
   });
 });
 
@@ -97,12 +117,20 @@ test.describe('Profile page (/profile, /intro)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Writing page (/writing)', () => {
-  test('shows navbar with active Writing and article list', async ({ page }) => {
+  test('shows navbar with active Writing and article list', async ({
+    page,
+  }) => {
     await page.goto('/writing');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Writing' })).toHaveClass(/site-nav__link--active/);
-    await expect(page.getByRole('heading', { name: 'Writing', level: 1 })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Reflection on Building Systems' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Writing' })).toHaveClass(
+      /site-nav__link--active/,
+    );
+    await expect(
+      page.getByRole('heading', { name: 'Writing', level: 1 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Reflection on Building Systems' }),
+    ).toBeVisible();
   });
 
   test('gaps between navbar, title, content', async ({ page }) => {
@@ -136,11 +164,15 @@ test.describe('Contact page (/contact)', () => {
   test('shows navbar with active Contact', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Contact' })).toHaveClass(/site-nav__link--active/);
+    await expect(page.getByRole('link', { name: 'Contact' })).toHaveClass(
+      /site-nav__link--active/,
+    );
   });
 
   test('shows Contact as page heading', async ({ page }) => {
     await page.goto('/contact');
-    await expect(page.getByRole('heading', { name: 'Contact', level: 1 })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Contact', level: 1 }),
+    ).toBeVisible();
   });
 });

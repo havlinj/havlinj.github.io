@@ -20,4 +20,3 @@ title: 'Profile'
   <a href="/professional" style="justify-self: center;">Professional</a>
   <a href="/personal" style="justify-self: end; text-align: right;">Personal</a>
 </div>
-
