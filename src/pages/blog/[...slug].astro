@@ -16,11 +16,9 @@ const post = posts.find((p) => p.slug === slug);
 const { Content } = await post.render();
 ---
 
-<Layout title={post.data.title}>
-  <main class="content">
-    <article>
-      <h1>{post.data.title}</h1>
-      <Content />
-    </article>
-  </main>
+<Layout title={post.data.title} activeSection="writing">
+  <article>
+    <h1>{post.data.title}</h1>
+    <Content />
+  </article>
 </Layout>

@@ -1,0 +1,30 @@
+/* ===============================
+   SITE HEADER (navbar)
+================================ */
+
+.site-header {
+  margin-bottom: 1rem;
+}
+
+.site-header__inner {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.site-header__item {
+  text-decoration: none;
+}
+
+.site-header__item:hover {
+  text-decoration: underline;
+}
+
+.site-header__brand {
+  font-weight: 500;
+}
+
+.site-nav__link--active {
+  text-decoration: underline;
+}

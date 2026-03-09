@@ -6,12 +6,12 @@ const compat = new FlatCompat({
 });
 
 export default [
-  // přeskočí generovaný Astro kód
+  // ignore Astro generated files
   {
     ignores: ['.astro/**/*.d.ts'],
   },
 
-  // zachování starých extends přes compat
+  // use legacy config via compat layer
   ...compat.extends('eslint:recommended'),
   ...compat.extends('plugin:@typescript-eslint/recommended'),
   ...compat.extends('plugin:astro/recommended'),

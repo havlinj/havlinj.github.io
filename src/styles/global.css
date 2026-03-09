@@ -10,9 +10,19 @@
 }
 
 /* ===============================
-   ZÁKLADNÍ TYPOGRAFIE
+   CSS VARIABLES
+================================ */
+:root {
+  --content-width: 70ch;
+}
+
+/* ===============================
+   BASE TYPOGRAPHY
 ================================ */
 html {
+  margin: 0;
+  width: 100%;
+  height: 100%;
   font-family:
     'Inter',
     system-ui,
@@ -27,24 +37,26 @@ html {
 
 body {
   margin: 0;
+  width: 100%;
+  height: 100%;
   color: #111;
   line-height: 1.65;
   letter-spacing: 0.01em;
-  background-color: #e0f7fa; /* jemné pastelové pozadí */
+  background-color: #e0f7fa; /* soft pastel background */
 }
 
 /* ===============================
-   CELÝ LAYOUT - unifikované okraje a max-width
+   LAYOUT – unified margins and max-width
 ================================ */
 main,
 .content {
-  max-width: 65ch; /* čitelná šířka textu */
-  margin: 0 auto; /* horizontální centrování */
-  padding: 2rem; /* vnitřní odsazení od okrajů obrazovky */
+  max-width: var(--content-width); /* readable text width */
+  margin: 0 auto; /* horizontal centering */
+  padding: 2rem; /* padding from viewport edges */
 }
 
 /* ===============================
-   ODSTAVCE A NADPISY
+   PARAGRAPHS AND HEADINGS
 ================================ */
 p {
   margin-bottom: 1.25rem;
@@ -77,7 +89,7 @@ h6 {
 }
 
 /* ===============================
-   ODKAZY
+   LINKS
 ================================ */
 a {
   color: inherit;
@@ -90,7 +102,7 @@ a:hover {
 }
 
 /* ===============================
-   SEZNAMY
+   LISTS
 ================================ */
 ul,
 ol {
@@ -98,7 +110,7 @@ ol {
   margin-bottom: 1rem;
 }
 
-/* Pro blog list – bez bulletů */
+/* Blog list – no bullets */
 ul.post-list {
   list-style: none;
   padding: 0;
@@ -106,7 +118,7 @@ ul.post-list {
 }
 
 /* ===============================
-   ČAS A MENŠÍ TEXTY
+   TIME AND SMALL TEXT
 ================================ */
 time {
   display: block;
@@ -116,9 +128,9 @@ time {
 }
 
 /* ===============================
-   DOPORUČENÉ BARVY
+   RECOMMENDED COLORS
 ================================ */
-/* Jemné pastelové barvy, moderní: */
-/* #fdf7f0 → jemný krémový (neutral pastel) */
-/* #e0f7fa → světle modrá / aqua */
-/* #fff0f5 → velmi světlá levandule */
+/* Soft pastels, modern palette: */
+/* #fdf7f0 → soft cream (neutral pastel) */
+/* #e0f7fa → light blue / aqua */
+/* #fff0f5 → very light lavender */

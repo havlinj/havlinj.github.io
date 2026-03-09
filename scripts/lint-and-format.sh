@@ -3,26 +3,26 @@
 
 # === scripts/lint-and-format.sh ===
 
-# Ukončit skript při jakékoliv chybě
+# Exit script on any error
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT_DIR="$SCRIPT_DIR/.."
 
-echo "Přecházím do root adresáře projektu: $ROOT_DIR"
+echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"
 
-echo "Spouštím ESLint s fixy..."
+echo "Running ESLint with fixes..."
 npm run lint -- --fix
 
-echo "Kontrola ESLint bez oprav..."
+echo "Running ESLint again (no fix)..."
 if ! npm run lint; then
-  echo "ESLint stále hlásí chyby. Oprav je před spuštěním formátování."
+  echo "ESLint still reports errors. Fix them before formatting."
   exit 1
 fi
 
-echo "ESLint prošel – spouštím Prettier..."
+echo "ESLint passed – running Prettier..."
 npm run format
 
-echo "Hotovo!"
+echo "Done!"

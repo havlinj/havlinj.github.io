@@ -13,9 +13,16 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const page = await getEntry('pages', slug);
 const { Content } = await page.render();
+
+const profileSlugs = ['profile', 'intro', 'professional', 'personal'];
+const activeSection = profileSlugs.includes(slug)
+  ? 'profile'
+  : slug === 'contact'
+    ? 'contact'
+    : undefined;
 ---
 
-<Layout title={page.data.title}>
+<Layout title={page.data.title} activeSection={activeSection}>
   <article>
     <h1>{page.data.title}</h1>
     <Content />

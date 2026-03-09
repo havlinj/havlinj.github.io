@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
+import '../styles/site_header.css';
 
-const { title } = Astro.props;
+const { title, activeSection } = Astro.props;
 const pageTitle = title || 'Astro Basics';
 ---
 
@@ -23,25 +24,46 @@ const pageTitle = title || 'Astro Basics';
     <title>{pageTitle}</title>
   </head>
   <body>
-    <!-- wrapper pro všechny stránky -->
     <main class="content">
+      {
+        activeSection && (
+          <header class="site-header">
+            <div class="site-header__inner">
+              <a href="/" class="site-header__item site-header__brand">
+                Jan Havlín
+              </a>
+              <a
+                href="/profile"
+                class={
+                  'site-header__item site-nav__link' +
+                  (activeSection === 'profile' ? ' site-nav__link--active' : '')
+                }
+              >
+                Profile
+              </a>
+              <a
+                href="/writing"
+                class={
+                  'site-header__item site-nav__link' +
+                  (activeSection === 'writing' ? ' site-nav__link--active' : '')
+                }
+              >
+                Writing
+              </a>
+              <a
+                href="/contact"
+                class={
+                  'site-header__item site-nav__link' +
+                  (activeSection === 'contact' ? ' site-nav__link--active' : '')
+                }
+              >
+                Contact
+              </a>
+            </div>
+          </header>
+        )
+      }
       <slot />
     </main>
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* jednotný wrapper pro obsah */
-  main.content {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-</style>

@@ -1,38 +1,21 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import '../styles/home.css';
-
-const aboutMe = await getEntry('pages', 'about');
-console.log(aboutMe);
-const posts = await getCollection('blog');
-posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <Layout title="Jan Havlín">
-  <main>
-    <section class="hero">
-      <h1>Jan Havlín</h1>
-      <p class="tagline">
-        Creating reliable, fast, and thoughtful systems from the ground up.
-      </p>
-      <p class="sub">
-        Architecturally driven backend engineer building high-impact systems
-        with creativity and discipline.
-      </p>
-      <div class="pages">
-        <!-- <a href="/projects">See my work</a> -->
-        <a href={`/${aboutMe.id.replace(/\.md$/, '')}`}>{aboutMe.data.title}</a>
-      </div>
-      <ul class="post-list">
-        {
-          posts.map((post) => (
-            <li>
-              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
-  </main>
+  <header class="hero-header">
+    <div class="hero-header__inner">
+      <a href="/profile" class="site-header__item site-nav__link">Profile</a>
+      <a href="/writing" class="site-header__item site-nav__link">Writing</a>
+      <a href="/contact" class="site-header__item site-nav__link">Contact</a>
+    </div>
+  </header>
+  <section class="hero">
+    <h1>Jan Havlín</h1>
+    <h2>Backend Systems & Architecture</h2><!--<h2>Software Development</h2>-->
+    <p class="tagline">
+      Building reliable, fast and high-impact backend systems from the ground up
+    </p>
+  </section>
 </Layout>
