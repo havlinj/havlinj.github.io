@@ -10,8 +10,7 @@ const title = 'Contact — Jan Havlín';
     <script
       src="https://challenges.cloudflare.com/turnstile/v0/api.js"
       async
-      defer
-    ></script>
+      defer></script>
   </Fragment>
   <article class="contact">
     <h1>Contact</h1>
@@ -33,7 +32,8 @@ const title = 'Contact — Jan Havlín';
 
       <label>
         Message
-        <textarea name="message" minlength="10" maxlength="5000" required></textarea>
+        <textarea name="message" minlength="10" maxlength="5000" required
+        ></textarea>
       </label>
 
       <div class="hidden" aria-hidden="true">
@@ -43,14 +43,11 @@ const title = 'Contact — Jan Havlín';
         </label>
       </div>
 
-      <div
-        class="cf-turnstile"
-        data-sitekey="0x4AAAAAACpJlpuMEv-nLyuB"
-      >
-      </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAACpJlpuMEv-nLyuB"></div>
 
       <button type="submit">Send</button>
-      <p id="status" class="contact-status" role="status" aria-live="polite"></p>
+      <p id="status" class="contact-status" role="status" aria-live="polite">
+      </p>
     </form>
   </article>
 
@@ -88,7 +85,7 @@ const title = 'Contact — Jan Havlín';
               window.turnstile.reset();
             }
           }
-        } catch (error) {
+        } catch {
           status.textContent = 'Network error. Please try again.';
 
           if (window.turnstile) {
@@ -99,4 +96,3 @@ const title = 'Contact — Jan Havlín';
     }
   </script>
 </Layout>
-
