@@ -175,4 +175,22 @@ test.describe('Contact page (/contact)', () => {
       page.getByRole('heading', { name: 'Contact', level: 1 }),
     ).toBeVisible();
   });
+
+  test('shows intro text and contact form fields', async ({ page }) => {
+    await page.goto('/contact');
+
+    await expect(
+      page.getByText(
+        'Feel free to reach out about engineering, architecture, or opportunities.',
+      ),
+    ).toBeVisible();
+
+    await expect(page.getByLabel('Name')).toBeVisible();
+    await expect(page.getByLabel('Email')).toBeVisible();
+    await expect(page.getByLabel('Message')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send' })).toBeVisible();
+
+    // Turnstile placeholder should be present in the DOM
+    await expect(page.locator('.cf-turnstile')).toBeVisible();
+  });
 });

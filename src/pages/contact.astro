@@ -5,15 +5,14 @@ import '../styles/contact.css';
 const title = 'Contact — Jan Havlín';
 ---
 
-<Astro.head>
-  <script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-    async
-    defer
-  ></script>
-</Astro.head>
-
 <Layout title={title} activeSection="contact">
+  <Fragment slot="head">
+    <script
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      async
+      defer
+    ></script>
+  </Fragment>
   <article class="contact">
     <h1>Contact</h1>
 
@@ -46,7 +45,7 @@ const title = 'Contact — Jan Havlín';
 
       <div
         class="cf-turnstile"
-        data-sitekey="YOUR_TURNSTILE_SITE_KEY"
+        data-sitekey="0x4AAAAAACpJlpuMEv-nLyuB"
       >
       </div>
 
