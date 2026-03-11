@@ -1,0 +1,75 @@
+/* ===============================
+   CONTACT PAGE
+================================ */
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-intro {
+  margin-bottom: 0.5rem;
+}
+
+.contact-form {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 500;
+}
+
+.contact-form input,
+.contact-form textarea,
+.contact-form button {
+  font: inherit;
+  color: #111;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.25rem;
+  border: 1px solid #111;
+  background-color: transparent;
+}
+
+.contact-form textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.contact-form button {
+  justify-self: flex-start;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid #111;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.contact-form button:hover {
+  background-color: #111;
+  color: #e0f7fa;
+}
+
+.contact-form .hidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.contact-status {
+  min-height: 1.5em;
+  font-size: 0.95rem;
+}
+

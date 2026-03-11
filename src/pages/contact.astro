@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/contact.css';
+
+const title = 'Contact — Jan Havlín';
+---
+
+<Astro.head>
+  <script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer
+  ></script>
+</Astro.head>
+
+<Layout title={title} activeSection="contact">
+  <article class="contact">
+    <h1>Contact</h1>
+
+    <p class="contact-intro">
+      Feel free to reach out about engineering, architecture, or opportunities.
+    </p>
+
+    <form id="contact-form" class="contact-form" novalidate>
+      <label>
+        Name
+        <input type="text" name="name" maxlength="100" required />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" required />
+      </label>
+
+      <label>
+        Message
+        <textarea name="message" minlength="10" maxlength="5000" required></textarea>
+      </label>
+
+      <div class="hidden" aria-hidden="true">
+        <label>
+          Company
+          <input type="text" name="company" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
+
+      <div
+        class="cf-turnstile"
+        data-sitekey="YOUR_TURNSTILE_SITE_KEY"
+      >
+      </div>
+
+      <button type="submit">Send</button>
+      <p id="status" class="contact-status" role="status" aria-live="polite"></p>
+    </form>
+  </article>
+
+  <script is:inline>
+    const form = document.getElementById('contact-form');
+    const status = document.getElementById('status');
+
+    if (form && status) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        status.textContent = 'Sending...';
+
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch('/api/contact', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.ok) {
+            form.reset();
+            status.textContent = 'Thanks! Your message has been sent.';
+
+            if (window.turnstile) {
+              window.turnstile.reset();
+            }
+          } else {
+            status.textContent = data.error || 'Something went wrong.';
+
+            if (window.turnstile && data.resetTurnstile) {
+              window.turnstile.reset();
+            }
+          }
+        } catch (error) {
+          status.textContent = 'Network error. Please try again.';
+
+          if (window.turnstile) {
+            window.turnstile.reset();
+          }
+        }
+      });
+    }
+  </script>
+</Layout>
+
