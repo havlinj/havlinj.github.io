@@ -52,7 +52,9 @@
   border: 1px solid #111;
   background-color: transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .contact-form button:hover {
@@ -72,4 +74,3 @@
   min-height: 1.5em;
   font-size: 0.95rem;
 }
-
