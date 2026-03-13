@@ -13,18 +13,29 @@ import '../styles/home.css';
   </header>
   <h1>Hello</h1>
   <section class="hero">
-    <div class="hero-grid">
-      <div class="hero-name-box">
-        <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
-      </div>
-      <div class="hero-role">
-        <span>BACKEND ARCHITECTURE</span>
-        <span>& SYSTEMS</span>
-      </div>
+    <div class="hero-bg" aria-hidden="true">
+      <img
+        src="/assets/hero/hero-bg.jpg"
+        alt=""
+        class="hero-bg__image"
+        loading="lazy"
+      />
     </div>
-    <p class="tagline">
-      Building reliable, fast and high-impact software from the ground up
-    </p>
+
+    <div class="hero-content">
+      <div class="hero-grid">
+        <div class="hero-name-box">
+          <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
+        </div>
+        <div class="hero-role">
+          <span>BACKEND ARCHITECTURE</span>
+          <span>& SYSTEMS</span>
+        </div>
+      </div>
+      <p class="tagline">
+        Building reliable, fast and high-impact software from the ground up
+      </p>
+    </div>
   </section>
   <script is:inline>
     (function () {
@@ -109,6 +120,40 @@ import '../styles/home.css';
         });
       }
 
+      function initHeroParallax() {
+        const hero = document.querySelector('.hero');
+        if (!hero) return;
+
+        const img = hero.querySelector('.hero-bg__image');
+        if (!img) return;
+
+        const maxTranslate = 24; // px
+
+        function updateParallax() {
+          const rect = hero.getBoundingClientRect();
+          const viewportHeight =
+            window.innerHeight || document.documentElement.clientHeight;
+
+          if (viewportHeight === 0) return;
+
+          const rawProgress = 1 - rect.top / viewportHeight;
+          const clamped = Math.min(1, Math.max(0, rawProgress));
+          const scrollOffset = (clamped - 0.5) * 2 * maxTranslate;
+
+          const viewportWidth =
+            window.innerWidth || document.documentElement.clientWidth;
+          const widthFactor = viewportWidth / 1200;
+          const horizontalOffset = (widthFactor - 1) * 18;
+
+          img.style.transform = `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(1.06)`;
+        }
+
+        updateParallax();
+
+        window.addEventListener('scroll', updateParallax, { passive: true });
+        window.addEventListener('resize', updateParallax);
+      }
+
       const resizeObserver = new ResizeObserver(() => {
         fitAllHeroNames();
         fitHeroRoles();
@@ -117,6 +162,7 @@ import '../styles/home.css';
       window.addEventListener('load', () => {
         fitAllHeroNames();
         fitHeroRoles();
+        initHeroParallax();
 
         document.querySelectorAll('.hero-name-box').forEach((box) => {
           resizeObserver.observe(box);
