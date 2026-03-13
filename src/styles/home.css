@@ -117,14 +117,14 @@
 }
 
 h1 + .hero {
-  margin-top: 1.45rem;
+  margin-top: 1.35rem;
 }
 
 .hero-name::before {
   content: '';
   position: absolute;
-  inset-block: -0.12em -0.12em;
-  inset-inline: -0.18em -0.12em;
+  inset-block: -0.12em -0.16em;
+  inset-inline: -0.18em -0.18em;
   background-color: var(--hero-highlight-bg);
   z-index: -1;
 }
@@ -154,8 +154,8 @@ h1 + .hero {
 .hero-role span::before {
   content: '';
   position: absolute;
-  inset-block: -0.08em -0.08em;
-  inset-inline: -0.18em -0.12em;
+  inset-block: -0.08em -0.1em;
+  inset-inline: -0.18em -0.18em;
   background-color: var(--hero-highlight-bg);
   z-index: -1;
 }
@@ -170,13 +170,36 @@ h1 + .hero {
   position: relative;
   display: inline-block;
   z-index: 1;
+  color: #111;
+}
+
+.tagline__text {
+  display: inline-block;
+  background: linear-gradient(
+    to bottom,
+    #111 0%,
+    #111 12%,
+    #333 30%,
+    #555 55%,
+    #666 78%,
+    #888 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .tagline::before {
   content: '';
   position: absolute;
-  inset-block: 0.05em 0.1em;
-  inset-inline: -0.2em -0.15em;
-  background-color: var(--hero-highlight-bg);
+  inset-block: 0.1em 0.00em;
+  inset-inline: -0.2em -0.2em;
+  background: linear-gradient(
+    to bottom,
+    #e0f7fa 0%,
+    rgba(224, 247, 250, 1) 45%,
+    rgba(235, 252, 254, 1) 100%
+  );
   z-index: -1;
 }
