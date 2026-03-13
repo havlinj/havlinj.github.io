@@ -28,12 +28,8 @@ import '../styles/home.css';
           <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
         </div>
         <div class="hero-role">
-          <div class="hero-role-line">
-            <span>BACKEND ARCHITECTURE</span>
-          </div>
-          <div class="hero-role-line">
-            <span>& SYSTEMS</span>
-          </div>
+          <span>BACKEND ARCHITECTURE</span>
+          <span>& SYSTEMS</span>
         </div>
       </div>
       <p class="tagline">
@@ -84,15 +80,11 @@ import '../styles/home.css';
 
       function fitHeroRoles() {
         const heroNameEl = document.querySelector('.hero-name');
-        const heroNameBox = document.querySelector('.hero-name-box');
-        if (!heroNameEl || !heroNameBox) return;
+        if (!heroNameEl) return;
 
         const heroNameStyle = window.getComputedStyle(heroNameEl);
         const heroNameSize =
-          parseFloat(heroNameStyle.fontSize || '0') || 0; // H (font-size jména)
-        const heroHeight = heroNameBox.getBoundingClientRect().height; // skutečná výška pásma vlevo
-
-        if (!heroNameSize || !heroHeight) return;
+          parseFloat(heroNameStyle.fontSize || '0') || 0;
 
         document.querySelectorAll('.hero-role').forEach((roleEl) => {
           const spans = Array.from(roleEl.querySelectorAll('span'));
@@ -102,9 +94,9 @@ import '../styles/home.css';
           const minFont = 10;
           const precision = 0.1;
 
-          // 1) šířkové omezení: binární hledání maximální velikosti, která se vejde do šířky
+          // šířkové omezení: binární hledání maximální velikosti, která se vejde do šířky
           let low = minFont;
-          let high = heroNameSize; // role nikdy nebude větší než jméno
+          let high = heroNameSize || 120;
           let bestWidth = minFont;
 
           spans.forEach((s) => {
@@ -129,64 +121,19 @@ import '../styles/home.css';
             }
           }
 
-          // 2) vertikální omezení: najdi role-size a mezeru tak, aby se 2 řádky + mezera vešly do heroHeight
-          const ratioLimit = 0.25; // role-font <= 25 % fontu jména
-          const maxRoleByRatio = heroNameSize * ratioLimit;
-          const maxRoleCandidate = Math.min(bestWidth, maxRoleByRatio);
-          const gapFactor = 0.6; // gap = 0.6 * role-font
+          // výškové omezení: jednoduchý poměr vůči jménu
+          const ratioLimitMax = 0.4; // horní hranice: role-font <= 40 % fontu jména
+          const ratioLimitMin = 0.3; // dolní hranice: role-font >= 30 % fontu jména
 
-          if (maxRoleCandidate <= minFont) {
-            // fallback – použij šířkový výsledek bez speciálního vertikálního ladění
-            spans.forEach((s, idx) => {
-              s.style.fontSize = bestWidth + 'px';
-              s.style.marginBottom = idx === 0 && spans.length > 1
-                ? bestWidth * gapFactor + 'px'
-                : '0px';
-            });
-            return;
+          let roleFont = bestWidth;
+          if (heroNameSize) {
+            roleFont = Math.min(roleFont, heroNameSize * ratioLimitMax);
+            roleFont = Math.max(roleFont, heroNameSize * ratioLimitMin);
           }
 
-          let vLow = minFont;
-          let vHigh = maxRoleCandidate;
-          let bestVertical = vLow;
-
-          function totalHeightForFont(sizePx) {
-            let total = 0;
-            spans.forEach((s, idx) => {
-              s.style.fontSize = sizePx + 'px';
-              s.style.marginBottom = '0px';
-              const rect = s.getBoundingClientRect();
-              total += rect.height;
-              if (idx === 0 && spans.length > 1) {
-                total += sizePx * gapFactor;
-              }
-            });
-            return total;
-          }
-
-          while (vHigh - vLow > precision) {
-            const mid = (vLow + vHigh) / 2;
-            const total = totalHeightForFont(mid);
-
-            if (total <= heroHeight) {
-              bestVertical = mid;
-              vLow = mid;
-            } else {
-              vHigh = mid;
-            }
-          }
-
-          const finalSize = bestVertical;
-          const gapPx = finalSize * gapFactor;
-
-          // 3) aplikuj finální velikost a mezeru
-          spans.forEach((s, idx) => {
-            s.style.fontSize = finalSize + 'px';
-            if (idx === 0 && spans.length > 1) {
-              s.style.marginBottom = gapPx + 'px';
-            } else {
-              s.style.marginBottom = '0px';
-            }
+          spans.forEach((s) => {
+            s.style.fontSize = roleFont + 'px';
+            s.style.marginBottom = '';
           });
         });
       }
@@ -255,10 +202,6 @@ import '../styles/home.css';
       });
 
       window.addEventListener('resize', () => {
-        scheduleHeroFit();
-      });
-
-      window.addEventListener('scroll', () => {
         scheduleHeroFit();
       });
 

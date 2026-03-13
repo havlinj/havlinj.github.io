@@ -103,11 +103,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-}
-
-.hero-role-line {
-  position: relative;
+  justify-content: center;
+  gap: 0.4em;
 }
 
 .hero-role span {
@@ -115,7 +112,7 @@
   margin: 0;
   white-space: nowrap;
   overflow: visible;
-  line-height: 1;
+  line-height: 1.1;
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
