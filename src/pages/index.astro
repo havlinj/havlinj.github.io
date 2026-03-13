@@ -4,6 +4,9 @@ import '../styles/home.css';
 ---
 
 <Layout title="Jan Havlín">
+  <Fragment slot="head">
+    <link rel="preload" href="/assets/hero/hero-bg.jpg" as="image" />
+  </Fragment>
   <header class="hero-header">
     <div class="hero-header__inner">
       <a href="/profile" class="site-header__item site-nav__link">Profile</a>
@@ -18,7 +21,7 @@ import '../styles/home.css';
         src="/assets/hero/hero-bg.jpg"
         alt=""
         class="hero-bg__image"
-        loading="lazy"
+        fetchpriority="high"
       />
     </div>
 
@@ -39,6 +42,14 @@ import '../styles/home.css';
   </section>
   <script is:inline>
     (function () {
+      (function showHeroWhenBgReady() {
+        var hero = document.querySelector('.hero');
+        var img = document.querySelector('.hero .hero-bg__image');
+        if (!hero || !img) return;
+        if (img.complete) hero.classList.add('is-loaded');
+        else img.addEventListener('load', function () { hero.classList.add('is-loaded'); });
+      })();
+
       function fitTextToContainer(textEl, options = {}) {
         const container = textEl.parentElement;
         if (!container) return;
