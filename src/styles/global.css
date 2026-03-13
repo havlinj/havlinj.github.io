@@ -15,7 +15,9 @@
 :root {
   --content-min-width: 40ch; /* floor: don't squeeze below readable width */
   --content-width: 70ch; /* max readable line length */
-  --hero-highlight-bg: rgba(224, 247, 250, 0.9); /* podklad pod hero texty */
+  --hero-highlight-bg: rgba(224, 247, 250, 1); /* podklad pod hero texty */
+  /* Šířka překryvu vlevo na hero: vizuálně zarovná začátek obrázku s prvním písmem (font side bearing). Lze doladit. */
+  --hero-optical-offset: 0.10em;
 }
 
 /* ===============================
