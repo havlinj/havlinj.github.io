@@ -169,19 +169,21 @@ h1 + .hero {
   color: #111;
 }
 
+/* Same diagonal as tagline::before: dark top-left → lighter toward bottom-right */
 .tagline__text {
   display: inline-block;
   background: linear-gradient(
-    to bottom,
+    to bottom right,
     #111 0%,
-    #111 8%,
-    #1c1c1c 18%,
-    #2a2a2a 28%,
-    #3a3a3a 40%,
-    #4d4d4d 52%,
-    #616161 65%,
-    #757575 78%,
-    #888 92%,
+    #111 12%,
+    #1a1a1a 22%,
+    #252525 32%,
+    #333 42%,
+    #444 52%,
+    #555 62%,
+    #666 72%,
+    #777 82%,
+    #888 90%,
     #8c8c8c 100%
   );
   -webkit-background-clip: text;
