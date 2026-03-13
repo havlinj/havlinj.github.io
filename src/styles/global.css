@@ -77,23 +77,13 @@ h6 {
 }
 
 h1 {
-  /* font-size: 2rem; /* 32px */
-  /* font-weight: 600;  */
   font-size: clamp(1.5rem, 2vw, 1.9rem);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  margin-top: 0;       /* zruší defaultní horní mezeru */
-  margin-bottom: 1rem; /* řízená mezera pod h1 */
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
-/* .hello {
-  font-size: clamp(1.5rem, 2vw, 1.9rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin: 0 0 0.5rem 0;
-} */
-
 
 h2,
 h3 {
@@ -147,10 +137,3 @@ time {
   margin-top: 0.25rem;
 }
 
-/* ===============================
-   RECOMMENDED COLORS
-================================ */
-/* Soft pastels, modern palette: */
-/* #fdf7f0 → soft cream (neutral pastel) */
-/* #e0f7fa → light blue / aqua */
-/* #fff0f5 → very light lavender */
