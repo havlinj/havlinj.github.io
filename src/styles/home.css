@@ -4,14 +4,17 @@
   text-align: left;
   min-height: auto;
   max-width: var(--content-width);
-  margin: 1.1rem auto 0 auto;
-  padding: 3rem 0 4rem 0;
+  margin: 0 auto;
+  padding: 0 0 4rem 0;
   overflow: hidden;
 }
 
 .hero-bg {
   position: absolute;
-  inset: -10%;
+  top: 0;
+  right: -10%;
+  bottom: -10%;
+  left: -10%;
   z-index: 0;
   pointer-events: none;
 }
@@ -30,6 +33,7 @@
 .hero-content {
   position: relative;
   z-index: 1;
+  padding-top: 3rem; /* posun textů dolů, obraz zůstává 1rem pod Hello */
 }
 
 .hero-name {
@@ -50,7 +54,7 @@
 }
 
 .hero-header {
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .hero-header__inner {
@@ -84,6 +88,11 @@
   position: relative;
   z-index: 1;
   display: inline-block;
+}
+
+/* mezera mezi Hello (h1) a celou hero sekcí – jen na této stránce */
+h1 + .hero {
+  margin-top: 1.45rem;
 }
 
 .hero-name::before {
