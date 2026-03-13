@@ -124,7 +124,7 @@
 .hero-role span::before {
   content: '';
   position: absolute;
-  inset-block: -0.12em -0.12em;
+  inset-block: -0.08em -0.08em;
   inset-inline: -0.18em -0.12em;
   background-color: rgba(224, 247, 250, 0.96);
   z-index: -1;
