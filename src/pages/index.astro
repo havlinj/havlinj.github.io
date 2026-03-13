@@ -89,8 +89,19 @@ import '../styles/home.css';
 
           const container = roleEl;
           const minFont = 10;
-          const maxFont = 120;
+          let maxFont = 120;
           const precision = 0.1;
+
+          // nikdy nepřerůst hero-name
+          const heroNameEl = document.querySelector('.hero-name');
+          if (heroNameEl) {
+            const heroNameSize = parseFloat(
+              window.getComputedStyle(heroNameEl).fontSize || '0',
+            );
+            if (heroNameSize > 0) {
+              maxFont = Math.min(maxFont, heroNameSize * 0.5);
+            }
+          }
 
           let low = minFont;
           let high = maxFont;
@@ -121,6 +132,17 @@ import '../styles/home.css';
           spans.forEach((s) => {
             s.style.fontSize = best + 'px';
           });
+        });
+      }
+
+      let scheduledFit = false;
+      function scheduleHeroFit() {
+        if (scheduledFit) return;
+        scheduledFit = true;
+        window.requestAnimationFrame(() => {
+          scheduledFit = false;
+          fitAllHeroNames();
+          fitHeroRoles();
         });
       }
 
@@ -159,8 +181,7 @@ import '../styles/home.css';
       }
 
       const resizeObserver = new ResizeObserver(() => {
-        fitAllHeroNames();
-        fitHeroRoles();
+        scheduleHeroFit();
       });
 
       window.addEventListener('load', () => {
@@ -178,8 +199,11 @@ import '../styles/home.css';
       });
 
       window.addEventListener('resize', () => {
-        fitAllHeroNames();
-        fitHeroRoles();
+        scheduleHeroFit();
+      });
+
+      window.addEventListener('scroll', () => {
+        scheduleHeroFit();
       });
 
       if (document.fonts && document.fonts.ready) {

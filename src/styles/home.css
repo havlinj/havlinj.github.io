@@ -111,21 +111,11 @@
   position: relative;
 }
 
-.hero-role-line::before {
-  content: '';
-  position: absolute;
-  inset-block: -0.12em -0.12em;
-  left: -0.6rem;   /* výrazný přesah vlevo */
-  right: -0.3em;   /* jemný přesah vpravo */
-  background-color: rgba(224, 247, 250, 0.96);
-  z-index: 0;
-}
-
 .hero-role span {
   min-width: 0;
   margin: 0;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   line-height: 1;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -133,6 +123,15 @@
   text-align: left;
   position: relative;
   z-index: 1;
+}
+
+.hero-role span::before {
+  content: '';
+  position: absolute;
+  inset-block: -0.12em -0.12em;
+  inset-inline: -0.18em -0.12em;
+  background-color: rgba(224, 247, 250, 0.96);
+  z-index: -1;
 }
 
 .tagline {
