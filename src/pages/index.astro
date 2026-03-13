@@ -11,25 +11,133 @@ import '../styles/home.css';
       <a href="/contact" class="site-header__item site-nav__link">Contact</a>
     </div>
   </header>
-  <h1>
-    Hello
-  </h1>  
+  <h1>Hello</h1>
   <section class="hero">
-      <!-- <br/><span class="tagline">I am your specialist,</span><br/> -->
-      <section class="credentials">
-      <h1>Jan Havlín</h1>
-      <h2>Backend&nbsp;Architecture &amp;&nbsp;Systems</h2>
-      </section>
-    <!-- <p class="tagline">
-      Building reliable, fast and high-<span class="tagline__no-break"
-        >impact software</span
-      > from <span class="tagline__no-break">the ground up</span>
-    </p> -->
-    <!-- <p class="tagline">
-      <span class="tagline__no-break">Building reliable, fast and high-impact</span> software from <span class="tagline__no-break">the ground up</span>
-    </p> -->
+    <div class="hero-grid">
+      <div class="hero-name-box">
+        <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
+      </div>
+      <div class="hero-role">
+        <span>BACKEND ARCHITECTURE</span>
+        <span>& SYSTEMS</span>
+      </div>
+    </div>
     <p class="tagline">
       Building reliable, fast and high-impact software from the ground up
     </p>
   </section>
+  <script is:inline>
+    (function () {
+      function fitTextToContainer(textEl, options = {}) {
+        const container = textEl.parentElement;
+        if (!container) return;
+
+        const minFont = options.minFont ?? 16;
+        const maxFont = options.maxFont ?? 220;
+        const precision = options.precision ?? 0.25;
+
+        let low = minFont;
+        let high = maxFont;
+        let best = minFont;
+
+        textEl.style.fontSize = minFont + 'px';
+
+        while (high - low > precision) {
+          const mid = (low + high) / 2;
+          textEl.style.fontSize = mid + 'px';
+
+          if (textEl.scrollWidth <= container.clientWidth) {
+            best = mid;
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+
+        textEl.style.fontSize = best + 'px';
+      }
+
+      function fitAllHeroNames() {
+        document.querySelectorAll('[data-fit-text]').forEach((el) => {
+          fitTextToContainer(el, {
+            minFont: 16,
+            maxFont: 220,
+            precision: 0.1,
+          });
+        });
+      }
+
+      function fitHeroRoles() {
+        document.querySelectorAll('.hero-role').forEach((roleEl) => {
+          const spans = Array.from(roleEl.querySelectorAll('span'));
+          if (spans.length === 0) return;
+
+          const container = roleEl;
+          const minFont = 10;
+          const maxFont = 120;
+          const precision = 0.1;
+
+          let low = minFont;
+          let high = maxFont;
+          let best = minFont;
+
+          spans.forEach((s) => {
+            s.style.fontSize = minFont + 'px';
+          });
+
+          while (high - low > precision) {
+            const mid = (low + high) / 2;
+            spans.forEach((s) => {
+              s.style.fontSize = mid + 'px';
+            });
+
+            const fits = spans.every(
+              (s) => s.scrollWidth <= container.clientWidth,
+            );
+
+            if (fits) {
+              best = mid;
+              low = mid;
+            } else {
+              high = mid;
+            }
+          }
+
+          spans.forEach((s) => {
+            s.style.fontSize = best + 'px';
+          });
+        });
+      }
+
+      const resizeObserver = new ResizeObserver(() => {
+        fitAllHeroNames();
+        fitHeroRoles();
+      });
+
+      window.addEventListener('load', () => {
+        fitAllHeroNames();
+        fitHeroRoles();
+
+        document.querySelectorAll('.hero-name-box').forEach((box) => {
+          resizeObserver.observe(box);
+        });
+
+        document.querySelectorAll('.hero-role').forEach((box) => {
+          resizeObserver.observe(box);
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        fitAllHeroNames();
+        fitHeroRoles();
+      });
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          fitAllHeroNames();
+          fitHeroRoles();
+        });
+      }
+    })();
+  </script>
 </Layout>

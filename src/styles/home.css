@@ -7,14 +7,16 @@
   padding: 0 0 2.5rem 0;
 }
 
-.credentials {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.hero-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+  align-items: stretch;
 }
 
 .hero-header {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .hero-header__inner {
@@ -36,33 +38,58 @@
   justify-self: end;
 }
 
-.hero h1 {
-  font-size: clamp(2.6rem, 5vw, 3.6rem);
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  margin: 0.5rem 0 0.75rem 0;
+/* LEVÝ BLOK */
+.hero-name-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
-.hero h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0.08em;
+.hero-name {
+  margin: 0;
+  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* PRAVÝ BLOK */
+.hero-role {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  row-gap: 0.5rem;
+  align-items: stretch;
+}
+
+.hero-role span {
+  min-width: 0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin: 0 0 1.1rem 0;
-  opacity: 0.7;
+  text-align: left;
+  /* opacity: 0.6; */
+  /* velikost řídí JS (fitHeroRoles) */
 }
 
 .tagline {
-  font-size: clamp(1.25rem, 2vw, 1.7rem);
-  font-weight: 500;
+  font-size: clamp(2rem, 0.5rem + 2.5vw, 3rem);
+  font-weight: 600;
   line-height: 1.38;
   text-align: left; 
+  max-width: 40ch;
   letter-spacing: -0.015em;
-  margin: 1.25rem 0 0 0;
+  margin: 1.5rem 0 0 0;
 }
-
 
 .tagline__no-break {
   white-space: nowrap;
