@@ -178,11 +178,15 @@ h1 + .hero {
   background: linear-gradient(
     to bottom,
     #111 0%,
-    #111 12%,
-    #333 30%,
-    #555 55%,
-    #666 78%,
-    #888 100%
+    #111 8%,
+    #1c1c1c 18%,
+    #2a2a2a 28%,
+    #3a3a3a 40%,
+    #4d4d4d 52%,
+    #616161 65%,
+    #757575 78%,
+    #888 92%,
+    #8c8c8c 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -194,11 +198,16 @@ h1 + .hero {
   content: '';
   position: absolute;
   inset-block: 0.1em 0.00em;
-  inset-inline: -0.2em -0.2em;
+  inset-inline: 0.03em -0.2em;
   background: linear-gradient(
     to bottom,
     #e0f7fa 0%,
-    rgba(224, 247, 250, 1) 45%,
+    #e0f7fa 10%,
+    rgba(224, 247, 250, 1) 25%,
+    rgba(227, 248, 251, 1) 40%,
+    rgba(230, 249, 252, 1) 55%,
+    rgba(232, 250, 253, 1) 70%,
+    rgba(234, 251, 253, 1) 82%,
     rgba(235, 252, 254, 1) 100%
   );
   z-index: -1;
