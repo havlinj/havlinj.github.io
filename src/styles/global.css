@@ -13,10 +13,9 @@
    CSS VARIABLES
 ================================ */
 :root {
-  --content-min-width: 40ch; /* floor: don't squeeze below readable width */
-  --content-width: 70ch; /* max readable line length */
-  --hero-highlight-bg: rgba(224, 247, 250, 1); /* podklad pod hero texty */
-  /* Šířka překryvu vlevo na hero: vizuálně zarovná začátek obrázku s prvním písmem (font side bearing). Lze doladit. */
+  --content-min-width: 40ch;
+  --content-width: 70ch;
+  --hero-highlight-bg: rgba(224, 247, 250, 1);
   --hero-optical-offset: 0.10em;
 }
 
@@ -35,7 +34,7 @@ html {
     'Segoe UI',
     Roboto,
     sans-serif;
-  font-size: 16px; /* 1rem = 16px */
+  font-size: 16px;
   scroll-behavior: smooth;
 }
 
@@ -46,7 +45,7 @@ body {
   color: #111;
   line-height: 1.65;
   letter-spacing: 0.01em;
-  background-color: #e0f7fa; /* soft pastel background */
+  background-color: #e0f7fa;
 }
 
 /* ===============================
@@ -56,8 +55,8 @@ main,
 .content {
   min-width: var(--content-min-width);
   max-width: var(--content-width);
-  margin: 0 auto; /* horizontal centering */
-  padding: 2rem; /* padding from viewport edges */
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 /* ===============================
@@ -89,15 +88,15 @@ h1 {
 
 h2,
 h3 {
-  font-size: 1.5rem; /* 24px */
-  font-weight: 500; /* medium */
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 h4,
 h5,
 h6 {
-  font-size: 1.25rem; /* 20px */
-  font-weight: 400; /* regular */
+  font-size: 1.25rem;
+  font-weight: 400;
 }
 
 /* ===============================

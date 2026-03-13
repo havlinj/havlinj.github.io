@@ -105,7 +105,6 @@ import '../styles/home.css';
           const minFont = 10;
           const precision = 0.1;
 
-          // šířkové omezení: binární hledání maximální velikosti, která se vejde do šířky
           let low = minFont;
           let high = heroNameSize || 120;
           let bestWidth = minFont;
@@ -132,9 +131,8 @@ import '../styles/home.css';
             }
           }
 
-          // výškové omezení: jednoduchý poměr vůči jménu
-          const ratioLimitMax = 0.4; // horní hranice: role-font <= 40 % fontu jména
-          const ratioLimitMin = 0.3; // dolní hranice: role-font >= 30 % fontu jména
+          const ratioLimitMax = 0.4;
+          const ratioLimitMin = 0.3;
 
           let roleFont = bestWidth;
           if (heroNameSize) {
@@ -144,7 +142,6 @@ import '../styles/home.css';
 
           spans.forEach((s) => {
             s.style.fontSize = roleFont + 'px';
-            s.style.marginBottom = '';
           });
         });
       }
@@ -167,7 +164,7 @@ import '../styles/home.css';
         const img = hero.querySelector('.hero-bg__image');
         if (!img) return;
 
-        const maxTranslate = 24; // px
+        const maxTranslate = 24;
 
         function updateParallax() {
           const rect = hero.getBoundingClientRect();
