@@ -224,3 +224,22 @@ h1 + .hero {
   );
   z-index: -1;
 }
+
+/* Bottom-left corner: soft blend from full page color, masks sharp edge of rectangle */
+.tagline::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 12%;
+  height: 70%;
+  background: radial-gradient(
+    ellipse 100% 100% at 0% 100%,
+    #e0f7fa 0%,
+    #e0f7fa 28%,
+    rgba(224, 247, 250, 0.5) 52%,
+    transparent 68%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
