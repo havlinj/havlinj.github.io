@@ -7,13 +7,13 @@ import '../styles/home.css';
   <Fragment slot="head">
     <link rel="preload" href="/assets/hero/hero-bg.jpg" as="image" />
   </Fragment>
-  <header class="hero-header">
+  <nav class="hero-header" aria-label="Main navigation">
     <div class="hero-header__inner">
       <a href="/profile" class="site-header__item site-nav__link">Profile</a>
       <a href="/writing" class="site-header__item site-nav__link">Writing</a>
       <a href="/contact" class="site-header__item site-nav__link">Contact</a>
     </div>
-  </header>
+  </nav>
   <h1>Hi there</h1>
   <section class="hero">
     <div class="hero-top-edge" aria-hidden="true"></div>
@@ -64,10 +64,18 @@ import '../styles/home.css';
         horizontalFactor: 18,
         scale: 1.06,
       };
+      const SEL = {
+        hero: '.hero',
+        heroBgImage: '.hero-bg__image',
+        heroName: '.hero-name',
+        heroRole: '.hero-role',
+        heroNameBox: '.hero-name-box',
+        fitText: '[data-fit-text]',
+      };
 
       function showHeroWhenBgReady() {
-        const hero = document.querySelector('.hero');
-        const img = hero?.querySelector('.hero-bg__image');
+        const hero = document.querySelector(SEL.hero);
+        const img = hero?.querySelector(SEL.heroBgImage);
         if (!hero || !img) return;
         if (img.complete) hero.classList.add('is-loaded');
         else img.addEventListener('load', () => hero.classList.add('is-loaded'));
@@ -100,23 +108,23 @@ import '../styles/home.css';
       }
 
       function fitAllHeroNames() {
-        document.querySelectorAll('[data-fit-text]').forEach((el) => {
+        document.querySelectorAll(SEL.fitText).forEach((el) => {
           fitTextToContainer(el, {
-          minFont: FIT_TEXT.min,
-          maxFont: FIT_TEXT.max,
-          precision: FIT_TEXT.precision,
-        });
+            minFont: FIT_TEXT.min,
+            maxFont: FIT_TEXT.max,
+            precision: FIT_TEXT.precision,
+          });
         });
       }
 
       function fitHeroRoles() {
-        const heroNameEl = document.querySelector('.hero-name');
+        const heroNameEl = document.querySelector(SEL.heroName);
         if (!heroNameEl) return;
 
         const heroNameSize =
           parseFloat(getComputedStyle(heroNameEl).fontSize) || 0;
 
-        document.querySelectorAll('.hero-role').forEach((roleEl) => {
+        document.querySelectorAll(SEL.heroRole).forEach((roleEl) => {
           const spans = Array.from(roleEl.querySelectorAll('span'));
           if (spans.length === 0) return;
 
@@ -163,7 +171,7 @@ import '../styles/home.css';
       }
 
       function initHeroParallax(hero) {
-        const img = hero.querySelector('.hero-bg__image');
+        const img = hero.querySelector(SEL.heroBgImage);
         if (!img) return;
 
         function updateParallax() {
@@ -193,11 +201,11 @@ import '../styles/home.css';
       function onLoad() {
         fitAllHeroNames();
         fitHeroRoles();
-        const hero = document.querySelector('.hero');
+        const hero = document.querySelector(SEL.hero);
         if (hero) {
           initHeroParallax(hero);
           document
-            .querySelectorAll('.hero-name-box, .hero-role')
+            .querySelectorAll(`${SEL.heroNameBox}, ${SEL.heroRole}`)
             .forEach((el) => resizeObserver.observe(el));
         }
       }
