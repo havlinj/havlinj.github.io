@@ -185,28 +185,39 @@ h1 + .hero {
   max-width: 40ch;
   letter-spacing: 0.01em;
   margin-block-start: 2.2rem;
+  padding: 0.1em 0.2em 0 0.03em; /* match ::before inset so overflow clips halo to rectangle */
   position: relative;
   display: inline-block;
   z-index: 1;
   color: #111;
+  overflow: hidden;
+  /* Halo in global bg color: soft diffuse blur, clipped to tagline rectangle */
+  text-shadow:
+    0 0 0.8em #e0f7fa,
+    0 0 1.2em rgba(224, 247, 250, 0.88),
+    0 0 1.8em rgba(224, 247, 250, 0.5),
+    0 0 2.6em rgba(224, 247, 250, 0.22),
+    0 0 3.4em rgba(224, 247, 250, 0.06);
 }
 
-/* Same diagonal as tagline::before; subtle lightening toward bottom-right */
-.tagline__text {
+/* Diagonal: very mild lightening until late, then pronounced lift at bottom-right */
+/* .tagline__text {
   display: inline-block;
   background: linear-gradient(
     to bottom right,
     #0a0a0a 0%,
-    #111 25%,
-    #1a1a1a 50%,
-    #222 72%,
-    #2a2a2a 100%
+    #111 30%,
+    #151515 55%,
+    #181818 78%,
+    #252525 88%,
+    #353535 96%,
+    #444 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-}
+} */
 
 .tagline::before {
   content: '';
