@@ -190,48 +190,80 @@ h1 + .hero {
   display: inline-block;
   z-index: 1;
   color: #111;
+  /* Only fill top padding strip so no light line; rest transparent for ::before gradient */
+  background: linear-gradient(to bottom, #e0f7fa 0, #e0f7fa 0.1em, transparent 0.1em);
   overflow: hidden;
-  /* Halo in global bg color: soft diffuse blur, clipped to tagline rectangle */
-  text-shadow:
-    0 0 0.8em #e0f7fa,
-    0 0 1.2em rgba(224, 247, 250, 0.88),
-    0 0 1.8em rgba(224, 247, 250, 0.5),
-    0 0 2.6em rgba(224, 247, 250, 0.22),
-    0 0 3.4em rgba(224, 247, 250, 0.06);
 }
 
-/* Diagonal: very mild lightening until late, then pronounced lift at bottom-right */
-/* .tagline__text {
-  display: inline-block;
-  background: linear-gradient(
-    to bottom right,
-    #0a0a0a 0%,
-    #111 30%,
-    #151515 55%,
-    #181818 78%,
-    #252525 88%,
-    #353535 96%,
-    #444 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Glow wrapper: behind text, children flow so last line can have its own glow */
+.tagline__glow-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tagline__glow {
   color: transparent;
-} */
+  text-shadow:
+    0 0 0.4em #e0f7fa,
+    0 0 0.8em #e0f7fa,
+    0 0 1.2em #e0f7fa,
+    0 0 1.8em #e0f7fa,
+    0 0 2.4em #e0f7fa,
+    0 0 3em #e0f7fa;
+}
+
+/* Last line only: stronger band + intensity, dosvit 15em, biased right */
+.tagline__glow--last {
+  color: transparent;
+  text-shadow:
+    0 0 0.45em #e0f7fa,
+    0 0 1em #e0f7fa,
+    0 0 1.65em #e0f7fa,
+    0 0 2.4em #e0f7fa,
+    0.25em 0 2.5em #e0f7fa,
+    0.55em 0 3.2em rgba(224, 247, 250, 0.98),
+    0.9em 0 4em rgba(224, 247, 250, 0.96),
+    1.3em 0 5em rgba(224, 247, 250, 0.92),
+    1.75em 0 6.1em rgba(224, 247, 250, 0.87),
+    2.25em 0 7.3em rgba(224, 247, 250, 0.82),
+    2.8em 0 8.6em rgba(224, 247, 250, 0.75),
+    3.4em 0 10em rgba(224, 247, 250, 0.67),
+    4.05em 0 11.5em rgba(224, 247, 250, 0.58),
+    4.75em 0 13.2em rgba(224, 247, 250, 0.49),
+    5.5em 0 15em rgba(224, 247, 250, 0.4),
+    6.3em 0 16.8em rgba(224, 247, 250, 0.31),
+    7.15em 0 18.8em rgba(224, 247, 250, 0.22),
+    8.05em 0 20.8em rgba(224, 247, 250, 0.13),
+    9em 0 22.8em rgba(224, 247, 250, 0.06);
+}
+
+/* Tagline text: solid #111 on top, no shadow */
+.tagline__text {
+  position: relative;
+  z-index: 1;
+  color: #111;
+}
 
 .tagline::before {
   content: '';
   position: absolute;
   inset-block: 0.1em 0.00em;
   inset-inline: 0.03em -0.2em;
-  /* Transparency goes down, strongest in bottom-right corner */
+  /* Top-left less transparent; fade toward bottom-right */
   background: linear-gradient(
     to bottom right,
     rgba(224, 247, 250, 1) 0%,
-    rgba(224, 247, 250, 1) 35%,
-    rgba(224, 247, 250, 0.92) 55%,
-    rgba(224, 247, 250, 0.8) 75%,
-    rgba(224, 247, 250, 0.65) 100%
+    rgba(224, 247, 250, 1) 22%,
+    rgba(224, 247, 250, 0.97) 38%,
+    rgba(224, 247, 250, 0.9) 52%,
+    rgba(224, 247, 250, 0.78) 65%,
+    rgba(224, 247, 250, 0.64) 76%,
+    rgba(224, 247, 250, 0.48) 86%,
+    rgba(224, 247, 250, 0.3) 94%,
+    rgba(224, 247, 250, 0.14) 100%
   );
   z-index: -1;
 }
