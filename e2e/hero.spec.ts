@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
+import type { Page } from '@playwright/test';
+import { LAYOUT_TOLERANCE } from './constants';
+
+/** Wait for hero to become visible (image loaded, .is-loaded applied). */
+async function waitForHeroLoaded(page: Page) {
+  await page
+    .locator('section.hero.is-loaded')
+    .waitFor({ state: 'visible', timeout: 15000 });
+}
 
 test.describe('Hero page (/)', () => {
   test('has hero-header with Profile, Writing, Contact links in one row', async ({
@@ -20,12 +28,18 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.site-header')).not.toBeVisible();
   });
 
-  test('has hero section with heading Jan Havlín', async ({ page }) => {
+  test('has intro heading "Hi there" and hero section with name Jan Havlín', async ({
+    page,
+  }) => {
     await page.goto('/');
     await expect(
-      page.getByRole('heading', { name: 'Jan Havlín', level: 1 }),
+      page.getByRole('heading', { name: 'Hi there', level: 1 }),
     ).toBeVisible();
     await expect(page.locator('section.hero')).toBeVisible();
+    await waitForHeroLoaded(page);
+    const heroName = page.locator('.hero-name');
+    await expect(heroName).toBeVisible();
+    await expect(heroName).toContainText('Jan Havlín');
   });
 
   test('hero-header links point to correct pages', async ({ page }) => {
@@ -70,64 +84,67 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('main.content')).toBeVisible();
   });
 
-  test('h1, h2, tagline are visible and spaced with proper gaps', async ({
+  test('hero wrap contains hero section and footer, tagline and role visible', async ({
     page,
   }) => {
     await page.goto('/');
-    const header = page.locator('.hero-header');
-    const h1 = page.getByRole('heading', { name: 'Jan Havlín', level: 1 });
-    const h2 = page.getByRole('heading', {
-      name: 'Backend Architecture & Systems',
-      level: 2,
-    });
-    const tagline = page.locator('.tagline');
-    await expect(header).toBeVisible();
-    await expect(h1).toBeVisible();
-    await expect(h2).toBeVisible();
-    await expect(tagline).toBeVisible();
-    await expect(tagline).toHaveText(
-      'Building reliable, fast and high-impact software from the ground up',
+    await waitForHeroLoaded(page);
+    const wrap = page.locator('.hero-wrap');
+    await expect(wrap).toBeVisible();
+    await expect(wrap.locator('section.hero')).toBeVisible();
+    await expect(wrap.locator('footer.hero-footer')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Hi there', level: 1 }),
+    ).toBeVisible();
+    await expect(page.locator('.hero-name')).toBeVisible();
+    await expect(page.locator('.hero-role')).toBeVisible();
+    await expect(page.locator('.hero-role')).toContainText(
+      'BACKEND ARCHITECTURE',
     );
-    const hBox = await header.boundingBox();
-    const h1Box = await h1.boundingBox();
-    const h2Box = await h2.boundingBox();
-    const tBox = await tagline.boundingBox();
-    expect(hBox).toBeTruthy();
-    expect(h1Box).toBeTruthy();
-    expect(h2Box).toBeTruthy();
-    expect(tBox).toBeTruthy();
-    const gapHeaderToH1 = h1Box!.y - (hBox!.y + hBox!.height);
-    const gapH1ToH2 = h2Box!.y - (h1Box!.y + h1Box!.height);
-    const gapH2ToTagline = tBox!.y - (h2Box!.y + h2Box!.height);
-    expect(gapHeaderToH1).toBeGreaterThanOrEqual(MIN_GAP);
-    expect(gapHeaderToH1).toBeLessThanOrEqual(MAX_GAP);
-    expect(gapH1ToH2).toBeGreaterThanOrEqual(MIN_GAP);
-    expect(gapH1ToH2).toBeLessThanOrEqual(MAX_GAP);
-    expect(gapH2ToTagline).toBeGreaterThanOrEqual(MIN_GAP);
-    expect(gapH2ToTagline).toBeLessThanOrEqual(MAX_GAP);
+    await expect(page.locator('.hero-role')).toContainText('& SYSTEMS');
+    const tagline = page.locator('.tagline');
+    await expect(tagline).toBeVisible();
+    await expect(tagline).toContainText('Building reliable');
+    await expect(tagline).toContainText('from the ground up');
+  });
+
+  test('hero has figure with background image and caption', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await waitForHeroLoaded(page);
+    const figure = page.locator('.hero-figure');
+    await expect(figure).toBeVisible();
+    await expect(figure.locator('.hero-bg__image')).toBeVisible();
+    await expect(figure.locator('img[alt="Intro background"]')).toBeVisible();
+    await expect(figure.locator('.hero-caption')).toContainText(
+      'AltumCode / Unsplash',
+    );
+  });
+
+  test('hero footer shows copyright', async ({ page }) => {
+    await page.goto('/');
+    const footer = page.locator('.hero-footer');
+    await expect(footer).toBeVisible();
+    await expect(footer).toContainText('© 2026 Jan Havlín');
+  });
+
+  test('hero-role shows two lines (BACKEND ARCHITECTURE, & SYSTEMS)', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await waitForHeroLoaded(page);
+    const role = page.locator('.hero-role');
+    await expect(role).toBeVisible();
+    const spans = role.locator('span');
+    await expect(spans).toHaveCount(2);
+    await expect(spans.nth(0)).toHaveText('BACKEND ARCHITECTURE');
+    await expect(spans.nth(1)).toHaveText('& SYSTEMS');
   });
 
   test('hero section - last screenshot matches', async ({ page }) => {
     await page.goto('/');
+    await waitForHeroLoaded(page);
     await expect(page).toHaveScreenshot('hero-section.png');
-  });
-
-  test('h2 wraps to two lines at moderate narrow viewport', async ({
-    page,
-  }) => {
-    // 520px: realistic small tablet / large phone, content not overly squeezed
-    await page.setViewportSize({ width: 520, height: 800 });
-    await page.goto('/');
-    const h2 = page.getByRole('heading', {
-      name: 'Backend Architecture & Systems',
-      level: 2,
-    });
-    await expect(h2).toBeVisible();
-    const lineCount = await h2.evaluate((el) => {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      return range.getClientRects().length;
-    });
-    expect(lineCount).toBe(2);
   });
 });
