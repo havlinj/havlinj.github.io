@@ -15,37 +15,45 @@ import '../styles/home.css';
     </div>
   </nav>
   <h1>Hi there</h1>
-  <section class="hero">
-    <div class="hero-top-edge" aria-hidden="true"></div>
-    <div class="hero-bg" aria-hidden="true">
-      <img
-        src="/assets/hero/hero-bg.jpg"
-        alt=""
-        class="hero-bg__image"
-        fetchpriority="high"
-        decoding="async"
-      />
-    </div>
+  <div class="hero-wrap">
+    <section class="hero">
+      <div class="hero-top-edge" aria-hidden="true"></div>
+      <figure class="hero-figure">
+        <div class="hero-bg" aria-hidden="true">
+          <img
+            src="/assets/hero/hero-bg.jpg"
+            alt="Intro background"
+            class="hero-bg__image"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        <figcaption class="hero-caption">Photo: AltumCode / Unsplash</figcaption>
+      </figure>
 
-    <div class="hero-content">
-      <div class="hero-grid">
-        <div class="hero-name-box">
-          <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
+      <div class="hero-content">
+        <div class="hero-grid">
+          <div class="hero-name-box">
+            <h1 class="hero-name" data-fit-text>Jan Havlín</h1>
+          </div>
+          <div class="hero-role">
+            <span>BACKEND ARCHITECTURE</span>
+            <span>& SYSTEMS</span>
+          </div>
         </div>
-        <div class="hero-role">
-          <span>BACKEND ARCHITECTURE</span>
-          <span>& SYSTEMS</span>
-        </div>
+        <p class="tagline">
+          <span class="tagline__glow-wrap" aria-hidden="true">
+            <span class="tagline__glow">Building reliable,<br>fast and high-impact<br>software<br></span>
+            <span class="tagline__glow tagline__glow--last">from the ground up</span>
+          </span>
+          <span class="tagline__text">Building reliable,<br>fast and high-impact<br>software<br>from the ground up</span>
+        </p>
       </div>
-      <p class="tagline">
-        <span class="tagline__glow-wrap" aria-hidden="true">
-          <span class="tagline__glow">Building reliable,<br>fast and high-impact<br>software<br></span>
-          <span class="tagline__glow tagline__glow--last">from the ground up</span>
-        </span>
-        <span class="tagline__text">Building reliable,<br>fast and high-impact<br>software<br>from the ground up</span>
-      </p>
-    </div>
-  </section>
+    </section>
+    <footer class="hero-footer">
+      <p>© 2026 Jan Havlín</p>
+    </footer>
+  </div>
   <script is:inline>
     (function () {
       'use strict';

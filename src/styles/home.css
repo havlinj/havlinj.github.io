@@ -1,7 +1,13 @@
-.hero {
-  position: relative;
+/* Wrapper: same width as hero so footer aligns to hero’s right edge */
+.hero-wrap {
+  width: 100%;
   max-width: var(--content-width);
   margin: 0 auto;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
   padding-bottom: 4rem;
   overflow: hidden;
   opacity: 0;
@@ -12,13 +18,20 @@
   opacity: 1;
 }
 
-.hero-bg {
+.hero-figure {
   position: absolute;
   top: 0;
   right: -15%;
   bottom: 0;
   left: -20%;
   z-index: 0;
+  pointer-events: none;
+  margin: 0;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
@@ -43,6 +56,32 @@
   transform: translate3d(0, 0, 0) scale(1.1);
   transform-origin: center;
   transition: transform 0.3s ease-in-out;
+}
+
+/* Caption: right edge of hero (figure overflows 15%) → ~11% + offset */
+.hero-caption {
+  position: absolute;
+  bottom: 0.5rem;
+  right: calc(11% + 0.5rem);
+  left: auto;
+  text-align: right;
+  font-size: 0.5rem;
+  color: var(--color-page-bg);
+  margin: 0;
+}
+
+.hero-footer {
+  width: 100%;
+  padding: 0.5rem 0 2rem 0;
+  text-align: right;
+  font-size: 0.5rem;
+  color: #111;
+  opacity: 0.7;
+}
+
+.hero-footer p {
+  margin: 0;
+  padding-right: 0.5rem;
 }
 
 .hero-content {
@@ -105,7 +144,7 @@
   display: inline-block;
 }
 
-h1 + .hero {
+h1 + .hero-wrap {
   margin-top: 1.35rem;
 }
 
