@@ -185,13 +185,22 @@ h1 + .hero {
   max-width: 40ch;
   letter-spacing: 0.01em;
   margin-block-start: 2.2rem;
-  padding: 0.1em 0.2em 0 0.03em; /* match ::before inset so overflow clips halo to rectangle */
+  padding: 0.1em 0.2em 0.18em 0.03em; /* match ::before inset + bottom so extended rectangle isn't clipped */
   position: relative;
   display: inline-block;
   z-index: 1;
   color: #111;
-  /* Only fill top padding strip so no light line; rest transparent for ::before gradient */
-  background: linear-gradient(to bottom, #e0f7fa 0, #e0f7fa 0.1em, transparent 0.1em);
+  /* Top strip: fades down and to the right so top-right doesn’t stick out */
+  background: linear-gradient(
+    to bottom right,
+    #e0f7fa 0%,
+    #e0f7fa 55%,
+    rgba(224, 247, 250, 0.6) 60%,
+    rgba(224, 247, 250, 0.3) 88%,
+    transparent 100%
+  );
+  background-size: 100% 1em;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
@@ -250,7 +259,7 @@ h1 + .hero {
 .tagline::before {
   content: '';
   position: absolute;
-  inset-block: 0.1em 0.00em;
+  inset-block: 0.1em -0.18em; /* bottom: -0.18em extends rectangle downward */
   inset-inline: 0.03em -0.2em;
   /* Solid first third, then more transparent toward bottom-right */
   background: linear-gradient(
