@@ -145,10 +145,9 @@ import '../styles/home.css';
         });
       }
 
-      function initHeroParallax() {
-        const hero = document.querySelector('.hero');
-        const img = hero?.querySelector('.hero-bg__image');
-        if (!hero || !img) return;
+      function initHeroParallax(hero) {
+        const img = hero.querySelector('.hero-bg__image');
+        if (!img) return;
 
         const maxTranslate = 24;
         function updateParallax() {
@@ -176,10 +175,13 @@ import '../styles/home.css';
       function onLoad() {
         fitAllHeroNames();
         fitHeroRoles();
-        initHeroParallax();
-        document
-          .querySelectorAll('.hero-name-box, .hero-role')
-          .forEach((el) => resizeObserver.observe(el));
+        const hero = document.querySelector('.hero');
+        if (hero) {
+          initHeroParallax(hero);
+          document
+            .querySelectorAll('.hero-name-box, .hero-role')
+            .forEach((el) => resizeObserver.observe(el));
+        }
       }
 
       window.addEventListener('load', onLoad);

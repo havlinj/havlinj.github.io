@@ -28,28 +28,10 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--hero-optical-offset);
-  background: #e0f7fa;
+  background: var(--hero-highlight-bg);
   z-index: 1;
   pointer-events: none;
 }
-
-/* .hero-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  Top: elliptical fade from top edge; bottom: long fade
-  background:
-    radial-gradient(
-      ellipse 100% 50% at 5% 0%,
-      #e0f7fa 0%,
-      rgba(224, 247, 250, 0.9) 10%,
-      rgba(168, 168, 168, 0.7) 32%,
-      rgba(224, 247, 250, 0.25) 40%,
-      transparent 100%
-    ),
-    linear-gradient(to bottom, transparent 50%, #e0f7fa 100%);
-  pointer-events: none;
-} */
 
 .hero-bg__image {
   width: 100%;
@@ -134,7 +116,7 @@ h1 + .hero {
   left: 0;
   right: 0;
   height: 0.25rem;
-  background-color: #e0f7fa;
+  background-color: var(--hero-highlight-bg);
   z-index: 1;
   pointer-events: none;
 }
@@ -193,8 +175,8 @@ h1 + .hero {
   /* Top strip: fades down and to the right so top-right doesn’t stick out */
   background: linear-gradient(
     to bottom right,
-    #e0f7fa 0%,
-    #e0f7fa 55%,
+    var(--hero-highlight-bg) 0%,
+    var(--hero-highlight-bg) 55%,
     rgba(224, 247, 250, 0.6) 60%,
     rgba(224, 247, 250, 0.3) 88%,
     transparent 100%
@@ -216,23 +198,23 @@ h1 + .hero {
 .tagline__glow {
   color: transparent;
   text-shadow:
-    0 0 0.4em #e0f7fa,
-    0 0 0.8em #e0f7fa,
-    0 0 1.2em #e0f7fa,
-    0 0 1.8em #e0f7fa,
-    0 0 2.4em #e0f7fa,
-    0 0 3em #e0f7fa;
+    0 0 0.4em var(--hero-highlight-bg),
+    0 0 0.8em var(--hero-highlight-bg),
+    0 0 1.2em var(--hero-highlight-bg),
+    0 0 1.8em var(--hero-highlight-bg),
+    0 0 2.4em var(--hero-highlight-bg),
+    0 0 3em var(--hero-highlight-bg);
 }
 
 /* Last line only: stronger band + intensity, dosvit 15em, biased right */
 .tagline__glow--last {
   color: transparent;
   text-shadow:
-    0 0 0.45em #e0f7fa,
-    0 0 1em #e0f7fa,
-    0 0 1.65em #e0f7fa,
-    0 0 2.4em #e0f7fa,
-    0.25em 0 2.5em #e0f7fa,
+    0 0 0.45em var(--hero-highlight-bg),
+    0 0 1em var(--hero-highlight-bg),
+    0 0 1.65em var(--hero-highlight-bg),
+    0 0 2.4em var(--hero-highlight-bg),
+    0.25em 0 2.5em var(--hero-highlight-bg),
     0.55em 0 3.2em rgba(224, 247, 250, 0.98),
     0.9em 0 4em rgba(224, 247, 250, 0.96),
     1.3em 0 5em rgba(224, 247, 250, 0.92),
@@ -286,9 +268,9 @@ h1 + .hero {
   height: 100%;
   background: radial-gradient(
     ellipse 100% 100% at 0% 100%,
-    #e0f7fa 0%,
-    #e0f7fa 45%,
-    #e0f7fa 55%,
+    var(--hero-highlight-bg) 0%,
+    var(--hero-highlight-bg) 45%,
+    var(--hero-highlight-bg) 55%,
     rgba(224, 247, 250, 0.88) 68%,
     rgba(224, 247, 250, 0.6) 78%,
     rgba(224, 247, 250, 0.3) 88%,
