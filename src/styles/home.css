@@ -252,36 +252,38 @@ h1 + .hero {
   position: absolute;
   inset-block: 0.1em 0.00em;
   inset-inline: 0.03em -0.2em;
-  /* Top-left less transparent; fade toward bottom-right */
+  /* Solid first third, then more transparent toward bottom-right */
   background: linear-gradient(
     to bottom right,
     rgba(224, 247, 250, 1) 0%,
-    rgba(224, 247, 250, 1) 22%,
-    rgba(224, 247, 250, 0.97) 38%,
-    rgba(224, 247, 250, 0.9) 52%,
-    rgba(224, 247, 250, 0.78) 65%,
-    rgba(224, 247, 250, 0.64) 76%,
-    rgba(224, 247, 250, 0.48) 86%,
-    rgba(224, 247, 250, 0.3) 94%,
-    rgba(224, 247, 250, 0.14) 100%
+    rgba(224, 247, 250, 1) 32%,
+    rgba(224, 247, 250, 0.92) 45%,
+    rgba(224, 247, 250, 0.78) 58%,
+    rgba(224, 247, 250, 0.58) 70%,
+    rgba(224, 247, 250, 0.60) 75%,
+    rgba(224, 247, 250, 0.54) 90%,
+    rgba(224, 247, 250, 0.70) 100%
   );
   z-index: -1;
 }
 
-/* Bottom-left corner: soft blend from full page color, masks sharp edge of rectangle */
+/* Bottom-left: full color along axis, then smooth fade */
 .tagline::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 12%;
-  height: 70%;
+  width: 30%;
+  height: 100%;
   background: radial-gradient(
     ellipse 100% 100% at 0% 100%,
     #e0f7fa 0%,
-    #e0f7fa 28%,
-    rgba(224, 247, 250, 0.5) 52%,
-    transparent 68%
+    #e0f7fa 45%,
+    #e0f7fa 55%,
+    rgba(224, 247, 250, 0.88) 68%,
+    rgba(224, 247, 250, 0.6) 78%,
+    rgba(224, 247, 250, 0.3) 88%,
+    transparent 100%
   );
   z-index: -1;
   pointer-events: none;
