@@ -10,6 +10,17 @@ async function waitForHeroLoaded(page: Page) {
 }
 
 test.describe('Hero page (/)', () => {
+  test('has correct page title', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveTitle('Jan Havlín');
+  });
+
+  test('hero-header nav has accessible label', async ({ page }) => {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    await expect(nav).toBeVisible();
+  });
+
   test('has hero-header with Profile, Writing, Contact links in one row', async ({
     page,
   }) => {
@@ -47,6 +58,12 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.hero-header a[href="/profile"]')).toBeVisible();
     await expect(page.locator('.hero-header a[href="/writing"]')).toBeVisible();
     await expect(page.locator('.hero-header a[href="/contact"]')).toBeVisible();
+  });
+
+  test('hero-header Profile link navigates to /profile', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Profile' }).click();
+    await expect(page).toHaveURL(/\/profile$/);
   });
 
   test('hero-header: Profile left, Writing center, Contact right', async ({
