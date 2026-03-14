@@ -17,7 +17,7 @@
   --content-width: 70ch;
   --color-page-bg: #e0f7fa;
   --hero-highlight-bg: var(--color-page-bg);
-  --hero-optical-offset: 0.10em;
+  --hero-optical-offset: 0.1em;
 }
 
 /* ===============================
@@ -138,4 +138,3 @@ time {
   color: #666;
   margin-top: 0.25rem;
 }
-

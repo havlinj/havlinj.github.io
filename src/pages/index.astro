@@ -28,7 +28,9 @@ import '../styles/home.css';
             decoding="async"
           />
         </div>
-        <figcaption class="hero-caption">Photo: AltumCode / Unsplash</figcaption>
+        <figcaption class="hero-caption">
+          Photo: AltumCode / Unsplash
+        </figcaption>
       </figure>
 
       <div class="hero-content">
@@ -43,10 +45,18 @@ import '../styles/home.css';
         </div>
         <p class="tagline">
           <span class="tagline__glow-wrap" aria-hidden="true">
-            <span class="tagline__glow">Building reliable,<br>fast and high-impact<br>software<br></span>
-            <span class="tagline__glow tagline__glow--last">from the ground up</span>
+            <span class="tagline__glow"
+              >Building reliable,<br />fast and high-impact<br />software<br
+              /></span
+            >
+            <span class="tagline__glow tagline__glow--last"
+              >from the ground up</span
+            >
           </span>
-          <span class="tagline__text">Building reliable,<br>fast and high-impact<br>software<br>from the ground up</span>
+          <span class="tagline__text"
+            >Building reliable,<br />fast and high-impact<br />software<br
+            />from the ground up</span
+          >
         </p>
       </div>
     </section>
@@ -86,7 +96,8 @@ import '../styles/home.css';
         const img = hero?.querySelector(SEL.heroBgImage);
         if (!hero || !img) return;
         if (img.complete) hero.classList.add('is-loaded');
-        else img.addEventListener('load', () => hero.classList.add('is-loaded'));
+        else
+          img.addEventListener('load', () => hero.classList.add('is-loaded'));
       }
       showHeroWhenBgReady();
 
@@ -148,7 +159,7 @@ import '../styles/home.css';
             const mid = (low + high) / 2;
             spans.forEach((s) => (s.style.fontSize = mid + 'px'));
             const fits = spans.every(
-              (s) => s.scrollWidth <= roleEl.clientWidth
+              (s) => s.scrollWidth <= roleEl.clientWidth,
             );
             if (fits) {
               bestWidth = mid;
@@ -184,19 +195,18 @@ import '../styles/home.css';
 
         function updateParallax() {
           const rect = hero.getBoundingClientRect();
-          const vh = window.innerHeight || document.documentElement.clientHeight;
+          const vh =
+            window.innerHeight || document.documentElement.clientHeight;
           if (vh === 0) return;
 
           const rawProgress = 1 - rect.top / vh;
           const clamped = Math.min(1, Math.max(0, rawProgress));
-          const scrollOffset =
-            (clamped - 0.5) * 2 * PARALLAX.maxTranslate;
+          const scrollOffset = (clamped - 0.5) * 2 * PARALLAX.maxTranslate;
           const vw = window.innerWidth || document.documentElement.clientWidth;
           const horizontalOffset =
             (vw / PARALLAX.viewportRefWidth - 1) * PARALLAX.horizontalFactor;
 
-          img.style.transform =
-            `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(${PARALLAX.scale})`;
+          img.style.transform = `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(${PARALLAX.scale})`;
         }
 
         updateParallax();
