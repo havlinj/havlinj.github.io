@@ -37,7 +37,17 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 50%, #e0f7fa 100%);
+  /* Top: elliptical fade from top edge; bottom: long fade */
+  background:
+    radial-gradient(
+      ellipse 100% 50% at 5% 0%,
+      #e0f7fa 0%,
+      rgba(224, 247, 250, 0.9) 10%,
+      rgba(168, 168, 168, 0.7) 32%,
+      rgba(224, 247, 250, 0.25) 40%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent 50%, #e0f7fa 100%);
   pointer-events: none;
 }
 
@@ -115,6 +125,18 @@
 
 h1 + .hero {
   margin-top: 1.35rem;
+}
+
+/* Bar 1rem below "Hi there": global background, sharp top edge for image */
+.hero-top-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.25rem;
+  background-color: #e0f7fa;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .hero-name::before {
