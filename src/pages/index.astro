@@ -50,6 +50,21 @@ import '../styles/home.css';
     (function () {
       'use strict';
 
+      const FIT_TEXT = { min: 16, max: 220, precision: 0.1 };
+      const FIT_ROLE = {
+        minFont: 10,
+        precision: 0.1,
+        highCapFallback: 120,
+        ratioMax: 0.4,
+        ratioMin: 0.3,
+      };
+      const PARALLAX = {
+        maxTranslate: 24,
+        viewportRefWidth: 1200,
+        horizontalFactor: 18,
+        scale: 1.06,
+      };
+
       function showHeroWhenBgReady() {
         const hero = document.querySelector('.hero');
         const img = hero?.querySelector('.hero-bg__image');
@@ -63,8 +78,8 @@ import '../styles/home.css';
         const container = textEl.parentElement;
         if (!container) return;
 
-        const minFont = options.minFont ?? 16;
-        const maxFont = options.maxFont ?? 220;
+        const minFont = options.minFont ?? FIT_TEXT.min;
+        const maxFont = options.maxFont ?? FIT_TEXT.max;
         const precision = options.precision ?? 0.25;
         let low = minFont;
         let high = maxFont;
@@ -86,7 +101,11 @@ import '../styles/home.css';
 
       function fitAllHeroNames() {
         document.querySelectorAll('[data-fit-text]').forEach((el) => {
-          fitTextToContainer(el, { minFont: 16, maxFont: 220, precision: 0.1 });
+          fitTextToContainer(el, {
+          minFont: FIT_TEXT.min,
+          maxFont: FIT_TEXT.max,
+          precision: FIT_TEXT.precision,
+        });
         });
       }
 
@@ -101,9 +120,9 @@ import '../styles/home.css';
           const spans = Array.from(roleEl.querySelectorAll('span'));
           if (spans.length === 0) return;
 
-          const minFont = 10;
-          const precision = 0.1;
-          const highCap = heroNameSize || 120;
+          const minFont = FIT_ROLE.minFont;
+          const precision = FIT_ROLE.precision;
+          const highCap = heroNameSize || FIT_ROLE.highCapFallback;
           let low = minFont;
           let high = highCap;
           let bestWidth = minFont;
@@ -123,12 +142,10 @@ import '../styles/home.css';
             }
           }
 
-          const ratioLimitMax = 0.4;
-          const ratioLimitMin = 0.3;
           let roleFont = bestWidth;
           if (heroNameSize) {
-            roleFont = Math.min(roleFont, heroNameSize * ratioLimitMax);
-            roleFont = Math.max(roleFont, heroNameSize * ratioLimitMin);
+            roleFont = Math.min(roleFont, heroNameSize * FIT_ROLE.ratioMax);
+            roleFont = Math.max(roleFont, heroNameSize * FIT_ROLE.ratioMin);
           }
           spans.forEach((s) => (s.style.fontSize = roleFont + 'px'));
         });
@@ -149,7 +166,6 @@ import '../styles/home.css';
         const img = hero.querySelector('.hero-bg__image');
         if (!img) return;
 
-        const maxTranslate = 24;
         function updateParallax() {
           const rect = hero.getBoundingClientRect();
           const vh = window.innerHeight || document.documentElement.clientHeight;
@@ -157,12 +173,14 @@ import '../styles/home.css';
 
           const rawProgress = 1 - rect.top / vh;
           const clamped = Math.min(1, Math.max(0, rawProgress));
-          const scrollOffset = (clamped - 0.5) * 2 * maxTranslate;
+          const scrollOffset =
+            (clamped - 0.5) * 2 * PARALLAX.maxTranslate;
           const vw = window.innerWidth || document.documentElement.clientWidth;
-          const horizontalOffset = (vw / 1200 - 1) * 18;
+          const horizontalOffset =
+            (vw / PARALLAX.viewportRefWidth - 1) * PARALLAX.horizontalFactor;
 
           img.style.transform =
-            `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(1.06)`;
+            `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(${PARALLAX.scale})`;
         }
 
         updateParallax();
