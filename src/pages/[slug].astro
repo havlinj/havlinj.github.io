@@ -23,7 +23,31 @@ const activeSection = profileSlugs.includes(slug)
 ---
 
 <Layout title={page.data.title} activeSection={activeSection}>
-  <article>
+  {slug === 'profile' && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      href="/assets/pages/profile/bg.jpg"
+    />
+  )}
+  <article
+    style={
+      slug === 'profile'
+        ? {
+            '--page-button-bg': "url('/assets/pages/profile/bg.jpg')",
+            /* Optional: shift which part of the image is visible (default 50% = center). Example: '40%' or '60%' */
+            '--page-button-bg-pos-x': '10%',
+            /* Optional: how “far” the image appears. 1 = default; < 1 = further away; > 1 = closer */
+            '--page-button-bg-zoom': '0.08',
+            /* Optional: image filters (1 = default). e.g. saturation 1.2, brightness 0.9, contrast 1.1 */
+            '--page-button-bg-saturation': '3',
+            '--page-button-bg-brightness': '1.5',
+            '--page-button-bg-contrast': '2',
+          }
+        : undefined
+    }
+  >
     <h1>{page.data.title}</h1>
     <Content />
   </article>

@@ -1,0 +1,117 @@
+---
+description: Unified style and node rules for the site (body buttons, typography, layout)
+alwaysApply: true
+---
+
+# General style and node rules
+
+This document records the unified design decisions for the site. Keep it as the single source of truth for cross-page styling conventions.
+
+---
+
+## Site-wide design principles
+
+- **Minimal**: One font, one text color (#111), one global background colour. Sparse imagery; text-first.
+- **Structure**: Top navigation, then simple heading + content. Same skeleton and page tree everywhere.
+
+---
+
+## Unified body-button style
+
+A recurring element across all non-hero pages: **body buttons** (and article labels that act as buttons). These are distinct from clickable labels in the header navigation. The style ties the hero's strong colour to the rest of the site by reusing the same visual language (photo underlay, gradient overlay, halo text).
+
+### Where it applies
+
+- **Profile page**: All buttons (e.g. Intro, Professional, Personal).
+- **Writing page**: All article/label links in the post list.
+- **Contact page**: Only the **Send** button in the form. Explicitly **excluded**: any future external-website links (e.g. two planned links); those must not use this style.
+
+### Visual and layout rules
+
+1. **Shape and border**
+   - Rectangular area, sharp corners (no border-radius).
+   - Border: **slightly softened** line at **0.7 opacity** (e.g. `rgba(17, 17, 17, 0.7)`).
+   - Use both **min-height** and **max-height** so buttons stay compact (e.g. min 1.75rem, max 2rem).
+
+2. **Background**
+   - One background image **per page**; image path: `public/assets/pages/<page-identifier>/` with a conventional filename (e.g. `bg.jpg`). Place the image in that folder; the code references it by URL.
+   - Image is **only ever visible inside the button frames**—never elsewhere on the page.
+   - **Vertically repeated** (`repeat-y`); horizontal position tunable via `--page-button-bg-pos-x` (e.g. `50%` = center).
+   - **Each button shows a different vertical slice** of the image (not the same view): set `--page-button-bg-y` per button in JS (accumulate offset so button 1 = 0, button 2 = −height1, etc.).
+   - **Optional page-level parameters** (set on the page container, default 1): **`--page-button-bg-zoom`** (how “far” the image appears: &lt; 1 = more of image visible / further away, &gt; 1 = closer; implemented via `background-size`), **`--page-button-bg-saturation`**, **`--page-button-bg-brightness`**, **`--page-button-bg-contrast`** (implemented via CSS `filter` on `.page-button__bg`).
+
+3. **Overlay (readability)**
+   - Over the photo, a layer in the **global background colour** that fades to transparent toward the **right** (linear gradient, direction **to right**).
+   - **Start the fade earlier** so more of the image is visible (e.g. solid until ~0.3× text length).
+   - **Stretch the fade past the word** so global-bg disappears gradually (e.g. fully transparent by ~1.28× text length).
+   - Gradient stop percentages are computed in JS from text length and button width.
+
+4. **Button width**
+   - **1.3 × text length + 2 × horizontal padding** (padding from the text to the left/right edge, added for both ends so the rectangle is "nicely long"). JS measures text width and inner padding, then sets `--btn-width`.
+
+5. **Clean rectangle**
+   - The background and overlay layers must form a **single clean cutout** with no visible gap at the top or sides. They are **direct children** of `.page-button` (not inside the inner wrapper) and extend slightly under the border (e.g. `top: -3px`, `left/right/bottom: -1px`) so no "noise" or offset appears at the edges.
+
+6. **Text and halo**
+   - Main text: colour `#111`, **font-weight 500**, **vertically centered** in the button (inner wrapper fills the button with `position: absolute; inset: 0` and uses `display: flex; align-items: center`).
+   - **Micro-typography** for readability: `letter-spacing: 0.025em`, `line-height: 1.25`, `-webkit-font-smoothing: antialiased` on the visible text; same letter-spacing and line-height on the glow layer so the halo stays aligned.
+   - Same technique as hero for readability: a second, identical text layer (e.g. in a glow-wrap) with `color: transparent` and a strong **halo** (`text-shadow`) in the global background colour; top layer stays solid #111.
+
+7. **Motion**
+   - The background photo inside the button should have **slight movement** on page load, window resize, or zoom—aligned with the behaviour used on the hero (e.g. same parallax/transform logic: scroll, resize, reference viewport). Keep the effect subtle.
+
+8. **Loading**
+   - Do everything possible so that **all parts of the button** (layers, image, overlay, text, halo) **load and appear in one moment** (no staggered or partial reveal). Preload the page background image where needed.
+
+9. **Alignment and stacking**
+   - **Group alignment**: Buttons as a group are aligned to the left (the whole block is left-aligned).
+   - **Text inside button**: Text starts near the left edge of the button (left-aligned text with a small padding from the left edge).
+   - **Stacking**: Buttons are usually stacked vertically, one under the other.
+   - **Spacing**: Modest vertical gap between buttons.
+
+10. **Hover: “Mexican wave”**
+   - On hover, the button has a **glint** (a shine band) that sweeps **left to right** and a gentle **scale wave** (button scales 1 → 1.02 → 1) in sync, so it feels like one wave passing through. Implemented with a `::after` pseudo-element (gradient, animation) and a keyframe animation on the button; glint sits below the text (z-index).
+
+---
+
+## Reusable implementation approach
+
+To apply this style easily wherever a body button is needed:
+
+### 1. Single shared stylesheet
+
+- `src/styles/page-buttons.css` defines `.page-button` and all layers:
+  - **Border**: softened at **0.7 opacity** (e.g. `rgba(17,17,17,0.7)`), sharp corners; **min-height** and **max-height** for compact buttons.
+  - **Background and overlay** as **direct children** of `.page-button`, extending under the border (`top: -3px`, `left/right/bottom: -1px`) for a clean rectangle. Background: `var(--page-button-bg)`, `repeat-y`, `background-size: calc(100% / var(--page-button-bg-zoom, 1)) auto`, position `var(--page-button-bg-pos-x, 50%) var(--page-button-bg-y, 0)`; **filter**: `saturate(var(--page-button-bg-saturation, 1)) brightness(var(--page-button-bg-brightness, 1)) contrast(var(--page-button-bg-contrast, 1))`.
+  - **Inner wrapper**: `position: absolute; inset: 0`, `display: flex; align-items: center`, so text is vertically centered; contains glow-wrap (halo) and visible text. Text: `font-weight: 500`, colour #111, **letter-spacing 0.025em**, **line-height 1.25**, **-webkit-font-smoothing: antialiased**; glow layer matches letter-spacing and line-height.
+  - **Hover**: `::after` glint (gradient band, left-to-right animation) and button animation (scale 1 → 1.02 → 1) in sync (“Mexican wave”).
+  - Page injects `--page-button-bg` and optionally `--page-button-bg-pos-x`, `--page-button-bg-zoom`, `--page-button-bg-saturation`, `--page-button-bg-brightness`, `--page-button-bg-contrast` on the page container. `--page-button-bg-y` and `--btn-width`, `--btn-gradient-start-fade`, `--btn-gradient-end` are set per button by JS.
+
+### 2. Page-level background image
+
+- Set `--page-button-bg` on the **page container** (e.g. `<article>` in `[slug].astro`). Optional: `--page-button-bg-pos-x`, `--page-button-bg-zoom`, `--page-button-bg-saturation`, `--page-button-bg-brightness`, `--page-button-bg-contrast` (all default 1). Image path: `public/assets/pages/<page-id>/<filename>` (e.g. `bg.jpg`). Preload the same URL in `<head>` so the button paints in one go.
+
+### 3. JS for dimensions, gradient, and per-button image slice
+
+- **Width**: Measure text width and inner padding; set `--btn-width` = `1.3 × textWidth + 2 × paddingHorizontal`.
+- **Gradient**: Constants e.g. `GRADIENT_SOLID_UNTIL_RATIO = 0.3`, `GRADIENT_TRANSPARENT_FROM_RATIO = 1.28`; compute percentages and set `--btn-gradient-start-fade`, `--btn-gradient-end`.
+- **Per-button Y**: Accumulate vertical offset; set `--page-button-bg-y` to `-offsetY` so each button shows the next vertical slice of the image.
+- **Parallax**: Same pattern as hero (scroll + resize, update `transform` on `.page-button__bg`).
+
+### 4. Markup and usage
+
+- **Structure**: `<a class="page-button">` (or `<button>`) contains, in order: `<span class="page-button__bg">`, `<span class="page-button__overlay">`, `<span class="page-button__inner">` with inside it `<span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Label</span></span>` and `<span class="page-button__text">Label</span>`.
+- **Container**: Wrapper with `display: flex`, `flex-direction: column`, `align-items: flex-start`, modest `gap` (e.g. `.profile-links`).
+
+### 5. Exclusions
+
+- Header navigation links: **do not** use this body-button class.
+- Contact page: **only** the Send button uses it; future external-website links must use a different style (e.g. plain or underlined link).
+
+---
+
+## Summary
+
+- **One rule file**: This file. No need for multiple style-rule files.
+- **Body buttons**: Rectangular, border at 0.7 opacity, sharp corners, min/max height. One page image in `public/assets/pages/<id>/` (e.g. `bg.jpg`), repeat-y, per-button slice (`--page-button-bg-y`). Optional image params: zoom, saturation, brightness, contrast. Linear-right overlay (fade early, end past word). Width = 1.3× text + 2× padding. Clean rectangle (bg/overlay direct children, extend under border). Text #111, font-weight 500, letter-spacing/line-height/smoothing; halo; vertically centered. Hover: glint + scale wave left to right (“Mexican wave”). Group left-aligned, stacked with modest gaps.
+- **Implementation**: `page-buttons.css`, page-level `--page-button-bg` and optional pos-x, zoom, saturation, brightness, contrast; JS sets `--btn-width`, gradient stops, `--page-button-bg-y`; markup with bg, overlay, inner (glow + text). Preload image.
