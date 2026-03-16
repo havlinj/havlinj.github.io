@@ -41,6 +41,17 @@
 
 .page-button:hover {
   text-decoration: none;
+  animation: page-btn-scale-wave 1s ease-in-out;
+}
+
+@keyframes page-btn-scale-wave {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 /* Hover: glint (shine) left to right */
@@ -61,42 +72,17 @@
   background-size: 200% 100%;
   background-position: 200% 0;
   opacity: 0;
-  transition: opacity 0.15s ease-out;
+  transition: opacity 0.2s ease-out;
 }
 
 .page-button:hover::after {
   opacity: 1;
-  animation: page-btn-glint 0.55s ease-out forwards;
+  animation: page-btn-glint 1.5s ease-out forwards;
 }
 
 @keyframes page-btn-glint {
   to {
     background-position: -100% 0;
-  }
-}
-
-/* Hover: wave through each letter one by one (Mexican wave), left to right – only one letter big at a time */
-.page-button__char {
-  display: inline-block;
-  transform-origin: center bottom;
-  animation-delay: calc(var(--char-index) * 0.2s);
-}
-
-.page-button:hover .page-button__char {
-  animation: page-btn-char-wave 0.5s ease-out both;
-}
-
-@keyframes page-btn-char-wave {
-  0%,
-  35%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  65% {
-    transform: scale(1);
   }
 }
 

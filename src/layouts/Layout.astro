@@ -122,32 +122,9 @@ const pageTitle = title || 'Astro Basics';
             window.addEventListener('resize', update);
           });
         }
-        function wrapButtonChars() {
-          document.querySelectorAll('.page-button').forEach(function (btn) {
-            var textEl = btn.querySelector('.page-button__text');
-            var glowEl = btn.querySelector('.page-button__glow');
-            if (!textEl || !glowEl) return;
-            var text = textEl.textContent || '';
-            var chars = text.split('');
-            if (chars.length === 0) return;
-            var fragment = document.createDocumentFragment();
-            chars.forEach(function (ch, i) {
-              var span = document.createElement('span');
-              span.className = 'page-button__char';
-              span.style.setProperty('--char-index', String(i));
-              span.textContent = ch;
-              fragment.appendChild(span);
-            });
-            textEl.textContent = '';
-            textEl.appendChild(fragment.cloneNode(true));
-            glowEl.textContent = '';
-            glowEl.appendChild(fragment);
-          });
-        }
         function initPageButtons() {
           if (!document.querySelector('.page-button')) return;
           measureAndSizeButtons();
-          wrapButtonChars();
           initParallax();
         }
         if (document.readyState === 'loading') {
