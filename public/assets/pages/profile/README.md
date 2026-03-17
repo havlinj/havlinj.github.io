@@ -1,7 +1,4 @@
-# Profile page button background
+# Profile page images
 
-Place the image used as the background behind profile buttons (Intro, Professional, Personal) in this folder.
-
-**Filename:** `bg.jpg` (or change the URL in `src/pages/[slug].astro` if you use another name, e.g. `bg.png`).
-
-The image is repeated vertically behind the buttons and never shown elsewhere on the page.
+- **bg.jpg** – Background repeated vertically behind the button labels (Intro, Professional, Personal). Tweak in `[slug].astro`: `--page-button-bg-*`.
+- **panel.jpg** – Second image: the rectangular “panel” behind the buttons that dissolves at the edges into the page background. Optional; if missing, the panel is just empty. Position it with `--panel-offset-x`, `--panel-offset-y` and `--panel-bg-pos-x`, `--panel-bg-pos-y` in `[slug].astro`.

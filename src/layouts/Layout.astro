@@ -81,6 +81,7 @@ const pageTitle = title || 'Astro Basics';
         function measureAndSizeButtons() {
           var buttons = document.querySelectorAll('.page-button');
           var offsetY = 0;
+          /* First pass: set width and gradient vars so layout is correct */
           buttons.forEach(function (btn) {
             var textEl = btn.querySelector('.page-button__text');
             var inner = btn.querySelector('.page-button__inner');
@@ -88,7 +89,6 @@ const pageTitle = title || 'Astro Basics';
 
             var textLengthPx = textEl.getBoundingClientRect().width;
             var paddingLeftPx = parseFloat(getComputedStyle(inner).paddingLeft) || 0;
-            /* Base length + twice the text offset from the edge (both ends) so the rectangle is nicely long */
             var buttonWidthPx = Math.ceil(BUTTON_WIDTH_FACTOR * textLengthPx + 2 * paddingLeftPx);
 
             var gradientStartFadePercent = (GRADIENT_SOLID_UNTIL_RATIO / BUTTON_WIDTH_FACTOR) * 100;
@@ -97,9 +97,21 @@ const pageTitle = title || 'Astro Basics';
             btn.style.setProperty('--btn-width', buttonWidthPx + 'px');
             btn.style.setProperty('--btn-gradient-start-fade', gradientStartFadePercent.toFixed(2));
             btn.style.setProperty('--btn-gradient-end', gradientEndPercent.toFixed(2));
-            /* Each button shows the next vertical slice of the image (negative Y = image shifted up) */
             btn.style.setProperty('--page-button-bg-y', (-offsetY) + 'px');
             offsetY += btn.getBoundingClientRect().height;
+          });
+          /* Reflow so buttons have final width; fade starts at text end + 1rem */
+          document.body.offsetHeight;
+          var remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+          buttons.forEach(function (btn) {
+            var textEl = btn.querySelector('.page-button__text');
+            if (!textEl) return;
+            var btnRect = btn.getBoundingClientRect();
+            var textRect = textEl.getBoundingClientRect();
+            var textEndPx = textRect.right - btnRect.left;
+            var solidUntilPx = textEndPx + remPx;
+            var solidUntilPercent = (solidUntilPx / btnRect.width) * 100;
+            btn.style.setProperty('--btn-solid-until', Math.min(100, solidUntilPercent).toFixed(2) + '%');
           });
         }
         function initParallax() {
@@ -133,6 +145,42 @@ const pageTitle = title || 'Astro Basics';
           initPageButtons();
         }
         document.fonts && document.fonts.ready.then(measureAndSizeButtons);
+
+        function revealProfileSectionWhenPortraitLoaded() {
+          var section = document.querySelector('.profile-section--loading');
+          if (!section) return;
+          var img = section.querySelector('.profile-photo-frame img');
+          if (!img) {
+            section.classList.remove('profile-section--loading');
+            return;
+          }
+          var timeoutId;
+          function reveal() {
+            if (timeoutId) clearTimeout(timeoutId);
+            img.removeEventListener('load', onReady);
+            img.removeEventListener('error', reveal);
+            section.classList.remove('profile-section--loading');
+          }
+          function onReady() {
+            if (img.decode) {
+              img.decode().then(reveal).catch(reveal);
+            } else {
+              reveal();
+            }
+          }
+          if (img.complete && img.naturalWidth > 0) {
+            onReady();
+            return;
+          }
+          img.addEventListener('load', onReady);
+          img.addEventListener('error', reveal);
+          timeoutId = setTimeout(reveal, 4000);
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', revealProfileSectionWhenPortraitLoaded);
+        } else {
+          revealProfileSectionWhenPortraitLoaded();
+        }
       })();
     </script>
   </body>

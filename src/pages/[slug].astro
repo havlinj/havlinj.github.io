@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const page = await getEntry('pages', slug);
+if (!page) return Astro.redirect('/');
 const { Content } = await page.render();
 
 const profileSlugs = ['profile', 'intro', 'professional', 'personal'];
@@ -20,34 +21,41 @@ const activeSection = profileSlugs.includes(slug)
   : slug === 'contact'
     ? 'contact'
     : undefined;
+const isProfile = slug === 'profile';
+
+const PROFILE_PRELOADS = [
+  '/assets/hero/dichromatic_portrait_bayer_noise.png',
+  '/assets/pages/profile/bg.jpg',
+  '/assets/pages/profile/panel.jpg',
+];
+
+const profileArticleStyle = isProfile
+  ? {
+      '--page-button-bg': "url('/assets/pages/profile/bg.jpg')",
+      '--page-button-bg-pos-x': '1%',
+      '--page-button-bg-zoom': '0.12',
+      '--page-button-bg-saturation': '3',
+      '--page-button-bg-brightness': '1.4',
+      '--page-button-bg-contrast': '1',
+      '--panel-bg': "url('/assets/pages/profile/panel.jpg')",
+      '--panel-bg-pos-x': '50%',
+      '--panel-bg-pos-y': '50%',
+      '--panel-bg-saturation': '0',
+      '--panel-bg-brightness': '1',
+      '--panel-bg-contrast': '1',
+      '--panel-margin-top': '0',
+      '--panel-padding-top': '2rem',
+      '--panel-padding-left': '2rem',
+      '--panel-padding-bottom': '2rem',
+    }
+  : undefined;
 ---
 
 <Layout title={page.data.title} activeSection={activeSection}>
-  {slug === 'profile' && (
-    <link
-      slot="head"
-      rel="preload"
-      as="image"
-      href="/assets/pages/profile/bg.jpg"
-    />
-  )}
-  <article
-    style={
-      slug === 'profile'
-        ? {
-            '--page-button-bg': "url('/assets/pages/profile/bg.jpg')",
-            /* Optional: shift which part of the image is visible (default 50% = center). Example: '40%' or '60%' */
-            '--page-button-bg-pos-x': '10%',
-            /* Optional: how “far” the image appears. 1 = default; < 1 = further away; > 1 = closer */
-            '--page-button-bg-zoom': '0.08',
-            /* Optional: image filters (1 = default). e.g. saturation 1.2, brightness 0.9, contrast 1.1 */
-            '--page-button-bg-saturation': '3',
-            '--page-button-bg-brightness': '1.5',
-            '--page-button-bg-contrast': '2',
-          }
-        : undefined
-    }
-  >
+  {isProfile && PROFILE_PRELOADS.map((href) => (
+    <link slot="head" rel="preload" as="image" href={href} />
+  ))}
+  <article class={isProfile ? 'has-buttons-panel' : undefined} style={profileArticleStyle}>
     <h1>{page.data.title}</h1>
     <Content />
   </article>

@@ -4,13 +4,58 @@
    See .cursor/rules/general_notes.mdc
 ================================ */
 
+/* Zone: same height as photo (stretch in profile-section); panel fills zone so bottom aligns with photo */
+.page-buttons-zone {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel: fills zone height (bottom = photo bottom); 2rem padding around buttons, right = 0 */
+.page-buttons-panel {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  margin-top: var(--panel-margin-top, 0);
+  padding: var(--panel-padding-top, 2rem) 0 var(--panel-padding-bottom, 2rem) var(--panel-padding-left, 2rem);
+  border: none;
+  border-radius: 0;
+  background-color: #111;
+  box-sizing: border-box;
+}
+
+/* Panel image on its own layer so only it gets the color filter, not the buttons */
+.page-buttons-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #111;
+  background-image: var(--panel-bg, none);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: var(--panel-bg-pos-x, 50%) var(--panel-bg-pos-y, 50%);
+  filter:
+    saturate(var(--panel-bg-saturation, 1))
+    brightness(var(--panel-bg-brightness, 1))
+    contrast(var(--panel-bg-contrast, 1));
+  pointer-events: none;
+}
+
+.page-buttons-zone .page-buttons {
+  position: relative;
+  z-index: 1;
+}
+
 /* Container: left-aligned, vertical stack, modest gap */
 .page-buttons,
 .profile-links {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.2rem;
 }
 
 .profile-links {
@@ -18,7 +63,14 @@
   min-height: 100%;
 }
 
-/* Button: width set by JS (--btn-width), sharp corners, #111 border */
+/* Inside panel: nav above image layer, shrinks to button stack */
+.page-buttons-panel .profile-links {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+/* Button: width set by JS (--btn-width), sharp corners; on profile page stretches to right edge */
 .page-button {
   --btn-gradient-start-fade: 38.46;
   --btn-gradient-end: 84.62;
@@ -27,7 +79,7 @@
   width: var(--btn-width, auto);
   min-height: 1.75rem;
   max-height: 2rem;
-  border: 1px solid rgba(17, 17, 17, 0.4);
+  border: none;
   border-radius: 0;
   overflow: hidden;
   position: relative;
@@ -39,19 +91,9 @@
   background: transparent;
 }
 
-.page-button:hover {
-  text-decoration: none;
-  animation: page-btn-scale-wave 1s ease-in-out;
-}
-
-@keyframes page-btn-scale-wave {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
+/* Profile: buttons extend to the right edge of the content, sharp end; full length shows the photo */
+.profile-links .page-button {
+  width: 100%;
 }
 
 /* Hover: glint (shine) left to right */
@@ -75,17 +117,6 @@
   transition: opacity 0.2s ease-out;
 }
 
-.page-button:hover::after {
-  opacity: 1;
-  animation: page-btn-glint 1.5s ease-out forwards;
-}
-
-@keyframes page-btn-glint {
-  to {
-    background-position: -100% 0;
-  }
-}
-
 /* Inner wrapper: fills the whole button so flex can center text in the full height (above hover glint) */
 .page-button__inner {
   position: absolute;
@@ -99,15 +130,10 @@
   padding: 0 0.65em;
 }
 
-/* Background image: direct child of .page-button, extends 1px under border for a clean rectangle.
-   Only visible inside this frame. repeat-y; Y position per-button so each button shows a different part.
-   Optional (default 1): --page-button-bg-zoom, --page-button-bg-saturation, --page-button-bg-brightness, --page-button-bg-contrast. */
+/* Background image: same size as button, repeat-y; Y per-button. Vars: --page-button-bg-zoom, --*-saturation, --*-brightness, --*-contrast (default 1). */
 .page-button__bg {
   position: absolute;
-  top: -3px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image: var(--page-button-bg, none);
@@ -125,43 +151,26 @@
 /* Overlay: same rectangle as bg, so the “cutout” is one clean shape */
 .page-button__overlay {
   position: absolute;
-  top: -3px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
+  inset: 0;
   z-index: 1;
   pointer-events: none;
+  /* Solid until --btn-solid-until (text end + 1rem), then smooth fade; uses page bg so theme stays consistent */
   background: linear-gradient(
     to right,
     var(--color-page-bg) 0%,
-    var(--color-page-bg) calc(var(--btn-gradient-start-fade, 38.46) * 1%),
-    transparent calc(var(--btn-gradient-end, 84.62) * 1%)
+    var(--color-page-bg) var(--btn-solid-until, 25%),
+    color-mix(in srgb, var(--color-page-bg) 85%, transparent) calc(var(--btn-solid-until, 25%) + 3%),
+    color-mix(in srgb, var(--color-page-bg) 65%, transparent) calc(var(--btn-solid-until, 25%) + 8%),
+    color-mix(in srgb, var(--color-page-bg) 40%, transparent) calc(var(--btn-solid-until, 25%) + 15%),
+    color-mix(in srgb, var(--color-page-bg) 20%, transparent) calc(var(--btn-solid-until, 25%) + 25%),
+    color-mix(in srgb, var(--color-page-bg) 6%, transparent) calc(var(--btn-solid-until, 25%) + 38%),
+    transparent calc(var(--btn-solid-until, 25%) + 52%)
   );
 }
 
-/* Halo layer: behind visible text, vertically centered with the text */
+/* Glow/halo removed – solid overlay ends at text so no need for letter backlight */
 .page-button__glow-wrap {
-  position: absolute;
-  left: 0.65em;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.page-button__glow {
-  color: transparent;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  line-height: 1.25;
-  text-shadow:
-    0 0 0.35em var(--color-page-bg),
-    0 0 0.7em var(--color-page-bg),
-    0 0 1.1em var(--color-page-bg),
-    0 0 1.6em var(--color-page-bg),
-    0 0 2.2em var(--color-page-bg),
-    0 0 2.8em var(--color-page-bg);
+  display: none;
 }
 
 /* Visible text: solid #111 on top, slightly bolder; micro typography for readability */
