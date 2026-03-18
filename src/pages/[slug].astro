@@ -34,7 +34,12 @@ const PROFILE_PRELOADS = [
     <link slot="head" rel="preload" as="image" href={href} />
   ))}
   <article class={isProfile ? 'has-buttons-panel' : undefined}>
-    <h1>{page.data.title}</h1>
+    <h1
+      class="page-title"
+      style={isProfile ? { '--page-title-margin-bottom': '1.3rem' } : undefined}
+    >
+      {page.data.title}
+    </h1>
     <Content />
   </article>
 </Layout>

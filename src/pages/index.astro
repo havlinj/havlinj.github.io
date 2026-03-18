@@ -14,7 +14,7 @@ import '../styles/hero.css';
       <a href="/contact" class="site-header__item site-nav__link">Contact</a>
     </div>
   </nav>
-  <h1>Hi there</h1>
+  <h1 class="page-title" style="--page-title-margin-bottom: 1.3rem">Hi there</h1>
   <div class="hero-wrap">
     <section class="hero">
       <div class="hero-top-edge" aria-hidden="true"></div>
@@ -60,9 +60,6 @@ import '../styles/hero.css';
         </p>
       </div>
     </section>
-    <footer class="hero-footer">
-      <p>© 2026 Jan Havlín</p>
-    </footer>
   </div>
   <script is:inline>
     (function () {
@@ -76,30 +73,13 @@ import '../styles/hero.css';
         ratioMax: 0.4,
         ratioMin: 0.3,
       };
-      const PARALLAX = {
-        maxTranslate: 24,
-        viewportRefWidth: 1200,
-        horizontalFactor: 18,
-        scale: 1.06,
-      };
       const SEL = {
         hero: '.hero',
-        heroBgImage: '.hero-bg__image',
         heroName: '.hero-name',
         heroRole: '.hero-role',
         heroNameBox: '.hero-name-box',
         fitText: '[data-fit-text]',
       };
-
-      function showHeroWhenBgReady() {
-        const hero = document.querySelector(SEL.hero);
-        const img = hero?.querySelector(SEL.heroBgImage);
-        if (!hero || !img) return;
-        if (img.complete) hero.classList.add('is-loaded');
-        else
-          img.addEventListener('load', () => hero.classList.add('is-loaded'));
-      }
-      showHeroWhenBgReady();
 
       function fitTextToContainer(textEl, options = {}) {
         const container = textEl.parentElement;
@@ -189,43 +169,14 @@ import '../styles/hero.css';
         });
       }
 
-      function initHeroParallax(hero) {
-        const img = hero.querySelector(SEL.heroBgImage);
-        if (!img) return;
-
-        function updateParallax() {
-          const rect = hero.getBoundingClientRect();
-          const vh =
-            window.innerHeight || document.documentElement.clientHeight;
-          if (vh === 0) return;
-
-          const rawProgress = 1 - rect.top / vh;
-          const clamped = Math.min(1, Math.max(0, rawProgress));
-          const scrollOffset = (clamped - 0.5) * 2 * PARALLAX.maxTranslate;
-          const vw = window.innerWidth || document.documentElement.clientWidth;
-          const horizontalOffset =
-            (vw / PARALLAX.viewportRefWidth - 1) * PARALLAX.horizontalFactor;
-
-          img.style.transform = `translate3d(${horizontalOffset}px, ${scrollOffset}px, 0) scale(${PARALLAX.scale})`;
-        }
-
-        updateParallax();
-        window.addEventListener('scroll', updateParallax, { passive: true });
-        window.addEventListener('resize', updateParallax);
-      }
-
       const resizeObserver = new ResizeObserver(scheduleHeroFit);
 
       function onLoad() {
         fitAllHeroNames();
         fitHeroRoles();
-        const hero = document.querySelector(SEL.hero);
-        if (hero) {
-          initHeroParallax(hero);
-          document
-            .querySelectorAll(`${SEL.heroNameBox}, ${SEL.heroRole}`)
-            .forEach((el) => resizeObserver.observe(el));
-        }
+        document
+          .querySelectorAll(`${SEL.heroNameBox}, ${SEL.heroRole}`)
+          .forEach((el) => resizeObserver.observe(el));
       }
 
       window.addEventListener('load', onLoad);

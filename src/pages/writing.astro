@@ -10,6 +10,7 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
   <article
     class="writing-page"
     style={{
+      '--page-title-margin-bottom': '1.3rem',
       '--panel-bg': "url('/assets/blog/crane_dichromatic_bayer16_inverted_dichrom.png')",
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
@@ -23,7 +24,7 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
       '--panel-padding-bottom': '6rem',
     }}
   >
-    <h1>Writing</h1>
+    <h1 class="page-title">Writing</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
         <ul class="post-list page-buttons" aria-label="Articles">

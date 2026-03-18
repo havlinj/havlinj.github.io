@@ -5,11 +5,31 @@
 .contact {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0;
+}
+
+.contact > h1 {
+  margin-bottom: 0;
+  position: relative;
+}
+
+.contact > h1::after {
+  content: '';
+  display: block;
+  /* Baseline 1.3rem below the “Contact” heading */
+  margin-top: 1.3rem;
+  width: 100%;
+  height: 1px;
+  background-color: #111;
 }
 
 .contact-intro {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* First intro paragraph starts 1rem below the baseline */
+.contact-intro:first-of-type {
+  margin-top: 1rem;
 }
 
 .contact-form {
@@ -40,6 +60,14 @@
   background-color: transparent;
 }
 
+.contact-form input:focus,
+.contact-form input:focus-visible,
+.contact-form textarea:focus,
+.contact-form textarea:focus-visible {
+  outline: none;
+  border: 2px solid #111;
+}
+
 .contact-form textarea {
   min-height: 9rem;
   resize: vertical;
@@ -47,8 +75,10 @@
 
 .contact-form button {
   justify-self: flex-start;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
+  min-height: 1.75rem;
+  max-height: 2rem;
+  padding: 0 1.4rem;
+  border-radius: 0;
   border: 1px solid #111;
   background-color: transparent;
   cursor: pointer;

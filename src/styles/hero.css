@@ -10,13 +10,9 @@
   width: 100%;
   /* Keep hero background square: height = content width */
   height: 100cqw;
+  /* Tagline sizing should follow hero width (not viewport) */
+  container-type: inline-size;
   overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.2s ease-out;
-}
-
-.hero.is-loaded {
-  opacity: 1;
 }
 
 .hero-figure {
@@ -89,12 +85,6 @@
   position: relative;
   z-index: 2;
   padding-top: 3rem;
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-}
-
-.hero.is-loaded .hero-content {
-  opacity: 1;
 }
 
 .hero-grid {
@@ -136,6 +126,7 @@
 
 .hero-name {
   margin: 0;
+  font-size: clamp(2.4rem, 1.2rem + 2cqw, 3.2rem);
   line-height: 0.9;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -201,7 +192,8 @@ h1 + .hero-wrap {
 }
 
 .tagline {
-  font-size: clamp(1.4rem, 0.4rem + 2.9vw, 3.4rem);
+  /* More consistent scaling on resize/zoom: use container query units */
+  font-size: clamp(1rem, 8cqw, 4rem);
   font-weight: 700;
   line-height: 1.4;
   max-width: 40ch;

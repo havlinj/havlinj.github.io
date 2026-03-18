@@ -57,7 +57,7 @@ main,
   min-width: var(--content-min-width);
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 2rem 0;
   /* Enable cqw based on the content-body width */
   container-type: inline-size;
 }
@@ -87,6 +87,11 @@ h1 {
   letter-spacing: -0.02em;
   margin-top: 0;
   margin-bottom: 1rem;
+}
+
+/* Page title: allow per-page optical spacing tweaks */
+h1.page-title {
+  margin-bottom: var(--page-title-margin-bottom, 1rem);
 }
 
 h2,
@@ -141,6 +146,11 @@ article.has-buttons-panel {
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
+}
+
+/* When profile-section is the last block in the article, avoid extra gap before footer */
+article .profile-section:last-child {
+  margin-bottom: 0;
 }
 
 /* Hidden until portrait has loaded, then both columns appear together */
