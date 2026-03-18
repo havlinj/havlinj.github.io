@@ -122,39 +122,9 @@ ol {
   margin-bottom: 1rem;
 }
 
-/* Blog list – no bullets */
-ul.post-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 /* Clip panel by content-body when it extends (soft edges stay inside) */
 article.has-buttons-panel {
   overflow: hidden;
-}
-
-/* Blog article: title, then date (same spacing above and below), then body */
-.blog-post .article-meta {
-  margin: 1rem 0;
-  font-size: 0.85rem;
-  color: #111;
-  font-weight: 400;
-}
-.blog-post .article-meta time {
-  margin-top: 0;
-}
-
-/* Drop cap: first letter of first paragraph, text wraps at a distance */
-.blog-post .article-body p:first-of-type::first-letter {
-  float: left;
-  font-size: 3rem;
-  line-height: 1;
-  margin-right: 0.35rem;
-  margin-top: 0.08em;
-  padding-top: 0.05em;
-  font-weight: 600;
-  color: #111;
 }
 
 /* ===============================
@@ -177,7 +147,7 @@ article.has-buttons-panel {
   transition: opacity 0.2s ease-out;
 }
 
-/* Left: exactly square photo; stays on top where it overlaps */
+/* Left: square portrait – right edge = exact seam with panel (50% | 50%) */
 .profile-photo-frame {
   flex: 0 0 50%;
   width: 50%;
@@ -185,14 +155,12 @@ article.has-buttons-panel {
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--color-page-bg);
-  position: relative;
-  z-index: 1;
 }
 
-/* Right: panel + same bg image; extends down and slightly under left edge */
+/* Right: panel image flush against portrait, no overlap */
 .profile-section .page-buttons-zone {
-  flex: 0 0 52%;
-  margin-left: -2%;
+  flex: 0 0 50%;
+  width: 50%;
   min-width: 0;
 }
 
