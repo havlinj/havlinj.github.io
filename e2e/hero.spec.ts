@@ -2,11 +2,10 @@ import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { LAYOUT_TOLERANCE } from './constants';
 
-/** Wait for hero to become visible (image loaded, .is-loaded applied). */
+/** Wait for hero section and background image to be in the DOM. */
 async function waitForHeroLoaded(page: Page) {
-  await page
-    .locator('section.hero.is-loaded')
-    .waitFor({ state: 'visible', timeout: 15000 });
+  await page.locator('section.hero').waitFor({ state: 'visible' });
+  await page.locator('.hero-bg__image').waitFor({ state: 'visible' });
 }
 
 test.describe('Hero page (/)', () => {
@@ -62,7 +61,10 @@ test.describe('Hero page (/)', () => {
 
   test('hero-header Profile link navigates to /profile', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Profile' }).click();
+    await page
+      .getByRole('navigation', { name: 'Main navigation' })
+      .getByRole('link', { name: 'Profile' })
+      .click();
     await expect(page).toHaveURL(/\/profile$/);
   });
 
@@ -101,7 +103,7 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('main.content')).toBeVisible();
   });
 
-  test('hero wrap contains hero section and footer, tagline and role visible', async ({
+  test('hero wrap contains hero section; site footer shows copyright', async ({
     page,
   }) => {
     await page.goto('/');
@@ -109,7 +111,9 @@ test.describe('Hero page (/)', () => {
     const wrap = page.locator('.hero-wrap');
     await expect(wrap).toBeVisible();
     await expect(wrap.locator('section.hero')).toBeVisible();
-    await expect(wrap.locator('footer.hero-footer')).toBeVisible();
+    await expect(page.locator('footer.site-footer')).toContainText(
+      '© 2026 Jan Havlín',
+    );
     await expect(
       page.getByRole('heading', { name: 'Hi there', level: 1 }),
     ).toBeVisible();
@@ -134,11 +138,37 @@ test.describe('Hero page (/)', () => {
     await expect(figure.locator('img[alt="Intro background"]')).toBeVisible();
   });
 
-  test('hero footer shows copyright', async ({ page }) => {
+  test('site footer shows copyright on home', async ({ page }) => {
     await page.goto('/');
-    const footer = page.locator('.hero-footer');
+    const footer = page.locator('footer.site-footer');
     await expect(footer).toBeVisible();
     await expect(footer).toContainText('© 2026 Jan Havlín');
+  });
+
+  test('preloads hero background image', async ({ page }) => {
+    await page.goto('/');
+    await expect(
+      page.locator(
+        'link[rel="preload"][as="image"][href="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dich_better_grid.png"]',
+      ),
+    ).toHaveCount(1);
+  });
+
+  test('has hero-top-edge strip and no photo credit caption', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.locator('.hero-top-edge')).toBeVisible();
+    await expect(page.locator('.hero-caption')).toHaveCount(0);
+  });
+
+  test('tagline visible text layer present', async ({ page }) => {
+    await page.goto('/');
+    await waitForHeroLoaded(page);
+    await expect(page.locator('.tagline__text')).toBeVisible();
+    await expect(page.locator('.tagline__text')).toContainText(
+      'from the ground up',
+    );
   });
 
   test('hero-role shows two lines (BACKEND ARCHITECTURE, & SYSTEMS)', async ({

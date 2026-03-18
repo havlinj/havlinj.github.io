@@ -15,18 +15,68 @@ test.describe('Profile page (/profile, /intro)', () => {
     );
   });
 
-  test('has placeholder image and Intro, Professional, Personal links', async ({
+  test('has portrait, Intro, Professional, Personal links', async ({
     page,
   }) => {
     await page.goto('/profile');
-    await expect(
-      page.getByRole('img', { name: /Profile photo placeholder/i }),
-    ).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Intro' })).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Personal' })).toBeVisible();
+  });
+
+  test('profile article uses buttons panel layout', async ({ page }) => {
+    await page.goto('/profile');
+    await expect(page.locator('article.has-buttons-panel')).toBeVisible();
+    await expect(page.locator('.profile-section')).toBeVisible();
+    await expect(page.locator('.page-buttons-panel')).toBeVisible();
+    await expect(
+      page.getByRole('navigation', { name: 'Profile sections' }),
+    ).toBeVisible();
+  });
+
+  test('profile section loses loading class after portrait handling', async ({
+    page,
+  }) => {
+    await page.goto('/profile');
+    await page
+      .locator('.profile-section:not(.profile-section--loading)')
+      .waitFor({ state: 'attached', timeout: 10000 });
+  });
+
+  test('profile section - last screenshot matches', async ({ page }) => {
+    await page.goto('/profile');
+    await page
+      .locator('.profile-section:not(.profile-section--loading)')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10000 });
+    await expect(page).toHaveScreenshot('profile-section.png');
+  });
+
+  test('Professional page has heading and profile-active navbar', async ({
+    page,
+  }) => {
+    await page.goto('/professional');
+    await expect(
+      page.getByRole('heading', { name: 'Professional', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
+      /site-nav__link--active/,
+    );
+  });
+
+  test('Personal page has heading and profile-active navbar', async ({
+    page,
+  }) => {
+    await page.goto('/personal');
+    await expect(
+      page.getByRole('heading', { name: 'Personal', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
+      /site-nav__link--active/,
+    );
   });
 
   test('site-header: Jan Havlín left, Profile Writing Contact spread across', async ({
@@ -72,6 +122,9 @@ test.describe('Profile page (/profile, /intro)', () => {
     page,
   }) => {
     await page.goto('/profile');
+    await page
+      .locator('.profile-section:not(.profile-section--loading)')
+      .waitFor({ state: 'visible', timeout: 10000 });
     const article = page.locator('main.content article');
     await expect(article).toBeVisible();
     const intro = article.getByRole('link', { name: 'Intro' });
@@ -88,19 +141,17 @@ test.describe('Profile page (/profile, /intro)', () => {
     expect(iBox).toBeTruthy();
     expect(pBox).toBeTruthy();
     expect(lBox).toBeTruthy();
-    expect(iBox!.x).toBeLessThanOrEqual(pBox!.x + LAYOUT_TOLERANCE);
-    expect(pBox!.x).toBeLessThanOrEqual(lBox!.x + LAYOUT_TOLERANCE);
-    expect(iBox!.x).toBeLessThanOrEqual(articleBox!.x + LAYOUT_TOLERANCE);
-    expect(lBox!.x + lBox!.width).toBeGreaterThanOrEqual(
-      articleBox!.x + articleBox!.width - LAYOUT_TOLERANCE,
+
+    // Buttons are stacked vertically in the profile panel (left-aligned),
+    // so assert vertical ordering and near-equal X alignment.
+    expect(Math.abs(iBox!.x - pBox!.x)).toBeLessThanOrEqual(
+      LAYOUT_TOLERANCE * 2,
     );
-    const mid = articleBox!.x + articleBox!.width / 2;
-    expect(pBox!.x + pBox!.width / 2).toBeGreaterThanOrEqual(
-      mid - articleBox!.width / 3,
+    expect(Math.abs(pBox!.x - lBox!.x)).toBeLessThanOrEqual(
+      LAYOUT_TOLERANCE * 2,
     );
-    expect(pBox!.x + pBox!.width / 2).toBeLessThanOrEqual(
-      mid + articleBox!.width / 3,
-    );
+    expect(iBox!.y).toBeLessThanOrEqual(pBox!.y + LAYOUT_TOLERANCE);
+    expect(pBox!.y).toBeLessThanOrEqual(lBox!.y + LAYOUT_TOLERANCE);
   });
 
   test('Intro (/intro) has active Profile in navbar', async ({ page }) => {
@@ -154,6 +205,35 @@ test.describe('Writing page (/writing)', () => {
     expect(gapTitleToContent).toBeGreaterThanOrEqual(MIN_GAP);
     expect(gapTitleToContent).toBeLessThanOrEqual(MAX_GAP);
   });
+
+  test('writing page has panel zone and article list with page buttons', async ({
+    page,
+  }) => {
+    await page.goto('/writing');
+    await expect(page.locator('article.writing-page')).toBeVisible();
+    await expect(page.locator('.page-buttons-zone')).toBeVisible();
+    await expect(page.locator('.page-buttons-panel')).toBeVisible();
+    const list = page.getByRole('list', { name: 'Articles' });
+    await expect(list).toBeVisible();
+    const buttons = list.locator('a.page-button');
+    await expect(buttons).toHaveCount(2);
+    await expect(
+      page.getByRole('link', { name: 'Reflection on Building Systems' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Example Article' }),
+    ).toBeVisible();
+  });
+
+  test('each writing list link targets /blog/ slug', async ({ page }) => {
+    await page.goto('/writing');
+    const links = page.locator('.post-list a.page-button');
+    const n = await links.count();
+    expect(n).toBeGreaterThanOrEqual(1);
+    for (let i = 0; i < n; i++) {
+      await expect(links.nth(i)).toHaveAttribute('href', /^\/blog\//);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -192,5 +272,66 @@ test.describe('Contact page (/contact)', () => {
 
     // Turnstile placeholder should be present in the DOM
     await expect(page.locator('.cf-turnstile')).toBeVisible();
+  });
+
+  test('shows first intro line and contact form id', async ({ page }) => {
+    await page.goto('/contact');
+    await expect(page.getByText('Glad you stopped by.')).toBeVisible();
+    await expect(page.locator('#contact-form')).toBeVisible();
+    await expect(page.locator('#contact-form')).toHaveAttribute(
+      'novalidate',
+      '',
+    );
+  });
+
+  test('honeypot company field is hidden from a11y tree', async ({ page }) => {
+    await page.goto('/contact');
+    const company = page.locator('#contact-form input[name="company"]');
+    const hiddenWrapper = page.locator('#contact-form .hidden');
+    await expect(company).toBeAttached();
+
+    // We expect the honeypot to be visually "hidden" via the `.hidden` class
+    // (offscreen position + 1x1 sizing). `input` itself can still report a
+    // larger box due to its own intrinsic layout, so we validate the wrapper.
+    await expect(company).toHaveAttribute('tabindex', '-1');
+    await expect(hiddenWrapper).toBeVisible(); // attached; wrapper exists in DOM
+
+    const wrapperBox = await hiddenWrapper.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+    expect(wrapperBox.width).toBeLessThanOrEqual(2);
+    expect(wrapperBox.height).toBeLessThanOrEqual(2);
+    expect(wrapperBox.x).toBeLessThanOrEqual(-9990);
+  });
+
+  test('status region is present and empty before submit', async ({ page }) => {
+    await page.goto('/contact');
+    const status = page.locator('#status');
+    await expect(status).toBeVisible();
+    await expect(status).toHaveText('');
+  });
+
+  test('after load: org links and intro text below Send', async ({ page }) => {
+    await page.goto('/contact');
+    await expect(
+      page.getByText('You can also find me on:', { exact: true }),
+    ).toBeVisible();
+    const extra = page.locator('.contact-extra-links');
+    await expect(extra).toBeVisible();
+    const github = extra.getByRole('link', { name: /GitHub/i });
+    const linkedin = extra.getByRole('link', { name: /LinkedIn/i });
+    await expect(github).toBeVisible();
+    await expect(linkedin).toBeVisible();
+    await expect(github.locator('img[alt="GitHub"]')).toBeVisible();
+    await expect(linkedin.locator('img[alt="LinkedIn"]')).toBeVisible();
+    await expect(github.locator('img')).toHaveAttribute(
+      'src',
+      '/assets/pages/contact/github.svg',
+    );
+    await expect(linkedin.locator('img')).toHaveAttribute(
+      'src',
+      '/assets/pages/contact/InBug-Black.png',
+    );
   });
 });
