@@ -12,14 +12,14 @@
   flex-direction: column;
 }
 
-/* Panel: fills zone height (bottom = photo bottom); padding-top/left configurable, bottom = 3× top; right = 0 */
+/* Panel: fills zone height; padding configurable (bottom = space below last button) */
 .page-buttons-panel {
   position: relative;
   width: 100%;
   flex: 1;
   min-height: 0;
   margin-top: var(--panel-margin-top, 0);
-  padding: var(--panel-padding-top, 2rem) 0 calc(3 * var(--panel-padding-top, 2rem)) var(--panel-padding-left, 2rem);
+  padding: var(--panel-padding-top, 2rem) 0 var(--panel-padding-bottom, calc(3 * var(--panel-padding-top, 2rem))) var(--panel-padding-left, 2rem);
   border: none;
   border-radius: 0;
   background-color: #111;
@@ -78,10 +78,8 @@
   min-height: 0;
 }
 
-/* Button: width set by JS (--btn-width) only for effects; layout stretches to full width of container */
+/* Button: same shape, font, position; solid page-bg only (no image, no gradient overlay) */
 .page-button {
-  --btn-gradient-start-fade: 38.46;
-  --btn-gradient-end: 84.62;
   display: block;
   min-width: 4ch;
   width: 100%;
@@ -133,46 +131,26 @@
   padding: 0 0.65em;
 }
 
-/* Background image: same size as button, repeat-y; Y per-button. Vars: --page-button-bg-zoom, --*-saturation, --*-brightness, --*-contrast (default 1). */
+/* Solid page-bg only; no image, no parallax */
 .page-button__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background-color: var(--color-page-bg);
-  background-image: var(--page-button-bg, none);
-  background-repeat: repeat-y;
-  background-size: calc(100% / var(--page-button-bg-zoom, 1)) auto;
-  background-position: var(--page-button-bg-pos-x, 50%) var(--page-button-bg-y, 0);
-  filter:
-    saturate(var(--page-button-bg-saturation, 1))
-    brightness(var(--page-button-bg-brightness, 1))
-    contrast(var(--page-button-bg-contrast, 1));
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.3s ease-in-out;
 }
 
 /* Overlay: same rectangle as bg, so the “cutout” is one clean shape */
+/* Overlay: solid until text end + 2rem (--btn-solid-until in px), then fade to the right */
 .page-button__overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  /* Solid until --btn-solid-until (text end + 1rem), then smooth fade; uses page bg so theme stays consistent */
-  background: linear-gradient(
-    to right,
-    var(--color-page-bg) 0%,
-    var(--color-page-bg) var(--btn-solid-until, 25%),
-    color-mix(in srgb, var(--color-page-bg) 85%, transparent) calc(var(--btn-solid-until, 25%) + 3%),
-    color-mix(in srgb, var(--color-page-bg) 65%, transparent) calc(var(--btn-solid-until, 25%) + 8%),
-    color-mix(in srgb, var(--color-page-bg) 40%, transparent) calc(var(--btn-solid-until, 25%) + 15%),
-    color-mix(in srgb, var(--color-page-bg) 20%, transparent) calc(var(--btn-solid-until, 25%) + 25%),
-    color-mix(in srgb, var(--color-page-bg) 6%, transparent) calc(var(--btn-solid-until, 25%) + 38%),
-    transparent calc(var(--btn-solid-until, 25%) + 52%)
-  );
+  background-color: var(--color-page-bg);
 }
 
-/* Glow/halo removed – solid overlay ends at text so no need for letter backlight */
+/* Glow/halo removed */
 .page-button__glow-wrap {
   display: none;
 }

@@ -129,31 +129,46 @@ ul.post-list {
   margin: 0;
 }
 
-/* ===============================
-   TIME AND SMALL TEXT
-================================ */
-time {
-  display: block;
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 0.25rem;
-}
-
 /* Clip panel by content-body when it extends (soft edges stay inside) */
 article.has-buttons-panel {
   overflow: hidden;
 }
 
+/* Blog article: title, then date (same spacing above and below), then body */
+.blog-post .article-meta {
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: #111;
+  font-weight: 400;
+}
+.blog-post .article-meta time {
+  margin-top: 0;
+}
+
+/* Drop cap: first letter of first paragraph, text wraps at a distance */
+.blog-post .article-body p:first-of-type::first-letter {
+  float: left;
+  font-size: 3rem;
+  line-height: 1;
+  margin-right: 0.35rem;
+  margin-top: 0.08em;
+  padding-top: 0.05em;
+  font-weight: 600;
+  color: #111;
+}
+
 /* ===============================
-   PROFILE PAGE – photo left, labels right
+   PROFILE PAGE – photo left (square), panel right extends ¼ width down, same image
 ================================ */
-/* stretch so zone = photo height; panel bottom aligns with photo bottom */
 .profile-section {
   display: flex;
   align-items: stretch;
-  gap: 2rem;
+  gap: 0;
+  flex-wrap: nowrap;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+  /* Height = 75% of width so right panel extends ¼ width below the square photo */
+  aspect-ratio: 4 / 3;
 }
 
 /* Hidden until portrait has loaded, then both columns appear together */
@@ -162,13 +177,23 @@ article.has-buttons-panel {
   transition: opacity 0.2s ease-out;
 }
 
-/* 50% - 1rem each side so with 2rem gap the two columns share the page equally */
+/* Left: exactly square photo; stays on top where it overlaps */
 .profile-photo-frame {
-  flex: 0 0 calc(50% - 1rem);
-  width: calc(50% - 1rem);
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 0;
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--color-page-bg);
+  position: relative;
+  z-index: 1;
+}
+
+/* Right: panel + same bg image; extends down and slightly under left edge */
+.profile-section .page-buttons-zone {
+  flex: 0 0 52%;
+  margin-left: -2%;
+  min-width: 0;
 }
 
 .profile-photo-frame img {

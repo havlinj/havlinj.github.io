@@ -14,11 +14,22 @@ const { slug } = Astro.params;
 const posts = await getCollection('blog');
 const post = posts.find((p) => p.slug === slug);
 const { Content } = await post.render();
+
+const dateFormatted = post.data.date.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 ---
 
 <Layout title={post.data.title} activeSection="writing">
-  <article>
+  <article class="blog-post">
     <h1>{post.data.title}</h1>
-    <Content />
+    <p class="article-meta" aria-label="Publication date">
+      <time datetime={post.data.date.toISOString()}>{dateFormatted}</time>
+    </p>
+    <div class="article-body">
+      <Content />
+    </div>
   </article>
 </Layout>

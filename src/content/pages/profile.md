@@ -5,7 +5,7 @@ title: 'Profile'
 <div class="profile-section profile-section--loading">
   <div class="profile-photo-frame">
     <img
-      src="/assets/hero/dichromatic_portrait_bayer_noise.png"
+      src="/assets/pages/profile/portrait_bayer16_style.png"
       alt="Jan Havlín"
       fetchpriority="high"
       decoding="async"

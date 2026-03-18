@@ -25,28 +25,20 @@ const isProfile = slug === 'profile';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
-  '/assets/pages/profile/bg.jpg',
-  '/assets/pages/profile/panel.jpg',
+  '/assets/pages/profile/panel/tai-bui-yKX7wC_VioM-unsplash_dichrom.png',
 ];
 
 const profileArticleStyle = isProfile
   ? {
-      '--page-button-bg': "url('/assets/pages/profile/bg.jpg')",
-      '--page-button-bg-pos-x': '1%',
-      '--page-button-bg-zoom': '0.12',
-      '--page-button-bg-saturation': '3',
-      '--page-button-bg-brightness': '1.4',
-      '--page-button-bg-contrast': '1',
-      '--panel-bg': "url('/assets/pages/profile/panel.jpg')",
+      '--panel-bg': "url('/assets/pages/profile/panel/tai-bui-yKX7wC_VioM-unsplash_dichrom.png')",
       '--panel-bg-pos-x': '50%',
-      '--panel-bg-pos-y': '50%',
-      '--panel-bg-saturation': '0',
-      '--panel-bg-brightness': '1',
-      '--panel-bg-contrast': '1',
+      '--panel-bg-pos-y': '45%',
+      '--panel-bg-saturation': '1',
+      '--panel-bg-brightness': '0.95',
+      '--panel-bg-contrast': '0.85',
       '--panel-margin-top': '0',
       '--panel-padding-top': '2rem',
       '--panel-padding-left': '2rem',
-      
     }
   : undefined;
 ---
