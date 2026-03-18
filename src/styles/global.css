@@ -58,6 +58,8 @@ main,
   max-width: var(--content-width);
   margin: 0 auto;
   padding: 2rem;
+  /* Enable cqw based on the content-body width */
+  container-type: inline-size;
 }
 
 /* ===============================
@@ -131,14 +133,14 @@ article.has-buttons-panel {
    PROFILE PAGE – photo left (square), panel right extends ¼ width down, same image
 ================================ */
 .profile-section {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 0;
-  flex-wrap: nowrap;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-  /* Height = 75% of width so right panel extends ¼ width below the square photo */
-  aspect-ratio: 4 / 3;
+  /* Grid is 2x2 exact squares: total height = content width */
+  height: 100cqw;
 }
 
 /* Hidden until portrait has loaded, then both columns appear together */
@@ -147,29 +149,92 @@ article.has-buttons-panel {
   transition: opacity 0.2s ease-out;
 }
 
-/* Left: square portrait – right edge = exact seam with panel (50% | 50%) */
-.profile-photo-frame {
-  flex: 0 0 50%;
-  width: 50%;
+/* Each grid tile */
+.profile-tile {
+  width: 100%;
+  height: 100%;
   min-width: 0;
-  aspect-ratio: 1;
   overflow: hidden;
   background: var(--color-page-bg);
 }
 
-/* Right: panel image flush against portrait, no overlap */
-.profile-section .page-buttons-zone {
-  flex: 0 0 50%;
-  width: 50%;
-  min-width: 0;
+.profile-photo-frame {
+  position: relative;
 }
 
-.profile-photo-frame img {
+/* Profile: grain overlay on photo + bottom image tiles */
+.profile-photo-box::after,
+.profile-image-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--profile-grain-opacity, 0.16);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 220px 220px;
+}
+
+.profile-tile--placeholder {
+  background: #111;
+}
+
+/* Bottom tiles (user-supplied images later): fallback = #111 */
+.profile-image-tile {
+  position: relative;
+  background-color: #111;
+}
+
+.profile-image-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--tile-bg, none);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
+  filter:
+    saturate(var(--tile-saturation, 1))
+    brightness(var(--tile-brightness, 1))
+    contrast(var(--tile-contrast, 1));
+  transform: scale(var(--tile-zoom, 1));
+  transform-origin: center;
+  pointer-events: none;
+}
+
+/* Top-left: portrait */
+.profile-photo-frame {
+  background: var(--color-page-bg);
+}
+
+/* Inner portrait square (inset + centered) */
+.profile-photo-box {
+  position: absolute;
+  inset: var(--portrait-tile-inset, 0);
+  overflow: hidden;
+  background: var(--color-page-bg);
+}
+
+/* Top-right: panel tile */
+.profile-section .page-buttons-zone {
+  width: 100%;
+  height: 100%;
+}
+
+.profile-photo-box img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 100% 90%;
+  object-position: var(--portrait-pos-x, 100%) var(--portrait-pos-y, 90%);
+  filter:
+    saturate(var(--portrait-saturation, 1))
+    brightness(var(--portrait-brightness, 1))
+    contrast(var(--portrait-contrast, 1));
+  transform: scale(var(--portrait-zoom, 1));
+  transform-origin: center;
 }
 
 /* .profile-links layout: see page-buttons.css (left-aligned, stacked) */

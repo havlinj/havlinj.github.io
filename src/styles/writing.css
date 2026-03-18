@@ -6,6 +6,11 @@ ul.post-list {
   margin: 0;
 }
 
+/* Writing: make the whole panel square, so the background fills it */
+.writing-page .page-buttons-panel {
+  aspect-ratio: 1 / 1;
+}
+
 .blog-post .article-meta {
   margin: 1rem 0;
   color: #111;

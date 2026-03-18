@@ -24,6 +24,7 @@
   border-radius: 0;
   background-color: #111;
   box-sizing: border-box;
+  overflow: hidden; /* clip background/grain layers */
 }
 
 /* Panel image on its own layer so only it gets the color filter, not the buttons */
@@ -42,6 +43,27 @@
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
   pointer-events: none;
+}
+
+/* Profile: mirror the panel background image */
+.profile-section .page-buttons-panel::before {
+  transform: scaleX(-1);
+  transform-origin: center;
+}
+
+
+/* Profile: grain overlay (clipped to panel) */
+.profile-section .page-buttons-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--profile-grain-opacity, 0.16);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 220px 220px;
 }
 
 .page-buttons-zone .page-buttons {

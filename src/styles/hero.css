@@ -8,7 +8,8 @@
 .hero {
   position: relative;
   width: 100%;
-  padding-bottom: 4rem;
+  /* Keep hero background square: height = content width */
+  height: 100cqw;
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.2s ease-out;

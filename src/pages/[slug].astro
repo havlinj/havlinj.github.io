@@ -25,29 +25,15 @@ const isProfile = slug === 'profile';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
-  '/assets/pages/profile/panel/tai-bui-yKX7wC_VioM-unsplash_dichrom.png',
+  '/assets/pages/profile/tai-bui-yKX7wC_VioM-unsplash_dichrom.png',
 ];
-
-const profileArticleStyle = isProfile
-  ? {
-      '--panel-bg': "url('/assets/pages/profile/panel/tai-bui-yKX7wC_VioM-unsplash_dichrom.png')",
-      '--panel-bg-pos-x': '50%',
-      '--panel-bg-pos-y': '45%',
-      '--panel-bg-saturation': '1',
-      '--panel-bg-brightness': '0.95',
-      '--panel-bg-contrast': '0.85',
-      '--panel-margin-top': '0',
-      '--panel-padding-top': '2rem',
-      '--panel-padding-left': '0',
-    }
-  : undefined;
 ---
 
 <Layout title={page.data.title} activeSection={activeSection}>
   {isProfile && PROFILE_PRELOADS.map((href) => (
     <link slot="head" rel="preload" as="image" href={href} />
   ))}
-  <article class={isProfile ? 'has-buttons-panel' : undefined} style={profileArticleStyle}>
+  <article class={isProfile ? 'has-buttons-panel' : undefined}>
     <h1>{page.data.title}</h1>
     <Content />
   </article>
