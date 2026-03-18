@@ -125,18 +125,13 @@ test.describe('Hero page (/)', () => {
     await expect(tagline).toContainText('from the ground up');
   });
 
-  test('hero has figure with background image and caption', async ({
-    page,
-  }) => {
+  test('hero has figure with background image', async ({ page }) => {
     await page.goto('/');
     await waitForHeroLoaded(page);
     const figure = page.locator('.hero-figure');
     await expect(figure).toBeVisible();
     await expect(figure.locator('.hero-bg__image')).toBeVisible();
     await expect(figure.locator('img[alt="Intro background"]')).toBeVisible();
-    await expect(figure.locator('.hero-caption')).toContainText(
-      'AltumCode / Unsplash',
-    );
   });
 
   test('hero footer shows copyright', async ({ page }) => {

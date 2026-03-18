@@ -104,3 +104,40 @@
   min-height: 1.5em;
   font-size: 0.95rem;
 }
+
+/* Additional links shown after the Send button (created by JS) */
+.contact-extra-links-wrapper {
+  /* contact-form has grid gap (1rem) between items, so add half rem
+     to reach ~1.5rem total after the Send button. */
+  margin-top: 1.5rem; /* 1rem + 1.5rem = ~2.5rem total */
+}
+
+.contact-extra-links-intro {
+  margin: 0;
+  padding: 0;
+}
+
+.contact-extra-links {
+  display: grid;
+  gap: 1rem; /* 1rem between the two links */
+  margin-top: 1rem; /* 1rem between the intro text and the first link */
+}
+
+.contact-extra-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none; /* underline only on hover via global a:hover */
+  color: inherit;
+}
+
+.contact-extra-link__icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.contact-extra-link__text {
+  font-weight: 500;
+}
