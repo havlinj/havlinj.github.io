@@ -4,4 +4,3 @@
 - **panel.jpg** – Second image used for the full-width panel behind the article labels. It sits under the buttons and is tinted/adjusted via `--panel-bg-*` variables in `src/pages/writing.astro`.
 
 If you change filenames, also update the URLs in `writing.astro`.
-

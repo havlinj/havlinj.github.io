@@ -11,7 +11,8 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
     class="writing-page"
     style={{
       '--page-title-margin-bottom': '1.3rem',
-      '--panel-bg': "url('/assets/blog/crane_dichromatic_bayer16_inverted_dichrom.png')",
+      '--panel-bg':
+        "url('/assets/blog/crane_dichromatic_bayer16_inverted_dichrom.png')",
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
       '--panel-bg-saturation': '1',
@@ -32,8 +33,8 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
             posts.map((post) => (
               <li>
                 <a href={`/blog/${post.slug}`} class="page-button">
-                  <span class="page-button__bg" aria-hidden="true"></span>
-                  <span class="page-button__overlay" aria-hidden="true"></span>
+                  <span class="page-button__bg" aria-hidden="true" />
+                  <span class="page-button__overlay" aria-hidden="true" />
                   <span class="page-button__inner">
                     <span class="page-button__glow-wrap" aria-hidden="true">
                       <span class="page-button__glow">{post.data.title}</span>

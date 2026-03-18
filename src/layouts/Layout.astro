@@ -108,7 +108,10 @@ const pageTitle = title || 'Astro Basics';
           timeoutId = setTimeout(reveal, 4000);
         }
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', revealProfileSectionWhenPortraitLoaded);
+          document.addEventListener(
+            'DOMContentLoaded',
+            revealProfileSectionWhenPortraitLoaded,
+          );
         } else {
           revealProfileSectionWhenPortraitLoaded();
         }

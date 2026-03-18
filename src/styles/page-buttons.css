@@ -19,7 +19,9 @@
   flex: 1;
   min-height: 0;
   margin-top: var(--panel-margin-top, 0);
-  padding: var(--panel-padding-top, 2rem) 0 var(--panel-padding-bottom, calc(3 * var(--panel-padding-top, 2rem))) var(--panel-padding-left, 2rem);
+  padding: var(--panel-padding-top, 2rem) 0
+    var(--panel-padding-bottom, calc(3 * var(--panel-padding-top, 2rem)))
+    var(--panel-padding-left, 2rem);
   border: none;
   border-radius: 0;
   background-color: #111;
@@ -38,8 +40,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: var(--panel-bg-pos-x, 50%) var(--panel-bg-pos-y, 50%);
-  filter:
-    saturate(var(--panel-bg-saturation, 1))
+  filter: saturate(var(--panel-bg-saturation, 1))
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
   pointer-events: none;
@@ -50,7 +51,6 @@
   transform: scaleX(-1);
   transform-origin: center;
 }
-
 
 /* Profile: grain overlay (clipped to panel) */
 .profile-section .page-buttons-panel::after {

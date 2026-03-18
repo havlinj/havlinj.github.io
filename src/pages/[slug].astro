@@ -30,9 +30,12 @@ const PROFILE_PRELOADS = [
 ---
 
 <Layout title={page.data.title} activeSection={activeSection}>
-  {isProfile && PROFILE_PRELOADS.map((href) => (
-    <link slot="head" rel="preload" as="image" href={href} />
-  ))}
+  {
+    isProfile &&
+      PROFILE_PRELOADS.map((href) => (
+        <link slot="head" rel="preload" as="image" href={href} />
+      ))
+  }
   <article class={isProfile ? 'has-buttons-panel' : undefined}>
     <h1
       class="page-title"
