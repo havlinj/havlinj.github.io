@@ -1,9 +1,50 @@
 ---
 import { getCollection } from 'astro:content';
+import { readdir } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 import Layout from '../layouts/Layout.astro';
 
 const posts = await getCollection('blog');
 posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const WRITING_POOL_DIR = join(
+  process.cwd(),
+  'public',
+  'assets',
+  'pages',
+  'writing',
+  'pool',
+);
+const IMAGE_EXTENSIONS = new Set([
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+  '.avif',
+  '.gif',
+  '.svg',
+]);
+
+let writingPoolUrls: string[] = [];
+try {
+  const dirEntries = await readdir(WRITING_POOL_DIR, { withFileTypes: true });
+  writingPoolUrls = dirEntries
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((fileName: string) =>
+      IMAGE_EXTENSIONS.has(extname(fileName).toLowerCase()),
+    )
+    .sort((a: string, b: string) => a.localeCompare(b, 'en'))
+    .map(
+      (fileName: string) =>
+        `/assets/pages/writing/pool/${encodeURIComponent(fileName)}`,
+    );
+} catch {
+  writingPoolUrls = [];
+}
+const defaultWritingBg = writingPoolUrls[0]
+  ? `url('${writingPoolUrls[0]}')`
+  : 'none';
 ---
 
 <Layout title="Writing" activeSection="writing">
@@ -11,8 +52,7 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
     class="writing-page"
     style={{
       '--page-title-margin-bottom': '1.3rem',
-      '--panel-bg':
-        "url('/assets/pages/writing/joschka-silzle-90pi4AI8MwA_dichrom.png')",
+      '--panel-bg': defaultWritingBg,
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
       '--panel-bg-saturation': '1',
@@ -49,4 +89,24 @@ posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
       </div>
     </div>
   </article>
+  <script is:inline define:vars={{ writingPoolUrls }}>
+    (() => {
+      if (!Array.isArray(writingPoolUrls) || writingPoolUrls.length === 0)
+        return;
+
+      const storageKey = 'writing-bg-index';
+      const rawValue = window.localStorage.getItem(storageKey);
+      const parsed = Number.parseInt(rawValue ?? '0', 10);
+      const currentIndex = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+      const selectedUrl =
+        writingPoolUrls[currentIndex % writingPoolUrls.length];
+      const nextIndex = (currentIndex + 1) % writingPoolUrls.length;
+
+      window.localStorage.setItem(storageKey, String(nextIndex));
+
+      const writingArticle = document.querySelector('article.writing-page');
+      if (!writingArticle) return;
+      writingArticle.style.setProperty('--panel-bg', `url('${selectedUrl}')`);
+    })();
+  </script>
 </Layout>

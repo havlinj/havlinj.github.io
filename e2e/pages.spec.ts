@@ -252,6 +252,43 @@ test.describe('Writing page (/writing)', () => {
     await expect(text).toHaveCSS('color', 'rgb(224, 247, 250)');
     await expect(bg).toHaveCSS('background-color', 'rgb(17, 17, 17)');
   });
+
+  test('writing background rotates across visits using localStorage index', async ({
+    page,
+  }) => {
+    await page.goto('/writing');
+    await page.evaluate(() => {
+      window.localStorage.removeItem('writing-bg-index');
+    });
+    await page.reload();
+
+    const firstBg = await page.evaluate(() => {
+      const article = document.querySelector('article.writing-page');
+      if (!article) return '';
+      return getComputedStyle(article).getPropertyValue('--panel-bg').trim();
+    });
+    const firstIndex = await page.evaluate(() =>
+      window.localStorage.getItem('writing-bg-index'),
+    );
+
+    await page.goto('/writing');
+    const secondBg = await page.evaluate(() => {
+      const article = document.querySelector('article.writing-page');
+      if (!article) return '';
+      return getComputedStyle(article).getPropertyValue('--panel-bg').trim();
+    });
+    const secondIndex = await page.evaluate(() =>
+      window.localStorage.getItem('writing-bg-index'),
+    );
+
+    expect(firstBg).toMatch(/url\(.+\)/);
+    expect(secondBg).toMatch(/url\(.+\)/);
+    // When pool has at least 2 images, background should advance.
+    expect(secondBg).not.toBe(firstBg);
+    expect(firstIndex).not.toBeNull();
+    expect(secondIndex).not.toBeNull();
+    expect(firstIndex).not.toBe(secondIndex);
+  });
 });
 
 // ---------------------------------------------------------------------------

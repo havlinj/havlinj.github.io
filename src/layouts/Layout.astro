@@ -41,21 +41,19 @@ const navItems = [
               <a href="/" class="site-header__item site-header__brand">
                 Jan Havlín
               </a>
-              {
-                navItems.map((item) => (
-                  <a
-                    href={item.href}
-                    class={
-                      'site-header__item site-nav__link' +
-                      (activeSection === item.section
-                        ? ' site-nav__link--active'
-                        : '')
-                    }
-                  >
-                    {item.label}
-                  </a>
-                ))
-              }
+              {navItems.map((item) => (
+                <a
+                  href={item.href}
+                  class={
+                    'site-header__item site-nav__link' +
+                    (activeSection === item.section
+                      ? ' site-nav__link--active'
+                      : '')
+                  }
+                >
+                  {item.label}
+                </a>
+              ))}
             </div>
           </header>
         )
