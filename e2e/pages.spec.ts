@@ -234,6 +234,67 @@ test.describe('Writing page (/writing)', () => {
       await expect(links.nth(i)).toHaveAttribute('href', /^\/blog\//);
     }
   });
+
+  test('writing buttons invert colors on hover', async ({ page }) => {
+    await page.goto('/writing');
+    const button = page
+      .getByRole('link', { name: 'Reflection on Building Systems' })
+      .first();
+    const text = button.locator('.page-button__text');
+    const bg = button.locator('.page-button__bg');
+
+    await expect(button).toBeVisible();
+    await expect(text).toHaveCSS('color', 'rgb(17, 17, 17)');
+    await expect(bg).toHaveCSS('background-color', 'rgb(224, 247, 250)');
+
+    await button.hover();
+
+    await expect(text).toHaveCSS('color', 'rgb(224, 247, 250)');
+    await expect(bg).toHaveCSS('background-color', 'rgb(17, 17, 17)');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Credits page (/credits)
+// ---------------------------------------------------------------------------
+
+test.describe('Credits page (/credits)', () => {
+  test('shows heading, footer link, and navbar', async ({ page }) => {
+    await page.goto('/credits');
+    await expect(
+      page.getByRole('heading', { name: 'Credits', level: 1 }),
+    ).toBeVisible();
+    await expect(page.locator('.site-header')).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Credits' }).first(),
+    ).toBeVisible();
+  });
+
+  test('renders photos section and core attributions', async ({ page }) => {
+    await page.goto('/credits');
+    await expect(
+      page.getByRole('heading', { name: 'Photos', level: 3 }),
+    ).toBeVisible();
+    await expect(page.getByText('AltumCode')).toBeVisible();
+    await expect(page.getByText('Dillon Shook')).toBeVisible();
+    await expect(page.getByText('Tai Bui')).toBeVisible();
+    await expect(page.getByText('Joschka Silzle')).toBeVisible();
+  });
+
+  test('legacy /credit redirects to /credits', async ({ page }) => {
+    await page.goto('/credit');
+    await expect(page).toHaveURL(/\/credits$/);
+  });
+
+  test('footer credits link navigates to /credits', async ({ page }) => {
+    await page.goto('/writing');
+    const footerCredits = page.locator(
+      'footer.site-footer a.site-footer__credits',
+    );
+    await expect(footerCredits).toBeVisible();
+    await footerCredits.click();
+    await expect(page).toHaveURL(/\/credits$/);
+  });
 });
 
 // ---------------------------------------------------------------------------

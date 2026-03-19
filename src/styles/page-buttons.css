@@ -160,6 +160,7 @@
   z-index: 0;
   pointer-events: none;
   background-color: var(--color-page-bg);
+  transition: background-color 0.18s ease;
 }
 
 /* Overlay: same rectangle as bg, so the “cutout” is one clean shape */
@@ -170,6 +171,7 @@
   z-index: 1;
   pointer-events: none;
   background-color: var(--color-page-bg);
+  transition: background-color 0.18s ease;
 }
 
 /* Glow/halo removed */
@@ -186,4 +188,18 @@
   letter-spacing: 0.025em;
   line-height: 1.25;
   -webkit-font-smoothing: antialiased;
+  transition: color 0.18s ease;
+}
+
+/* Invert button/text colors on hover or keyboard focus */
+.page-button:hover .page-button__bg,
+.page-button:hover .page-button__overlay,
+.page-button:focus-visible .page-button__bg,
+.page-button:focus-visible .page-button__overlay {
+  background-color: #111;
+}
+
+.page-button:hover .page-button__text,
+.page-button:focus-visible .page-button__text {
+  color: var(--color-page-bg);
 }

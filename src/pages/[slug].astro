@@ -23,7 +23,7 @@ const activeSection = profileSlugs.includes(slug)
     ? 'contact'
     : slug === 'credits'
       ? 'credits'
-    : undefined;
+      : undefined;
 const isProfile = slug === 'profile';
 const isCredits = slug === 'credits';
 
@@ -41,10 +41,9 @@ const PROFILE_PRELOADS = [
       ))
   }
   <article
-    class={[
-      isProfile && 'has-buttons-panel',
-      isCredits && 'credits-page',
-    ].filter(Boolean).join(' ')}
+    class={[isProfile && 'has-buttons-panel', isCredits && 'credits-page']
+      .filter(Boolean)
+      .join(' ')}
   >
     <h1
       class="page-title"
