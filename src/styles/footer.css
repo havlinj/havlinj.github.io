@@ -1,24 +1,21 @@
 .site-footer {
-  width: 100%;
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 1rem 2rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  text-align: center;
+  padding: 1.5rem 0 2rem;
   /* Footer copy: smaller on mobile, scales up smoothly, caps at current size. */
   font-size: clamp(0.65rem, 0.55rem + 0.5vw, 0.8rem);
   color: #111;
 }
 
-.site-footer p {
+.site-footer__inner {
+  text-align: left;
+}
+
+.site-footer__inner p {
   margin: 0;
 }
 
 .site-footer__credits {
+  display: inline-block;
+  margin-top: 0.15rem;
   font-size: 0.9em;
   line-height: 1.2;
 }
