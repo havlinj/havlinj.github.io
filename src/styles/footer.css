@@ -4,7 +4,8 @@
   margin: 0 auto;
   padding: 1rem 2rem 2rem;
   text-align: center;
-  font-size: 0.8rem;
+  /* Footer copy: smaller on mobile, scales up smoothly, caps at current size. */
+  font-size: clamp(0.65rem, 0.55rem + 0.5vw, 0.8rem);
   color: #111;
 }
 

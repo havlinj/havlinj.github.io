@@ -5,7 +5,7 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    --portrait-tile-inset: 2.5rem;
+    --portrait-tile-inset: clamp(1.2rem, 7cqw, 2.5rem);
     --portrait-pos-x: 40%;
     --portrait-pos-y: 65%;
     --portrait-zoom: 1.05;
