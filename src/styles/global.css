@@ -192,10 +192,6 @@ article .profile-section:last-child {
   background: var(--color-page-bg);
 }
 
-.profile-photo-frame {
-  position: relative;
-}
-
 /* Profile: grain overlay on photo + bottom image tiles */
 .profile-photo-box::after,
 .profile-image-tile::after {
@@ -238,6 +234,7 @@ article .profile-section:last-child {
 
 /* Top-left: portrait */
 .profile-photo-frame {
+  position: relative;
   background: var(--color-page-bg);
 }
 

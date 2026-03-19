@@ -55,32 +55,6 @@
   transition: transform 0.3s ease-in-out;
 }
 
-/* Caption: right edge of hero (figure overflows 15%) → ~11% + offset */
-.hero-caption {
-  position: absolute;
-  bottom: 0.5rem;
-  right: calc(11% + 0.5rem);
-  left: auto;
-  text-align: right;
-  font-size: 0.5rem;
-  color: var(--color-page-bg);
-  margin: 0;
-}
-
-.hero-footer {
-  width: 100%;
-  padding: 0.5rem 0 2rem 0;
-  text-align: right;
-  font-size: 0.5rem;
-  color: #111;
-  opacity: 0.7;
-}
-
-.hero-footer p {
-  margin: 0;
-  padding-right: 0.5rem;
-}
-
 .hero-content {
   position: relative;
   z-index: 2;

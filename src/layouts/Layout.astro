@@ -7,6 +7,11 @@ import '../styles/page-buttons.css';
 
 const { title, activeSection } = Astro.props;
 const pageTitle = title || 'Astro Basics';
+const navItems = [
+  { href: '/profile', label: 'Profile', section: 'profile' },
+  { href: '/writing', label: 'Writing', section: 'writing' },
+  { href: '/contact', label: 'Contact', section: 'contact' },
+];
 ---
 
 <!doctype html>
@@ -36,33 +41,21 @@ const pageTitle = title || 'Astro Basics';
               <a href="/" class="site-header__item site-header__brand">
                 Jan Havlín
               </a>
-              <a
-                href="/profile"
-                class={
-                  'site-header__item site-nav__link' +
-                  (activeSection === 'profile' ? ' site-nav__link--active' : '')
-                }
-              >
-                Profile
-              </a>
-              <a
-                href="/writing"
-                class={
-                  'site-header__item site-nav__link' +
-                  (activeSection === 'writing' ? ' site-nav__link--active' : '')
-                }
-              >
-                Writing
-              </a>
-              <a
-                href="/contact"
-                class={
-                  'site-header__item site-nav__link' +
-                  (activeSection === 'contact' ? ' site-nav__link--active' : '')
-                }
-              >
-                Contact
-              </a>
+              {
+                navItems.map((item) => (
+                  <a
+                    href={item.href}
+                    class={
+                      'site-header__item site-nav__link' +
+                      (activeSection === item.section
+                        ? ' site-nav__link--active'
+                        : '')
+                    }
+                  >
+                    {item.label}
+                  </a>
+                ))
+              }
             </div>
           </header>
         )
@@ -78,7 +71,7 @@ const pageTitle = title || 'Astro Basics';
     <script is:inline>
       (function () {
         'use strict';
-        /* Buttons: solid page-bg only, no image/parallax/overlay gradient – no JS needed */
+        /* Profile: reveal section only after portrait is ready or timeout hits. */
 
         function revealProfileSectionWhenPortraitLoaded() {
           var section = document.querySelector('.profile-section--loading');

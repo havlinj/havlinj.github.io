@@ -60,10 +60,7 @@
   background-color: transparent;
 }
 
-.contact-form input:focus,
-.contact-form input:focus-visible,
-.contact-form textarea:focus,
-.contact-form textarea:focus-visible {
+.contact-form :is(input, textarea):is(:focus, :focus-visible) {
   outline: none;
   border: 2px solid #111;
 }

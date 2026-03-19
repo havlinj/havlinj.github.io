@@ -10,9 +10,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { slug } = Astro.params;
-const posts = await getCollection('blog');
-const post = posts.find((p) => p.slug === slug);
+const { post } = Astro.props;
 const { Content } = await post.render();
 
 const dateFormatted = post.data.date.toLocaleDateString('en-GB', {

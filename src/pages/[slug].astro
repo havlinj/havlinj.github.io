@@ -16,14 +16,14 @@ const page = await getEntry('pages', slug);
 if (!page) return Astro.redirect('/');
 const { Content } = await page.render();
 
-const profileSlugs = ['profile', 'intro', 'professional', 'personal'];
-const activeSection = profileSlugs.includes(slug)
+const profileSlugs = new Set(['profile', 'intro', 'professional', 'personal']);
+const sectionBySlug: Record<string, string> = {
+  contact: 'contact',
+  credits: 'credits',
+};
+const activeSection = profileSlugs.has(slug)
   ? 'profile'
-  : slug === 'contact'
-    ? 'contact'
-    : slug === 'credits'
-      ? 'credits'
-      : undefined;
+  : sectionBySlug[slug] || undefined;
 const isProfile = slug === 'profile';
 const isCredits = slug === 'credits';
 
