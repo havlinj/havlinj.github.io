@@ -11,6 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+if (slug === 'credit') return Astro.redirect('/credits');
 const page = await getEntry('pages', slug);
 if (!page) return Astro.redirect('/');
 const { Content } = await page.render();
@@ -20,8 +21,11 @@ const activeSection = profileSlugs.includes(slug)
   ? 'profile'
   : slug === 'contact'
     ? 'contact'
+    : slug === 'credits'
+      ? 'credits'
     : undefined;
 const isProfile = slug === 'profile';
+const isCredits = slug === 'credits';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
@@ -36,7 +40,12 @@ const PROFILE_PRELOADS = [
         <link slot="head" rel="preload" as="image" href={href} />
       ))
   }
-  <article class={isProfile ? 'has-buttons-panel' : undefined}>
+  <article
+    class={[
+      isProfile && 'has-buttons-panel',
+      isCredits && 'credits-page',
+    ].filter(Boolean).join(' ')}
+  >
     <h1
       class="page-title"
       style={isProfile ? { '--page-title-margin-bottom': '1.3rem' } : undefined}

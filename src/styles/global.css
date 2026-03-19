@@ -107,6 +107,30 @@ h6 {
   font-weight: 400;
 }
 
+/* Credits: keep H3 visually distinct from H2 */
+article.credits-page h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+/* Credits: same divider line under title as Contact page */
+article.credits-page > h1.page-title {
+  margin-bottom: 0;
+}
+
+article.credits-page > h1.page-title::after {
+  content: '';
+  display: block;
+  margin-top: 1.3rem;
+  width: 100%;
+  height: 1px;
+  background-color: #111;
+}
+
+article.credits-page > h1.page-title + * {
+  margin-top: 1rem;
+}
+
 /* ===============================
    LINKS
 ================================ */
