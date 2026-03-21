@@ -25,7 +25,12 @@ const activeSection = profileSlugs.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
 const isProfile = slug === 'profile';
-const isCredits = slug === 'credits';
+/** Same 1px rule under H1 as Contact (global.css --page-title-rule-gap) */
+const hasPageTitleRule =
+  slug === 'credits' ||
+  slug === 'professional' ||
+  slug === 'intro' ||
+  slug === 'personal';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
@@ -41,7 +46,7 @@ const PROFILE_PRELOADS = [
       ))
   }
   <article
-    class={[isProfile && 'has-buttons-panel', isCredits && 'credits-page']
+    class={[isProfile && 'has-buttons-panel', hasPageTitleRule && 'has-page-title-rule']
       .filter(Boolean)
       .join(' ')}
   >

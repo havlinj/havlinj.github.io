@@ -22,6 +22,22 @@
   --color-divider: rgba(17, 17, 17, 0.22);
   /* List bullets / numbers: visible but slightly softer than body text */
   --color-list-marker: rgba(17, 17, 17, 0.55);
+  /* Optical vertical align: negative = nudge bullet/number up (via ::before, not ::marker — Firefox) */
+  --list-marker-nudge-y: -0.1em;
+  /* Marker column: offset from li edge + glyph width + gap before line (≈ old 0.5rem after bullet) */
+  --list-marker-left: 0.15rem;
+  --list-after-marker-gap: 0.48rem;
+  --list-ul-indent: calc(
+    var(--list-marker-left) + 0.65em + var(--list-after-marker-gap)
+  );
+  /* Match ol > li::before min-width (room for 2–3 digits) + same gap as ul */
+  --list-ol-indent: calc(
+    var(--list-marker-left) + 2em + var(--list-after-marker-gap)
+  );
+  /* Hollow = ▫ (U+25AB), same “small square” size class as ▪; scale down only if you switch to □ (U+25A1) */
+  --list-marker-hollow-scale: 1;
+  /* 1px rule under main H1 on Contact + Credits (gap above/below line) */
+  --page-title-rule-gap: 1.35rem;
 }
 
 /* ===============================
@@ -98,6 +114,25 @@ h1.page-title {
   margin-bottom: var(--page-title-margin-bottom, 1rem);
 }
 
+/* Credits, Professional, Intro, Personal: same line under page H1 as Contact */
+article.has-page-title-rule > h1.page-title {
+  margin-bottom: 0;
+  position: relative;
+}
+
+article.has-page-title-rule > h1.page-title::after {
+  content: '';
+  display: block;
+  margin-top: var(--page-title-rule-gap);
+  width: 100%;
+  height: 1px;
+  background-color: #111;
+}
+
+article.has-page-title-rule > h1.page-title + * {
+  margin-top: var(--page-title-rule-gap);
+}
+
 h2 {
   font-size: clamp(1.45rem, 2.1vw, 1.9rem);
   font-weight: 550;
@@ -132,49 +167,80 @@ a:hover {
 
 /* ===============================
    LISTS
+   Markers via ::before (not ::marker): Chrome allows transform on ::marker,
+   Firefox does not — pseudo-element keeps bullet/number nudge consistent.
 ================================ */
 ul,
 ol {
-  /* Wider gutter: custom unicode markers need room + air before list text */
-  padding-left: 1.85rem;
+  list-style: none;
+  padding-left: 0;
   margin-bottom: 1rem;
 }
 
-ul li,
+/* Indent nested lists inside a list item */
+:where(ul, ol) :where(ul, ol) {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  padding-left: 1.5rem;
+}
+
+ul li {
+  position: relative;
+  padding-left: var(--list-ul-indent);
+}
+
 ol li {
-  /* Space between marker and line text (especially with string list-style-type) */
-  padding-inline-start: 0.5rem;
+  position: relative;
+  padding-left: var(--list-ol-indent);
 }
 
-/* Unordered: filled small square vs hollow square for nested lists */
-ul {
-  list-style-type: '\25AA'; /* ▪ BLACK SMALL SQUARE */
-}
-
-ul ul {
-  list-style-type: '\25A1'; /* □ WHITE SQUARE (reads as outline on light bg) */
-}
-
-ul ul ul {
-  list-style-type: '\25AA';
-}
-
-ul ul ul ul {
-  list-style-type: '\25A1';
-}
-
-ul li::marker {
+/* Shared marker box */
+ul > li::before,
+ol > li::before {
+  position: absolute;
+  left: var(--list-marker-left);
+  top: 0;
+  line-height: inherit;
   color: var(--color-list-marker);
+  transform: translateY(var(--list-marker-nudge-y));
+  pointer-events: none;
 }
 
-/* Ordered: keep decimal; style the numerals via ::marker */
+/* Unordered: ▪ vs ▫ — both “small square” code points; U+25A1 (□) is oversized in Inter */
+ul > li::before {
+  content: '\25AA'; /* ▪ BLACK SMALL SQUARE */
+}
+
+ul ul > li::before,
+ul ul ul ul > li::before {
+  content: '\25AB'; /* ▫ WHITE SMALL SQUARE — matches ▪ size; avoid U+25A1 (□) */
+  font-size: calc(1em * var(--list-marker-hollow-scale));
+}
+
+ul ul ul > li::before {
+  content: '\25AA';
+}
+
+/* Ordered: decimal counter (restarts per nested ol) */
 ol {
-  list-style-type: decimal;
+  counter-reset: ordered-item;
 }
 
-ol li::marker {
-  color: var(--color-list-marker);
+ol > li {
+  counter-increment: ordered-item;
+}
+
+ol > li::before {
+  content: counter(ordered-item) '.';
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  min-width: 2em;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+ol ol {
+  counter-reset: ordered-item;
 }
 
 /* ===============================

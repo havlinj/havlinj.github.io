@@ -6,9 +6,14 @@ ul.post-list {
   margin: 0;
 }
 
-/* Global `ul li` adds marker-to-text gap; post list has no markers */
-ul.post-list li {
-  padding-inline-start: 0;
+/* Global lists use li::before bullets; Writing nav has none */
+ul.post-list > li {
+  padding-left: 0;
+}
+
+ul.post-list > li::before {
+  content: none;
+  display: none;
 }
 
 /* Writing: make the whole panel square, so the background fills it */

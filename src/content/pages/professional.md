@@ -2,8 +2,6 @@
 title: 'Professional'
 ---
 
----
-
 ## Engineering Approach
 
 I build software systems where architecture, performance, and long-term integrity matter.

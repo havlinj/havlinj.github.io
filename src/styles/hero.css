@@ -110,16 +110,28 @@
   display: inline-block;
 }
 
+/*
+ * Vertical rhythm: "Hi there" → start of *visible* hero photo (~1.35rem total)
+ *
+ * 1) index.astro sets --page-title-margin-bottom: 1.1rem on this page’s h1.page-title.
+ * 2) h1 + .hero-wrap margin-top: 1.1rem (below) must stay the SAME value as (1).
+ *    The two margins collapse, so the gap from the title margin box to the top of
+ *    .hero is 1.1rem — not their sum.
+ * 3) .hero-top-edge is 0.25rem tall, same color as the page background, and sits on
+ *    top of the image at the hero’s top — it masks the photo but reads as “more air”.
+ *
+ * Perceived distance before you see the image: 1.1rem + 0.25rem ≈ 1.35rem.
+ */
 h1 + .hero-wrap {
-  margin-top: 1.35rem;
+  margin-top: 1.1rem;
 }
 
-/* Bar 1rem below "Hi there": global background, sharp top edge for image */
 .hero-top-edge {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  /* Part of the ~1.35rem visual gap; see block comment above */
   height: 0.25rem;
   background-color: var(--hero-highlight-bg);
   z-index: 1;

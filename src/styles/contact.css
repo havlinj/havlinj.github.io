@@ -6,8 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  /* Space above and below the title divider line */
-  --contact-divider-gap: 1.35rem;
+  /* Same token as Credits title rule (global.css --page-title-rule-gap) */
+  --contact-divider-gap: var(--page-title-rule-gap);
 }
 
 .contact > h1 {
