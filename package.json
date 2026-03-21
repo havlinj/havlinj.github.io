@@ -15,11 +15,11 @@
     "all": "bash ./scripts/all.sh"
   },
   "dependencies": {
-    "astro": "^5.17.1"
+    "astro": "^6.0.8"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
     "@eslint/eslintrc": "^3.3.4",
+    "@playwright/test": "^1.49.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^9.39.3",

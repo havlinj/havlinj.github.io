@@ -51,7 +51,7 @@ const defaultWritingBg = writingPoolUrls[0]
   <article
     class="writing-page"
     style={{
-      '--page-title-margin-bottom': '1.3rem',
+      '--page-title-margin-bottom': '1.35rem',
       '--panel-bg': defaultWritingBg,
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
@@ -59,7 +59,8 @@ const defaultWritingBg = writingPoolUrls[0]
       '--panel-bg-brightness': '1',
       '--panel-bg-contrast': '1',
       /* Panel starts 0.5rem under h1 (h1 has 1rem bottom margin) so total gap is 1.5rem */
-      '--panel-margin-top': '0.5rem',
+      // jelikoz nepouzivam...muzeme odstranit?
+      // // '--panel-margin-top': '0.5rem',
       '--panel-padding-top': '2rem',
       '--panel-padding-left': '2rem',
       '--panel-padding-bottom': '6rem',
@@ -72,7 +73,7 @@ const defaultWritingBg = writingPoolUrls[0]
           {
             posts.map((post) => (
               <li>
-                <a href={`/blog/${post.slug}`} class="page-button">
+                <a href={`/blog/${post.id}`} class="page-button">
                   <span class="page-button__bg" aria-hidden="true" />
                   <span class="page-button__overlay" aria-hidden="true" />
                   <span class="page-button__inner">

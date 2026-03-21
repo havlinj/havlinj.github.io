@@ -6,6 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  /* Space above and below the title divider line */
+  --contact-divider-gap: 1.35rem;
 }
 
 .contact > h1 {
@@ -16,8 +18,7 @@
 .contact > h1::after {
   content: '';
   display: block;
-  /* Baseline 1.3rem below the “Contact” heading */
-  margin-top: 1.3rem;
+  margin-top: var(--contact-divider-gap);
   width: 100%;
   height: 1px;
   background-color: #111;
@@ -27,9 +28,9 @@
   margin-bottom: 0.75rem;
 }
 
-/* First intro paragraph starts 1rem below the baseline */
+/* First intro paragraph: same gap below the line as above */
 .contact-intro:first-of-type {
-  margin-top: 1rem;
+  margin-top: var(--contact-divider-gap);
 }
 
 .contact-form {

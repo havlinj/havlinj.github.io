@@ -18,6 +18,10 @@
   --color-page-bg: #e0f7fa;
   --hero-highlight-bg: var(--color-page-bg);
   --hero-optical-offset: 0.1em;
+  /* Markdown --- → <hr>: subtle divider, same hue as body text */
+  --color-divider: rgba(17, 17, 17, 0.22);
+  /* List bullets / numbers: visible but slightly softer than body text */
+  --color-list-marker: rgba(17, 17, 17, 0.55);
 }
 
 /* ===============================
@@ -81,12 +85,12 @@ h6 {
 }
 
 h1 {
-  font-size: clamp(1.5rem, 2vw, 1.9rem);
+  font-size: clamp(1.9rem, 2.8vw, 2.5rem);
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 /* Page title: allow per-page optical spacing tweaks */
@@ -94,41 +98,23 @@ h1.page-title {
   margin-bottom: var(--page-title-margin-bottom, 1rem);
 }
 
-h2,
+h2 {
+  font-size: clamp(1.45rem, 2.1vw, 1.9rem);
+  font-weight: 550;
+  margin-top: 1.75rem;
+}
+
 h3 {
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 1.6vw, 1.45rem);
   font-weight: 500;
+  margin-top: 1.25rem;
 }
 
 h4,
 h5,
 h6 {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 400;
-}
-
-/* Credits: keep H3 visually distinct from H2 */
-article.credits-page h3 {
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-/* Credits: same divider line under title as Contact page */
-article.credits-page > h1.page-title {
-  margin-bottom: 0;
-}
-
-article.credits-page > h1.page-title::after {
-  content: '';
-  display: block;
-  margin-top: 1.3rem;
-  width: 100%;
-  height: 1px;
-  background-color: #111;
-}
-
-article.credits-page > h1.page-title + * {
-  margin-top: 1rem;
 }
 
 /* ===============================
@@ -149,8 +135,56 @@ a:hover {
 ================================ */
 ul,
 ol {
-  padding-left: 1.5rem;
+  /* Wider gutter: custom unicode markers need room + air before list text */
+  padding-left: 1.85rem;
   margin-bottom: 1rem;
+}
+
+ul li,
+ol li {
+  /* Space between marker and line text (especially with string list-style-type) */
+  padding-inline-start: 0.5rem;
+}
+
+/* Unordered: filled small square vs hollow square for nested lists */
+ul {
+  list-style-type: '\25AA'; /* ▪ BLACK SMALL SQUARE */
+}
+
+ul ul {
+  list-style-type: '\25A1'; /* □ WHITE SQUARE (reads as outline on light bg) */
+}
+
+ul ul ul {
+  list-style-type: '\25AA';
+}
+
+ul ul ul ul {
+  list-style-type: '\25A1';
+}
+
+ul li::marker {
+  color: var(--color-list-marker);
+}
+
+/* Ordered: keep decimal; style the numerals via ::marker */
+ol {
+  list-style-type: decimal;
+}
+
+ol li::marker {
+  color: var(--color-list-marker);
+  font-weight: 500;
+}
+
+/* ===============================
+   HORIZONTAL RULE (markdown ---)
+================================ */
+hr {
+  border: 0;
+  height: 1px;
+  margin: 2rem 0;
+  background-color: var(--color-divider);
 }
 
 /* Clip panel by content-body when it extends (soft edges stay inside) */

@@ -6,6 +6,11 @@ ul.post-list {
   margin: 0;
 }
 
+/* Global `ul li` adds marker-to-text gap; post list has no markers */
+ul.post-list li {
+  padding-inline-start: 0;
+}
+
 /* Writing: make the whole panel square, so the background fills it */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
