@@ -69,7 +69,8 @@ article .profile-section:last-child {
 .profile-image-tile::before {
   content: '';
   position: absolute;
-  inset: 0;
+  /* Prevent occasional 1px dark seams from subpixel transforms/compositing */
+  inset: -1px;
   background-image: var(--tile-bg, none);
   background-repeat: no-repeat;
   background-size: cover;
@@ -78,6 +79,8 @@ article .profile-section:last-child {
     brightness(var(--tile-brightness, 1)) contrast(var(--tile-contrast, 1));
   transform: scale(var(--tile-zoom, 1));
   transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
   pointer-events: none;
 }
 
@@ -93,7 +96,6 @@ article .profile-section:last-child {
   inset: var(--portrait-tile-inset, 0);
   overflow: hidden;
   background: transparent;
-  border: 1px solid #111;
 }
 
 /* Top-right: panel tile */
