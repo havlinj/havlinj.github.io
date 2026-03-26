@@ -83,10 +83,9 @@
       topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
       bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
 
-      // Middle two quarters => full-size zone.
-      // Transition is intentionally quick toward outer quarters.
-      const centerBand = 0.5; // middle 50%
-      const transitionBand = 0.2;
+      // Wider transition zone to avoid abrupt threshold jumps.
+      const centerBand = 0.4;
+      const transitionBand = 0.45;
 
       lines.forEach((line) => {
         const r = line.getBoundingClientRect();
