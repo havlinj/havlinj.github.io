@@ -1,5 +1,5 @@
 .site-footer {
-  padding: 1.5rem 0 2rem;
+  padding: 2.5rem 0 2rem;
   /* Footer copy: smaller on mobile, scales up smoothly, caps at current size. */
   font-size: clamp(0.65rem, 0.55rem + 0.5vw, 0.8rem);
   color: #111;
@@ -7,14 +7,30 @@
 
 .site-footer__inner {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
   text-align: left;
+}
+
+.site-footer__inner > * {
+  opacity: 0.6;
 }
 
 .site-footer__copyright {
   margin: 0;
+  justify-self: auto;
+  text-align: left;
+  font-size: 0.9em;
+  line-height: 1.2;
+}
+
+.site-footer__home {
+  justify-self: auto;
+}
+
+.site-footer__credits {
+  justify-self: auto;
 }
 
 .site-footer__link {
