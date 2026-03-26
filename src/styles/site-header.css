@@ -21,10 +21,6 @@
   text-decoration: underline;
 }
 
-.site-header__brand {
-  font-weight: 500;
-}
-
 .site-nav__link--active {
   text-decoration: underline;
 }

@@ -1,0 +1,120 @@
+.why-page .why-wrapper {
+  max-width: 38rem;
+  padding-top: 0;
+  padding-right: 2rem;
+  padding-bottom: 0;
+  padding-left: 2rem;
+}
+
+.why-page .why-box {
+  position: relative;
+  width: min(100%, 38rem);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.why-page .why-box::before,
+.why-page .why-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.why-page .why-box::before {
+  top: 0;
+  /* Shorter top fade so opening lines stay clearer */
+  height: clamp(72px, 12vh, 130px);
+  background: linear-gradient(
+    to top,
+    rgba(224, 247, 250, 0) 0%,
+    rgba(224, 247, 250, 0.2) 20%,
+    rgba(224, 247, 250, 0.46) 40%,
+    rgba(224, 247, 250, 0.72) 60%,
+    rgba(224, 247, 250, 0.9) 78%,
+    rgba(224, 247, 250, 0.99) 90%,
+    var(--color-page-bg) 100%
+  );
+}
+
+.why-page .why-box::after {
+  bottom: 0;
+  /* Keep stronger/larger bottom hint */
+  height: clamp(130px, 24vh, 240px);
+  background: linear-gradient(
+    to bottom,
+    rgba(224, 247, 250, 0) 0%,
+    rgba(224, 247, 250, 0.2) 20%,
+    rgba(224, 247, 250, 0.46) 40%,
+    rgba(224, 247, 250, 0.72) 60%,
+    rgba(224, 247, 250, 0.9) 78%,
+    rgba(224, 247, 250, 0.99) 90%,
+    var(--color-page-bg) 100%
+  );
+}
+
+.why-page .why-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  max-width: calc(var(--content-width) * 2 / 3);
+  padding: clamp(2rem, 5vw, 3rem);
+  padding-right: 0;
+  padding-left: 0;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.why-page .why-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.why-page .why-label {
+  margin: 0 0 2.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.why-page .why-block {
+  max-width: 100%;
+}
+
+.why-page .why-block--body {
+  margin-top: clamp(4rem, 7vh, 5.5rem);
+}
+
+.why-page .why-block--close {
+  margin-top: clamp(4.5rem, 8vh, 6.5rem);
+}
+
+.why-page .why-scroll p {
+  margin: 0;
+  /* Match site pattern: fluid, readable base text that scales gently */
+  font-size: clamp(1.06rem, 0.98rem + 0.35vw, 1.22rem);
+  line-height: 1.75;
+  letter-spacing: -0.01em;
+}
+
+.why-page .why-scroll p + p {
+  margin-top: 1.5rem;
+}
+
+.why-page .why-lead {
+  font-size: clamp(1.1rem, 1.05rem + 0.3vw, 1.2rem);
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.why-page .why-anchor {
+  font-weight: 500;
+}
+
+.why-page .why-close {
+  margin-top: 2rem !important;
+  font-size: inherit;
+  line-height: 1.7;
+}

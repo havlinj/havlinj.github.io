@@ -1,6 +1,8 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import WhyContent from '../components/WhyContent.astro';
+import '../styles/why.css';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
@@ -16,7 +18,7 @@ const page = await getEntry('pages', slug);
 if (!page) return Astro.redirect('/');
 const { Content } = await render(page);
 
-const profileSlugs = new Set(['profile', 'intro', 'professional', 'personal']);
+const profileSlugs = new Set(['profile', 'why', 'professional', 'personal']);
 const sectionBySlug: Record<string, string> = {
   contact: 'contact',
   credits: 'credits',
@@ -25,11 +27,12 @@ const activeSection = profileSlugs.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
 const isProfile = slug === 'profile';
+const isWhy = slug === 'why';
 /** Same 1px rule under H1 as Contact (global.css --page-title-rule-gap) */
 const hasPageTitleRule =
   slug === 'credits' ||
   slug === 'professional' ||
-  slug === 'intro' ||
+  slug === 'why' ||
   slug === 'personal';
 
 const PROFILE_PRELOADS = [
@@ -46,7 +49,11 @@ const PROFILE_PRELOADS = [
       ))
   }
   <article
-    class={[isProfile && 'has-buttons-panel', hasPageTitleRule && 'has-page-title-rule']
+    class={[
+      isProfile && 'has-buttons-panel',
+      isWhy && 'why-page',
+      hasPageTitleRule && 'has-page-title-rule',
+    ]
       .filter(Boolean)
       .join(' ')}
   >
@@ -56,6 +63,6 @@ const PROFILE_PRELOADS = [
     >
       {page.data.title}
     </h1>
-    <Content />
+    {isWhy ? <WhyContent /> : <Content />}
   </article>
 </Layout>

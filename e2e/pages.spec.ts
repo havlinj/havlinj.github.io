@@ -2,25 +2,29 @@ import { test, expect } from '@playwright/test';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
 
 // ---------------------------------------------------------------------------
-// Profile page (/profile, /intro)
+// Profile page (/profile, /why)
 // ---------------------------------------------------------------------------
 
-test.describe('Profile page (/profile, /intro)', () => {
-  test('shows navbar with name and active Profile', async ({ page }) => {
+test.describe('Profile page (/profile, /why)', () => {
+  test('shows navbar with active Profile (no Home in header)', async ({
+    page,
+  }) => {
     await page.goto('/profile');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Jan Havlín' })).toBeVisible();
+    await expect(
+      page.locator('.site-header__inner').getByRole('link', { name: 'Home' }),
+    ).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
       /site-nav__link--active/,
     );
   });
 
-  test('has portrait, Intro, Professional, Personal links', async ({
+  test('has portrait, Why, Professional, Personal links', async ({
     page,
   }) => {
     await page.goto('/profile');
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Intro' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
@@ -79,28 +83,24 @@ test.describe('Profile page (/profile, /intro)', () => {
     );
   });
 
-  test('site-header: Jan Havlín left, Profile Writing Contact spread across', async ({
+  test('site-header: Profile, Writing, Contact spread across', async ({
     page,
   }) => {
     await page.goto('/profile');
     const inner = page.locator('.site-header__inner');
     await expect(inner).toBeVisible();
-    const brand = inner.getByRole('link', { name: 'Jan Havlín' });
     const profile = inner.getByRole('link', { name: 'Profile' });
     const writing = inner.getByRole('link', { name: 'Writing' });
     const contact = inner.getByRole('link', { name: 'Contact' });
     const box = await inner.boundingBox();
-    const bBox = await brand.boundingBox();
     const pBox = await profile.boundingBox();
     const wBox = await writing.boundingBox();
     const cBox = await contact.boundingBox();
     expect(box).toBeTruthy();
-    expect(bBox).toBeTruthy();
     expect(pBox).toBeTruthy();
     expect(wBox).toBeTruthy();
     expect(cBox).toBeTruthy();
-    expect(bBox!.x).toBeLessThanOrEqual(box!.x + LAYOUT_TOLERANCE);
-    expect(bBox!.x).toBeLessThanOrEqual(pBox!.x + LAYOUT_TOLERANCE);
+    expect(pBox!.x).toBeLessThanOrEqual(box!.x + LAYOUT_TOLERANCE);
     expect(pBox!.x).toBeLessThanOrEqual(wBox!.x + LAYOUT_TOLERANCE);
     expect(wBox!.x).toBeLessThanOrEqual(cBox!.x + LAYOUT_TOLERANCE);
     expect(cBox!.x + cBox!.width).toBeGreaterThanOrEqual(
@@ -108,17 +108,20 @@ test.describe('Profile page (/profile, /intro)', () => {
     );
   });
 
-  test('navbar contains Profile, Writing, Contact links and name links to /', async ({
+  test('navbar: Profile, Writing, Contact only; Home link in footer', async ({
     page,
   }) => {
     await page.goto('/profile');
-    await expect(page.locator('.site-header a[href="/"]')).toBeVisible();
+    await expect(page.locator('.site-header a[href="/"]')).toHaveCount(0);
     await expect(page.locator('.site-header a[href="/profile"]')).toBeVisible();
     await expect(page.locator('.site-header a[href="/writing"]')).toBeVisible();
     await expect(page.locator('.site-header a[href="/contact"]')).toBeVisible();
+    const footerHome = page.locator('footer.site-footer a.site-footer__home');
+    await expect(footerHome).toHaveAttribute('href', '/');
+    await expect(footerHome).toHaveText('Home');
   });
 
-  test('Intro, Professional, Personal in one row: Intro left, Professional center, Personal right', async ({
+  test('Why, Professional, Personal in one row: Why left, Professional center, Personal right', async ({
     page,
   }) => {
     await page.goto('/profile');
@@ -127,14 +130,14 @@ test.describe('Profile page (/profile, /intro)', () => {
       .waitFor({ state: 'visible', timeout: 10000 });
     const article = page.locator('main.content article');
     await expect(article).toBeVisible();
-    const intro = article.getByRole('link', { name: 'Intro' });
+    const why = article.getByRole('link', { name: 'Why' });
     const professional = article.getByRole('link', { name: 'Professional' });
     const personal = article.getByRole('link', { name: 'Personal' });
-    await expect(intro).toBeVisible();
+    await expect(why).toBeVisible();
     await expect(professional).toBeVisible();
     await expect(personal).toBeVisible();
     const articleBox = await article.boundingBox();
-    const iBox = await intro.boundingBox();
+    const iBox = await why.boundingBox();
     const pBox = await professional.boundingBox();
     const lBox = await personal.boundingBox();
     expect(articleBox).toBeTruthy();
@@ -154,13 +157,14 @@ test.describe('Profile page (/profile, /intro)', () => {
     expect(pBox!.y).toBeLessThanOrEqual(lBox!.y + LAYOUT_TOLERANCE);
   });
 
-  test('Intro (/intro) has active Profile in navbar', async ({ page }) => {
-    await page.goto('/intro');
+  test('Why (/why) has active Profile in navbar', async ({ page }) => {
+    await page.goto('/why');
     await expect(page.locator('.site-header')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
       /site-nav__link--active/,
     );
   });
+
 });
 
 // ---------------------------------------------------------------------------

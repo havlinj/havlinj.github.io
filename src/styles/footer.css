@@ -6,16 +6,25 @@
 }
 
 .site-footer__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
   text-align: left;
 }
 
-.site-footer__inner p {
+.site-footer__copyright {
   margin: 0;
 }
 
-.site-footer__credits {
+.site-footer__link {
   display: inline-block;
-  margin-top: 0.15rem;
   font-size: 0.9em;
   line-height: 1.2;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-footer__link:hover {
+  text-decoration: underline;
 }

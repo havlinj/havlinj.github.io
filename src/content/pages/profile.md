@@ -50,12 +50,12 @@ title: 'Profile'
   <div class="profile-tile page-buttons-zone">
     <div class="page-buttons-panel" aria-label="Profile image + navigation">
       <nav class="profile-links" aria-label="Profile sections">
-        <a href="/intro" class="page-button">
+        <a href="/why" class="page-button">
           <span class="page-button__bg" aria-hidden="true"></span>
           <span class="page-button__overlay" aria-hidden="true"></span>
           <span class="page-button__inner">
-            <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Intro</span></span>
-            <span class="page-button__text">Intro</span>
+            <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Why</span></span>
+            <span class="page-button__text">Why</span>
           </span>
         </a>
         <a href="/professional" class="page-button">

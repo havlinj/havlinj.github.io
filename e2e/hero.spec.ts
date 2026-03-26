@@ -38,7 +38,7 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.site-header')).not.toBeVisible();
   });
 
-  test('has intro heading "Hi there" and hero section with name Jan Havlín', async ({
+  test('has hero heading "Hi there" and hero section with name Jan Havlín', async ({
     page,
   }) => {
     await page.goto('/');
@@ -135,7 +135,7 @@ test.describe('Hero page (/)', () => {
     const figure = page.locator('.hero-figure');
     await expect(figure).toBeVisible();
     await expect(figure.locator('.hero-bg__image')).toBeVisible();
-    await expect(figure.locator('img[alt="Intro background"]')).toBeVisible();
+    await expect(figure.locator('img[alt="Hero background"]')).toBeVisible();
   });
 
   test('site footer shows copyright on home', async ({ page }) => {
