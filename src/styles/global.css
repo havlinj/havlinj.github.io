@@ -36,7 +36,7 @@
   );
   /* Hollow = ▫ (U+25AB), same “small square” size class as ▪; scale down only if you switch to □ (U+25A1) */
   --list-marker-hollow-scale: 1;
-  /* 1px rule under main H1 on Contact + Credits (gap above/below line) */
+  /* 1px rule under main H1 on selected pages (gap above/below line) */
   --page-title-rule-gap: 1.35rem;
 }
 

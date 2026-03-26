@@ -2,7 +2,9 @@
   <div class="why-box">
     <div class="why-scroll">
       <div class="why-block why-block--intro">
-        <p class="why-lead"><br /><br />I'm a software engineer.</p>
+        <p class="why-lead">
+          <br /><br /><br /><br /><br />
+          I'm a software engineer.</p>
 
         <p>
           Platforms like LinkedIn or GitHub are useful - but they say little
@@ -20,7 +22,7 @@
 
         <p>
           I'm ambitious and drawn to building things that matter. Doing it well
-          requires more than code - it requires the right mindset.
+          requires more than code — it requires the right mindset.
         </p>
       </div>
 
@@ -29,10 +31,64 @@
 
         <p class="why-close">
           If this resonates, you probably already know why you're here.
-          <br /><br /><br />
-          <br /><br /><br />
+          <br /><br /><br /><br /><br /><br /><br />
         </p>
       </div>
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    const scrollEl = document.querySelector('.why-page .why-scroll');
+    if (!scrollEl) return;
+
+    const lines = Array.from(scrollEl.querySelectorAll('p'));
+    if (lines.length === 0) return;
+
+    const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+    const smoothstep = (x) => x * x * (3 - 2 * x);
+
+    let rafId = 0;
+    const schedule = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(update);
+    };
+
+    function update() {
+      rafId = 0;
+      const boxRect = scrollEl.getBoundingClientRect();
+      const half = boxRect.height / 2;
+      const center = boxRect.top + half;
+
+      // Middle two quarters => full-size zone.
+      // Transition is intentionally quick toward outer quarters.
+      const centerBand = 0.5; // middle 50%
+      const transitionBand = 0.2;
+
+      lines.forEach((line) => {
+        const r = line.getBoundingClientRect();
+        const mid = (r.top + r.bottom) / 2;
+        const normalized = Math.abs(mid - center) / half; // 0..1
+
+        const edgeProgress = clamp(
+          (normalized - centerBand) / transitionBand,
+          0,
+          1,
+        );
+        const eased = smoothstep(edgeProgress);
+
+        // Target values for outer quarters.
+        const scale = 1 - 0.4 * eased; // down to 0.6x
+        const inset = 2 * eased; // up to 2rem
+
+        line.style.setProperty('--why-line-scale', scale.toFixed(3));
+        line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
+      });
+    }
+
+    scrollEl.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    schedule();
+  })();
+</script>

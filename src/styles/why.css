@@ -1,16 +1,23 @@
 .why-page .why-wrapper {
-  max-width: 38rem;
+  --why-box-bg: #111;
+  --why-box-fg: var(--color-page-bg);
+  /* Baseline inset for text inside the box */
+  --why-base-inset: 1.35rem;
+  max-width: none;
+  margin-top: var(--page-title-rule-gap);
   padding-top: 0;
-  padding-right: 2rem;
+  padding-right: 0;
   padding-bottom: 0;
-  padding-left: 2rem;
+  padding-left: 0;
 }
 
 .why-page .why-box {
   position: relative;
-  width: min(100%, 38rem);
+  width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
+  background-color: var(--why-box-bg);
+  color: var(--why-box-fg);
 }
 
 .why-page .why-box::before,
@@ -28,13 +35,13 @@
   height: clamp(72px, 12vh, 130px);
   background: linear-gradient(
     to top,
-    rgba(224, 247, 250, 0) 0%,
-    rgba(224, 247, 250, 0.2) 20%,
-    rgba(224, 247, 250, 0.46) 40%,
-    rgba(224, 247, 250, 0.72) 60%,
-    rgba(224, 247, 250, 0.9) 78%,
-    rgba(224, 247, 250, 0.99) 90%,
-    var(--color-page-bg) 100%
+    rgba(17, 17, 17, 0) 0%,
+    rgba(17, 17, 17, 0.2) 20%,
+    rgba(17, 17, 17, 0.46) 40%,
+    rgba(17, 17, 17, 0.72) 60%,
+    rgba(17, 17, 17, 0.9) 78%,
+    rgba(17, 17, 17, 0.99) 90%,
+    var(--why-box-bg) 100%
   );
 }
 
@@ -44,13 +51,13 @@
   height: clamp(130px, 24vh, 240px);
   background: linear-gradient(
     to bottom,
-    rgba(224, 247, 250, 0) 0%,
-    rgba(224, 247, 250, 0.2) 20%,
-    rgba(224, 247, 250, 0.46) 40%,
-    rgba(224, 247, 250, 0.72) 60%,
-    rgba(224, 247, 250, 0.9) 78%,
-    rgba(224, 247, 250, 0.99) 90%,
-    var(--color-page-bg) 100%
+    rgba(17, 17, 17, 0) 0%,
+    rgba(17, 17, 17, 0.2) 20%,
+    rgba(17, 17, 17, 0.46) 40%,
+    rgba(17, 17, 17, 0.72) 60%,
+    rgba(17, 17, 17, 0.9) 78%,
+    rgba(17, 17, 17, 0.99) 90%,
+    var(--why-box-bg) 100%
   );
 }
 
@@ -96,6 +103,14 @@
   font-size: clamp(1.06rem, 0.98rem + 0.35vw, 1.22rem);
   line-height: 1.75;
   letter-spacing: -0.01em;
+  padding-left: calc(var(--why-base-inset) + var(--why-line-inset, 0));
+  padding-right: var(--why-line-inset, 0);
+  transform: scale(var(--why-line-scale, 1));
+  transform-origin: left center;
+  transition:
+    transform 90ms linear,
+    padding-inline 90ms linear;
+  will-change: transform, padding-inline;
 }
 
 .why-page .why-scroll p + p {
