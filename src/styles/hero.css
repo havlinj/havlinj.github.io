@@ -185,68 +185,12 @@ h1 + .hero-wrap {
   max-width: 40ch;
   letter-spacing: 0.01em;
   margin-block-start: 2.2rem;
-  padding: 0.1em 0.2em 0.18em 0.03em; /* match ::before inset + bottom so extended rectangle isn't clipped */
+  padding: 0.12em 0.2em 0.12em 0.03em;
   position: relative;
   display: inline-block;
   z-index: 1;
   color: #111;
-  /* Top strip: fades down and to the right so top-right doesn’t stick out */
-  background: linear-gradient(
-    to bottom right,
-    var(--hero-highlight-bg) 0%,
-    var(--hero-highlight-bg) 55%,
-    rgba(224, 247, 250, 0.6) 60%,
-    rgba(224, 247, 250, 0.3) 88%,
-    transparent 100%
-  );
-  background-size: 100% 1em;
-  background-repeat: no-repeat;
-  overflow: hidden;
-}
-
-/* Glow wrapper: behind text, children flow so last line can have its own glow */
-.tagline__glow-wrap {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.tagline__glow {
-  color: transparent;
-  text-shadow:
-    0 0 0.4em var(--hero-highlight-bg),
-    0 0 0.8em var(--hero-highlight-bg),
-    0 0 1.2em var(--hero-highlight-bg),
-    0 0 1.8em var(--hero-highlight-bg),
-    0 0 2.4em var(--hero-highlight-bg),
-    0 0 3em var(--hero-highlight-bg);
-}
-
-/* Last line only: stronger band + intensity, dosvit 15em, biased right */
-.tagline__glow--last {
-  color: transparent;
-  text-shadow:
-    0 0 0.45em var(--hero-highlight-bg),
-    0 0 1em var(--hero-highlight-bg),
-    0 0 1.65em var(--hero-highlight-bg),
-    0 0 2.4em var(--hero-highlight-bg),
-    0.25em 0 2.5em var(--hero-highlight-bg),
-    0.55em 0 3.2em rgba(224, 247, 250, 0.98),
-    0.9em 0 4em rgba(224, 247, 250, 0.96),
-    1.3em 0 5em rgba(224, 247, 250, 0.92),
-    1.75em 0 6.1em rgba(224, 247, 250, 0.87),
-    2.25em 0 7.3em rgba(224, 247, 250, 0.82),
-    2.8em 0 8.6em rgba(224, 247, 250, 0.75),
-    3.4em 0 10em rgba(224, 247, 250, 0.67),
-    4.05em 0 11.5em rgba(224, 247, 250, 0.58),
-    4.75em 0 13.2em rgba(224, 247, 250, 0.49),
-    5.5em 0 15em rgba(224, 247, 250, 0.4),
-    6.3em 0 16.8em rgba(224, 247, 250, 0.31),
-    7.15em 0 18.8em rgba(224, 247, 250, 0.22),
-    8.05em 0 20.8em rgba(224, 247, 250, 0.13),
-    9em 0 22.8em rgba(224, 247, 250, 0.06);
+  background-color: var(--hero-highlight-bg);
 }
 
 /* Tagline text: solid #111 on top, no shadow */
@@ -254,46 +198,4 @@ h1 + .hero-wrap {
   position: relative;
   z-index: 1;
   color: #111;
-}
-
-.tagline::before {
-  content: '';
-  position: absolute;
-  inset-block: 0.1em -0.18em; /* bottom: -0.18em extends rectangle downward */
-  inset-inline: 0.03em -0.2em;
-  /* Solid first third, then more transparent toward bottom-right */
-  background: linear-gradient(
-    to bottom right,
-    rgba(224, 247, 250, 1) 0%,
-    rgba(224, 247, 250, 1) 32%,
-    rgba(224, 247, 250, 0.92) 45%,
-    rgba(224, 247, 250, 0.78) 58%,
-    rgba(224, 247, 250, 0.58) 70%,
-    rgba(224, 247, 250, 0.6) 75%,
-    rgba(224, 247, 250, 0.54) 90%,
-    rgba(224, 247, 250, 0.7) 100%
-  );
-  z-index: -1;
-}
-
-/* Bottom-left: full color along axis, then smooth fade */
-.tagline::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30%;
-  height: 100%;
-  background: radial-gradient(
-    ellipse 100% 100% at 0% 100%,
-    var(--hero-highlight-bg) 0%,
-    var(--hero-highlight-bg) 45%,
-    var(--hero-highlight-bg) 55%,
-    rgba(224, 247, 250, 0.88) 68%,
-    rgba(224, 247, 250, 0.6) 78%,
-    rgba(224, 247, 250, 0.3) 88%,
-    transparent 100%
-  );
-  z-index: -1;
-  pointer-events: none;
 }
