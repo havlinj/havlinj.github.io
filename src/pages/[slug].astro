@@ -19,7 +19,7 @@ const page = await getEntry('pages', slug);
 if (!page) return Astro.redirect('/');
 const { Content } = await render(page);
 
-const profileSlugs = new Set(['profile', 'why', 'professional', 'personal']);
+const profileSlugs = new Set(['profile', 'why', 'professional', 'perspective']);
 const sectionBySlug: Record<string, string> = {
   contact: 'contact',
   credits: 'credits',
@@ -33,7 +33,7 @@ const isWhy = slug === 'why';
 const hasPageTitleRule =
   slug === 'credits' ||
   slug === 'professional' ||
-  slug === 'personal';
+  slug === 'perspective';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',

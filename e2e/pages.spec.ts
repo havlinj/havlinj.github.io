@@ -19,7 +19,7 @@ test.describe('Profile page (/profile, /why)', () => {
     );
   });
 
-  test('has portrait, Why, Professional, Personal links', async ({
+  test('has portrait, Why, Professional, Perspective links', async ({
     page,
   }) => {
     await page.goto('/profile');
@@ -28,17 +28,19 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(
       page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Personal' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Perspective' })).toBeVisible();
   });
 
-  test('profile article uses buttons panel layout', async ({ page }) => {
+  test('profile article uses 2x2 clickable-tile layout', async ({ page }) => {
     await page.goto('/profile');
     await expect(page.locator('article.has-buttons-panel')).toBeVisible();
     await expect(page.locator('.profile-section')).toBeVisible();
-    await expect(page.locator('.page-buttons-panel')).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
     await expect(
-      page.getByRole('navigation', { name: 'Profile sections' }),
+      page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Perspective' })).toBeVisible();
   });
 
   test('profile section loses loading class after portrait handling', async ({
@@ -71,12 +73,12 @@ test.describe('Profile page (/profile, /why)', () => {
     );
   });
 
-  test('Personal page has heading and profile-active navbar', async ({
+  test('Perspective page has heading and profile-active navbar', async ({
     page,
   }) => {
-    await page.goto('/personal');
+    await page.goto('/perspective');
     await expect(
-      page.getByRole('heading', { name: 'Personal', level: 1 }),
+      page.getByRole('heading', { name: 'Perspective', level: 1 }),
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
       /site-nav__link--active/,
@@ -121,40 +123,36 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(footerHome).toHaveText('Home');
   });
 
-  test('Why, Professional, Personal in one row: Why left, Professional center, Personal right', async ({
+  test('profile tiles are positioned as Why TL, Portrait TR, Professional BL, Perspective BR', async ({
     page,
   }) => {
     await page.goto('/profile');
     await page
       .locator('.profile-section:not(.profile-section--loading)')
       .waitFor({ state: 'visible', timeout: 10000 });
-    const article = page.locator('main.content article');
-    await expect(article).toBeVisible();
-    const why = article.getByRole('link', { name: 'Why' });
-    const professional = article.getByRole('link', { name: 'Professional' });
-    const personal = article.getByRole('link', { name: 'Personal' });
+    const profileSection = page.locator('.profile-section');
+    await expect(profileSection).toBeVisible();
+    const why = profileSection.getByRole('link', { name: 'Why' });
+    const professional = profileSection.getByRole('link', { name: 'Professional' });
+    const perspective = profileSection.getByRole('link', { name: 'Perspective' });
+    const portrait = profileSection.getByRole('img', { name: 'Jan Havlín' });
     await expect(why).toBeVisible();
     await expect(professional).toBeVisible();
-    await expect(personal).toBeVisible();
-    const articleBox = await article.boundingBox();
-    const iBox = await why.boundingBox();
-    const pBox = await professional.boundingBox();
-    const lBox = await personal.boundingBox();
-    expect(articleBox).toBeTruthy();
-    expect(iBox).toBeTruthy();
-    expect(pBox).toBeTruthy();
-    expect(lBox).toBeTruthy();
+    await expect(perspective).toBeVisible();
+    await expect(portrait).toBeVisible();
+    const whyBox = await why.boundingBox();
+    const proBox = await professional.boundingBox();
+    const perBox = await perspective.boundingBox();
+    const portraitBox = await portrait.boundingBox();
+    expect(whyBox).toBeTruthy();
+    expect(proBox).toBeTruthy();
+    expect(perBox).toBeTruthy();
+    expect(portraitBox).toBeTruthy();
 
-    // Buttons are stacked vertically in the profile panel (left-aligned),
-    // so assert vertical ordering and near-equal X alignment.
-    expect(Math.abs(iBox!.x - pBox!.x)).toBeLessThanOrEqual(
-      LAYOUT_TOLERANCE * 2,
-    );
-    expect(Math.abs(pBox!.x - lBox!.x)).toBeLessThanOrEqual(
-      LAYOUT_TOLERANCE * 2,
-    );
-    expect(iBox!.y).toBeLessThanOrEqual(pBox!.y + LAYOUT_TOLERANCE);
-    expect(pBox!.y).toBeLessThanOrEqual(lBox!.y + LAYOUT_TOLERANCE);
+    expect(whyBox!.x).toBeLessThan(portraitBox!.x);
+    expect(proBox!.x).toBeLessThan(perBox!.x);
+    expect(whyBox!.y).toBeLessThan(proBox!.y);
+    expect(portraitBox!.y).toBeLessThan(perBox!.y);
   });
 
   test('Why (/why) has active Profile in navbar', async ({ page }) => {

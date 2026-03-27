@@ -13,8 +13,6 @@ article.has-buttons-panel {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 0;
-  border-top: 1px solid #111;
-  border-left: 1px solid #111;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
@@ -78,6 +76,7 @@ article .profile-section:last-child {
   filter: saturate(var(--tile-saturation, 1))
     brightness(var(--tile-brightness, 1)) contrast(var(--tile-contrast, 1));
   transform: scale(var(--tile-zoom, 1));
+  opacity: var(--tile-image-opacity, 1);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
@@ -104,6 +103,102 @@ article .profile-section:last-child {
   height: 100%;
 }
 
+/* Clickable profile tiles (Why / Professional / Perspective) */
+.profile-tile-button {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+}
+
+.profile-tile-button .page-button__inner {
+  padding: 0 1rem 0 2rem;
+}
+
+.profile-tile-button .page-button__bg {
+  background-color: rgba(17, 17, 17, 0.1);
+}
+
+.profile-tile-button .page-button__overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(17, 17, 17, 0.75) 0%,
+    rgba(17, 17, 17, 0.67) 20%,
+    rgba(17, 17, 17, 0.52) 50%
+  );
+}
+
+.profile-tile-button .page-button__text {
+  color: var(--color-page-bg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* Bottom-right tile has a softer custom treatment */
+.profile-tile-button--perspective .page-button__bg {
+  background-color: rgba(17, 17, 17, 0.1);
+}
+
+.profile-tile-button--perspective.profile-image-tile {
+  background-color: var(--color-page-bg);
+}
+
+.profile-tile-button__reveal {
+  display: none;
+}
+
+.profile-tile-button--perspective .page-button__overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(17, 17, 17, 0.34) 0%,
+    rgba(17, 17, 17, 0.25) 50%,
+    rgba(17, 17, 17, 0.14) 100%
+  );
+}
+
+/* Keep hover effect subtle: darken overlay only, never flip to black */
+.profile-tile-button--perspective:hover .page-button__bg,
+.profile-tile-button--perspective:focus-visible .page-button__bg {
+  background-color: rgba(17, 17, 17, 0.2);
+}
+
+.profile-tile-button--perspective:hover .page-button__overlay,
+.profile-tile-button--perspective:focus-visible .page-button__overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(17, 17, 17, 0.46) 0%,
+    rgba(17, 17, 17, 0.36) 50%,
+    rgba(17, 17, 17, 0.24) 100%
+  );
+}
+
+.profile-tile-button--perspective.is-revealed::before,
+.profile-tile-button--perspective.is-revealed::after,
+.profile-tile-button--perspective.is-revealed .page-button__bg,
+.profile-tile-button--perspective.is-revealed .page-button__overlay,
+.profile-tile-button--perspective.is-revealed .page-button__inner {
+  display: none;
+}
+
+.profile-tile-button--perspective.is-revealed .profile-tile-button__reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  text-align: center;
+  background: #111;
+  color: var(--color-page-bg);
+  font-size: inherit;
+  font-weight: 600;
+  line-height: 2.5;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  pointer-events: none;
+}
+
 .profile-photo-box img {
   display: block;
   width: 100%;
@@ -113,7 +208,7 @@ article .profile-section:last-child {
   filter: saturate(var(--portrait-saturation, 1))
     brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
-  transform: scale(var(--portrait-zoom, 1));
+  transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: center;
 }
 

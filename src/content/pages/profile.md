@@ -5,22 +5,20 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    --portrait-tile-inset: clamp(1.2rem, 7cqw, 2.5rem);
+    --portrait-tile-inset: 0;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 65%;
     --portrait-zoom: 1.05;
     --portrait-saturation: 1;
     --portrait-brightness: 1;
     --portrait-contrast: 1;
-    --panel-bg: url('/assets/pages/profile/dillon-shook-ADxOq184yk8-unsplash_dichrom.png');
-    --panel-bg-pos-x: 100%;
-    --panel-bg-pos-y: 45%;
-    --panel-bg-saturation: 1;
-    --panel-bg-brightness: 0.75;
-    --panel-bg-contrast: 0.9;
-    --panel-margin-top: 0;
-    --panel-padding-top: 2rem;
-    --panel-padding-left: 0;
+    --profile-tile-1-bg: url('/assets/pages/profile/dillon-shook-ADxOq184yk8-unsplash_dichrom.png');
+    --profile-tile-1-pos-x: 100%;
+    --profile-tile-1-pos-y: 45%;
+    --profile-tile-1-zoom: 1;
+    --profile-tile-1-saturation: 1;
+    --profile-tile-1-brightness: 0.75;
+    --profile-tile-1-contrast: 0.9;
     --profile-tile-3-bg: url('/assets/pages/profile/tai-bui-yKX7wC_VioM-unsplash_dichrom.png');
     --profile-tile-3-pos-x: 50%;
     --profile-tile-3-pos-y: 50%;
@@ -32,11 +30,33 @@ title: 'Profile'
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 50%;
     --profile-tile-4-zoom: 1.05;
-    --profile-tile-4-saturation: 1;
+    --profile-tile-4-saturation: 2;
     --profile-tile-4-brightness: 1;
     --profile-tile-4-contrast: 1;
+    --profile-tile-4-opacity: 0.3;
   "
 >
+  <a
+    href="/why"
+    class="profile-tile profile-image-tile page-button profile-tile-button"
+    style="
+      --tile-bg: var(--profile-tile-1-bg);
+      --tile-pos-x: var(--profile-tile-1-pos-x);
+      --tile-pos-y: var(--profile-tile-1-pos-y);
+      --tile-zoom: var(--profile-tile-1-zoom);
+      --tile-saturation: var(--profile-tile-1-saturation);
+      --tile-brightness: var(--profile-tile-1-brightness);
+      --tile-contrast: var(--profile-tile-1-contrast);
+    "
+    aria-label="Why"
+  >
+    <span class="page-button__bg" aria-hidden="true"></span>
+    <span class="page-button__overlay" aria-hidden="true"></span>
+    <span class="page-button__inner">
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Why</span></span>
+      <span class="page-button__text">Why</span>
+    </span>
+  </a>
   <div class="profile-tile profile-photo-frame">
     <div class="profile-photo-box">
       <img
@@ -47,38 +67,9 @@ title: 'Profile'
       />
     </div>
   </div>
-  <div class="profile-tile page-buttons-zone">
-    <div class="page-buttons-panel" aria-label="Profile image + navigation">
-      <nav class="profile-links" aria-label="Profile sections">
-        <a href="/why" class="page-button">
-          <span class="page-button__bg" aria-hidden="true"></span>
-          <span class="page-button__overlay" aria-hidden="true"></span>
-          <span class="page-button__inner">
-            <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Why</span></span>
-            <span class="page-button__text">Why</span>
-          </span>
-        </a>
-        <a href="/professional" class="page-button">
-          <span class="page-button__bg" aria-hidden="true"></span>
-          <span class="page-button__overlay" aria-hidden="true"></span>
-          <span class="page-button__inner">
-            <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Professional</span></span>
-            <span class="page-button__text">Professional</span>
-          </span>
-        </a>
-        <a href="/personal" class="page-button">
-          <span class="page-button__bg" aria-hidden="true"></span>
-          <span class="page-button__overlay" aria-hidden="true"></span>
-          <span class="page-button__inner">
-            <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Personal</span></span>
-            <span class="page-button__text">Personal</span>
-          </span>
-        </a>
-      </nav>
-    </div>
-  </div>
-  <div
-    class="profile-tile profile-image-tile"
+  <a
+    href="/professional"
+    class="profile-tile profile-image-tile page-button profile-tile-button"
     style="
       --tile-bg: var(--profile-tile-3-bg);
       --tile-pos-x: var(--profile-tile-3-pos-x);
@@ -88,10 +79,18 @@ title: 'Profile'
       --tile-brightness: var(--profile-tile-3-brightness);
       --tile-contrast: var(--profile-tile-3-contrast);
     "
-    aria-label="Profile image tile 3"
-  ></div>
-  <div
-    class="profile-tile profile-image-tile"
+    aria-label="Professional"
+  >
+    <span class="page-button__bg" aria-hidden="true"></span>
+    <span class="page-button__overlay" aria-hidden="true"></span>
+    <span class="page-button__inner">
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Professional</span></span>
+      <span class="page-button__text">Professional</span>
+    </span>
+  </a>
+  <a
+    href="/perspective"
+    class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--perspective"
     style="
       --tile-bg: var(--profile-tile-4-bg);
       --tile-pos-x: var(--profile-tile-4-pos-x);
@@ -100,7 +99,33 @@ title: 'Profile'
       --tile-saturation: var(--profile-tile-4-saturation);
       --tile-brightness: var(--profile-tile-4-brightness);
       --tile-contrast: var(--profile-tile-4-contrast);
+      --tile-image-opacity: var(--profile-tile-4-opacity);
     "
-    aria-label="Profile image tile 4"
-  ></div>
+    aria-label="Perspective"
+  >
+    <span class="page-button__bg" aria-hidden="true"></span>
+    <span class="page-button__overlay" aria-hidden="true"></span>
+    <span class="page-button__inner">
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Perspective</span></span>
+      <span class="page-button__text">Perspective</span>
+    </span>
+    <span class="profile-tile-button__reveal" aria-hidden="true">
+      Worldview &amp; identity.<br />
+      Useful context.<br />
+      Not essential.
+    </span>
+  </a>
 </div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const perspectiveTile = document.querySelector('.profile-tile-button--perspective');
+    if (!(perspectiveTile instanceof HTMLAnchorElement)) return;
+
+    perspectiveTile.addEventListener('click', (event) => {
+      if (perspectiveTile.classList.contains('is-revealed')) return;
+      event.preventDefault();
+      perspectiveTile.classList.add('is-revealed');
+    });
+  });
+</script>
