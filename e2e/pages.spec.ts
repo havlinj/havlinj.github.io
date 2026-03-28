@@ -19,7 +19,7 @@ test.describe('Profile page (/profile, /why)', () => {
     );
   });
 
-  test('has portrait, Why, Professional, Perspective links', async ({
+  test('has portrait, Why, Professional, Foundations links', async ({
     page,
   }) => {
     await page.goto('/profile');
@@ -28,7 +28,7 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(
       page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Perspective' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
 
   test('profile article uses 2x2 clickable-tile layout', async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(
       page.getByRole('link', { name: 'Professional' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Perspective' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
 
   test('profile section loses loading class after portrait handling', async ({
@@ -73,12 +73,12 @@ test.describe('Profile page (/profile, /why)', () => {
     );
   });
 
-  test('Perspective page has heading and profile-active navbar', async ({
+  test('Foundations page has heading and profile-active navbar', async ({
     page,
   }) => {
-    await page.goto('/perspective');
+    await page.goto('/foundations');
     await expect(
-      page.getByRole('heading', { name: 'Perspective', level: 1 }),
+      page.getByRole('heading', { name: 'Foundations', level: 1 }),
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
       /site-nav__link--active/,
@@ -123,7 +123,7 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(footerHome).toHaveText('Home');
   });
 
-  test('profile tiles are positioned as Why TL, Portrait TR, Professional BL, Perspective BR', async ({
+  test('profile tiles are positioned as Why TL, Portrait TR, Professional BL, Foundations BR', async ({
     page,
   }) => {
     await page.goto('/profile');
@@ -134,15 +134,15 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(profileSection).toBeVisible();
     const why = profileSection.getByRole('link', { name: 'Why' });
     const professional = profileSection.getByRole('link', { name: 'Professional' });
-    const perspective = profileSection.getByRole('link', { name: 'Perspective' });
+    const foundations = profileSection.getByRole('link', { name: 'Foundations' });
     const portrait = profileSection.getByRole('img', { name: 'Jan Havlín' });
     await expect(why).toBeVisible();
     await expect(professional).toBeVisible();
-    await expect(perspective).toBeVisible();
+    await expect(foundations).toBeVisible();
     await expect(portrait).toBeVisible();
     const whyBox = await why.boundingBox();
     const proBox = await professional.boundingBox();
-    const perBox = await perspective.boundingBox();
+    const perBox = await foundations.boundingBox();
     const portraitBox = await portrait.boundingBox();
     expect(whyBox).toBeTruthy();
     expect(proBox).toBeTruthy();

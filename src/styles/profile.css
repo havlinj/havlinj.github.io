@@ -7,6 +7,15 @@ article.has-buttons-panel {
   overflow: hidden;
 }
 
+/*
+ * Jednotné odsazení (inline na .profile-section):
+ *   --profile-inner-gutter     → stejný „rámeček“ ze všech stran (barva buňky = --color-page-bg):
+ *                                 portrét uprostřed čtverce + Foundations reveal při hoveru (2. stav).
+ *   --profile-inner-gutter-x   → volitelně jinak vodorovně (vlevo+vpravo)
+ *   --profile-inner-gutter-y   → volitelně jinak svisle (nahoře+dole)
+ * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (použijí se jako jedna hodnota pro obě osy).
+ * --profile-tile-label-font-size: profile-tile-type-fit.ts
+ */
 .profile-section {
   position: relative;
   display: grid;
@@ -83,16 +92,20 @@ article .profile-section:last-child {
   pointer-events: none;
 }
 
-/* Top-left: portrait */
+/* Buňka s portrétem v mřížce */
 .profile-photo-frame {
   position: relative;
   background: transparent;
 }
 
-/* Inner portrait square (inset + centered) */
+/*
+ * Portrét: stejný inset ze všech stran → rámeček v barvě pozadí buňky, obsah vycentrovaný v čtverci.
+ * inset: <svisle> <vodorovně> — jedna proměnná --profile-inner-gutter řídí obě, pokud není -x/-y.
+ */
 .profile-photo-box {
   position: absolute;
-  inset: var(--portrait-tile-inset, 0);
+  inset: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))))
+    var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
   overflow: hidden;
   background: transparent;
 }
@@ -103,15 +116,22 @@ article .profile-section:last-child {
   height: 100%;
 }
 
-/* Clickable profile tiles (Why / Professional / Perspective) */
+/* Clickable profile tiles (Why / Professional / Foundations) */
 .profile-tile-button {
   height: 100%;
   max-height: none;
   min-height: 0;
+  /* cqi/cqw for font caps = this tile’s width (grid cell) */
+  container-type: inline-size;
+  container-name: profile-tile;
 }
 
 .profile-tile-button .page-button__inner {
-  padding: 0 1rem 0 2rem;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden;
+  justify-content: center;
 }
 
 .profile-tile-button .page-button__bg {
@@ -129,33 +149,39 @@ article .profile-section:last-child {
 
 .profile-tile-button .page-button__text {
   color: var(--color-page-bg);
-  font-size: var(--page-title-font-size);
+  /* Inherited from .profile-section (fit from "PROFESSIONAL" on /professional tile) */
+  font-size: var(
+    --profile-tile-label-font-size,
+    clamp(0.7rem, 6cqi, var(--page-title-font-size))
+  );
   font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.02em;
   text-transform: uppercase;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 /* Bottom-right tile has a softer custom treatment */
-.profile-tile-button--perspective .page-button__bg {
+.profile-tile-button--foundations .page-button__bg {
   background-color: rgba(17, 17, 17, 0.1);
 }
 
-.profile-tile-button--perspective.profile-image-tile {
+.profile-tile-button--foundations.profile-image-tile {
   background-color: var(--color-page-bg);
 }
 
 /* Second state only: pointer — hover avoids transform (text raster “skube”); use soft bg instead */
-.profile-tile-button--perspective.is-revealed {
+.profile-tile-button--foundations.is-revealed {
   cursor: pointer;
 }
 
-/* Perspective reveal layer: opacity-driven show/hide (no display:none) for transitions */
-.profile-tile-button--perspective::before,
-.profile-tile-button--perspective::after,
-.profile-tile-button--perspective .page-button__bg,
-.profile-tile-button--perspective .page-button__overlay,
-.profile-tile-button--perspective .page-button__inner {
+/* Foundations reveal layer: opacity-driven show/hide (no display:none) for transitions */
+.profile-tile-button--foundations::before,
+.profile-tile-button--foundations::after,
+.profile-tile-button--foundations .page-button__bg,
+.profile-tile-button--foundations .page-button__overlay,
+.profile-tile-button--foundations .page-button__inner {
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
@@ -165,13 +191,18 @@ article .profile-section:last-child {
   z-index: 4;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
-  padding: 1.2rem 1.2rem 1.2rem 2rem;
+  padding: 1.2rem 2rem;
+  box-sizing: border-box;
   text-align: left;
   background: #111;
   color: var(--color-page-bg);
-  font-size: var(--page-title-font-size);
+  /* --profile-reveal-font-size from profile-tile-type-fit.ts (measured) */
+  font-size: var(
+    --profile-reveal-font-size,
+    clamp(0.65rem, 4.5cqi, var(--page-title-font-size))
+  );
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -180,9 +211,12 @@ article .profile-section:last-child {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+  max-width: 100%;
+  /* Strict inset: nothing paints outside the padding box (2rem L/R) */
+  overflow: hidden;
 }
 
-.profile-tile-button--perspective .page-button__overlay {
+.profile-tile-button--foundations .page-button__overlay {
   background: linear-gradient(
     90deg,
     rgba(17, 17, 17, 0.34) 0%,
@@ -192,13 +226,13 @@ article .profile-section:last-child {
 }
 
 /* Keep hover effect subtle: darken overlay only, never flip to black */
-.profile-tile-button--perspective:hover .page-button__bg,
-.profile-tile-button--perspective:focus-visible .page-button__bg {
+.profile-tile-button--foundations:hover .page-button__bg,
+.profile-tile-button--foundations:focus-visible .page-button__bg {
   background-color: rgba(17, 17, 17, 0.2);
 }
 
-.profile-tile-button--perspective:hover .page-button__overlay,
-.profile-tile-button--perspective:focus-visible .page-button__overlay {
+.profile-tile-button--foundations:hover .page-button__overlay,
+.profile-tile-button--foundations:focus-visible .page-button__overlay {
   background: linear-gradient(
     90deg,
     rgba(17, 17, 17, 0.46) 0%,
@@ -207,89 +241,124 @@ article .profile-section:last-child {
   );
 }
 
-.profile-tile-button--perspective.is-revealed::before,
-.profile-tile-button--perspective.is-revealed::after,
-.profile-tile-button--perspective.is-revealed .page-button__bg,
-.profile-tile-button--perspective.is-revealed .page-button__overlay,
-.profile-tile-button--perspective.is-revealed .page-button__inner {
+.profile-tile-button--foundations.is-revealed::before,
+.profile-tile-button--foundations.is-revealed::after,
+.profile-tile-button--foundations.is-revealed .page-button__bg,
+.profile-tile-button--foundations.is-revealed .page-button__overlay,
+.profile-tile-button--foundations.is-revealed .page-button__inner {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
-.profile-tile-button--perspective.is-revealed .profile-tile-button__reveal {
+.profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
   opacity: 1;
   visibility: visible;
   background-color: #111;
   box-shadow: none;
+  /* longhand: hover zmenší stejně ze všech stran jako portrét */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   transition:
     opacity 0.18s ease,
     visibility 0s,
     background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Hover/focus: tint toward page bg + inset ring (fallback when no color-mix) */
-.profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
-.profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+/* Hover 2. stav: stejný obvodový inset jako portrét (centrované zmenšení) */
+.profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
+.profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
+  animation: none;
+  top: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))));
+  right: var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
+  bottom: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))));
+  left: var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
+  transition:
+    opacity 0.18s ease,
+    visibility 0s,
+    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   background-color: #18191b;
-  box-shadow: inset 0 0 0 1px rgba(224, 247, 250, 0.22);
+  box-shadow: none;
 }
 
 @supports (background-color: color-mix(in srgb, white, black)) {
-  .profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
-  .profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+  .profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
+  .profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
     background-color: color-mix(in srgb, var(--color-page-bg) 9%, #121212);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-page-bg) 36%, transparent);
   }
 }
 
-/* Subtle “alive” pulse: only on inner copy so outer opacity transition never fights animation (avoids post-click flash) */
-.profile-tile-button--perspective.is-revealed:not(.is-reveal-fading-out):not(
+/* “Alive” pulse: bg vs copy same period; text plný když je plocha nejsvětlejší (slabší „černá“) */
+.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
+  .profile-tile-button__reveal {
+  animation: profile-foundations-reveal-tile-breathe 3.2s ease-in-out 0.45s infinite;
+}
+
+.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
   .profile-tile-button__reveal-copy {
-  animation: profile-perspective-reveal-breathe 3.2s ease-in-out 0.45s infinite;
+  /*
+   * 0%/100% keyframes use opacity 0.58; default opacity is 1. Without fill-mode,
+   * the delay shows 1 then snaps to 0.58 → bright flash on the light ink.
+   */
+  animation: profile-foundations-reveal-copy-breathe 3.2s ease-in-out 0.45s infinite
+    backwards;
 }
 
-/* Steady type while the pointer shows intent — avoids hover + breathe fighting visually */
-.profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal-copy,
-.profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal-copy {
-  animation-play-state: paused;
+.profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal-copy,
+.profile-tile-button--foundations.is-revealed:focus-visible
+  .profile-tile-button__reveal-copy {
+  animation: none;
+  opacity: 1;
 }
 
 /* Fade reveal text out before returning to the default tile */
-.profile-tile-button--perspective.is-revealed.is-reveal-fading-out
+.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
   .profile-tile-button__reveal {
   opacity: 0;
   visibility: visible;
   transition: opacity 0.18s ease;
+  animation: none;
 }
 
-.profile-tile-button--perspective.is-revealed.is-reveal-fading-out
+.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
   .profile-tile-button__reveal-copy {
   animation: none;
 }
 
 /* One frame: base layers at opacity 0, no transition, then class removed → fade in */
-.profile-tile-button--perspective.is-reveal-opening::before,
-.profile-tile-button--perspective.is-reveal-opening::after,
-.profile-tile-button--perspective.is-reveal-opening .page-button__bg,
-.profile-tile-button--perspective.is-reveal-opening .page-button__overlay,
-.profile-tile-button--perspective.is-reveal-opening .page-button__inner {
+.profile-tile-button--foundations.is-reveal-opening::before,
+.profile-tile-button--foundations.is-reveal-opening::after,
+.profile-tile-button--foundations.is-reveal-opening .page-button__bg,
+.profile-tile-button--foundations.is-reveal-opening .page-button__overlay,
+.profile-tile-button--foundations.is-reveal-opening .page-button__inner {
   opacity: 0;
   visibility: visible;
   transition: none;
 }
 
-.profile-tile-button--perspective.is-reveal-opening .profile-tile-button__reveal {
+.profile-tile-button--foundations.is-reveal-opening .profile-tile-button__reveal {
   opacity: 0;
   visibility: hidden;
   transition: none;
+  animation: none;
 }
 
-.profile-tile-button--perspective.is-reveal-opening .profile-tile-button__reveal-copy {
+.profile-tile-button--foundations.is-reveal-opening .profile-tile-button__reveal-copy {
   animation: none;
 }
 
@@ -297,10 +366,17 @@ article .profile-section:last-child {
   display: flex;
   flex-direction: column;
   gap: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .profile-tile-button__reveal-stanza {
   display: block;
+  max-width: 100%;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {
@@ -312,37 +388,52 @@ article .profile-section:last-child {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: var(--portrait-pos-x, 100%) var(--portrait-pos-y, 90%);
+  object-position: var(--portrait-pos-x, 45%) var(--portrait-pos-y, 50%);
   filter: saturate(var(--portrait-saturation, 1))
     brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
+  /* center + scaleX(-1): right/top origin často odsune výřez mimo clip — průhledný „zmizelý“ portrét */
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: center;
 }
 
-@keyframes profile-perspective-reveal-breathe {
+@keyframes profile-foundations-reveal-tile-breathe {
   0%,
   100% {
-    opacity: 1;
+    background-color: #111;
   }
   50% {
-    opacity: 0.62;
+    /* Slight lift toward page tone (≈ color-mix with --color-page-bg) */
+    background-color: #2a3034;
+  }
+}
+
+@keyframes profile-foundations-reveal-copy-breathe {
+  0%,
+  100% {
+    opacity: 0.58;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-tile-button--perspective.is-revealed .profile-tile-button__reveal {
+  .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
     transition: opacity 0.18s ease, visibility 0s;
+    animation: none !important;
   }
 
-  .profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
-  .profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+  .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal-copy {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
+  .profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
     background-color: #111;
     box-shadow: none;
-  }
-
-  .profile-tile-button--perspective.is-revealed .profile-tile-button__reveal-copy {
-    animation: none !important;
+    transition: opacity 0.18s ease, visibility 0s, background-color 0.52s ease;
   }
 }
 

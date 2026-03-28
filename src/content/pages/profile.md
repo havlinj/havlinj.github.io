@@ -5,10 +5,11 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    --portrait-tile-inset: 0;
+    /* Rámeček v barvě pozadí ze všech stran: portrét + zmenšení Foundations při hoveru (2. stav) */
+    --profile-inner-gutter: 9%;
     --portrait-pos-x: 40%;
-    --portrait-pos-y: 65%;
-    --portrait-zoom: 1.05;
+    --portrait-pos-y: 62%;
+    --portrait-zoom: 1;
     --portrait-saturation: 1;
     --portrait-brightness: 1;
     --portrait-contrast: 1;
@@ -32,7 +33,7 @@ title: 'Profile'
     --profile-tile-4-zoom: 1.05;
     --profile-tile-4-saturation: 2;
     --profile-tile-4-brightness: 1;
-    --profile-tile-4-contrast: 1;
+    --profile-tile-4-contrast: 0.8;
     --profile-tile-4-opacity: 0.3;
   "
 >
@@ -89,8 +90,8 @@ title: 'Profile'
     </span>
   </a>
   <a
-    href="/perspective"
-    class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--perspective"
+    href="/foundations"
+    class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--foundations"
     style="
       --tile-bg: var(--profile-tile-4-bg);
       --tile-pos-x: var(--profile-tile-4-pos-x);
@@ -101,13 +102,13 @@ title: 'Profile'
       --tile-contrast: var(--profile-tile-4-contrast);
       --tile-image-opacity: var(--profile-tile-4-opacity);
     "
-    aria-label="Perspective"
+    aria-label="Foundations"
   >
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
-      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Perspective</span></span>
-      <span class="page-button__text">Perspective</span>
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Foundations</span></span>
+      <span class="page-button__text">Foundations</span>
     </span>
     <span class="profile-tile-button__reveal" aria-hidden="true">
       <span class="profile-tile-button__reveal-copy">
@@ -117,69 +118,9 @@ title: 'Profile'
         </span>
         <span class="profile-tile-button__reveal-stanza">
           Meaningful<br />
-          Beyond what's needed here
+          Beyond what's needed
         </span>
       </span>
     </span>
   </a>
 </div>
-
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const perspectiveTile = document.querySelector('.profile-tile-button--perspective');
-    if (!(perspectiveTile instanceof HTMLAnchorElement)) return;
-    const REVEAL_TIMEOUT_MS = 7000;
-    const REVEAL_FADE_MS = 180;
-    const REVEAL_PAUSE_MS = 50;
-    let revealTimeoutId = 0;
-    let revealCloseStepId = 0;
-
-    const clearRevealTimers = () => {
-      window.clearTimeout(revealTimeoutId);
-      window.clearTimeout(revealCloseStepId);
-      revealTimeoutId = 0;
-      revealCloseStepId = 0;
-    };
-
-    const finishRevealClose = () => {
-      perspectiveTile.classList.remove(
-        'is-revealed',
-        'is-reveal-fading-out',
-      );
-      perspectiveTile.classList.add('is-reveal-opening');
-      void perspectiveTile.offsetWidth;
-      perspectiveTile.classList.remove('is-reveal-opening');
-    };
-
-    const runRevealCloseSequence = () => {
-      perspectiveTile.classList.add('is-reveal-fading-out');
-      revealCloseStepId = window.setTimeout(() => {
-        finishRevealClose();
-        revealCloseStepId = 0;
-      }, REVEAL_FADE_MS + REVEAL_PAUSE_MS);
-    };
-
-    perspectiveTile.addEventListener('click', (event) => {
-      if (perspectiveTile.classList.contains('is-reveal-fading-out')) {
-        event.preventDefault();
-        return;
-      }
-      if (perspectiveTile.classList.contains('is-reveal-opening')) {
-        event.preventDefault();
-        return;
-      }
-      if (perspectiveTile.classList.contains('is-revealed')) {
-        clearRevealTimers();
-        return;
-      }
-      event.preventDefault();
-      perspectiveTile.classList.remove('is-reveal-fading-out', 'is-reveal-opening');
-      perspectiveTile.classList.add('is-revealed');
-      clearRevealTimers();
-      revealTimeoutId = window.setTimeout(() => {
-        revealTimeoutId = 0;
-        runRevealCloseSequence();
-      }, REVEAL_TIMEOUT_MS);
-    });
-  });
-</script>

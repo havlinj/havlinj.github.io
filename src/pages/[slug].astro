@@ -19,7 +19,7 @@ const page = await getEntry('pages', slug);
 if (!page) return Astro.redirect('/');
 const { Content } = await render(page);
 
-const profileSlugs = new Set(['profile', 'why', 'professional', 'perspective']);
+const profileSlugs = new Set(['profile', 'why', 'professional', 'foundations']);
 const sectionBySlug: Record<string, string> = {
   contact: 'contact',
   credits: 'credits',
@@ -33,7 +33,7 @@ const isWhy = slug === 'why';
 const hasPageTitleRule =
   slug === 'credits' ||
   slug === 'professional' ||
-  slug === 'perspective';
+  slug === 'foundations';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
@@ -65,4 +65,11 @@ const PROFILE_PRELOADS = [
     </h1>
     {isWhy ? <WhyContent /> : <Content />}
   </article>
+  {
+    isProfile && (
+      <script>
+        import '../scripts/profile-tile-type-fit.ts';
+      </script>
+    )
+  }
 </Layout>

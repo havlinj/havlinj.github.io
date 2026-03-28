@@ -70,14 +70,41 @@ const navItems = [
     <script is:inline>
       (function () {
         'use strict';
-        /* Profile: reveal section only after portrait is ready or timeout hits. */
+        /* Profile: fade grid in only after portrait is ready AND tile type-fit JS ran
+           (register type-fit listener synchronously — module may run before DOMContentLoaded). */
 
-        function revealProfileSectionWhenPortraitLoaded() {
-          var section = document.querySelector('.profile-section--loading');
-          if (!section) return;
+        var section = document.querySelector('.profile-section--loading');
+        if (!section) return;
+
+        var portraitReady = false;
+        var typeFitReady = false;
+
+        function tryReveal() {
+          if (!portraitReady || !typeFitReady) return;
+          section.classList.remove('profile-section--loading');
+        }
+
+        document.addEventListener(
+          'profileTileTypeFit',
+          function onTypeFit() {
+            typeFitReady = true;
+            tryReveal();
+          },
+          { once: true },
+        );
+
+        setTimeout(function () {
+          if (!typeFitReady) {
+            typeFitReady = true;
+            tryReveal();
+          }
+        }, 8000);
+
+        function wirePortrait() {
           var img = section.querySelector('.profile-photo-frame img');
           if (!img) {
-            section.classList.remove('profile-section--loading');
+            portraitReady = true;
+            tryReveal();
             return;
           }
           var timeoutId;
@@ -85,7 +112,8 @@ const navItems = [
             if (timeoutId) clearTimeout(timeoutId);
             img.removeEventListener('load', onReady);
             img.removeEventListener('error', reveal);
-            section.classList.remove('profile-section--loading');
+            portraitReady = true;
+            tryReveal();
           }
           function onReady() {
             if (img.decode) {
@@ -102,13 +130,11 @@ const navItems = [
           img.addEventListener('error', reveal);
           timeoutId = setTimeout(reveal, 4000);
         }
+
         if (document.readyState === 'loading') {
-          document.addEventListener(
-            'DOMContentLoaded',
-            revealProfileSectionWhenPortraitLoaded,
-          );
+          document.addEventListener('DOMContentLoaded', wirePortrait);
         } else {
-          revealProfileSectionWhenPortraitLoaded();
+          wirePortrait();
         }
       })();
     </script>
