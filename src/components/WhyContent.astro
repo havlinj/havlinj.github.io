@@ -99,9 +99,12 @@
         );
         const eased = smoothstep(edgeProgress);
 
-        // Target values for outer quarters.
-        const scale = 1 - 0.5 * eased; // down to 0.5x
-        const inset = 4 * eased; // up to 4rem
+        const isLead = line.classList.contains('why-lead');
+        // Lead line scales/insets less aggressively so its typographic emphasis remains visible.
+        const scaleDrop = isLead ? 0.3 : 0.5;
+        const maxInset = isLead ? 2.4 : 4;
+        const scale = 1 - scaleDrop * eased;
+        const inset = maxInset * eased;
 
         line.style.setProperty('--why-line-scale', scale.toFixed(3));
         line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);

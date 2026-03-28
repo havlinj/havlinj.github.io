@@ -110,9 +110,16 @@ title: 'Profile'
       <span class="page-button__text">Perspective</span>
     </span>
     <span class="profile-tile-button__reveal" aria-hidden="true">
-      Worldview &amp; identity.<br />
-      Useful context.<br />
-      Not essential.
+      <span class="profile-tile-button__reveal-copy">
+        <span class="profile-tile-button__reveal-stanza">
+          What shaped me<br />
+          Beyond the craft
+        </span>
+        <span class="profile-tile-button__reveal-stanza">
+          Meaningful<br />
+          Beyond what's needed here
+        </span>
+      </span>
     </span>
   </a>
 </div>
@@ -121,11 +128,58 @@ title: 'Profile'
   document.addEventListener('DOMContentLoaded', () => {
     const perspectiveTile = document.querySelector('.profile-tile-button--perspective');
     if (!(perspectiveTile instanceof HTMLAnchorElement)) return;
+    const REVEAL_TIMEOUT_MS = 7000;
+    const REVEAL_FADE_MS = 180;
+    const REVEAL_PAUSE_MS = 50;
+    let revealTimeoutId = 0;
+    let revealCloseStepId = 0;
+
+    const clearRevealTimers = () => {
+      window.clearTimeout(revealTimeoutId);
+      window.clearTimeout(revealCloseStepId);
+      revealTimeoutId = 0;
+      revealCloseStepId = 0;
+    };
+
+    const finishRevealClose = () => {
+      perspectiveTile.classList.remove(
+        'is-revealed',
+        'is-reveal-fading-out',
+      );
+      perspectiveTile.classList.add('is-reveal-opening');
+      void perspectiveTile.offsetWidth;
+      perspectiveTile.classList.remove('is-reveal-opening');
+    };
+
+    const runRevealCloseSequence = () => {
+      perspectiveTile.classList.add('is-reveal-fading-out');
+      revealCloseStepId = window.setTimeout(() => {
+        finishRevealClose();
+        revealCloseStepId = 0;
+      }, REVEAL_FADE_MS + REVEAL_PAUSE_MS);
+    };
 
     perspectiveTile.addEventListener('click', (event) => {
-      if (perspectiveTile.classList.contains('is-revealed')) return;
+      if (perspectiveTile.classList.contains('is-reveal-fading-out')) {
+        event.preventDefault();
+        return;
+      }
+      if (perspectiveTile.classList.contains('is-reveal-opening')) {
+        event.preventDefault();
+        return;
+      }
+      if (perspectiveTile.classList.contains('is-revealed')) {
+        clearRevealTimers();
+        return;
+      }
       event.preventDefault();
+      perspectiveTile.classList.remove('is-reveal-fading-out', 'is-reveal-opening');
       perspectiveTile.classList.add('is-revealed');
+      clearRevealTimers();
+      revealTimeoutId = window.setTimeout(() => {
+        revealTimeoutId = 0;
+        runRevealCloseSequence();
+      }, REVEAL_TIMEOUT_MS);
     });
   });
 </script>

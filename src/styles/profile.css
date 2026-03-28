@@ -129,7 +129,9 @@ article .profile-section:last-child {
 
 .profile-tile-button .page-button__text {
   color: var(--color-page-bg);
+  font-size: var(--page-title-font-size);
   font-weight: 600;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
@@ -143,8 +145,41 @@ article .profile-section:last-child {
   background-color: var(--color-page-bg);
 }
 
+/* Second state only: pointer — hover avoids transform (text raster “skube”); use soft bg instead */
+.profile-tile-button--perspective.is-revealed {
+  cursor: pointer;
+}
+
+/* Perspective reveal layer: opacity-driven show/hide (no display:none) for transitions */
+.profile-tile-button--perspective::before,
+.profile-tile-button--perspective::after,
+.profile-tile-button--perspective .page-button__bg,
+.profile-tile-button--perspective .page-button__overlay,
+.profile-tile-button--perspective .page-button__inner {
+  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+}
+
 .profile-tile-button__reveal {
-  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.2rem 1.2rem 1.2rem 2rem;
+  text-align: left;
+  background: #111;
+  color: var(--color-page-bg);
+  font-size: var(--page-title-font-size);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
 .profile-tile-button--perspective .page-button__overlay {
@@ -177,26 +212,99 @@ article .profile-section:last-child {
 .profile-tile-button--perspective.is-revealed .page-button__bg,
 .profile-tile-button--perspective.is-revealed .page-button__overlay,
 .profile-tile-button--perspective.is-revealed .page-button__inner {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
 .profile-tile-button--perspective.is-revealed .profile-tile-button__reveal {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
+  opacity: 1;
+  visibility: visible;
+  background-color: #111;
+  box-shadow: none;
+  transition:
+    opacity 0.18s ease,
+    visibility 0s,
+    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover/focus: tint toward page bg + inset ring (fallback when no color-mix) */
+.profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
+.profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+  background-color: #18191b;
+  box-shadow: inset 0 0 0 1px rgba(224, 247, 250, 0.22);
+}
+
+@supports (background-color: color-mix(in srgb, white, black)) {
+  .profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
+  .profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+    background-color: color-mix(in srgb, var(--color-page-bg) 9%, #121212);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-page-bg) 36%, transparent);
+  }
+}
+
+/* Subtle “alive” pulse: only on inner copy so outer opacity transition never fights animation (avoids post-click flash) */
+.profile-tile-button--perspective.is-revealed:not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
+  .profile-tile-button__reveal-copy {
+  animation: profile-perspective-reveal-breathe 3.2s ease-in-out 0.45s infinite;
+}
+
+/* Steady type while the pointer shows intent — avoids hover + breathe fighting visually */
+.profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal-copy,
+.profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal-copy {
+  animation-play-state: paused;
+}
+
+/* Fade reveal text out before returning to the default tile */
+.profile-tile-button--perspective.is-revealed.is-reveal-fading-out
+  .profile-tile-button__reveal {
+  opacity: 0;
+  visibility: visible;
+  transition: opacity 0.18s ease;
+}
+
+.profile-tile-button--perspective.is-revealed.is-reveal-fading-out
+  .profile-tile-button__reveal-copy {
+  animation: none;
+}
+
+/* One frame: base layers at opacity 0, no transition, then class removed → fade in */
+.profile-tile-button--perspective.is-reveal-opening::before,
+.profile-tile-button--perspective.is-reveal-opening::after,
+.profile-tile-button--perspective.is-reveal-opening .page-button__bg,
+.profile-tile-button--perspective.is-reveal-opening .page-button__overlay,
+.profile-tile-button--perspective.is-reveal-opening .page-button__inner {
+  opacity: 0;
+  visibility: visible;
+  transition: none;
+}
+
+.profile-tile-button--perspective.is-reveal-opening .profile-tile-button__reveal {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+
+.profile-tile-button--perspective.is-reveal-opening .profile-tile-button__reveal-copy {
+  animation: none;
+}
+
+.profile-tile-button__reveal-copy {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.2rem;
-  text-align: center;
-  background: #111;
-  color: var(--color-page-bg);
-  font-size: inherit;
-  font-weight: 600;
-  line-height: 2.5;
-  letter-spacing: -0.02em;
-  text-transform: none;
-  pointer-events: none;
+  flex-direction: column;
+  gap: 0;
+}
+
+.profile-tile-button__reveal-stanza {
+  display: block;
+}
+
+.profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {
+  margin-top: 1.35rem;
 }
 
 .profile-photo-box img {
@@ -210,6 +318,32 @@ article .profile-section:last-child {
     contrast(var(--portrait-contrast, 1));
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: center;
+}
+
+@keyframes profile-perspective-reveal-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.62;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-tile-button--perspective.is-revealed .profile-tile-button__reveal {
+    transition: opacity 0.18s ease, visibility 0s;
+  }
+
+  .profile-tile-button--perspective.is-revealed:hover .profile-tile-button__reveal,
+  .profile-tile-button--perspective.is-revealed:focus-visible .profile-tile-button__reveal {
+    background-color: #111;
+    box-shadow: none;
+  }
+
+  .profile-tile-button--perspective.is-revealed .profile-tile-button__reveal-copy {
+    animation: none !important;
+  }
 }
 
 /* .profile-links layout: see page-buttons.css (left-aligned, stacked) */
