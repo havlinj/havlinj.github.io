@@ -14,9 +14,10 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-if (slug === 'credit') return Astro.redirect('/credits');
 const page = await getEntry('pages', slug);
-if (!page) return Astro.redirect('/');
+if (!page) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
 const { Content } = await render(page);
 
 const profileSlugs = new Set(['profile', 'why', 'professional', 'foundations']);

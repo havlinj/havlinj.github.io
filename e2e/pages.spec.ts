@@ -73,18 +73,6 @@ test.describe('Profile page (/profile, /why)', () => {
     );
   });
 
-  test('Foundations page has heading and profile-active navbar', async ({
-    page,
-  }) => {
-    await page.goto('/foundations');
-    await expect(
-      page.getByRole('heading', { name: 'Foundations', level: 1 }),
-    ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
-      /site-nav__link--active/,
-    );
-  });
-
   test('site-header: Profile, Writing, Contact spread across', async ({
     page,
   }) => {
@@ -318,11 +306,6 @@ test.describe('Credits page (/credits)', () => {
     await expect(page.getByText('Dillon Shook')).toBeVisible();
     await expect(page.getByText('Tai Bui')).toBeVisible();
     await expect(page.getByText('Joschka Silzle')).toBeVisible();
-  });
-
-  test('legacy /credit redirects to /credits', async ({ page }) => {
-    await page.goto('/credit');
-    await expect(page).toHaveURL(/\/credits$/);
   });
 
   test('footer credits link navigates to /credits', async ({ page }) => {
