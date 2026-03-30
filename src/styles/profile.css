@@ -73,6 +73,8 @@ article.has-buttons-panel {
   /* state1 (a = A/2) */
   --profile-foundations-height: calc(var(--profile-right-height-px) / 2);
   --portrait-stand-bottom: calc(var(--profile-right-height-px) / 2);
+  --profile-motion-duration: 0.45s;
+  --profile-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .profile-right-column .profile-photo-frame {
@@ -90,7 +92,7 @@ article.has-buttons-panel {
   z-index: 1;
 
   height: var(--profile-foundations-height);
-  transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: height var(--profile-motion-duration) var(--profile-motion-ease);
 }
 
 /* state2: after click (is-revealed), Foundations smoothly expands to h_max */
@@ -190,7 +192,7 @@ article .profile-section:last-child {
   left: auto;
   right: var(--profile-photo-inset-right, 0);
   bottom: var(--portrait-stand-bottom, 50%);
-  transition: bottom 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: bottom var(--profile-motion-duration) var(--profile-motion-ease);
   width: calc(100% - (2 * var(--profile-photo-gutter-x)));
   height: auto;
   aspect-ratio: 1;
@@ -263,6 +265,10 @@ article .profile-section:last-child {
 /* Second state only: pointer — hover avoids transform (text raster “skube”); use soft bg instead */
 .profile-tile-button--foundations.is-revealed {
   cursor: pointer;
+  --profile-reveal-fade-duration: 0.18s;
+  --profile-reveal-fade-delay: 0.18s;
+  --profile-reveal-bg-duration: 0.52s;
+  --profile-reveal-bg-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Foundations reveal layer: opacity-driven show/hide (no display:none) for transitions */
@@ -271,7 +277,8 @@ article .profile-section:last-child {
 .profile-tile-button--foundations .page-button__bg,
 .profile-tile-button--foundations .page-button__overlay,
 .profile-tile-button--foundations .page-button__inner {
-  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+  transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+    visibility 0s linear var(--profile-reveal-fade-delay, 0.18s);
 }
 
 .profile-tile-button__reveal {
@@ -299,7 +306,8 @@ article .profile-section:last-child {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+  transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+    visibility 0s linear var(--profile-reveal-fade-delay, 0.18s);
   max-width: 100%;
   /* Strict inset: nothing paints outside the padding box (2rem L/R) */
   overflow: hidden;
@@ -332,9 +340,10 @@ article .profile-section:last-child {
   box-shadow: none;
   inset: 0;
   transition:
-    opacity 0.18s ease,
+    opacity var(--profile-reveal-fade-duration, 0.18s) ease,
     visibility 0s,
-    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+    background-color var(--profile-reveal-bg-duration, 0.52s)
+      var(--profile-reveal-bg-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 /* "Alive" pulse: same period for background and copy. Text peaks at the lightest phase. */
@@ -362,7 +371,7 @@ article .profile-section:last-child {
   .profile-tile-button__reveal {
   opacity: 0;
   visibility: visible;
-  transition: opacity 0.18s ease;
+  transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease;
   animation: none;
 }
 
@@ -427,7 +436,7 @@ article .profile-section:last-child {
   transform: scale(calc(var(--portrait-zoom, 1) * var(--portrait-img-shrink, 1)))
     scaleX(-1);
   transform-origin: bottom center;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--profile-motion-duration) var(--profile-motion-ease);
 }
 
 /* state2: during expand (is-revealed), visually shrink portrait (~20%) */
@@ -464,7 +473,8 @@ article .profile-section:last-child {
   }
 
   .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
-    transition: opacity 0.18s ease, visibility 0s;
+    transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+      visibility 0s;
     animation: none !important;
   }
 

@@ -1,28 +1,29 @@
 import { test, expect } from '@playwright/test';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
+import { expectNavLinkActive, gotoProfileWhenReady, mustBox } from './helpers';
 
 // ---------------------------------------------------------------------------
 // Profile page (/profile, /why)
 // ---------------------------------------------------------------------------
 
 test.describe('Profile page (/profile, /why)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/profile');
+  });
+
   test('shows navbar with active Profile (no Home in header)', async ({
     page,
   }) => {
-    await page.goto('/profile');
     await expect(page.locator('.site-header')).toBeVisible();
     await expect(
       page.locator('.site-header__inner').getByRole('link', { name: 'Home' }),
     ).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
-      /site-nav__link--active/,
-    );
+    await expectNavLinkActive(page, 'Profile');
   });
 
   test('has portrait, Why, Professional, Foundations links', async ({
     page,
   }) => {
-    await page.goto('/profile');
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
     await expect(
@@ -32,7 +33,6 @@ test.describe('Profile page (/profile, /why)', () => {
   });
 
   test('profile article uses 2x2 clickable-tile layout', async ({ page }) => {
-    await page.goto('/profile');
     await expect(page.locator('article.has-buttons-panel')).toBeVisible();
     await expect(page.locator('.profile-section')).toBeVisible();
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
@@ -46,18 +46,11 @@ test.describe('Profile page (/profile, /why)', () => {
   test('profile section loses loading class after portrait handling', async ({
     page,
   }) => {
-    await page.goto('/profile');
-    await page
-      .locator('.profile-section:not(.profile-section--loading)')
-      .waitFor({ state: 'attached', timeout: 10000 });
+    await gotoProfileWhenReady(page);
   });
 
   test('profile section - last screenshot matches', async ({ page }) => {
-    await page.goto('/profile');
-    await page
-      .locator('.profile-section:not(.profile-section--loading)')
-      .first()
-      .waitFor({ state: 'visible', timeout: 10000 });
+    await gotoProfileWhenReady(page);
     await expect(page).toHaveScreenshot('profile-section.png');
   });
 
@@ -76,32 +69,26 @@ test.describe('Profile page (/profile, /why)', () => {
   test('site-header: Profile, Writing, Contact spread across', async ({
     page,
   }) => {
-    await page.goto('/profile');
     const inner = page.locator('.site-header__inner');
     await expect(inner).toBeVisible();
     const profile = inner.getByRole('link', { name: 'Profile' });
     const writing = inner.getByRole('link', { name: 'Writing' });
     const contact = inner.getByRole('link', { name: 'Contact' });
-    const box = await inner.boundingBox();
-    const pBox = await profile.boundingBox();
-    const wBox = await writing.boundingBox();
-    const cBox = await contact.boundingBox();
-    expect(box).toBeTruthy();
-    expect(pBox).toBeTruthy();
-    expect(wBox).toBeTruthy();
-    expect(cBox).toBeTruthy();
-    expect(pBox!.x).toBeLessThanOrEqual(box!.x + LAYOUT_TOLERANCE);
-    expect(pBox!.x).toBeLessThanOrEqual(wBox!.x + LAYOUT_TOLERANCE);
-    expect(wBox!.x).toBeLessThanOrEqual(cBox!.x + LAYOUT_TOLERANCE);
-    expect(cBox!.x + cBox!.width).toBeGreaterThanOrEqual(
-      box!.x + box!.width - LAYOUT_TOLERANCE,
+    const box = await mustBox(inner);
+    const pBox = await mustBox(profile);
+    const wBox = await mustBox(writing);
+    const cBox = await mustBox(contact);
+    expect(pBox.x).toBeLessThanOrEqual(box.x + LAYOUT_TOLERANCE);
+    expect(pBox.x).toBeLessThanOrEqual(wBox.x + LAYOUT_TOLERANCE);
+    expect(wBox.x).toBeLessThanOrEqual(cBox.x + LAYOUT_TOLERANCE);
+    expect(cBox.x + cBox.width).toBeGreaterThanOrEqual(
+      box.x + box.width - LAYOUT_TOLERANCE,
     );
   });
 
   test('navbar: Profile, Writing, Contact only; Home link in footer', async ({
     page,
   }) => {
-    await page.goto('/profile');
     await expect(page.locator('.site-header a[href="/"]')).toHaveCount(0);
     await expect(page.locator('.site-header a[href="/profile"]')).toBeVisible();
     await expect(page.locator('.site-header a[href="/writing"]')).toBeVisible();
@@ -114,10 +101,7 @@ test.describe('Profile page (/profile, /why)', () => {
   test('profile tiles are positioned as Why TL, Portrait TR, Professional BL, Foundations BR', async ({
     page,
   }) => {
-    await page.goto('/profile');
-    await page
-      .locator('.profile-section:not(.profile-section--loading)')
-      .waitFor({ state: 'visible', timeout: 10000 });
+    await gotoProfileWhenReady(page);
     const profileSection = page.locator('.profile-section');
     await expect(profileSection).toBeVisible();
     const why = profileSection.getByRole('link', { name: 'Why' });
@@ -128,27 +112,21 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(professional).toBeVisible();
     await expect(foundations).toBeVisible();
     await expect(portrait).toBeVisible();
-    const whyBox = await why.boundingBox();
-    const proBox = await professional.boundingBox();
-    const perBox = await foundations.boundingBox();
-    const portraitBox = await portrait.boundingBox();
-    expect(whyBox).toBeTruthy();
-    expect(proBox).toBeTruthy();
-    expect(perBox).toBeTruthy();
-    expect(portraitBox).toBeTruthy();
+    const whyBox = await mustBox(why);
+    const proBox = await mustBox(professional);
+    const perBox = await mustBox(foundations);
+    const portraitBox = await mustBox(portrait);
 
-    expect(whyBox!.x).toBeLessThan(portraitBox!.x);
-    expect(proBox!.x).toBeLessThan(perBox!.x);
-    expect(whyBox!.y).toBeLessThan(proBox!.y);
-    expect(portraitBox!.y).toBeLessThan(perBox!.y);
+    expect(whyBox.x).toBeLessThan(portraitBox.x);
+    expect(proBox.x).toBeLessThan(perBox.x);
+    expect(whyBox.y).toBeLessThan(proBox.y);
+    expect(portraitBox.y).toBeLessThan(perBox.y);
   });
 
   test('Why (/why) has active Profile in navbar', async ({ page }) => {
     await page.goto('/why');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Profile' })).toHaveClass(
-      /site-nav__link--active/,
-    );
+    await expectNavLinkActive(page, 'Profile');
   });
 
 });
@@ -158,14 +136,15 @@ test.describe('Profile page (/profile, /why)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Writing page (/writing)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/writing');
+  });
+
   test('shows navbar with active Writing and article list', async ({
     page,
   }) => {
-    await page.goto('/writing');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Writing' })).toHaveClass(
-      /site-nav__link--active/,
-    );
+    await expectNavLinkActive(page, 'Writing');
     await expect(
       page.getByRole('heading', { name: 'Writing', level: 1 }),
     ).toBeVisible();
@@ -175,21 +154,17 @@ test.describe('Writing page (/writing)', () => {
   });
 
   test('gaps between navbar, title, content', async ({ page }) => {
-    await page.goto('/writing');
     const nav = page.locator('.site-header');
     const title = page.getByRole('heading', { name: 'Writing', level: 1 });
     const list = page.locator('.post-list');
     await expect(nav).toBeVisible();
     await expect(title).toBeVisible();
     await expect(list).toBeVisible();
-    const nBox = await nav.boundingBox();
-    const tBox = await title.boundingBox();
-    const lBox = await list.boundingBox();
-    expect(nBox).toBeTruthy();
-    expect(tBox).toBeTruthy();
-    expect(lBox).toBeTruthy();
-    const gapNavToTitle = tBox!.y - (nBox!.y + nBox!.height);
-    const gapTitleToContent = lBox!.y - (tBox!.y + tBox!.height);
+    const nBox = await mustBox(nav);
+    const tBox = await mustBox(title);
+    const lBox = await mustBox(list);
+    const gapNavToTitle = tBox.y - (nBox.y + nBox.height);
+    const gapTitleToContent = lBox.y - (tBox.y + tBox.height);
     expect(gapNavToTitle).toBeGreaterThanOrEqual(MIN_GAP);
     expect(gapNavToTitle).toBeLessThanOrEqual(MAX_GAP);
     expect(gapTitleToContent).toBeGreaterThanOrEqual(MIN_GAP);
@@ -199,7 +174,6 @@ test.describe('Writing page (/writing)', () => {
   test('writing page has panel zone and article list with page buttons', async ({
     page,
   }) => {
-    await page.goto('/writing');
     await expect(page.locator('article.writing-page')).toBeVisible();
     await expect(page.locator('.page-buttons-zone')).toBeVisible();
     await expect(page.locator('.page-buttons-panel')).toBeVisible();
@@ -216,7 +190,6 @@ test.describe('Writing page (/writing)', () => {
   });
 
   test('each writing list link targets /blog/ slug', async ({ page }) => {
-    await page.goto('/writing');
     const links = page.locator('.post-list a.page-button');
     const n = await links.count();
     expect(n).toBeGreaterThanOrEqual(1);
@@ -226,7 +199,6 @@ test.describe('Writing page (/writing)', () => {
   });
 
   test('writing buttons invert colors on hover', async ({ page }) => {
-    await page.goto('/writing');
     const button = page
       .getByRole('link', { name: 'Reflection on Building Systems' })
       .first();
@@ -246,7 +218,6 @@ test.describe('Writing page (/writing)', () => {
   test('writing background rotates across visits using localStorage index', async ({
     page,
   }) => {
-    await page.goto('/writing');
     await page.evaluate(() => {
       window.localStorage.removeItem('writing-bg-index');
     });

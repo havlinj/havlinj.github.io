@@ -10,6 +10,8 @@
 
 const LABEL_VAR = '--profile-tile-label-font-size';
 const REVEAL_VAR = '--profile-reveal-font-size';
+const PROFILE_RIGHT_HEIGHT_VAR = '--profile-right-height-px';
+const PROFILE_PORTRAIT_SIDE_VAR = '--profile-portrait-side-px';
 
 /** Longest default label; measurement uses this string, not other tiles’ copy. */
 const TILE_LABEL_REFERENCE = 'PROFESSIONAL';
@@ -22,13 +24,40 @@ let portraitGeometryPxMeasured = false;
 
 /** Layout.astro waits for this before fading the profile grid in (avoids font-size FOUC). */
 const TYPE_FIT_EVENT = 'profileTileTypeFit';
+const SELECTORS = {
+  profileSection: '.profile-section',
+  pageTitle: 'article h1.page-title',
+  professionalTile: 'a.profile-tile-button[href="/professional"]',
+  pageButtonInner: '.page-button__inner',
+  pageButtonText: '.page-button__text',
+  foundationsTile: '.profile-tile-button--foundations',
+  foundationsReveal: '.profile-tile-button__reveal',
+  foundationsRevealInTile: '.profile-tile-button--foundations .profile-tile-button__reveal',
+  foundationsRevealStanza: '.profile-tile-button__reveal-stanza',
+  profileRightColumn: '.profile-right-column',
+  profilePhotoBox: '.profile-photo-box',
+} as const;
+const REVEAL_CLASSES = {
+  revealed: 'is-revealed',
+  fadingOut: 'is-reveal-fading-out',
+  opening: 'is-reveal-opening',
+} as const;
+
+function queryElement<T extends Element>(
+  root: ParentNode,
+  selector: string,
+  ctor: { new (...args: never[]): T },
+): T | null {
+  const el = root.querySelector(selector);
+  return el instanceof ctor ? el : null;
+}
 
 function rootRemPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 }
 
 function titleCapFontPx(): number {
-  const h1 = document.querySelector('article h1.page-title');
+  const h1 = document.querySelector(SELECTORS.pageTitle);
   if (!(h1 instanceof HTMLElement)) return Math.min(40, rootRemPx() * 2.5);
   return parseFloat(getComputedStyle(h1).fontSize) || 40;
 }
@@ -113,26 +142,33 @@ function roundPx(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-function fitTileLabels(): void {
-  const section = document.querySelector('.profile-section');
-  if (!(section instanceof HTMLElement)) return;
+function contentWidthWithoutHorizontalPadding(el: HTMLElement): number {
+  const cs = getComputedStyle(el);
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const padR = parseFloat(cs.paddingRight) || 0;
+  return el.clientWidth - padL - padR;
+}
 
-  const professional = section.querySelector(
-    'a.profile-tile-button[href="/professional"]',
+function fitTileLabels(section: HTMLElement): void {
+  const professional = queryElement(
+    section,
+    SELECTORS.professionalTile,
+    HTMLAnchorElement,
   );
-  if (!(professional instanceof HTMLAnchorElement)) return;
+  if (!professional) return;
 
-  const inner = professional.querySelector('.page-button__inner');
-  const textEl = professional.querySelector('.page-button__text');
-  if (!(inner instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
+  const inner = queryElement(professional, SELECTORS.pageButtonInner, HTMLElement);
+  const textEl = queryElement(
+    professional,
+    SELECTORS.pageButtonText,
+    HTMLElement,
+  );
+  if (!inner || !textEl) return;
 
   const rem = rootRemPx();
   const minPx = rem * 0.7;
   const maxPx = titleCapFontPx();
-  const ics = getComputedStyle(inner);
-  const padL = parseFloat(ics.paddingLeft) || 0;
-  const padR = parseFloat(ics.paddingRight) || 0;
-  const available = inner.clientWidth - padL - padR;
+  const available = contentWidthWithoutHorizontalPadding(inner);
   const tcs = getComputedStyle(textEl);
   const lines = [TILE_LABEL_REFERENCE];
   const fontPx = fitFontSize(available, minPx, maxPx, (fp) =>
@@ -141,22 +177,23 @@ function fitTileLabels(): void {
   section.style.setProperty(LABEL_VAR, `${roundPx(fontPx)}px`);
 }
 
-function fitFoundationsReveal(): void {
-  const reveal = document.querySelector('.profile-tile-button__reveal');
-  if (!(reveal instanceof HTMLElement)) return;
+function collectRevealLines(reveal: HTMLElement): string[] {
+  const lines: string[] = [];
+  reveal.querySelectorAll(SELECTORS.foundationsRevealStanza).forEach((stanza) => {
+    lines.push(...stanzaLines(stanza));
+  });
+  return lines;
+}
+
+function fitFoundationsReveal(reveal: HTMLElement): void {
   const rem = rootRemPx();
   const minPx = rem * 0.65;
   const maxPx = titleCapFontPx();
   const rcs = getComputedStyle(reveal);
-  const padL = parseFloat(rcs.paddingLeft) || 0;
-  const padR = parseFloat(rcs.paddingRight) || 0;
-  const available = reveal.clientWidth - padL - padR;
+  const available = contentWidthWithoutHorizontalPadding(reveal);
   /* Grid/transition can yield a one-frame width of 0; skip write to avoid a flash */
   if (available < 4) return;
-  const lines: string[] = [];
-  reveal.querySelectorAll('.profile-tile-button__reveal-stanza').forEach((st) => {
-    lines.push(...stanzaLines(st));
-  });
+  const lines = collectRevealLines(reveal);
   if (lines.length === 0) return;
   const fontPx = fitFontSize(available, minPx, maxPx, (fp) =>
     maxLineWidth(lines, fp, rcs),
@@ -165,25 +202,23 @@ function fitFoundationsReveal(): void {
 }
 
 function fitAll(): void {
-  fitTileLabels();
-  fitFoundationsReveal();
+  const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
+  if (section) fitTileLabels(section);
+  const reveal = queryElement(document, SELECTORS.foundationsReveal, HTMLElement);
+  if (reveal) fitFoundationsReveal(reveal);
   measurePortraitGeometryPxOnce();
 }
 
 function measurePortraitGeometryPxOnce(): void {
   if (portraitGeometryPxMeasured) return;
-  const rightColumn = document.querySelector(
-    '.profile-right-column',
-  ) as HTMLElement | null;
+  const rightColumn = queryElement(document, SELECTORS.profileRightColumn, HTMLElement);
   if (!rightColumn) return;
 
   // A = height of the right column (big square / whole right region)
   const rcHeight = rightColumn.getBoundingClientRect().height;
   if (!Number.isFinite(rcHeight) || rcHeight < 4) return;
 
-  const box = rightColumn.querySelector(
-    '.profile-photo-box',
-  ) as HTMLElement | null;
+  const box = queryElement(rightColumn, SELECTORS.profilePhotoBox, HTMLElement);
   if (!box) return;
 
   // Portrait width is the "c" we need for h_max = A - c.
@@ -191,16 +226,18 @@ function measurePortraitGeometryPxOnce(): void {
   const w = box.getBoundingClientRect().width;
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
-  rightColumn.style.setProperty('--profile-right-height-px', `${roundPx(rcHeight)}px`);
-  rightColumn.style.setProperty('--profile-portrait-side-px', `${roundPx(w)}px`);
+  rightColumn.style.setProperty(PROFILE_RIGHT_HEIGHT_VAR, `${roundPx(rcHeight)}px`);
+  rightColumn.style.setProperty(PROFILE_PORTRAIT_SIDE_VAR, `${roundPx(w)}px`);
   portraitGeometryPxMeasured = true;
 }
 
 function wireFoundationsReveal(): void {
-  const foundationsTile = document.querySelector(
-    '.profile-tile-button--foundations',
+  const foundationsTile = queryElement(
+    document,
+    SELECTORS.foundationsTile,
+    HTMLAnchorElement,
   );
-  if (!(foundationsTile instanceof HTMLAnchorElement)) return;
+  if (!foundationsTile) return;
 
   let revealTimeoutId = 0;
   let revealCloseStepId = 0;
@@ -220,76 +257,80 @@ function wireFoundationsReveal(): void {
     revealCloseStepId = 0;
   };
 
+  const isRevealed = (): boolean =>
+    foundationsTile.classList.contains(REVEAL_CLASSES.revealed);
+  const isFadingOut = (): boolean =>
+    foundationsTile.classList.contains(REVEAL_CLASSES.fadingOut);
+  const isOpening = (): boolean =>
+    foundationsTile.classList.contains(REVEAL_CLASSES.opening);
+
   const finishRevealClose = () => {
-    foundationsTile.classList.remove('is-revealed', 'is-reveal-fading-out');
-    foundationsTile.classList.add('is-reveal-opening');
+    foundationsTile.classList.remove(REVEAL_CLASSES.revealed, REVEAL_CLASSES.fadingOut);
+    foundationsTile.classList.add(REVEAL_CLASSES.opening);
     void foundationsTile.offsetWidth;
-    foundationsTile.classList.remove('is-reveal-opening');
+    foundationsTile.classList.remove(REVEAL_CLASSES.opening);
   };
 
   const runRevealCloseSequence = () => {
-    foundationsTile.classList.add('is-reveal-fading-out');
+    foundationsTile.classList.add(REVEAL_CLASSES.fadingOut);
     revealCloseStepId = window.setTimeout(() => {
       finishRevealClose();
       revealCloseStepId = 0;
     }, REVEAL_FADE_MS + REVEAL_PAUSE_MS);
   };
 
+  const openReveal = () => {
+    foundationsTile.classList.remove(REVEAL_CLASSES.fadingOut, REVEAL_CLASSES.opening);
+    foundationsTile.classList.add(REVEAL_CLASSES.revealed);
+    clearRevealTimers();
+    revealTimeoutId = window.setTimeout(() => {
+      revealTimeoutId = 0;
+      runRevealCloseSequence();
+    }, revealTimeoutMs());
+  };
+
   foundationsTile.addEventListener('click', (event) => {
-    if (foundationsTile.classList.contains('is-reveal-fading-out')) {
+    if (isFadingOut() || isOpening()) {
       event.preventDefault();
       return;
     }
-    if (foundationsTile.classList.contains('is-reveal-opening')) {
-      event.preventDefault();
-      return;
-    }
-    if (foundationsTile.classList.contains('is-revealed')) {
+    if (isRevealed()) {
       clearRevealTimers();
       event.preventDefault();
       window.location.assign(foundationsTile.href);
       return;
     }
     event.preventDefault();
-    foundationsTile.classList.remove(
-      'is-reveal-fading-out',
-      'is-reveal-opening',
-    );
-    foundationsTile.classList.add('is-revealed');
-    clearRevealTimers();
-    revealTimeoutId = window.setTimeout(() => {
-      revealTimeoutId = 0;
-      runRevealCloseSequence();
-    }, revealTimeoutMs());
+    openReveal();
   });
 }
 
+function makeRafCoalesced(fn: () => void): () => void {
+  let rafId = 0;
+  return () => {
+    if (rafId) window.cancelAnimationFrame(rafId);
+    rafId = window.requestAnimationFrame(() => {
+      rafId = 0;
+      fn();
+    });
+  };
+}
+
 function wireResize(): void {
-  const section = document.querySelector('.profile-section');
-  if (!(section instanceof HTMLElement)) return;
-  const ro = new ResizeObserver(() => {
-    requestAnimationFrame(() => fitAll());
-  });
+  const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
+  if (!section) return;
+  const scheduleFitAll = makeRafCoalesced(fitAll);
+  const ro = new ResizeObserver(scheduleFitAll);
   ro.observe(section);
-  window.addEventListener('orientationchange', () => {
-    requestAnimationFrame(() => fitAll());
-  });
+  window.addEventListener('orientationchange', scheduleFitAll);
 }
 
 /** Reveal width changes while column expands/compresses in state2; observe it directly. */
 function wireFoundationsRevealResize(): void {
-  const reveal = document.querySelector(
-    '.profile-tile-button--foundations .profile-tile-button__reveal',
-  );
-  if (!(reveal instanceof HTMLElement)) return;
-  let rafId = 0;
-  const ro = new ResizeObserver(() => {
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      rafId = 0;
-      fitFoundationsReveal();
-    });
-  });
+  const reveal = queryElement(document, SELECTORS.foundationsRevealInTile, HTMLElement);
+  if (!reveal) return;
+  const scheduleRevealFit = makeRafCoalesced(() => fitFoundationsReveal(reveal));
+  const ro = new ResizeObserver(scheduleRevealFit);
   ro.observe(reveal);
 }
 

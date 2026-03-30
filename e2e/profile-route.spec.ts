@@ -1,11 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-
-async function gotoProfileWhenReady(page: Page) {
-  await page.goto('/profile');
-  await page
-    .locator('.profile-section:not(.profile-section--loading)')
-    .waitFor({ state: 'visible', timeout: 10000 });
-}
+import { gotoProfileWhenReady, mustBox } from './helpers';
 
 type FoundationsGeometry = {
   columnHeight: number;
@@ -136,11 +130,10 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const box = page.locator('.profile-photo-frame .profile-photo-box');
     await expect(frame).toBeVisible();
     await expect(box).toBeVisible();
-    const inner = await box.boundingBox();
-    const outer = await frame.boundingBox();
-    expect(inner && outer).toBeTruthy();
-    expect(inner!.width).toBeLessThan(outer!.width - 2);
-    expect(inner!.height).toBeLessThan(outer!.height - 2);
+    const inner = await mustBox(box);
+    const outer = await mustBox(frame);
+    expect(inner.width).toBeLessThan(outer.width - 2);
+    expect(inner.height).toBeLessThan(outer.height - 2);
   });
 
   test('state2 geometry follows A - (c * scale) and does not react to mouse position', async ({
@@ -156,13 +149,12 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(Math.abs(g1.foundationsHeight - expected)).toBeLessThan(2.5);
     expect(Math.abs(g1.portraitBottom - expected)).toBeLessThan(2.5);
 
-    const tileBox = await tile.boundingBox();
-    expect(tileBox).toBeTruthy();
+    const tileBox = await mustBox(tile);
     await page.mouse.move(8, 8);
     await page.waitForTimeout(120);
-    await page.mouse.move(tileBox!.x + tileBox!.width * 0.5, tileBox!.y + 8);
+    await page.mouse.move(tileBox.x + tileBox.width * 0.5, tileBox.y + 8);
     await page.waitForTimeout(120);
-    await page.mouse.move(tileBox!.x + tileBox!.width * 0.8, tileBox!.y + tileBox!.height * 0.8);
+    await page.mouse.move(tileBox.x + tileBox.width * 0.8, tileBox.y + tileBox.height * 0.8);
     await page.waitForTimeout(120);
 
     const g2 = await readFoundationsGeometry(page);
