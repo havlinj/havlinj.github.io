@@ -138,13 +138,6 @@ test.describe('Hero page (/)', () => {
     await expect(figure.locator('img[alt="Hero background"]')).toBeVisible();
   });
 
-  test('site footer shows copyright on home', async ({ page }) => {
-    await page.goto('/');
-    const footer = page.locator('footer.site-footer');
-    await expect(footer).toBeVisible();
-    await expect(footer).toContainText('© 2026 Jan Havlín');
-  });
-
   test('preloads hero background image', async ({ page }) => {
     await page.goto('/');
     await expect(

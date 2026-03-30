@@ -60,17 +60,16 @@ test.describe('Content width limits', () => {
     page,
   }) => {
     await page.goto('/');
-    const main = page.locator('main.content');
-    await expect(main).toBeVisible();
-    const maxWidth = await main.evaluate((el) => {
-      const v = getComputedStyle(el).maxWidth;
-      return v;
+    const [rootVar, mainMaxWidth] = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement)
+        .getPropertyValue('--content-width')
+        .trim();
+      const main = document.querySelector('main.content');
+      const max = main ? getComputedStyle(main).maxWidth : '';
+      return [root, max];
     });
-    expect(maxWidth).toMatch(/^\d+px$/);
-    const maxPx = Number.parseInt(maxWidth, 10);
-    // 70ch at 16px is typically ~500–600px depending on font
-    expect(maxPx).toBeGreaterThanOrEqual(400);
-    expect(maxPx).toBeLessThanOrEqual(900);
+    expect(rootVar).toBe('70ch');
+    expect(mainMaxWidth).toMatch(/^\d+px$/);
   });
 
   test('content width stays within min at narrow viewport', async ({

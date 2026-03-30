@@ -14,7 +14,7 @@ const REVEAL_VAR = '--profile-reveal-font-size';
 /** Longest default label; measurement uses this string, not other tiles’ copy. */
 const TILE_LABEL_REFERENCE = 'PROFESSIONAL';
 
-const REVEAL_TIMEOUT_MS = 7000;
+const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
 
@@ -204,6 +204,14 @@ function wireFoundationsReveal(): void {
 
   let revealTimeoutId = 0;
   let revealCloseStepId = 0;
+  const revealTimeoutMs = (): number => {
+    const raw = getComputedStyle(foundationsTile)
+      .getPropertyValue('--profile-reveal-timeout-ms')
+      .trim();
+    const parsed = Number.parseFloat(raw);
+    if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_REVEAL_TIMEOUT_MS;
+    return parsed;
+  };
 
   const clearRevealTimers = () => {
     window.clearTimeout(revealTimeoutId);
@@ -252,7 +260,7 @@ function wireFoundationsReveal(): void {
     revealTimeoutId = window.setTimeout(() => {
       revealTimeoutId = 0;
       runRevealCloseSequence();
-    }, REVEAL_TIMEOUT_MS);
+    }, revealTimeoutMs());
   });
 }
 

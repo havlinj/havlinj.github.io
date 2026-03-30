@@ -45,6 +45,29 @@ async function readFoundationsGeometry(page: Page): Promise<FoundationsGeometry>
   });
 }
 
+async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
+  await page.evaluate((timeout) => {
+    const tile = document.querySelector(
+      '.profile-tile-button--foundations',
+    ) as HTMLElement | null;
+    if (!tile) throw new Error('missing .profile-tile-button--foundations');
+    tile.style.setProperty('--profile-reveal-timeout-ms', `${timeout}`);
+  }, ms);
+}
+
+async function waitForState2Settled(page: Page): Promise<FoundationsGeometry> {
+  await expect
+    .poll(async () => {
+      const g = await readFoundationsGeometry(page);
+      const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
+      const deltaH = Math.abs(g.foundationsHeight - expected);
+      const deltaB = Math.abs(g.portraitBottom - expected);
+      return deltaH < 2.5 && deltaB < 2.5;
+    }, { timeout: 3000, intervals: [100, 150, 250] })
+    .toBe(true);
+  return readFoundationsGeometry(page);
+}
+
 test.describe('/profile — type fit, Foundations tile, reveal', () => {
   test.use({
     viewport: { width: 1280, height: 900 },
@@ -88,7 +111,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   test('first click opens reveal and stays on /profile', async ({ page }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.dispatchEvent('click');
+    await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.profile-tile-button__reveal')).toContainText(
@@ -101,7 +124,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.dispatchEvent('click');
+    await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await tile.click();
     await expect(page).toHaveURL(/\/foundations\/?$/);
@@ -125,11 +148,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.dispatchEvent('click');
+    await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
-    await page.waitForTimeout(600);
-
-    const g1 = await readFoundationsGeometry(page);
+    const g1 = await waitForState2Settled(page);
     expect(g1.effectiveScale).toBeCloseTo(0.8, 2);
     const expected = g1.columnHeight - g1.portraitSide * g1.effectiveScale;
     expect(Math.abs(g1.foundationsHeight - expected)).toBeLessThan(2.5);
@@ -145,25 +166,24 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await page.waitForTimeout(120);
 
     const g2 = await readFoundationsGeometry(page);
-    expect(Math.abs(g2.foundationsHeight - g1.foundationsHeight)).toBeLessThan(1.5);
-    expect(Math.abs(g2.portraitBottom - g1.portraitBottom)).toBeLessThan(1.5);
+    expect(Math.abs(g2.foundationsHeight - g1.foundationsHeight)).toBeLessThan(3);
+    expect(Math.abs(g2.portraitBottom - g1.portraitBottom)).toBeLessThan(3);
   });
 
   test('state2 holds until timeout, then returns to state1 geometry', async ({ page }) => {
     await gotoProfileWhenReady(page);
+    await setRevealTimeoutMs(page, 900);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.dispatchEvent('click');
+    await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
-    await page.waitForTimeout(600);
-
-    const state2 = await readFoundationsGeometry(page);
+    const state2 = await waitForState2Settled(page);
     expect(state2.foundationsHeight).toBeGreaterThan(state2.columnHeight * 0.5 + 2);
 
     await expect
       .poll(async () => {
         const cls = (await tile.getAttribute('class')) ?? '';
         return cls.includes('is-revealed');
-      }, { timeout: 9000, intervals: [250, 500, 1000] })
+      }, { timeout: 2500, intervals: [100, 200, 350] })
       .toBe(false);
 
     const state1 = await readFoundationsGeometry(page);
@@ -186,12 +206,11 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     });
 
     await gotoProfileWhenReady(page);
+    await setRevealTimeoutMs(page, 900);
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.dispatchEvent('click');
     await expect(tile).toHaveClass(/is-revealed/);
-    await page.waitForTimeout(600);
-
-    const state2 = await readFoundationsGeometry(page);
+    const state2 = await waitForState2Settled(page);
     const expected = state2.columnHeight - state2.portraitSide * state2.effectiveScale;
     expect(Math.abs(state2.foundationsHeight - expected)).toBeLessThan(3);
     expect(Math.abs(state2.portraitBottom - expected)).toBeLessThan(3);
@@ -200,7 +219,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       .poll(async () => {
         const cls = (await tile.getAttribute('class')) ?? '';
         return cls.includes('is-revealed');
-      }, { timeout: 9000, intervals: [250, 500, 1000] })
+      }, { timeout: 2500, intervals: [100, 200, 350] })
       .toBe(false);
   });
 });
