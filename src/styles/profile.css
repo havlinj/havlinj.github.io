@@ -65,6 +65,10 @@ article.has-buttons-panel {
    */
   --profile-right-height-px: 0px; /* A */
   --profile-portrait-side-px: 0px; /* c */
+  --portrait-effective-scale: 1;
+  --profile-portrait-effective-px: calc(
+    var(--profile-portrait-side-px) * var(--portrait-effective-scale)
+  );
 
   /* state1 (a = A/2) */
   --profile-foundations-height: calc(var(--profile-right-height-px) / 2);
@@ -91,11 +95,12 @@ article.has-buttons-panel {
 
 /* state2: po kliknutí (is-revealed) se Foundations plynule rozšíří do h_max */
 .profile-right-column:has(.profile-tile-button--foundations.is-revealed) {
+  --portrait-effective-scale: 0.8;
   --profile-foundations-height: calc(
-    var(--profile-right-height-px) - var(--profile-portrait-side-px)
+    var(--profile-right-height-px) - var(--profile-portrait-effective-px)
   );
   --portrait-stand-bottom: calc(
-    var(--profile-right-height-px) - var(--profile-portrait-side-px)
+    var(--profile-right-height-px) - var(--profile-portrait-effective-px)
   );
 }
 
@@ -178,6 +183,8 @@ article .profile-section:last-child {
     --profile-inner-gutter-x,
     var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0)))
   );
+  /* Vizuální shrink portrétu jen během expandu do state 2 */
+  --portrait-img-shrink: 1;
   position: absolute;
   top: auto;
   left: auto;
@@ -417,8 +424,16 @@ article .profile-section:last-child {
     brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
   /* center + scaleX(-1): right/top origin často odsune výřez mimo clip — průhledný „zmizelý“ portrét */
-  transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
-  transform-origin: center;
+  transform: scale(calc(var(--portrait-zoom, 1) * var(--portrait-img-shrink, 1)))
+    scaleX(-1);
+  transform-origin: bottom center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* state2: během expandu (is-revealed) vizuálně zmenšit portrét (~20%) */
+.profile-right-column:has(.profile-tile-button--foundations.is-revealed)
+  .profile-photo-box {
+  --portrait-img-shrink: var(--portrait-effective-scale, 0.8);
 }
 
 @keyframes profile-foundations-reveal-tile-breathe {

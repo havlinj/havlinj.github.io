@@ -6,7 +6,7 @@ title: 'Profile'
   class="profile-section profile-section--loading"
   style="
     /* Reveal klid = 50/50; hover na Foundations = natažení nahoru (sloupec − strana portrétu) + portrét */
-    --profile-inner-gutter: 9%;
+    --profile-inner-gutter: 12%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;
