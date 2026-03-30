@@ -5,7 +5,7 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    /* Rámeček v barvě pozadí ze všech stran: portrét + zmenšení Foundations při hoveru (2. stav) */
+    /* Reveal klid = 50/50; hover na Foundations = natažení nahoru (sloupec − strana portrétu) + portrét */
     --profile-inner-gutter: 9%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
@@ -58,16 +58,6 @@ title: 'Profile'
       <span class="page-button__text">Why</span>
     </span>
   </a>
-  <div class="profile-tile profile-photo-frame">
-    <div class="profile-photo-box">
-      <img
-        src="/assets/pages/profile/portrait_bayer16_style.png"
-        alt="Jan Havlín"
-        fetchpriority="high"
-        decoding="async"
-      />
-    </div>
-  </div>
   <a
     href="/professional"
     class="profile-tile profile-image-tile page-button profile-tile-button"
@@ -89,21 +79,32 @@ title: 'Profile'
       <span class="page-button__text">Professional</span>
     </span>
   </a>
-  <a
-    href="/foundations"
-    class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--foundations"
-    style="
-      --tile-bg: var(--profile-tile-4-bg);
-      --tile-pos-x: var(--profile-tile-4-pos-x);
-      --tile-pos-y: var(--profile-tile-4-pos-y);
-      --tile-zoom: var(--profile-tile-4-zoom);
-      --tile-saturation: var(--profile-tile-4-saturation);
-      --tile-brightness: var(--profile-tile-4-brightness);
-      --tile-contrast: var(--profile-tile-4-contrast);
-      --tile-image-opacity: var(--profile-tile-4-opacity);
-    "
-    aria-label="Foundations"
-  >
+  <div class="profile-right-column">
+    <div class="profile-tile profile-photo-frame">
+      <div class="profile-photo-box">
+        <img
+          src="/assets/pages/profile/portrait_bayer16_style.png"
+          alt="Jan Havlín"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+    </div>
+    <a
+      href="/foundations"
+      class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--foundations"
+      style="
+        --tile-bg: var(--profile-tile-4-bg);
+        --tile-pos-x: var(--profile-tile-4-pos-x);
+        --tile-pos-y: var(--profile-tile-4-pos-y);
+        --tile-zoom: var(--profile-tile-4-zoom);
+        --tile-saturation: var(--profile-tile-4-saturation);
+        --tile-brightness: var(--profile-tile-4-brightness);
+        --tile-contrast: var(--profile-tile-4-contrast);
+        --tile-image-opacity: var(--profile-tile-4-opacity);
+      "
+      aria-label="Foundations"
+    >
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
@@ -117,10 +118,11 @@ title: 'Profile'
           Beyond the craft
         </span>
         <span class="profile-tile-button__reveal-stanza">
-          Meaningful<br />
-          Beyond what's needed
+          More reading<br />
+          more meaning
         </span>
       </span>
     </span>
   </a>
+  </div>
 </div>

@@ -9,10 +9,11 @@ article.has-buttons-panel {
 
 /*
  * Jednotné odsazení (inline na .profile-section):
- *   --profile-inner-gutter     → stejný „rámeček“ ze všech stran (barva buňky = --color-page-bg):
- *                                 portrét uprostřed čtverce + Foundations reveal při hoveru (2. stav).
+ *   --profile-inner-gutter     → horiz. strana portrétu; stejná jako --profile-portrait-side (šířka sloupce − 2× gutter).
  *   --profile-inner-gutter-x   → volitelně jinak vodorovně (vlevo+vpravo)
- *   --profile-inner-gutter-y   → volitelně jinak svisle (nahoře+dole)
+ *   --profile-inner-gutter-y   → rezerva
+ *   --profile-photo-inset-bottom → spodní hrana čtverce (0 = k dlaždici pod)
+ *   --profile-photo-inset-right  → vpravo od okraje buňky (0 = úplně vpravo; velikost čtverce stejná)
  * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (použijí se jako jedna hodnota pro obě osy).
  * --profile-tile-label-font-size: profile-tile-type-fit.ts
  */
@@ -26,6 +27,76 @@ article.has-buttons-panel {
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
+}
+
+.profile-section > a[href='/why'] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.profile-section > a[href='/professional'] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/*
+ * Pravý sloupec (geometrie A/a/c):
+ * - A: výška „velkého čtverce“ (= výška celé pravé oblasti, 100%).
+ * - a: základní výška Foundations (state 1) = A/2 = 50%.
+ * - c: strana portrétu (měřená jednou v JS do `--profile-portrait-side-px`).
+ *
+ * State 1: Foundations = a, portrét stojí na jeho horní hraně (bottom = 50%).
+ * State 2: Foundations = h_max = A - c, portrét se zvedne tak, aby se dotýkal
+ *           horní hrany (bottom = FoundationsHeight).
+ *
+ * Důležité: animujeme pouze vertikální pozici (`bottom`) a výšku (`height`).
+ * Horizontalitu neměníme (bez left/right animací → bez „blikání“).
+ */
+.profile-right-column {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+
+  /*
+   * Velikosti (geometrie A/a/c) v px.
+   * Používáme px místo % aby state2 nereagovala na hover/focus drobné změny výšky A.
+   */
+  --profile-right-height-px: 0px; /* A */
+  --profile-portrait-side-px: 0px; /* c */
+
+  /* state1 (a = A/2) */
+  --profile-foundations-height: calc(var(--profile-right-height-px) / 2);
+  --portrait-stand-bottom: calc(var(--profile-right-height-px) / 2);
+}
+
+.profile-right-column .profile-photo-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none; /* kliky vždy míří na Foundations */
+}
+
+.profile-right-column .profile-tile-button--foundations {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+
+  height: var(--profile-foundations-height);
+  transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* state2: po kliknutí (is-revealed) se Foundations plynule rozšíří do h_max */
+.profile-right-column:has(.profile-tile-button--foundations.is-revealed) {
+  --profile-foundations-height: calc(
+    var(--profile-right-height-px) - var(--profile-portrait-side-px)
+  );
+  --portrait-stand-bottom: calc(
+    var(--profile-right-height-px) - var(--profile-portrait-side-px)
+  );
 }
 
 /* When profile-section is the last block in the article, avoid extra gap before footer */
@@ -99,13 +170,24 @@ article .profile-section:last-child {
 }
 
 /*
- * Portrét: stejný inset ze všech stran → rámeček v barvě pozadí buňky, obsah vycentrovaný v čtverci.
- * inset: <svisle> <vodorovně> — jedna proměnná --profile-inner-gutter řídí obě, pokud není -x/-y.
+ * Portrét: čtverec strany calc(100% − 2× horiz. gutter); přitisknutý vpravo a dolů k okrajům buňky.
+ * Velikost jako dřív (symetrické horiz. guttery), pozice max. doprava (--profile-photo-inset-right, výchozí 0).
  */
 .profile-photo-box {
+  --profile-photo-gutter-x: var(
+    --profile-inner-gutter-x,
+    var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0)))
+  );
   position: absolute;
-  inset: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))))
-    var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
+  top: auto;
+  left: auto;
+  right: var(--profile-photo-inset-right, 0);
+  bottom: var(--portrait-stand-bottom, 50%);
+  transition: bottom 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  width: calc(100% - (2 * var(--profile-photo-gutter-x)));
+  height: auto;
+  aspect-ratio: 1;
+  max-height: 100%;
   overflow: hidden;
   background: transparent;
 }
@@ -219,25 +301,9 @@ article .profile-section:last-child {
 .profile-tile-button--foundations .page-button__overlay {
   background: linear-gradient(
     90deg,
-    rgba(17, 17, 17, 0.34) 0%,
-    rgba(17, 17, 17, 0.25) 50%,
-    rgba(17, 17, 17, 0.14) 100%
-  );
-}
-
-/* Keep hover effect subtle: darken overlay only, never flip to black */
-.profile-tile-button--foundations:hover .page-button__bg,
-.profile-tile-button--foundations:focus-visible .page-button__bg {
-  background-color: rgba(17, 17, 17, 0.2);
-}
-
-.profile-tile-button--foundations:hover .page-button__overlay,
-.profile-tile-button--foundations:focus-visible .page-button__overlay {
-  background: linear-gradient(
-    90deg,
-    rgba(17, 17, 17, 0.46) 0%,
-    rgba(17, 17, 17, 0.36) 50%,
-    rgba(17, 17, 17, 0.24) 100%
+    rgba(17, 17, 17, 0.22) 0%,
+    rgba(17, 17, 17, 0.15) 50%,
+    rgba(17, 17, 17, 0.08) 100%
   );
 }
 
@@ -257,46 +323,11 @@ article .profile-section:last-child {
   visibility: visible;
   background-color: #111;
   box-shadow: none;
-  /* longhand: hover zmenší stejně ze všech stran jako portrét */
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   transition:
     opacity 0.18s ease,
     visibility 0s,
-    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Hover 2. stav: stejný obvodový inset jako portrét (centrované zmenšení) */
-.profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
-.profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
-  animation: none;
-  top: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))));
-  right: var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
-  bottom: var(--profile-inner-gutter-y, var(--profile-inner-gutter, var(--portrait-gap-bottom, var(--portrait-gap-left, 0))));
-  left: var(--profile-inner-gutter-x, var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0))));
-  transition:
-    opacity 0.18s ease,
-    visibility 0s,
-    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  background-color: #18191b;
-  box-shadow: none;
-}
-
-@supports (background-color: color-mix(in srgb, white, black)) {
-  .profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
-  .profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
-    background-color: color-mix(in srgb, var(--color-page-bg) 9%, #121212);
-  }
+    background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* “Alive” pulse: bg vs copy same period; text plný když je plocha nejsvětlejší (slabší „černá“) */
@@ -317,13 +348,6 @@ article .profile-section:last-child {
    */
   animation: profile-foundations-reveal-copy-breathe 3.2s ease-in-out 0.45s infinite
     backwards;
-}
-
-.profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal-copy,
-.profile-tile-button--foundations.is-revealed:focus-visible
-  .profile-tile-button__reveal-copy {
-  animation: none;
-  opacity: 1;
 }
 
 /* Fade reveal text out before returning to the default tile */
@@ -419,6 +443,11 @@ article .profile-section:last-child {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .profile-right-column .profile-photo-frame,
+  .profile-right-column .profile-tile-button--foundations {
+    transition: none;
+  }
+
   .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
     transition: opacity 0.18s ease, visibility 0s;
     animation: none !important;
@@ -427,13 +456,6 @@ article .profile-section:last-child {
   .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal-copy {
     animation: none !important;
     opacity: 1;
-  }
-
-  .profile-tile-button--foundations.is-revealed:hover .profile-tile-button__reveal,
-  .profile-tile-button--foundations.is-revealed:focus-visible .profile-tile-button__reveal {
-    background-color: #111;
-    box-shadow: none;
-    transition: opacity 0.18s ease, visibility 0s, background-color 0.52s ease;
   }
 }
 

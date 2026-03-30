@@ -18,6 +18,8 @@ const REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
 
+let portraitGeometryPxMeasured = false;
+
 /** Layout.astro waits for this before fading the profile grid in (avoids font-size FOUC). */
 const TYPE_FIT_EVENT = 'profileTileTypeFit';
 
@@ -149,6 +151,8 @@ function fitFoundationsReveal(): void {
   const padL = parseFloat(rcs.paddingLeft) || 0;
   const padR = parseFloat(rcs.paddingRight) || 0;
   const available = reveal.clientWidth - padL - padR;
+  /* Při přepnutí gridu může být jeden frame šířka 0 → nepsat --profile-reveal-font-size (problik) */
+  if (available < 4) return;
   const lines: string[] = [];
   reveal.querySelectorAll('.profile-tile-button__reveal-stanza').forEach((st) => {
     lines.push(...stanzaLines(st));
@@ -163,6 +167,33 @@ function fitFoundationsReveal(): void {
 function fitAll(): void {
   fitTileLabels();
   fitFoundationsReveal();
+  measurePortraitGeometryPxOnce();
+}
+
+function measurePortraitGeometryPxOnce(): void {
+  if (portraitGeometryPxMeasured) return;
+  const rightColumn = document.querySelector(
+    '.profile-right-column',
+  ) as HTMLElement | null;
+  if (!rightColumn) return;
+
+  // A = height of the right column (big square / whole right region)
+  const rcHeight = rightColumn.getBoundingClientRect().height;
+  if (!Number.isFinite(rcHeight) || rcHeight < 4) return;
+
+  const box = rightColumn.querySelector(
+    '.profile-photo-box',
+  ) as HTMLElement | null;
+  if (!box) return;
+
+  // Portrait width is the "c" we need for h_max = A - c.
+  // This is horizontal-only (computed once); we only use it for vertical calc.
+  const w = box.getBoundingClientRect().width;
+  if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
+
+  rightColumn.style.setProperty('--profile-right-height-px', `${roundPx(rcHeight)}px`);
+  rightColumn.style.setProperty('--profile-portrait-side-px', `${roundPx(w)}px`);
+  portraitGeometryPxMeasured = true;
 }
 
 function wireFoundationsReveal(): void {
@@ -207,6 +238,8 @@ function wireFoundationsReveal(): void {
     }
     if (foundationsTile.classList.contains('is-revealed')) {
       clearRevealTimers();
+      event.preventDefault();
+      window.location.assign(foundationsTile.href);
       return;
     }
     event.preventDefault();
@@ -235,7 +268,7 @@ function wireResize(): void {
   });
 }
 
-/** Reveal box mění šířku při hover insetu (2. stav) — sekce se neroztáhne, takže vlastní RO. */
+/** Reveal mění šířku při roztažení sloupce / hover kompresi (2. stav) — vlastní RO. */
 function wireFoundationsRevealResize(): void {
   const reveal = document.querySelector(
     '.profile-tile-button--foundations .profile-tile-button__reveal',
