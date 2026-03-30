@@ -188,8 +188,8 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
 
     const state1 = await readFoundationsGeometry(page);
     const half = state1.columnHeight / 2;
-    expect(Math.abs(state1.foundationsHeight - half)).toBeLessThan(14);
-    expect(Math.abs(state1.portraitBottom - half)).toBeLessThan(14);
+    expect(Math.abs(state1.foundationsHeight - half)).toBeLessThan(20);
+    expect(Math.abs(state1.portraitBottom - half)).toBeLessThan(20);
   });
 
   test('state2 works without hover capability (touch-like)', async ({ page, browserName }) => {

@@ -8,14 +8,14 @@ article.has-buttons-panel {
 }
 
 /*
- * Jednotné odsazení (inline na .profile-section):
- *   --profile-inner-gutter     → horiz. strana portrétu; stejná jako --profile-portrait-side (šířka sloupce − 2× gutter).
- *   --profile-inner-gutter-x   → volitelně jinak vodorovně (vlevo+vpravo)
- *   --profile-inner-gutter-y   → rezerva
- *   --profile-photo-inset-bottom → spodní hrana čtverce (0 = k dlaždici pod)
- *   --profile-photo-inset-right  → vpravo od okraje buňky (0 = úplně vpravo; velikost čtverce stejná)
- * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (použijí se jako jedna hodnota pro obě osy).
- * --profile-tile-label-font-size: profile-tile-type-fit.ts
+ * Unified insets (inline on .profile-section):
+ *   --profile-inner-gutter      -> base portrait horizontal inset (column width - 2x gutter)
+ *   --profile-inner-gutter-x    -> optional horizontal override (left + right)
+ *   --profile-inner-gutter-y    -> reserved
+ *   --profile-photo-inset-bottom -> portrait square bottom edge (0 = touches tile below)
+ *   --profile-photo-inset-right  -> portrait square right offset (0 = fully right)
+ * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (single value for both axes).
+ * --profile-tile-label-font-size is set by profile-tile-type-fit.ts
  */
 .profile-section {
   position: relative;
@@ -40,17 +40,17 @@ article.has-buttons-panel {
 }
 
 /*
- * Pravý sloupec (geometrie A/a/c):
- * - A: výška „velkého čtverce“ (= výška celé pravé oblasti, 100%).
- * - a: základní výška Foundations (state 1) = A/2 = 50%.
- * - c: strana portrétu (měřená jednou v JS do `--profile-portrait-side-px`).
+ * Right column geometry (A/a/c model):
+ * - A: "big square" height (= full right region height, 100%).
+ * - a: default Foundations height (state 1) = A/2 = 50%.
+ * - c: portrait side length (measured once in JS into `--profile-portrait-side-px`).
  *
- * State 1: Foundations = a, portrét stojí na jeho horní hraně (bottom = 50%).
- * State 2: Foundations = h_max = A - c, portrét se zvedne tak, aby se dotýkal
- *           horní hrany (bottom = FoundationsHeight).
+ * State 1: Foundations = a, portrait stands on top edge (bottom = 50%).
+ * State 2: Foundations = h_max = A - c, portrait lifts and still touches
+ *          the top edge (bottom = FoundationsHeight).
  *
- * Důležité: animujeme pouze vertikální pozici (`bottom`) a výšku (`height`).
- * Horizontalitu neměníme (bez left/right animací → bez „blikání“).
+ * Important: animate vertical position (`bottom`) and height (`height`) only.
+ * Horizontal positioning stays fixed (no left/right animation => no flicker).
  */
 .profile-right-column {
   grid-column: 2;
@@ -60,8 +60,8 @@ article.has-buttons-panel {
   min-width: 0;
 
   /*
-   * Velikosti (geometrie A/a/c) v px.
-   * Používáme px místo % aby state2 nereagovala na hover/focus drobné změny výšky A.
+   * A/a/c geometry in px.
+   * Using px instead of % keeps state2 stable against tiny hover/focus reflow changes.
    */
   --profile-right-height-px: 0px; /* A */
   --profile-portrait-side-px: 0px; /* c */
@@ -79,7 +79,7 @@ article.has-buttons-panel {
   position: absolute;
   inset: 0;
   z-index: 2;
-  pointer-events: none; /* kliky vždy míří na Foundations */
+  pointer-events: none; /* Clicks should always reach Foundations tile */
 }
 
 .profile-right-column .profile-tile-button--foundations {
@@ -93,7 +93,7 @@ article.has-buttons-panel {
   transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* state2: po kliknutí (is-revealed) se Foundations plynule rozšíří do h_max */
+/* state2: after click (is-revealed), Foundations smoothly expands to h_max */
 .profile-right-column:has(.profile-tile-button--foundations.is-revealed) {
   --portrait-effective-scale: 0.8;
   --profile-foundations-height: calc(
@@ -168,22 +168,22 @@ article .profile-section:last-child {
   pointer-events: none;
 }
 
-/* Buňka s portrétem v mřížce */
+/* Portrait cell in the grid */
 .profile-photo-frame {
   position: relative;
   background: transparent;
 }
 
 /*
- * Portrét: čtverec strany calc(100% − 2× horiz. gutter); přitisknutý vpravo a dolů k okrajům buňky.
- * Velikost jako dřív (symetrické horiz. guttery), pozice max. doprava (--profile-photo-inset-right, výchozí 0).
+ * Portrait: square side calc(100% - 2x horizontal gutter), anchored right and bottom.
+ * Size remains gutter-based; max right alignment via --profile-photo-inset-right (default 0).
  */
 .profile-photo-box {
   --profile-photo-gutter-x: var(
     --profile-inner-gutter-x,
     var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0)))
   );
-  /* Vizuální shrink portrétu jen během expandu do state 2 */
+  /* Visual portrait shrink only during transition to state 2 */
   --portrait-img-shrink: 1;
   position: absolute;
   top: auto;
@@ -337,7 +337,7 @@ article .profile-section:last-child {
     background-color 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* “Alive” pulse: bg vs copy same period; text plný když je plocha nejsvětlejší (slabší „černá“) */
+/* "Alive" pulse: same period for background and copy. Text peaks at the lightest phase. */
 .profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
@@ -423,14 +423,14 @@ article .profile-section:last-child {
   filter: saturate(var(--portrait-saturation, 1))
     brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
-  /* center + scaleX(-1): right/top origin často odsune výřez mimo clip — průhledný „zmizelý“ portrét */
+  /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
   transform: scale(calc(var(--portrait-zoom, 1) * var(--portrait-img-shrink, 1)))
     scaleX(-1);
   transform-origin: bottom center;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* state2: během expandu (is-revealed) vizuálně zmenšit portrét (~20%) */
+/* state2: during expand (is-revealed), visually shrink portrait (~20%) */
 .profile-right-column:has(.profile-tile-button--foundations.is-revealed)
   .profile-photo-box {
   --portrait-img-shrink: var(--portrait-effective-scale, 0.8);

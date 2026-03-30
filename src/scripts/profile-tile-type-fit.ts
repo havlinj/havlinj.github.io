@@ -151,7 +151,7 @@ function fitFoundationsReveal(): void {
   const padL = parseFloat(rcs.paddingLeft) || 0;
   const padR = parseFloat(rcs.paddingRight) || 0;
   const available = reveal.clientWidth - padL - padR;
-  /* Při přepnutí gridu může být jeden frame šířka 0 → nepsat --profile-reveal-font-size (problik) */
+  /* Grid/transition can yield a one-frame width of 0; skip write to avoid a flash */
   if (available < 4) return;
   const lines: string[] = [];
   reveal.querySelectorAll('.profile-tile-button__reveal-stanza').forEach((st) => {
@@ -276,7 +276,7 @@ function wireResize(): void {
   });
 }
 
-/** Reveal mění šířku při roztažení sloupce / hover kompresi (2. stav) — vlastní RO. */
+/** Reveal width changes while column expands/compresses in state2; observe it directly. */
 function wireFoundationsRevealResize(): void {
   const reveal = document.querySelector(
     '.profile-tile-button--foundations .profile-tile-button__reveal',

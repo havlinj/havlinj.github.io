@@ -5,7 +5,7 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    /* Reveal klid = 50/50; hover na Foundations = natažení nahoru (sloupec − strana portrétu) + portrét */
+    /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
     --profile-inner-gutter: 12%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
