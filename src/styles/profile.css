@@ -184,10 +184,15 @@ article .profile-section:last-child {
 .profile-photo-shell {
   --profile-photo-gutter-x: var(
     --profile-inner-gutter-x,
-    var(--profile-inner-gutter, var(--portrait-gap-left, var(--portrait-gap-bottom, 0)))
+    var(
+      --profile-inner-gutter,
+      var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
+    )
   );
   --profile-photo-frame-size: 6px;
-  --profile-portrait-content-side: calc(100% - (2 * var(--profile-photo-gutter-x)));
+  --profile-portrait-content-side: calc(
+    100% - (2 * var(--profile-photo-gutter-x))
+  );
   position: absolute;
   top: auto;
   left: auto;
@@ -196,7 +201,8 @@ article .profile-section:last-child {
   transition: bottom var(--profile-motion-duration) var(--profile-motion-ease);
   width: min(
     calc(
-      var(--profile-portrait-content-side) + (2 * var(--profile-photo-frame-size))
+      var(--profile-portrait-content-side) +
+        (2 * var(--profile-photo-frame-size))
     ),
     100%
   );
@@ -289,6 +295,8 @@ article .profile-section:last-child {
   --profile-reveal-fade-delay: 0.18s;
   --profile-reveal-bg-duration: 0.52s;
   --profile-reveal-bg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --profile-reveal-pulse-period: 1.8s;
+  --profile-reveal-pulse-delay: 0.45s;
 }
 
 /* Foundations reveal layer: opacity-driven show/hide (no display:none) for transitions */
@@ -297,7 +305,8 @@ article .profile-section:last-child {
 .profile-tile-button--foundations .page-button__bg,
 .profile-tile-button--foundations .page-button__overlay,
 .profile-tile-button--foundations .page-button__inner {
-  transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+  transition:
+    opacity var(--profile-reveal-fade-duration, 0.18s) ease,
     visibility 0s linear var(--profile-reveal-fade-delay, 0.18s);
 }
 
@@ -326,7 +335,8 @@ article .profile-section:last-child {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+  transition:
+    opacity var(--profile-reveal-fade-duration, 0.18s) ease,
     visibility 0s linear var(--profile-reveal-fade-delay, 0.18s);
   max-width: 100%;
   /* Strict inset: nothing paints outside the padding box (2rem L/R) */
@@ -350,7 +360,9 @@ article .profile-section:last-child {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+  transition:
+    opacity 0.18s ease,
+    visibility 0s linear 0.18s;
 }
 
 .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
@@ -371,7 +383,9 @@ article .profile-section:last-child {
     .is-reveal-opening
   )
   .profile-tile-button__reveal {
-  animation: profile-foundations-reveal-tile-breathe 3.2s ease-in-out 0.45s infinite;
+  animation: profile-foundations-reveal-tile-breathe
+    var(--profile-reveal-pulse-period, 2.2s) ease-in-out
+    var(--profile-reveal-pulse-delay, 0.45s) infinite;
 }
 
 .profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
@@ -382,8 +396,9 @@ article .profile-section:last-child {
    * 0%/100% keyframes use opacity 0.58; default opacity is 1. Without fill-mode,
    * the delay shows 1 then snaps to 0.58 → bright flash on the light ink.
    */
-  animation: profile-foundations-reveal-copy-breathe 3.2s ease-in-out 0.45s infinite
-    backwards;
+  animation: profile-foundations-reveal-copy-breathe
+    var(--profile-reveal-pulse-period, 2.2s) ease-in-out
+    var(--profile-reveal-pulse-delay, 0.45s) infinite backwards;
 }
 
 /* Fade reveal text out before returning to the default tile */
@@ -411,14 +426,16 @@ article .profile-section:last-child {
   transition: none;
 }
 
-.profile-tile-button--foundations.is-reveal-opening .profile-tile-button__reveal {
+.profile-tile-button--foundations.is-reveal-opening
+  .profile-tile-button__reveal {
   opacity: 0;
   visibility: hidden;
   transition: none;
   animation: none;
 }
 
-.profile-tile-button--foundations.is-reveal-opening .profile-tile-button__reveal-copy {
+.profile-tile-button--foundations.is-reveal-opening
+  .profile-tile-button__reveal-copy {
   animation: none;
 }
 
@@ -462,7 +479,8 @@ article .profile-section:last-child {
   /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: bottom center;
-  transition: transform var(--profile-motion-duration) var(--profile-motion-ease);
+  transition: transform var(--profile-motion-duration)
+    var(--profile-motion-ease);
 }
 
 /* state2: during expand (is-revealed), visually shrink portrait (~20%) */
@@ -499,12 +517,14 @@ article .profile-section:last-child {
   }
 
   .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
-    transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease,
+    transition:
+      opacity var(--profile-reveal-fade-duration, 0.18s) ease,
       visibility 0s;
     animation: none !important;
   }
 
-  .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal-copy {
+  .profile-tile-button--foundations.is-revealed
+    .profile-tile-button__reveal-copy {
     animation: none !important;
     opacity: 1;
   }

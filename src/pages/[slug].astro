@@ -32,9 +32,7 @@ const isProfile = slug === 'profile';
 const isWhy = slug === 'why';
 /** Same 1px rule under H1 as Contact (global.css --page-title-rule-gap) */
 const hasPageTitleRule =
-  slug === 'credits' ||
-  slug === 'what-i-do' ||
-  slug === 'foundations';
+  slug === 'credits' || slug === 'what-i-do' || slug === 'foundations';
 
 const PROFILE_PRELOADS = [
   '/assets/hero/dichromatic_portrait_bayer_noise.png',
@@ -66,11 +64,5 @@ const PROFILE_PRELOADS = [
     </h1>
     {isWhy ? <WhyContent /> : <Content />}
   </article>
-  {
-    isProfile && (
-      <script>
-        import '../scripts/profile-tile-type-fit.ts';
-      </script>
-    )
-  }
+  {isProfile && <script>import '../scripts/profile-tile-type-fit.ts';</script>}
 </Layout>

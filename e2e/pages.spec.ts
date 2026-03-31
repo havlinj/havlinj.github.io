@@ -21,14 +21,10 @@ test.describe('Profile page (/profile, /why)', () => {
     await expectNavLinkActive(page, 'Profile');
   });
 
-  test('has portrait, Why, What I do, Foundations links', async ({
-    page,
-  }) => {
+  test('has portrait, Why, What I do, Foundations links', async ({ page }) => {
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'What I do' }),
-    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'What I do' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
 
@@ -37,9 +33,7 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(page.locator('.profile-section')).toBeVisible();
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'What I do' }),
-    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'What I do' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
 
@@ -106,7 +100,9 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(profileSection).toBeVisible();
     const why = profileSection.getByRole('link', { name: 'Why' });
     const whatIDo = profileSection.getByRole('link', { name: 'What I do' });
-    const foundations = profileSection.getByRole('link', { name: 'Foundations' });
+    const foundations = profileSection.getByRole('link', {
+      name: 'Foundations',
+    });
     const portrait = profileSection.getByRole('img', { name: 'Jan Havlín' });
     await expect(why).toBeVisible();
     await expect(whatIDo).toBeVisible();
@@ -128,7 +124,6 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(page.locator('.site-header')).toBeVisible();
     await expectNavLinkActive(page, 'Profile');
   });
-
 });
 
 // ---------------------------------------------------------------------------

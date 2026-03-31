@@ -2,7 +2,7 @@
 title: 'Foundations'
 ---
 
-*Note: Some may find that I hold strong opinions. That would be a problem if I did not also value tolerance, reject xenophobia, and respect everyone’s right to their own views. In professional collaboration, I try to remain apolitical, as I consider that part of being professional.*
+_Note: Some may find that I hold strong opinions. That would be a problem if I did not also value tolerance, reject xenophobia, and respect everyone’s right to their own views. In professional collaboration, I try to remain apolitical, as I consider that part of being professional._
 
 ---
 
@@ -26,7 +26,7 @@ I tend to see myself as a global citizen. In a way, I belong anywhere, even thou
 
 ---
 
-*Note: Just as I approach the world in a broader way, I try to approach software in a similar manner. Both operate under changing conditions and multiple variables, whether cultural, economic, or technical.*
+_Note: Just as I approach the world in a broader way, I try to approach software in a similar manner. Both operate under changing conditions and multiple variables, whether cultural, economic, or technical._
 
 ---
 

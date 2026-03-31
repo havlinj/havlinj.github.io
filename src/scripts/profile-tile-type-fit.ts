@@ -28,7 +28,8 @@ const SELECTORS = {
   pageButtonText: '.page-button__text',
   foundationsTile: '.profile-tile-button--foundations',
   foundationsReveal: '.profile-tile-button__reveal',
-  foundationsRevealInTile: '.profile-tile-button--foundations .profile-tile-button__reveal',
+  foundationsRevealInTile:
+    '.profile-tile-button--foundations .profile-tile-button__reveal',
   foundationsRevealStanza: '.profile-tile-button__reveal-stanza',
   profileRightColumn: '.profile-right-column',
   profilePhotoShell: '.profile-photo-shell',
@@ -160,7 +161,11 @@ function fitTileLabels(section: HTMLElement): void {
   const measureTile = foundations ?? whatIDo ?? why;
   if (!measureTile) return;
 
-  const inner = queryElement(measureTile, SELECTORS.pageButtonInner, HTMLElement);
+  const inner = queryElement(
+    measureTile,
+    SELECTORS.pageButtonInner,
+    HTMLElement,
+  );
   const textEl = queryElement(
     measureTile,
     SELECTORS.pageButtonText,
@@ -193,13 +198,27 @@ function fitTileLabels(section: HTMLElement): void {
 
 function collectRevealLines(reveal: HTMLElement): string[] {
   const lines: string[] = [];
-  reveal.querySelectorAll(SELECTORS.foundationsRevealStanza).forEach((stanza) => {
-    lines.push(...stanzaLines(stanza));
-  });
+  reveal
+    .querySelectorAll(SELECTORS.foundationsRevealStanza)
+    .forEach((stanza) => {
+      lines.push(...stanzaLines(stanza));
+    });
   return lines;
 }
 
 function fitFoundationsReveal(reveal: HTMLElement): void {
+  const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
+  if (section) {
+    const baseRaw = getComputedStyle(section)
+      .getPropertyValue(LABEL_VAR)
+      .trim();
+    const basePx = Number.parseFloat(baseRaw);
+    if (Number.isFinite(basePx) && basePx > 0) {
+      reveal.style.setProperty(REVEAL_VAR, `${roundPx(basePx * 0.85)}px`);
+      return;
+    }
+  }
+
   const rem = rootRemPx();
   const minPx = rem * 0.65;
   const maxPx = titleCapFontPx();
@@ -218,20 +237,32 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
 function fitAll(): void {
   const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
   if (section) fitTileLabels(section);
-  const reveal = queryElement(document, SELECTORS.foundationsReveal, HTMLElement);
+  const reveal = queryElement(
+    document,
+    SELECTORS.foundationsReveal,
+    HTMLElement,
+  );
   if (reveal) fitFoundationsReveal(reveal);
   measurePortraitGeometryPx();
 }
 
 function measurePortraitGeometryPx(): void {
-  const rightColumn = queryElement(document, SELECTORS.profileRightColumn, HTMLElement);
+  const rightColumn = queryElement(
+    document,
+    SELECTORS.profileRightColumn,
+    HTMLElement,
+  );
   if (!rightColumn) return;
 
   // A = height of the right column (big square / whole right region)
   const rcHeight = rightColumn.getBoundingClientRect().height;
   if (!Number.isFinite(rcHeight) || rcHeight < 4) return;
 
-  const shell = queryElement(rightColumn, SELECTORS.profilePhotoShell, HTMLElement);
+  const shell = queryElement(
+    rightColumn,
+    SELECTORS.profilePhotoShell,
+    HTMLElement,
+  );
   if (!shell) return;
 
   // Portrait width is the "c" we need for h_max = A - c.
@@ -239,7 +270,10 @@ function measurePortraitGeometryPx(): void {
   const w = shell.getBoundingClientRect().width;
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
-  rightColumn.style.setProperty(PROFILE_RIGHT_HEIGHT_VAR, `${roundPx(rcHeight)}px`);
+  rightColumn.style.setProperty(
+    PROFILE_RIGHT_HEIGHT_VAR,
+    `${roundPx(rcHeight)}px`,
+  );
   rightColumn.style.setProperty(PROFILE_PORTRAIT_SIDE_VAR, `${roundPx(w)}px`);
 }
 
@@ -258,7 +292,8 @@ function wireFoundationsReveal(): void {
       .getPropertyValue('--profile-reveal-timeout-ms')
       .trim();
     const parsed = Number.parseFloat(raw);
-    if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_REVEAL_TIMEOUT_MS;
+    if (!Number.isFinite(parsed) || parsed <= 0)
+      return DEFAULT_REVEAL_TIMEOUT_MS;
     return parsed;
   };
 
@@ -277,7 +312,10 @@ function wireFoundationsReveal(): void {
     foundationsTile.classList.contains(REVEAL_CLASSES.opening);
 
   const finishRevealClose = () => {
-    foundationsTile.classList.remove(REVEAL_CLASSES.revealed, REVEAL_CLASSES.fadingOut);
+    foundationsTile.classList.remove(
+      REVEAL_CLASSES.revealed,
+      REVEAL_CLASSES.fadingOut,
+    );
     foundationsTile.classList.add(REVEAL_CLASSES.opening);
     void foundationsTile.offsetWidth;
     foundationsTile.classList.remove(REVEAL_CLASSES.opening);
@@ -292,7 +330,10 @@ function wireFoundationsReveal(): void {
   };
 
   const openReveal = () => {
-    foundationsTile.classList.remove(REVEAL_CLASSES.fadingOut, REVEAL_CLASSES.opening);
+    foundationsTile.classList.remove(
+      REVEAL_CLASSES.fadingOut,
+      REVEAL_CLASSES.opening,
+    );
     foundationsTile.classList.add(REVEAL_CLASSES.revealed);
     clearRevealTimers();
     revealTimeoutId = window.setTimeout(() => {
@@ -339,9 +380,15 @@ function wireResize(): void {
 
 /** Reveal width changes while column expands/compresses in state2; observe it directly. */
 function wireFoundationsRevealResize(): void {
-  const reveal = queryElement(document, SELECTORS.foundationsRevealInTile, HTMLElement);
+  const reveal = queryElement(
+    document,
+    SELECTORS.foundationsRevealInTile,
+    HTMLElement,
+  );
   if (!reveal) return;
-  const scheduleRevealFit = makeRafCoalesced(() => fitFoundationsReveal(reveal));
+  const scheduleRevealFit = makeRafCoalesced(() =>
+    fitFoundationsReveal(reveal),
+  );
   const ro = new ResizeObserver(scheduleRevealFit);
   ro.observe(reveal);
 }

@@ -9,15 +9,19 @@ type FoundationsGeometry = {
   effectiveScale: number;
 };
 
-async function readFoundationsGeometry(page: Page): Promise<FoundationsGeometry> {
+async function readFoundationsGeometry(
+  page: Page,
+): Promise<FoundationsGeometry> {
   return page.evaluate(() => {
     const col = document.querySelector('.profile-right-column');
     const tile = document.querySelector('.profile-tile-button--foundations');
     const shell = document.querySelector('.profile-photo-shell');
-    if (!(col instanceof HTMLElement)) throw new Error('missing .profile-right-column');
+    if (!(col instanceof HTMLElement))
+      throw new Error('missing .profile-right-column');
     if (!(tile instanceof HTMLElement))
       throw new Error('missing .profile-tile-button--foundations');
-    if (!(shell instanceof HTMLElement)) throw new Error('missing .profile-photo-shell');
+    if (!(shell instanceof HTMLElement))
+      throw new Error('missing .profile-photo-shell');
 
     const cs = getComputedStyle(col);
     const parseNum = (name: string): number => {
@@ -52,13 +56,16 @@ async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
 
 async function waitForState2Settled(page: Page): Promise<FoundationsGeometry> {
   await expect
-    .poll(async () => {
-      const g = await readFoundationsGeometry(page);
-      const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
-      const deltaH = Math.abs(g.foundationsHeight - expected);
-      const deltaB = Math.abs(g.portraitBottom - expected);
-      return deltaH < 2.5 && deltaB < 2.5;
-    }, { timeout: 3000, intervals: [100, 150, 250] })
+    .poll(
+      async () => {
+        const g = await readFoundationsGeometry(page);
+        const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
+        const deltaH = Math.abs(g.foundationsHeight - expected);
+        const deltaB = Math.abs(g.portraitBottom - expected);
+        return deltaH < 2.5 && deltaB < 2.5;
+      },
+      { timeout: 3000, intervals: [100, 150, 250] },
+    )
     .toBe(true);
   return readFoundationsGeometry(page);
 }
@@ -85,13 +92,29 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     page,
   }) => {
     await gotoProfileWhenReady(page);
-    const raw = await page
-      .locator('.profile-tile-button--foundations .profile-tile-button__reveal')
-      .evaluate((el) =>
-        getComputedStyle(el).getPropertyValue('--profile-reveal-font-size'),
+    const { revealPx, labelPx } = await page.evaluate(() => {
+      const section = document.querySelector('.profile-section');
+      const reveal = document.querySelector(
+        '.profile-tile-button--foundations .profile-tile-button__reveal',
       );
-    expect(raw.trim()).toMatch(/px$/);
-    expect(parseFloat(raw)).toBeGreaterThan(0);
+      if (!(section instanceof HTMLElement))
+        throw new Error('missing .profile-section');
+      if (!(reveal instanceof HTMLElement))
+        throw new Error('missing foundations reveal node');
+      const revealRaw = getComputedStyle(reveal)
+        .getPropertyValue('--profile-reveal-font-size')
+        .trim();
+      const labelRaw = getComputedStyle(section)
+        .getPropertyValue('--profile-tile-label-font-size')
+        .trim();
+      return {
+        revealPx: Number.parseFloat(revealRaw),
+        labelPx: Number.parseFloat(labelRaw),
+      };
+    });
+    expect(revealPx).toBeGreaterThan(0);
+    expect(labelPx).toBeGreaterThan(0);
+    expect(revealPx / labelPx).toBeCloseTo(0.85, 2);
   });
 
   test('Foundations tile targets /foundations and uses foundations modifier', async ({
@@ -110,7 +133,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.profile-tile-button__reveal')).toContainText(
-      /What shaped me/i,
+      /Longer read,\s*optional/i,
     );
   });
 
@@ -125,7 +148,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(page).toHaveURL(/\/foundations\/?$/);
   });
 
-  test('portrait lives in photo frame with inset photo box', async ({ page }) => {
+  test('portrait lives in photo frame with inset photo box', async ({
+    page,
+  }) => {
     await gotoProfileWhenReady(page);
     const frame = page.locator('.profile-photo-frame');
     const box = page.locator('.profile-photo-frame .profile-photo-box');
@@ -135,6 +160,34 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const outer = await mustBox(frame);
     expect(inner.width).toBeLessThan(outer.width - 2);
     expect(inner.height).toBeLessThan(outer.height - 2);
+  });
+
+  test('state1 geometry stays locked at half height across viewport resize', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+
+    const assertState1Half = async () => {
+      await expect
+        .poll(
+          async () => {
+            const g = await readFoundationsGeometry(page);
+            const half = g.columnHeight / 2;
+            return (
+              Math.abs(g.foundationsHeight - half) < 20 &&
+              Math.abs(g.portraitBottom - half) < 20
+            );
+          },
+          { timeout: 2500, intervals: [100, 200, 350] },
+        )
+        .toBe(true);
+    };
+
+    await assertState1Half();
+    await page.setViewportSize({ width: 980, height: 700 });
+    await assertState1Half();
+    await page.setViewportSize({ width: 1440, height: 980 });
+    await assertState1Half();
   });
 
   test('state2 geometry follows A - (c * scale) and does not react to mouse position', async ({
@@ -155,28 +208,40 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await page.waitForTimeout(120);
     await page.mouse.move(tileBox.x + tileBox.width * 0.5, tileBox.y + 8);
     await page.waitForTimeout(120);
-    await page.mouse.move(tileBox.x + tileBox.width * 0.8, tileBox.y + tileBox.height * 0.8);
+    await page.mouse.move(
+      tileBox.x + tileBox.width * 0.8,
+      tileBox.y + tileBox.height * 0.8,
+    );
     await page.waitForTimeout(120);
 
     const g2 = await readFoundationsGeometry(page);
-    expect(Math.abs(g2.foundationsHeight - g1.foundationsHeight)).toBeLessThan(3);
+    expect(Math.abs(g2.foundationsHeight - g1.foundationsHeight)).toBeLessThan(
+      3,
+    );
     expect(Math.abs(g2.portraitBottom - g1.portraitBottom)).toBeLessThan(3);
   });
 
-  test('state2 holds until timeout, then returns to state1 geometry', async ({ page }) => {
+  test('state2 holds until timeout, then returns to state1 geometry', async ({
+    page,
+  }) => {
     await gotoProfileWhenReady(page);
     await setRevealTimeoutMs(page, 900);
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     const state2 = await waitForState2Settled(page);
-    expect(state2.foundationsHeight).toBeGreaterThan(state2.columnHeight * 0.5 + 2);
+    expect(state2.foundationsHeight).toBeGreaterThan(
+      state2.columnHeight * 0.5 + 2,
+    );
 
     await expect
-      .poll(async () => {
-        const cls = (await tile.getAttribute('class')) ?? '';
-        return cls.includes('is-revealed');
-      }, { timeout: 2500, intervals: [100, 200, 350] })
+      .poll(
+        async () => {
+          const cls = (await tile.getAttribute('class')) ?? '';
+          return cls.includes('is-revealed');
+        },
+        { timeout: 2500, intervals: [100, 200, 350] },
+      )
       .toBe(false);
 
     const state1 = await readFoundationsGeometry(page);
@@ -185,8 +250,14 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(Math.abs(state1.portraitBottom - half)).toBeLessThan(20);
   });
 
-  test('state2 works without hover capability (touch-like)', async ({ page, browserName }) => {
-    test.skip(browserName !== 'chromium', 'Touch-capability override is Chromium-only here');
+  test('state2 works without hover capability (touch-like)', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== 'chromium',
+      'Touch-capability override is Chromium-only here',
+    );
 
     const cdp = await page.context().newCDPSession(page);
     await cdp.send('Emulation.setTouchEmulationEnabled', {
@@ -204,15 +275,19 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await tile.dispatchEvent('click');
     await expect(tile).toHaveClass(/is-revealed/);
     const state2 = await waitForState2Settled(page);
-    const expected = state2.columnHeight - state2.portraitSide * state2.effectiveScale;
+    const expected =
+      state2.columnHeight - state2.portraitSide * state2.effectiveScale;
     expect(Math.abs(state2.foundationsHeight - expected)).toBeLessThan(3);
     expect(Math.abs(state2.portraitBottom - expected)).toBeLessThan(3);
 
     await expect
-      .poll(async () => {
-        const cls = (await tile.getAttribute('class')) ?? '';
-        return cls.includes('is-revealed');
-      }, { timeout: 2500, intervals: [100, 200, 350] })
+      .poll(
+        async () => {
+          const cls = (await tile.getAttribute('class')) ?? '';
+          return cls.includes('is-revealed');
+        },
+        { timeout: 2500, intervals: [100, 200, 350] },
+      )
       .toBe(false);
   });
 });

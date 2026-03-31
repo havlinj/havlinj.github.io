@@ -85,9 +85,7 @@ test.describe('Hero page (/)', () => {
       box.x + box.width - LAYOUT_TOLERANCE,
     );
     const mid = box.x + box.width / 2;
-    expect(wBox.x + wBox.width / 2).toBeGreaterThanOrEqual(
-      mid - box.width / 3,
-    );
+    expect(wBox.x + wBox.width / 2).toBeGreaterThanOrEqual(mid - box.width / 3);
     expect(wBox.x + wBox.width / 2).toBeLessThanOrEqual(mid + box.width / 3);
   });
 
