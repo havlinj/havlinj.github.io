@@ -116,7 +116,7 @@ h1.page-title {
   margin-bottom: var(--page-title-margin-bottom, 1rem);
 }
 
-/* Credits, Professional, Why, Foundations: same line under page H1 as Contact */
+/* Credits, What I do, Why, Foundations: same line under page H1 as Contact */
 article.has-page-title-rule > h1.page-title {
   margin-bottom: 0;
   position: relative;

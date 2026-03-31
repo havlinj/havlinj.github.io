@@ -1,7 +1,7 @@
 /**
  * Profile grid:
- * - Default tile labels: one fit from the string "PROFESSIONAL" and the
- *   /professional tile inner width; --profile-tile-label-font-size on
+ * - Default tile labels: one shared fit from the longest of the three visible
+ *   profile tile labels (Why, What I do, Foundations); --profile-tile-label-font-size on
  *   .profile-section (all tiles inherit).
  * - Foundations reveal: separate --profile-reveal-font-size on the reveal box.
  * CSS provides clamp fallbacks when JS is off.
@@ -12,9 +12,6 @@ const LABEL_VAR = '--profile-tile-label-font-size';
 const REVEAL_VAR = '--profile-reveal-font-size';
 const PROFILE_RIGHT_HEIGHT_VAR = '--profile-right-height-px';
 const PROFILE_PORTRAIT_SIDE_VAR = '--profile-portrait-side-px';
-
-/** Longest default label; measurement uses this string, not other tiles’ copy. */
-const TILE_LABEL_REFERENCE = 'PROFESSIONAL';
 
 const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
@@ -27,7 +24,8 @@ const TYPE_FIT_EVENT = 'profileTileTypeFit';
 const SELECTORS = {
   profileSection: '.profile-section',
   pageTitle: 'article h1.page-title',
-  professionalTile: 'a.profile-tile-button[href="/professional"]',
+  whyTile: 'a.profile-tile-button[href="/why"]',
+  whatIDoTile: 'a.profile-tile-button[href="/what-i-do"]',
   pageButtonInner: '.page-button__inner',
   pageButtonText: '.page-button__text',
   foundationsTile: '.profile-tile-button--foundations',
@@ -150,16 +148,23 @@ function contentWidthWithoutHorizontalPadding(el: HTMLElement): number {
 }
 
 function fitTileLabels(section: HTMLElement): void {
-  const professional = queryElement(
+  const foundations = queryElement(
     section,
-    SELECTORS.professionalTile,
+    SELECTORS.foundationsTile,
     HTMLAnchorElement,
   );
-  if (!professional) return;
+  const whatIDo = queryElement(
+    section,
+    SELECTORS.whatIDoTile,
+    HTMLAnchorElement,
+  );
+  const why = queryElement(section, SELECTORS.whyTile, HTMLAnchorElement);
+  const measureTile = foundations ?? whatIDo ?? why;
+  if (!measureTile) return;
 
-  const inner = queryElement(professional, SELECTORS.pageButtonInner, HTMLElement);
+  const inner = queryElement(measureTile, SELECTORS.pageButtonInner, HTMLElement);
   const textEl = queryElement(
-    professional,
+    measureTile,
     SELECTORS.pageButtonText,
     HTMLElement,
   );
@@ -167,10 +172,21 @@ function fitTileLabels(section: HTMLElement): void {
 
   const rem = rootRemPx();
   const minPx = rem * 0.7;
-  const maxPx = titleCapFontPx();
   const available = contentWidthWithoutHorizontalPadding(inner);
+  /*
+   * For tile labels we want true max-width utilization.
+   * Do not cap by page-title size; use the tile content width as the practical upper bound.
+   */
+  const maxPx = Math.max(minPx, available);
   const tcs = getComputedStyle(textEl);
-  const lines = [TILE_LABEL_REFERENCE];
+  const lines = Array.from(
+    section.querySelectorAll<HTMLElement>(
+      `${SELECTORS.whyTile} ${SELECTORS.pageButtonText}, ${SELECTORS.whatIDoTile} ${SELECTORS.pageButtonText}, ${SELECTORS.foundationsTile} ${SELECTORS.pageButtonText}`,
+    ),
+  )
+    .map((el) => el.textContent?.trim() ?? '')
+    .filter((text) => text.length > 0);
+  if (lines.length === 0) return;
   const fontPx = fitFontSize(available, minPx, maxPx, (fp) =>
     maxLineWidth(lines, fp, tcs),
   );

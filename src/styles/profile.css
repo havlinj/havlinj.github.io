@@ -27,6 +27,7 @@ article.has-buttons-panel {
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
+  --profile-tile-text-inset-x: 2rem;
 }
 
 .profile-section > a[href='/why'] {
@@ -34,7 +35,7 @@ article.has-buttons-panel {
   grid-row: 1;
 }
 
-.profile-section > a[href='/professional'] {
+.profile-section > a[href='/what-i-do'] {
   grid-column: 1;
   grid-row: 2;
 }
@@ -207,7 +208,7 @@ article .profile-section:last-child {
   height: 100%;
 }
 
-/* Clickable profile tiles (Why / Professional / Foundations) */
+/* Clickable profile tiles (Why / What I do / Foundations) */
 .profile-tile-button {
   height: 100%;
   max-height: none;
@@ -218,11 +219,11 @@ article .profile-section:last-child {
 }
 
 .profile-tile-button .page-button__inner {
-  padding: 0 2rem;
+  padding: 0 var(--profile-tile-text-inset-x);
   box-sizing: border-box;
   max-width: 100%;
   overflow-x: hidden;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .profile-tile-button .page-button__bg {
@@ -240,7 +241,7 @@ article .profile-section:last-child {
 
 .profile-tile-button .page-button__text {
   color: var(--color-page-bg);
-  /* Inherited from .profile-section (fit from "PROFESSIONAL" on /professional tile) */
+  /* Inherited from .profile-section (fit from "PROFESSIONAL" on /what-i-do tile) */
   font-size: var(
     --profile-tile-label-font-size,
     clamp(0.7rem, 6cqi, var(--page-title-font-size))
@@ -251,6 +252,7 @@ article .profile-section:last-child {
   text-transform: uppercase;
   max-width: 100%;
   white-space: nowrap;
+  text-align: left;
 }
 
 /* Bottom-right tile has a softer custom treatment */
@@ -289,7 +291,7 @@ article .profile-section:last-child {
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  padding: 1.2rem 2rem;
+  padding: 1.2rem var(--profile-tile-text-inset-x);
   box-sizing: border-box;
   text-align: left;
   background: #111;

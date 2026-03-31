@@ -13,28 +13,28 @@ title: 'Profile'
     --portrait-saturation: 1;
     --portrait-brightness: 1;
     --portrait-contrast: 1;
-    --profile-tile-1-bg: url('/assets/pages/profile/dillon-shook-ADxOq184yk8-unsplash_dichrom.png');
-    --profile-tile-1-pos-x: 100%;
-    --profile-tile-1-pos-y: 45%;
-    --profile-tile-1-zoom: 1;
+    --profile-tile-1-bg: url('/assets/pages/profile/erwan-hesry-EMVhWOm4-qo-unsplash_dichrom_inverted.png');
+    --profile-tile-1-pos-x: 30%;
+    --profile-tile-1-pos-y: 50%;
+    --profile-tile-1-zoom: 1.5;
     --profile-tile-1-saturation: 1;
     --profile-tile-1-brightness: 0.75;
     --profile-tile-1-contrast: 0.9;
-    --profile-tile-3-bg: url('/assets/pages/profile/tai-bui-yKX7wC_VioM-unsplash_dichrom.png');
+    --profile-tile-3-bg: url('/assets/pages/profile/dillon-shook-ADxOq184yk8-unsplash_dichrom.png');
     --profile-tile-3-pos-x: 50%;
-    --profile-tile-3-pos-y: 50%;
+    --profile-tile-3-pos-y: 80%;
     --profile-tile-3-zoom: 1;
     --profile-tile-3-saturation: 1;
     --profile-tile-3-brightness: 1;
     --profile-tile-3-contrast: 1;
-    --profile-tile-4-bg: url('/assets/pages/profile/atelierbyvineeth-e9JnKvY6O5A-unsplash_dichrom.png');
+    --profile-tile-4-bg: url('/assets/pages/profile/nur-shahirah-ahmad-tarmizi-uS1u31FtAHk-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
-    --profile-tile-4-pos-y: 50%;
-    --profile-tile-4-zoom: 1.05;
-    --profile-tile-4-saturation: 2;
+    --profile-tile-4-pos-y: 120%;
+    --profile-tile-4-zoom: 1.2;
+    --profile-tile-4-saturation: 1;
     --profile-tile-4-brightness: 1;
-    --profile-tile-4-contrast: 0.8;
-    --profile-tile-4-opacity: 0.3;
+    --profile-tile-4-contrast: 1;
+    --profile-tile-4-opacity: 0.6;
   "
 >
   <a
@@ -59,7 +59,7 @@ title: 'Profile'
     </span>
   </a>
   <a
-    href="/professional"
+    href="/what-i-do"
     class="profile-tile profile-image-tile page-button profile-tile-button"
     style="
       --tile-bg: var(--profile-tile-3-bg);
@@ -70,13 +70,13 @@ title: 'Profile'
       --tile-brightness: var(--profile-tile-3-brightness);
       --tile-contrast: var(--profile-tile-3-contrast);
     "
-    aria-label="Professional"
+    aria-label="What I do"
   >
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
-      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Professional</span></span>
-      <span class="page-button__text">Professional</span>
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">What I do</span></span>
+      <span class="page-button__text">What I do</span>
     </span>
   </a>
   <div class="profile-right-column">
