@@ -13,11 +13,11 @@ async function readFoundationsGeometry(page: Page): Promise<FoundationsGeometry>
   return page.evaluate(() => {
     const col = document.querySelector('.profile-right-column');
     const tile = document.querySelector('.profile-tile-button--foundations');
-    const box = document.querySelector('.profile-photo-box');
+    const shell = document.querySelector('.profile-photo-shell');
     if (!(col instanceof HTMLElement)) throw new Error('missing .profile-right-column');
     if (!(tile instanceof HTMLElement))
       throw new Error('missing .profile-tile-button--foundations');
-    if (!(box instanceof HTMLElement)) throw new Error('missing .profile-photo-box');
+    if (!(shell instanceof HTMLElement)) throw new Error('missing .profile-photo-shell');
 
     const cs = getComputedStyle(col);
     const parseNum = (name: string): number => {
@@ -27,13 +27,14 @@ async function readFoundationsGeometry(page: Page): Promise<FoundationsGeometry>
     };
     const colRect = col.getBoundingClientRect();
     const tileRect = tile.getBoundingClientRect();
-    const boxRect = box.getBoundingClientRect();
+    const shellRect = shell.getBoundingClientRect();
+    const portraitSidePxVar = parseNum('--profile-portrait-side-px');
 
     return {
       columnHeight: colRect.height,
       foundationsHeight: tileRect.height,
-      portraitSide: boxRect.width,
-      portraitBottom: colRect.bottom - boxRect.bottom,
+      portraitSide: portraitSidePxVar > 0 ? portraitSidePxVar : shellRect.width,
+      portraitBottom: colRect.bottom - shellRect.bottom,
       effectiveScale: parseNum('--portrait-effective-scale'),
     };
   });

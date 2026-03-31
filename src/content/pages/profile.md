@@ -81,13 +81,15 @@ title: 'Profile'
   </a>
   <div class="profile-right-column">
     <div class="profile-tile profile-photo-frame">
-      <div class="profile-photo-box">
-        <img
-          src="/assets/pages/profile/portrait_bayer16_style.png"
-          alt="Jan Havlín"
-          fetchpriority="high"
-          decoding="async"
-        />
+      <div class="profile-photo-shell">
+        <div class="profile-photo-box">
+          <img
+            src="/assets/pages/profile/portrait_bayer16_style.png"
+            alt="Jan Havlín"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
       </div>
     </div>
     <a

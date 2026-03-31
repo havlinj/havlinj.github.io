@@ -33,7 +33,7 @@ const SELECTORS = {
   foundationsRevealInTile: '.profile-tile-button--foundations .profile-tile-button__reveal',
   foundationsRevealStanza: '.profile-tile-button__reveal-stanza',
   profileRightColumn: '.profile-right-column',
-  profilePhotoBox: '.profile-photo-box',
+  profilePhotoShell: '.profile-photo-shell',
 } as const;
 const REVEAL_CLASSES = {
   revealed: 'is-revealed',
@@ -234,12 +234,12 @@ function measurePortraitGeometryPxOnce(): void {
   const rcHeight = rightColumn.getBoundingClientRect().height;
   if (!Number.isFinite(rcHeight) || rcHeight < 4) return;
 
-  const box = queryElement(rightColumn, SELECTORS.profilePhotoBox, HTMLElement);
-  if (!box) return;
+  const shell = queryElement(rightColumn, SELECTORS.profilePhotoShell, HTMLElement);
+  if (!shell) return;
 
   // Portrait width is the "c" we need for h_max = A - c.
   // This is horizontal-only (computed once); we only use it for vertical calc.
-  const w = box.getBoundingClientRect().width;
+  const w = shell.getBoundingClientRect().width;
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
   rightColumn.style.setProperty(PROFILE_RIGHT_HEIGHT_VAR, `${roundPx(rcHeight)}px`);
