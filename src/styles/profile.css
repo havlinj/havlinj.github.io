@@ -44,7 +44,7 @@ article.has-buttons-panel {
  * Right column geometry (A/a/c model):
  * - A: "big square" height (= full right region height, 100%).
  * - a: default Foundations height (state 1) = A/2 = 50%.
- * - c: portrait wrapper side length (measured once in JS into `--profile-portrait-side-px`).
+ * - c: portrait wrapper side length (measured in JS into `--profile-portrait-side-px`).
  *
  * State 1: Foundations = a, portrait stands on top edge (bottom = 50%).
  * State 2: Foundations = h_max = A - c, portrait lifts and still touches
@@ -437,6 +437,13 @@ article .profile-section:last-child {
   max-width: 100%;
   min-width: 0;
   white-space: nowrap;
+}
+
+.profile-tile-button__reveal-stanza--center-left {
+  width: max-content;
+  max-width: 100%;
+  align-self: center;
+  text-align: left;
 }
 
 .profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {

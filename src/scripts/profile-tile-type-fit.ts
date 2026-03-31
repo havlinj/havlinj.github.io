@@ -17,8 +17,6 @@ const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
 
-let portraitGeometryPxMeasured = false;
-
 /** Layout.astro waits for this before fading the profile grid in (avoids font-size FOUC). */
 const TYPE_FIT_EVENT = 'profileTileTypeFit';
 const SELECTORS = {
@@ -222,11 +220,10 @@ function fitAll(): void {
   if (section) fitTileLabels(section);
   const reveal = queryElement(document, SELECTORS.foundationsReveal, HTMLElement);
   if (reveal) fitFoundationsReveal(reveal);
-  measurePortraitGeometryPxOnce();
+  measurePortraitGeometryPx();
 }
 
-function measurePortraitGeometryPxOnce(): void {
-  if (portraitGeometryPxMeasured) return;
+function measurePortraitGeometryPx(): void {
   const rightColumn = queryElement(document, SELECTORS.profileRightColumn, HTMLElement);
   if (!rightColumn) return;
 
@@ -244,7 +241,6 @@ function measurePortraitGeometryPxOnce(): void {
 
   rightColumn.style.setProperty(PROFILE_RIGHT_HEIGHT_VAR, `${roundPx(rcHeight)}px`);
   rightColumn.style.setProperty(PROFILE_PORTRAIT_SIDE_VAR, `${roundPx(w)}px`);
-  portraitGeometryPxMeasured = true;
 }
 
 function wireFoundationsReveal(): void {

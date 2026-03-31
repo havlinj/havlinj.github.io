@@ -115,14 +115,9 @@ title: 'Profile'
     </span>
     <span class="profile-tile-button__reveal" aria-hidden="true">
       <span class="profile-tile-button__reveal-copy">
-        <span class="profile-tile-button__reveal-stanza">
-          What shaped me<br />
-          Beyond the craft
-        </span>
-        <span class="profile-tile-button__reveal-stanza">
-          More reading<br />
-          more meaning
-        </span>
+        <span class="profile-tile-button__reveal-stanza profile-tile-button__reveal-stanza--center-left"
+          >Longer read,<br />optional</span
+        >
       </span>
     </span>
   </a>
