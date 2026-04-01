@@ -28,6 +28,7 @@ article.has-buttons-panel {
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
   --profile-tile-text-inset-x: 2rem;
+  --profile-photo-frame-size: 6px;
   /* Temporary: disable image grain/overlay effects on profile tiles */
   --profile-grain-opacity: 0.5;
 }
@@ -221,7 +222,6 @@ article .profile-section:last-child {
       var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
     )
   );
-  --profile-photo-frame-size: 6px;
   --profile-photo-overhang-y: 1px;
   --profile-portrait-content-side: calc(
     100% - (2 * var(--profile-photo-gutter-x))
@@ -272,6 +272,8 @@ article .profile-section:last-child {
   height: 100%;
   max-height: none;
   min-height: 0;
+  box-sizing: border-box;
+  border: var(--profile-photo-frame-size) solid #111;
   /* cqi/cqw for font caps = this tile’s width (grid cell) */
   container-type: inline-size;
   container-name: profile-tile;
