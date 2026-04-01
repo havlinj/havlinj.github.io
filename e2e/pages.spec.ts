@@ -45,6 +45,15 @@ test.describe('Profile page (/profile, /why)', () => {
 
   test('profile section - last screenshot matches', async ({ page }) => {
     await gotoProfileWhenReady(page);
+    // Stabilize autoplay media in profile tiles for deterministic snapshots.
+    await page.evaluate(() => {
+      document.querySelectorAll('video').forEach((node) => {
+        if (node instanceof HTMLVideoElement) {
+          node.pause();
+          node.currentTime = 0;
+        }
+      });
+    });
     await expect(page).toHaveScreenshot('profile-section.png');
   });
 

@@ -185,7 +185,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
 
     expect(layout.revealPadL).toBeCloseTo(32, 1);
     expect(layout.revealPadR).toBeCloseTo(32, 1);
-    expect(layout.copyClass).toContain('profile-tile-button__reveal-copy--center-left');
+    expect(layout.copyClass).toContain(
+      'profile-tile-button__reveal-copy--center-left',
+    );
     expect(layout.copyTextAlign).toBe('left');
     expect(layout.primaryText).toMatch(/Additional\s*context/i);
     expect(layout.secondaryText).toMatch(/Beyond\s*the core/i);
@@ -260,7 +262,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     }
   });
 
-  test('state1 hover inverts tile background and text colors', async ({ page }) => {
+  test('state1 hover inverts tile background and text colors', async ({
+    page,
+  }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Why' });
     await expect(tile).not.toHaveClass(/is-revealed/);
@@ -269,14 +273,18 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       page.evaluate(() => {
         const tile = Array.from(
           document.querySelectorAll('a.profile-tile-button'),
-        ).find((el) => (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why');
+        ).find(
+          (el) =>
+            (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why',
+        );
         if (!(tile instanceof HTMLElement))
           throw new Error('missing Why profile tile');
         const text = tile.querySelector('.page-button__text');
         const bg = tile.querySelector('.page-button__bg');
         if (!(text instanceof HTMLElement))
           throw new Error('missing .page-button__text');
-        if (!(bg instanceof HTMLElement)) throw new Error('missing .page-button__bg');
+        if (!(bg instanceof HTMLElement))
+          throw new Error('missing .page-button__bg');
 
         const probe = document.createElement('span');
         probe.style.color = 'var(--color-page-bg)';

@@ -43,6 +43,7 @@ const REVEAL_CLASSES = {
 function queryElement<T extends Element>(
   root: ParentNode,
   selector: string,
+  // eslint-disable-next-line no-unused-vars -- type-level constructor signature only
   ctor: { new (...args: never[]): T },
 ): T | null {
   const el = root.querySelector(selector);

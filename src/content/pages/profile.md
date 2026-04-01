@@ -37,8 +37,7 @@ title: 'Profile'
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 50%;
     --profile-tile-4-pan-x: 15%;
-       --profile-tile-4-pan-y: 20%;
-    /* --profile-tile-4-pan-y: 20%; */
+    --profile-tile-4-pan-y: 20%;
     --profile-tile-4-zoom: 1.4;
     --profile-tile-4-saturation: 1;
     --profile-tile-4-brightness: 1.2;
