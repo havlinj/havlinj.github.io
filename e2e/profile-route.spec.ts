@@ -137,6 +137,63 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     );
   });
 
+  test('Foundations reveal copy uses two-tier stanza layout and scaled subcopy', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const tile = page.getByRole('link', { name: 'Foundations' });
+    await tile.click();
+    await expect(tile).toHaveClass(/is-revealed/);
+
+    const layout = await page.evaluate(() => {
+      const reveal = document.querySelector(
+        '.profile-tile-button--foundations .profile-tile-button__reveal',
+      );
+      const copy = document.querySelector(
+        '.profile-tile-button--foundations .profile-tile-button__reveal-copy',
+      );
+      const stanzas = Array.from(
+        document.querySelectorAll(
+          '.profile-tile-button--foundations .profile-tile-button__reveal-stanza',
+        ),
+      );
+      if (!(reveal instanceof HTMLElement))
+        throw new Error('missing foundations reveal node');
+      if (!(copy instanceof HTMLElement))
+        throw new Error('missing foundations reveal copy node');
+      if (stanzas.length < 2) throw new Error('expected two reveal stanzas');
+      const [primary, secondary] = stanzas as HTMLElement[];
+      const revealCs = getComputedStyle(reveal);
+      const copyCs = getComputedStyle(copy);
+      const primaryCs = getComputedStyle(primary);
+      const secondaryCs = getComputedStyle(secondary);
+      const primaryPx = Number.parseFloat(primaryCs.fontSize);
+      const secondaryPx = Number.parseFloat(secondaryCs.fontSize);
+      const secondaryGapPx = Number.parseFloat(secondaryCs.marginTop) || 0;
+      return {
+        revealPadL: Number.parseFloat(revealCs.paddingLeft) || 0,
+        revealPadR: Number.parseFloat(revealCs.paddingRight) || 0,
+        copyClass: copy.className,
+        copyTextAlign: copyCs.textAlign,
+        primaryText: primary.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        secondaryText: secondary.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        primaryPx,
+        secondaryPx,
+        secondaryGapPx,
+      };
+    });
+
+    expect(layout.revealPadL).toBeCloseTo(32, 1);
+    expect(layout.revealPadR).toBeCloseTo(32, 1);
+    expect(layout.copyClass).toContain('profile-tile-button__reveal-copy--center-left');
+    expect(layout.copyTextAlign).toBe('left');
+    expect(layout.primaryText).toMatch(/Additional\s*context/i);
+    expect(layout.secondaryText).toMatch(/Beyond\s*the core/i);
+    expect(layout.primaryPx).toBeGreaterThan(0);
+    expect(layout.secondaryPx / layout.primaryPx).toBeCloseTo(0.9, 1);
+    expect(layout.secondaryGapPx).toBeGreaterThanOrEqual(45);
+  });
+
   test('second click while revealed navigates to /foundations', async ({
     page,
   }) => {
@@ -160,6 +217,90 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const outer = await mustBox(frame);
     expect(inner.width).toBeLessThan(outer.width - 2);
     expect(inner.height).toBeLessThan(outer.height - 2);
+  });
+
+  test('profile tile borders use portrait frame thickness with border-box sizing', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const info = await page.evaluate(() => {
+      const section = document.querySelector('.profile-section');
+      const tiles = Array.from(
+        document.querySelectorAll('.profile-tile-button'),
+      ) as HTMLElement[];
+      if (!(section instanceof HTMLElement))
+        throw new Error('missing .profile-section');
+      if (tiles.length === 0) throw new Error('missing .profile-tile-button');
+      const sectionCs = getComputedStyle(section);
+      const frameVar = Number.parseFloat(
+        sectionCs.getPropertyValue('--profile-photo-frame-size').trim(),
+      );
+      const tileData = tiles.map((tile) => {
+        const cs = getComputedStyle(tile);
+        return {
+          boxSizing: cs.boxSizing,
+          borderTop: Number.parseFloat(cs.borderTopWidth) || 0,
+          borderRight: Number.parseFloat(cs.borderRightWidth) || 0,
+          borderBottom: Number.parseFloat(cs.borderBottomWidth) || 0,
+          borderLeft: Number.parseFloat(cs.borderLeftWidth) || 0,
+          borderColor: cs.borderTopColor,
+        };
+      });
+      return { frameVar, tileData };
+    });
+
+    expect(info.frameVar).toBeGreaterThan(0);
+    for (const tile of info.tileData) {
+      expect(tile.boxSizing).toBe('border-box');
+      expect(tile.borderTop).toBeCloseTo(info.frameVar, 1);
+      expect(tile.borderRight).toBeCloseTo(info.frameVar, 1);
+      expect(tile.borderBottom).toBeCloseTo(info.frameVar, 1);
+      expect(tile.borderLeft).toBeCloseTo(info.frameVar, 1);
+      expect(tile.borderColor).toBe('rgb(17, 17, 17)');
+    }
+  });
+
+  test('state1 hover inverts tile background and text colors', async ({ page }) => {
+    await gotoProfileWhenReady(page);
+    const tile = page.getByRole('link', { name: 'Why' });
+    await expect(tile).not.toHaveClass(/is-revealed/);
+
+    const readColors = async () =>
+      page.evaluate(() => {
+        const tile = Array.from(
+          document.querySelectorAll('a.profile-tile-button'),
+        ).find((el) => (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why');
+        if (!(tile instanceof HTMLElement))
+          throw new Error('missing Why profile tile');
+        const text = tile.querySelector('.page-button__text');
+        const bg = tile.querySelector('.page-button__bg');
+        if (!(text instanceof HTMLElement))
+          throw new Error('missing .page-button__text');
+        if (!(bg instanceof HTMLElement)) throw new Error('missing .page-button__bg');
+
+        const probe = document.createElement('span');
+        probe.style.color = 'var(--color-page-bg)';
+        document.body.appendChild(probe);
+        const pageBgColorResolved = getComputedStyle(probe).color;
+        probe.remove();
+
+        return {
+          textColor: getComputedStyle(text).color,
+          bgColor: getComputedStyle(bg).backgroundColor,
+          pageBgColorResolved,
+        };
+      });
+
+    const before = await readColors();
+    expect(before.textColor).toBe('rgb(17, 17, 17)');
+
+    await tile.hover();
+    await expect
+      .poll(readColors, { timeout: 2000, intervals: [80, 140, 220] })
+      .toMatchObject({
+        textColor: before.pageBgColorResolved,
+        bgColor: 'rgb(17, 17, 17)',
+      });
   });
 
   test('state1 geometry stays locked at half height across viewport resize', async ({

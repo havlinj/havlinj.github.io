@@ -13,7 +13,7 @@ title: 'Profile'
     --portrait-saturation: 1;
     --portrait-brightness: 1;
     --portrait-contrast: 1;
-    --portrait-opacity: 0.8;
+    --portrait-opacity: 1;
     --profile-tile-1-bg: url('/assets/pages/profile/illia-kholin-i51OubmBtw8-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 50%;
@@ -23,7 +23,7 @@ title: 'Profile'
     --profile-tile-1-saturation: 1;
     --profile-tile-1-brightness: 1.2;
     --profile-tile-1-contrast: 1;
-    --profile-tile-1-opacity: 0.4;
+    --profile-tile-1-opacity: 0.8;
     --profile-tile-3-pos-x: 50%;
     --profile-tile-3-pos-y: 50%;
     --profile-tile-3-pan-x: 10%;
@@ -32,7 +32,7 @@ title: 'Profile'
     --profile-tile-3-saturation: 1;
     --profile-tile-3-brightness: 1.2;
     --profile-tile-3-contrast: 1;
-    --profile-tile-3-opacity: 0.4;
+    --profile-tile-3-opacity: 0.8;
     --profile-tile-4-bg: url('/assets/pages/profile/pedro-henrique-rWbEip80LN0-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 50%;
@@ -43,7 +43,7 @@ title: 'Profile'
     --profile-tile-4-saturation: 1;
     --profile-tile-4-brightness: 1.2;
     --profile-tile-4-contrast: 1;
-    --profile-tile-4-opacity: 0.4;
+    --profile-tile-4-opacity: 0.8;
   "
 >
   <a

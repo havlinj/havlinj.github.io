@@ -323,6 +323,26 @@ article .profile-section:last-child {
   text-align: left;
 }
 
+/*
+ * Contrast strip under profile tile labels:
+ * - Base tone uses page background color.
+ * - Subtle horizontal banding + 4x4 ordered-dither (Bayer-like) texture.
+ */
+.profile-tile-button .page-button__text::before {
+  content: '';
+  position: absolute;
+  top: -0.18em;
+  bottom: -0.18em;
+  left: calc(-1 * var(--profile-label-strip-left, 0.42em));
+  right: calc(-1 * var(--profile-label-strip-right, 0.42em));
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--color-page-bg);
+  border: 0 solid transparent;
+  box-sizing: border-box;
+  transition: background-color 0.18s ease;
+}
+
 /* State1 invert: dark text by default, dark bg + light text on hover/focus */
 .profile-tile-button:not(.is-revealed):hover .page-button__bg,
 .profile-tile-button:not(.is-revealed):focus-visible .page-button__bg {
@@ -337,6 +357,44 @@ article .profile-section:last-child {
 .profile-tile-button:not(.is-revealed):hover .page-button__text,
 .profile-tile-button:not(.is-revealed):focus-visible .page-button__text {
   color: var(--color-page-bg);
+}
+
+.profile-tile-button:not(.is-revealed):hover .page-button__text::before,
+.profile-tile-button:not(.is-revealed):focus-visible .page-button__text::before {
+  background-color: #111;
+  border-width: 1px;
+  border-color: var(--color-page-bg);
+}
+
+.profile-section > a[href='/why']:not(.is-revealed):hover .page-button__text::before,
+.profile-section
+  > a[href='/why']:not(.is-revealed):focus-visible
+  .page-button__text::before,
+.profile-section
+  > a[href='/what-i-do']:not(.is-revealed):hover
+  .page-button__text::before,
+.profile-section
+  > a[href='/what-i-do']:not(.is-revealed):focus-visible
+  .page-button__text::before {
+  border-left-width: 0;
+}
+
+.profile-section
+  .profile-tile-button--foundations:not(.is-revealed):hover
+  .page-button__text::before,
+.profile-section
+  .profile-tile-button--foundations:not(.is-revealed):focus-visible
+  .page-button__text::before {
+  border-right-width: 0;
+}
+
+.profile-section > a[href='/why'] .page-button__text,
+.profile-section > a[href='/what-i-do'] .page-button__text {
+  --profile-label-strip-left: var(--profile-tile-text-inset-x);
+}
+
+.profile-section .profile-tile-button--foundations .page-button__text {
+  --profile-label-strip-right: var(--profile-tile-text-inset-x);
 }
 
 /* Bottom-right tile has a softer custom treatment */
