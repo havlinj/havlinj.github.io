@@ -266,8 +266,13 @@ function measurePortraitGeometryPx(): void {
   if (!shell) return;
 
   // Portrait width is the "c" we need for h_max = A - c.
-  // This is horizontal-only (computed once); we only use it for vertical calc.
-  const w = shell.getBoundingClientRect().width;
+  // Keep this as BASE width (before visual scale in state2), otherwise c gets scaled twice.
+  const cs = getComputedStyle(rightColumn);
+  const rawScale = cs.getPropertyValue('--portrait-effective-scale').trim();
+  const parsedScale = Number.parseFloat(rawScale);
+  const effectiveScale =
+    Number.isFinite(parsedScale) && parsedScale > 0 ? parsedScale : 1;
+  const w = shell.getBoundingClientRect().width / effectiveScale;
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
   rightColumn.style.setProperty(

@@ -221,6 +221,53 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(Math.abs(g2.portraitBottom - g1.portraitBottom)).toBeLessThan(3);
   });
 
+  test('state2 stays clamped during zoom-like viewport changes', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    await setRevealTimeoutMs(page, 2200);
+    const tile = page.getByRole('link', { name: 'Foundations' });
+    await tile.click();
+    await expect(tile).toHaveClass(/is-revealed/);
+    await waitForState2Settled(page);
+
+    const assertState2Clamped = async () => {
+      await expect
+        .poll(
+          async () => {
+            const g = await readFoundationsGeometry(page);
+            const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
+            const topDelta = await page.evaluate(() => {
+              const col = document.querySelector('.profile-right-column');
+              const shell = document.querySelector('.profile-photo-shell');
+              if (!(col instanceof HTMLElement))
+                throw new Error('missing .profile-right-column');
+              if (!(shell instanceof HTMLElement))
+                throw new Error('missing .profile-photo-shell');
+              const colRect = col.getBoundingClientRect();
+              const shellRect = shell.getBoundingClientRect();
+              return shellRect.top - colRect.top;
+            });
+            return (
+              Math.abs(g.foundationsHeight - expected) < 4 &&
+              Math.abs(g.portraitBottom - expected) < 4 &&
+              topDelta >= -2
+            );
+          },
+          { timeout: 3000, intervals: [100, 180, 300] },
+        )
+        .toBe(true);
+    };
+
+    await assertState2Clamped();
+    await page.setViewportSize({ width: 1024, height: 720 });
+    await assertState2Clamped();
+    await page.setViewportSize({ width: 1460, height: 920 });
+    await assertState2Clamped();
+    await page.setViewportSize({ width: 900, height: 980 });
+    await assertState2Clamped();
+  });
+
   test('state2 holds until timeout, then returns to state1 geometry', async ({
     page,
   }) => {
