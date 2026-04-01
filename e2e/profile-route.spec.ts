@@ -133,7 +133,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.profile-tile-button__reveal')).toContainText(
-      /Longer read,\s*optional/i,
+      /Additional\s*context/i,
     );
   });
 

@@ -509,11 +509,20 @@ article .profile-section:last-child {
   overflow: hidden;
 }
 
+.profile-tile-button__reveal-copy--center-left {
+  width: max-content;
+  max-width: 100%;
+  align-self: center;
+  text-align: left;
+}
+
 .profile-tile-button__reveal-stanza {
   display: block;
   max-width: 100%;
   min-width: 0;
   white-space: nowrap;
+  line-height: 1.12;
+  letter-spacing: 0.012em;
 }
 
 .profile-tile-button__reveal-stanza--center-left {
@@ -525,6 +534,16 @@ article .profile-section:last-child {
 
 .profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {
   margin-top: 1.35rem;
+}
+
+.profile-tile-button__reveal-stanza--sub {
+  font-size: 0.9em;
+  line-height: 1.18;
+  letter-spacing: 0.014em;
+}
+
+.profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza--sub {
+  margin-top: 3rem;
 }
 
 .profile-photo-box img {

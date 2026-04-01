@@ -142,9 +142,12 @@ title: 'Profile'
       <span class="page-button__text">Foundations</span>
     </span>
     <span class="profile-tile-button__reveal" aria-hidden="true">
-      <span class="profile-tile-button__reveal-copy">
+      <span class="profile-tile-button__reveal-copy profile-tile-button__reveal-copy--center-left">
         <span class="profile-tile-button__reveal-stanza profile-tile-button__reveal-stanza--center-left"
-          >Longer read,<br />optional</span
+          >Additional<br />context</span
+        >
+        <span class="profile-tile-button__reveal-stanza profile-tile-button__reveal-stanza--sub"
+          >Beyond<br />the core</span
         >
       </span>
     </span>
