@@ -47,6 +47,7 @@ article.has-buttons-panel {
  * - c: portrait wrapper side length (measured in JS into `--profile-portrait-side-px`).
  *
  * State 1: Foundations = a, portrait stands on top edge (bottom = 50%).
+ *          This stays pure CSS (50%) to avoid visible settling during extreme zoom/resize.
  * State 2: Foundations = h_max = A - c, portrait lifts and still touches
  *          the top edge (bottom = FoundationsHeight).
  *
@@ -71,9 +72,9 @@ article.has-buttons-panel {
     var(--profile-portrait-side-px) * var(--portrait-effective-scale)
   );
 
-  /* state1 (a = A/2) */
-  --profile-foundations-height: calc(var(--profile-right-height-px) / 2);
-  --portrait-stand-bottom: calc(var(--profile-right-height-px) / 2);
+  /* state1 (a = A/2) stays CSS-native for immediate stability on resize/zoom */
+  --profile-foundations-height: 50%;
+  --portrait-stand-bottom: 50%;
   --profile-motion-duration: 0.45s;
   --profile-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
