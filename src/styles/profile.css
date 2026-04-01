@@ -28,6 +28,8 @@ article.has-buttons-panel {
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
   --profile-tile-text-inset-x: 2rem;
+  /* Temporary: disable image grain/overlay effects on profile tiles */
+  --profile-grain-opacity: 0.5;
 }
 
 .profile-section > a[href='/why'] {
@@ -128,9 +130,10 @@ article .profile-section:last-child {
   background: var(--color-page-bg);
 }
 
-/* Profile: grain overlay on photo + bottom image tiles */
+/* Profile: grain overlay on photo + media/image tiles */
 .profile-photo-box::after,
-.profile-image-tile::after {
+.profile-image-tile::after,
+.profile-gif-tile::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -150,7 +153,12 @@ article .profile-section:last-child {
 /* Bottom tiles (user-supplied images later): fallback = #111 */
 .profile-image-tile {
   position: relative;
-  background-color: #111;
+  background-color: var(--color-page-bg);
+}
+
+.profile-gif-tile {
+  position: relative;
+  background-color: var(--color-page-bg);
 }
 
 .profile-image-tile::before {
@@ -164,9 +172,32 @@ article .profile-section:last-child {
   background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
   filter: saturate(var(--tile-saturation, 1))
     brightness(var(--tile-brightness, 1)) contrast(var(--tile-contrast, 1));
-  transform: scale(var(--tile-zoom, 1));
+  /*
+   * Fine pan controls for zoomed tile images.
+   * Useful when background-position is already near an edge and you need subtle extra nudge.
+   */
+  transform: translate(var(--tile-pan-x, 0%), var(--tile-pan-y, 0%))
+    scale(var(--tile-zoom, 1));
   opacity: var(--tile-image-opacity, 1);
   transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.profile-gif-tile__media {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  object-fit: cover;
+  object-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
+  filter: saturate(var(--tile-saturation, 1))
+    brightness(var(--tile-brightness, 1)) contrast(var(--tile-contrast, 1));
+  transform: translate(var(--tile-pan-x, 0%), var(--tile-pan-y, 0%))
+    scale(var(--tile-zoom, 1));
+  transform-origin: center;
+  opacity: var(--tile-image-opacity, 1);
   backface-visibility: hidden;
   will-change: transform;
   pointer-events: none;
@@ -224,7 +255,7 @@ article .profile-section:last-child {
   position: absolute;
   inset: var(--profile-photo-frame-size);
   overflow: hidden;
-  background: transparent;
+  background: var(--color-page-bg);
 }
 
 /* Top-right: panel tile */
@@ -262,6 +293,13 @@ article .profile-section:last-child {
     rgba(17, 17, 17, 0.67) 20%,
     rgba(17, 17, 17, 0.52) 50%
   );
+}
+
+/* Temporary: turn off tint/overlay layer above profile images */
+.profile-image-tile .page-button__overlay,
+.profile-gif-tile .page-button__overlay {
+  opacity: 0;
+  background: none;
 }
 
 .profile-tile-button .page-button__text {
@@ -477,6 +515,7 @@ article .profile-section:last-child {
   filter: saturate(var(--portrait-saturation, 1))
     brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
+  opacity: var(--portrait-opacity, 1);
   /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: bottom center;
