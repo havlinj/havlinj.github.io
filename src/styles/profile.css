@@ -283,7 +283,7 @@ article .profile-section:last-child {
   padding: 0 var(--profile-tile-text-inset-x);
   box-sizing: border-box;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow: visible;
   justify-content: flex-start;
 }
 
@@ -323,11 +323,7 @@ article .profile-section:last-child {
   text-align: left;
 }
 
-/*
- * Contrast strip under profile tile labels:
- * - Base tone uses page background color.
- * - Subtle horizontal banding + 4x4 ordered-dither (Bayer-like) texture.
- */
+/* Contrast strip under profile tile labels */
 .profile-tile-button .page-button__text::before {
   content: '';
   position: absolute;
@@ -341,6 +337,28 @@ article .profile-section:last-child {
   border: 0 solid transparent;
   box-sizing: border-box;
   transition: background-color 0.18s ease;
+}
+
+/*
+ * Hover-only outline rectangle:
+ * - separate layer so base-state label underlay stays untouched
+ * - stretched to full tile edges (including frame width)
+ */
+.profile-tile-button .page-button__text::after {
+  content: '';
+  position: absolute;
+  top: -0.18em;
+  bottom: -0.18em;
+  left: calc(-1 * var(--profile-hover-outline-left, 0.42em));
+  right: calc(-1 * var(--profile-hover-outline-right, 0.42em));
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+  border: 0 solid transparent;
+  box-sizing: border-box;
+  transition:
+    border-color 0.18s ease,
+    border-width 0.18s ease;
 }
 
 /* State1 invert: dark text by default, dark bg + light text on hover/focus */
@@ -362,39 +380,58 @@ article .profile-section:last-child {
 .profile-tile-button:not(.is-revealed):hover .page-button__text::before,
 .profile-tile-button:not(.is-revealed):focus-visible .page-button__text::before {
   background-color: #111;
+  border-width: 0;
+}
+
+.profile-tile-button:not(.is-revealed):hover .page-button__text::after,
+.profile-tile-button:not(.is-revealed):focus-visible .page-button__text::after {
   border-width: 1px;
   border-color: var(--color-page-bg);
 }
 
-.profile-section > a[href='/why']:not(.is-revealed):hover .page-button__text::before,
+.profile-section > a[href='/why']:not(.is-revealed):hover .page-button__text::after,
 .profile-section
   > a[href='/why']:not(.is-revealed):focus-visible
-  .page-button__text::before,
+  .page-button__text::after,
 .profile-section
   > a[href='/what-i-do']:not(.is-revealed):hover
-  .page-button__text::before,
+  .page-button__text::after,
 .profile-section
   > a[href='/what-i-do']:not(.is-revealed):focus-visible
-  .page-button__text::before {
+  .page-button__text::after {
   border-left-width: 0;
 }
 
+
 .profile-section
   .profile-tile-button--foundations:not(.is-revealed):hover
-  .page-button__text::before,
+  .page-button__text::after,
 .profile-section
   .profile-tile-button--foundations:not(.is-revealed):focus-visible
-  .page-button__text::before {
+  .page-button__text::after {
   border-right-width: 0;
 }
 
+
 .profile-section > a[href='/why'] .page-button__text,
 .profile-section > a[href='/what-i-do'] .page-button__text {
-  --profile-label-strip-left: var(--profile-tile-text-inset-x);
+  --profile-label-strip-left: calc(
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+  );
+  --profile-hover-outline-left: calc(
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+  );
+  --profile-hover-outline-right: 0.42em;
 }
 
 .profile-section .profile-tile-button--foundations .page-button__text {
-  --profile-label-strip-right: var(--profile-tile-text-inset-x);
+  --profile-label-strip-right: calc(
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+  );
+  --profile-hover-outline-left: 0.42em;
+  --profile-hover-outline-right: calc(
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+  );
 }
 
 /* Bottom-right tile has a softer custom treatment */
