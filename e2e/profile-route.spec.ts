@@ -291,10 +291,19 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       )
       .toBe(false);
 
-    const state1 = await readFoundationsGeometry(page);
-    const half = state1.columnHeight / 2;
-    expect(Math.abs(state1.foundationsHeight - half)).toBeLessThan(20);
-    expect(Math.abs(state1.portraitBottom - half)).toBeLessThan(20);
+    await expect
+      .poll(
+        async () => {
+          const state1 = await readFoundationsGeometry(page);
+          const half = state1.columnHeight / 2;
+          return (
+            Math.abs(state1.foundationsHeight - half) < 20 &&
+            Math.abs(state1.portraitBottom - half) < 20
+          );
+        },
+        { timeout: 3000, intervals: [100, 180, 300] },
+      )
+      .toBe(true);
   });
 
   test('state2 works without hover capability (touch-like)', async ({

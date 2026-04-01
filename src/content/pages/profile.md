@@ -21,28 +21,29 @@ title: 'Profile'
     --profile-tile-1-pan-y: 15%;
     --profile-tile-1-zoom: 1.5;
     --profile-tile-1-saturation: 1;
-    --profile-tile-1-brightness: 1;
+    --profile-tile-1-brightness: 1.2;
     --profile-tile-1-contrast: 1;
-    --profile-tile-1-opacity: 0.7;
+    --profile-tile-1-opacity: 0.4;
     --profile-tile-3-pos-x: 50%;
     --profile-tile-3-pos-y: 50%;
-    --profile-tile-3-pan-x: -10%;
-    --profile-tile-3-pan-y: -15%;
-    --profile-tile-3-zoom: 1.35;
+    --profile-tile-3-pan-x: 10%;
+    --profile-tile-3-pan-y: 5%;
+    --profile-tile-3-zoom: 1.39;
     --profile-tile-3-saturation: 1;
-    --profile-tile-3-brightness: 1;
-    --profile-tile-3-contrast: ;
-    --profile-tile-3-opacity: 0.7;
-    --profile-tile-4-bg: url('/assets/pages/profile/himal-rana-war7VqpmdQU-unsplash_dichrom.png');
+    --profile-tile-3-brightness: 1.2;
+    --profile-tile-3-contrast: 1;
+    --profile-tile-3-opacity: 0.4;
+    --profile-tile-4-bg: url('/assets/pages/profile/pedro-henrique-rWbEip80LN0-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 50%;
-    --profile-tile-4-pan-x: 0%;
-    --profile-tile-4-pan-y: 20%;
+    --profile-tile-4-pan-x: 15%;
+       --profile-tile-4-pan-y: 20%;
+    /* --profile-tile-4-pan-y: 20%; */
     --profile-tile-4-zoom: 1.4;
     --profile-tile-4-saturation: 1;
-    --profile-tile-4-brightness: 1;
+    --profile-tile-4-brightness: 1.2;
     --profile-tile-4-contrast: 1;
-    --profile-tile-4-opacity: 0.7;
+    --profile-tile-4-opacity: 0.4;
   "
 >
   <a

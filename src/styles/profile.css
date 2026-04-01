@@ -222,6 +222,7 @@ article .profile-section:last-child {
     )
   );
   --profile-photo-frame-size: 6px;
+  --profile-photo-overhang-y: 1px;
   --profile-portrait-content-side: calc(
     100% - (2 * var(--profile-photo-gutter-x))
   );
@@ -229,7 +230,9 @@ article .profile-section:last-child {
   top: auto;
   left: auto;
   right: var(--profile-photo-inset-right, 0);
-  bottom: var(--portrait-stand-bottom, 50%);
+  bottom: calc(
+    var(--portrait-stand-bottom, 50%) - var(--profile-photo-overhang-y)
+  );
   transition: bottom var(--profile-motion-duration) var(--profile-motion-ease);
   width: min(
     calc(
@@ -303,7 +306,7 @@ article .profile-section:last-child {
 }
 
 .profile-tile-button .page-button__text {
-  color: var(--color-page-bg);
+  color: #111;
   /* Inherited from .profile-section (fit from "PROFESSIONAL" on /what-i-do tile) */
   font-size: var(
     --profile-tile-label-font-size,
@@ -316,6 +319,22 @@ article .profile-section:last-child {
   max-width: 100%;
   white-space: nowrap;
   text-align: left;
+}
+
+/* State1 invert: dark text by default, dark bg + light text on hover/focus */
+.profile-tile-button:not(.is-revealed):hover .page-button__bg,
+.profile-tile-button:not(.is-revealed):focus-visible .page-button__bg {
+  background-color: #111;
+}
+
+.profile-tile-button:not(.is-revealed):hover .page-button__overlay,
+.profile-tile-button:not(.is-revealed):focus-visible .page-button__overlay {
+  background: #111;
+}
+
+.profile-tile-button:not(.is-revealed):hover .page-button__text,
+.profile-tile-button:not(.is-revealed):focus-visible .page-button__text {
+  color: var(--color-page-bg);
 }
 
 /* Bottom-right tile has a softer custom treatment */
@@ -507,9 +526,11 @@ article .profile-section:last-child {
 }
 
 .profile-photo-box img {
+  position: absolute;
+  inset: -1px;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
   object-fit: cover;
   object-position: var(--portrait-pos-x, 45%) var(--portrait-pos-y, 50%);
   filter: saturate(var(--portrait-saturation, 1))
