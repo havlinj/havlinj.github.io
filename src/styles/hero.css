@@ -13,6 +13,9 @@
   /* Tagline sizing should follow hero width (not viewport) */
   container-type: inline-size;
   overflow: hidden;
+  /* Composition anchor offsets (default: exact center of the square) */
+  --hero-composition-offset-x: 0%;
+  --hero-composition-offset-y: -0.5%;
 }
 
 .hero-figure {
@@ -56,13 +59,21 @@
 }
 
 .hero-content {
-  position: relative;
+  /*
+   * Keep the foreground composition (name/role/tagline) centered in the hero square.
+   * Adjustable via --hero-composition-offset-x/y while staying tied to square center.
+   */
+  position: absolute;
+  left: calc(50% + var(--hero-composition-offset-x));
+  top: calc(50% + var(--hero-composition-offset-y));
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 100%;
   z-index: 2;
-  padding-top: 3rem;
 }
 
 .hero-grid {
-  margin-top: 1.5rem;
+  margin-top: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 2rem;
