@@ -482,8 +482,6 @@ article .profile-section:last-child {
 }
 
 .profile-tile-button--foundations.is-revealed.is-reveal-fading-out
-  .profile-tile-button__reveal-icon,
-.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
   .profile-tile-button__reveal-copy {
   animation: none;
 }
@@ -505,8 +503,6 @@ article .profile-section:last-child {
   animation: none;
 }
 
-.profile-tile-button--foundations.is-reveal-opening
-  .profile-tile-button__reveal-icon,
 .profile-tile-button--foundations.is-reveal-opening
   .profile-tile-button__reveal-copy {
   animation: none;
@@ -549,28 +545,11 @@ article .profile-section:last-child {
   overflow: hidden;
 }
 
-.profile-tile-button__reveal-icon {
-  --profile-reveal-icon-size: 2.9em;
-  width: var(--profile-reveal-icon-size);
-  height: var(--profile-reveal-icon-size);
-  align-self: center;
-  margin-bottom: 0.8em;
-  background-color: var(--color-page-bg);
-  -webkit-mask-image: url('/assets/pages/profile/exclamation-triangle-icon.svg?v=2');
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-image: url('/assets/pages/profile/exclamation-triangle-icon.svg?v=2');
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-}
-
 .profile-tile-button__reveal-copy--center-left {
-  width: max-content;
+  width: 100%;
   max-width: 100%;
-  align-self: center;
-  text-align: center;
+  align-self: stretch;
+  text-align: left;
 }
 
 .profile-tile-button__reveal-stanza {
@@ -583,10 +562,10 @@ article .profile-section:last-child {
 }
 
 .profile-tile-button__reveal-stanza--center-left {
-  width: max-content;
+  width: 100%;
   max-width: 100%;
-  align-self: center;
-  text-align: center;
+  align-self: stretch;
+  text-align: left;
 }
 
 .profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {

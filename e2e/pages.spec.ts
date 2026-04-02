@@ -272,15 +272,22 @@ test.describe('Credits page (/credits)', () => {
     ).toBeVisible();
   });
 
-  test('renders photos section and core attributions', async ({ page }) => {
+  test('renders photos/videos sections and updated attributions', async ({
+    page,
+  }) => {
     await page.goto('/credits');
     await expect(
       page.getByRole('heading', { name: 'Photos', level: 3 }),
     ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Videos', level: 3 }),
+    ).toBeVisible();
     await expect(page.getByText('AltumCode')).toBeVisible();
-    await expect(page.getByText('Dillon Shook')).toBeVisible();
-    await expect(page.getByText('Tai Bui')).toBeVisible();
+    await expect(page.getByText('Illia Kholin')).toBeVisible();
+    await expect(page.getByText('Enrique Hoyos')).toBeVisible();
     await expect(page.getByText('Joschka Silzle')).toBeVisible();
+    await expect(page.getByText('Raddy')).toBeVisible();
+    await expect(page.getByText('Nicola Narracci')).toBeVisible();
   });
 
   test('footer credits link navigates to /credits', async ({ page }) => {

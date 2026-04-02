@@ -36,7 +36,12 @@ const navItems = [
     <main class="content">
       {
         activeSection && (
-          <header class="site-header">
+          <header
+            class={
+              'site-header' +
+              (activeSection === 'profile' ? ' site-header--profile' : '')
+            }
+          >
             {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
             <div class="site-header__inner">
               {navItems.map((item) => (
@@ -44,12 +49,18 @@ const navItems = [
                   href={item.href}
                   class={
                     'site-header__item site-nav__link' +
+                    (activeSection === 'profile' && item.section === 'writing'
+                      ? ' site-header__item--writing-anchor'
+                      : '') +
                     (activeSection === item.section
                       ? ' site-nav__link--active'
                       : '')
                   }
                 >
                   {item.label}
+                  {activeSection === 'profile' && item.section === 'writing' && (
+                    <span class="site-header__writing-pointer" aria-hidden="true"></span>
+                  )}
                 </a>
               ))}
             </div>

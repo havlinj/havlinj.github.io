@@ -170,6 +170,12 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const primaryPx = Number.parseFloat(primaryCs.fontSize);
       const secondaryPx = Number.parseFloat(secondaryCs.fontSize);
       const secondaryGapPx = Number.parseFloat(secondaryCs.marginTop) || 0;
+      const primaryLeft = primary.getBoundingClientRect().left;
+      const secondaryLeft = secondary.getBoundingClientRect().left;
+      const revealIconCount = document.querySelectorAll(
+        '.profile-tile-button--foundations .profile-tile-button__reveal-icon',
+      ).length;
+      const copyAnimName = copyCs.animationName;
       return {
         revealPadL: Number.parseFloat(revealCs.paddingLeft) || 0,
         revealPadR: Number.parseFloat(revealCs.paddingRight) || 0,
@@ -180,6 +186,10 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         primaryPx,
         secondaryPx,
         secondaryGapPx,
+        primaryLeft,
+        secondaryLeft,
+        revealIconCount,
+        copyAnimName,
       };
     });
 
@@ -194,6 +204,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(layout.primaryPx).toBeGreaterThan(0);
     expect(layout.secondaryPx / layout.primaryPx).toBeCloseTo(0.9, 1);
     expect(layout.secondaryGapPx).toBeGreaterThanOrEqual(45);
+    expect(Math.abs(layout.primaryLeft - layout.secondaryLeft)).toBeLessThan(1.5);
+    expect(layout.revealIconCount).toBe(0);
+    expect(layout.copyAnimName).toBe('none');
   });
 
   test('second click while revealed navigates to /foundations', async ({
