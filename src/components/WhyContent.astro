@@ -4,6 +4,19 @@
       <div class="why-content why-content--pending-layout">
         <div class="why-spacer why-spacer--top" aria-hidden="true"></div>
 
+        <div class="why-gif-holder" aria-hidden="true">
+          <div class="why-gif-frame">
+            <!-- Placeholder GIF URL (replace later with your real asset). -->
+            <img
+              class="why-gif"
+              src="/assets/pages/profile/why/nicola_narracci_14570518_1920_1080_30fps_pexels_dichrom.gif"
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        </div>
+
         <div class="why-block why-block--intro">
           <p class="why-lead">I'm a software engineer.</p>
 
@@ -58,6 +71,8 @@
     const lines = Array.from(scrollEl.querySelectorAll('p'));
     if (lines.length === 0) return;
 
+    const gifEl = scrollEl.querySelector('.why-gif-holder');
+
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
     const smoothstep = (x) => x * x * (3 - 2 * x);
 
@@ -75,13 +90,17 @@
       const firstLine = lines[0];
       const firstRect = firstLine.getBoundingClientRect();
       const firstHeight = firstRect.height || 0;
+      const gifHeight = gifEl ? gifEl.getBoundingClientRect().height || 0 : 0;
       const scrollStyle = window.getComputedStyle(scrollEl);
       const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
       const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
 
-      // Place the first line so its bottom edge sits on the box center line.
-      const topSpacerPx = Math.max(0, half - padTop - firstHeight);
-      const bottomSpacerPx = Math.max(0, half - padBottom - firstHeight);
+      // Place the first line so its TOP edge sits on the box center line.
+      // This keeps the lead text visually centered even when a GIF sits above it.
+      // We then apply a small additional downward bias to match the desired composition.
+      const leadDownPx = firstHeight * 0.18;
+      const topSpacerPx = Math.max(0, half - padTop - gifHeight + leadDownPx);
+      const bottomSpacerPx = Math.max(0, half - padBottom - gifHeight);
       topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
       bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
 
@@ -111,6 +130,39 @@
         line.style.setProperty('--why-line-scale', scale.toFixed(3));
         line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
       });
+
+      // Drive the GIF with the same center-based geometry as the text lines.
+      // We fade it out as it moves away from the box center, while also applying
+      // the same scale + inset feel as the paragraphs.
+      if (gifEl) {
+        const r = gifEl.getBoundingClientRect();
+        const mid = (r.top + r.bottom) / 2;
+        const normalized = Math.abs(mid - center) / half; // 0..1
+
+        const edgeProgress = clamp(
+          (normalized - centerBand) / transitionBand,
+          0,
+          1,
+        );
+        const eased = smoothstep(edgeProgress);
+
+        // Visually lift the GIF higher than the lead line
+        // without affecting the lead line centering math.
+        const liftPx = firstHeight * 0.75;
+        gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(2)}px`);
+
+        const scaleDrop = 0.35;
+        const maxInset = 3.2;
+        const scale = 1 - scaleDrop * eased;
+        const inset = maxInset * eased;
+
+        gifEl.style.setProperty('--why-line-scale', scale.toFixed(3));
+        gifEl.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
+
+        const opacityDrop = 0.75;
+        const opacity = clamp(1 - opacityDrop * eased, 0, 1);
+        gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+      }
     }
 
     function afterTwoFrames(fn) {
