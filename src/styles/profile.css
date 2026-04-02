@@ -461,20 +461,15 @@ article .profile-section:last-child {
       var(--profile-reveal-bg-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-/* "Alive" pulse: same period for background and copy. Text peaks at the lightest phase. */
-.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
-    .is-reveal-opening
-  )
-  .profile-tile-button__reveal {
-  animation: profile-foundations-reveal-tile-breathe
-    var(--profile-reveal-pulse-period, 2.2s) ease-in-out
-    var(--profile-reveal-pulse-delay, 0.45s) infinite;
-}
+/* "Alive" pulse: pulse the copy only (keep black reveal background stable). */
 
 .profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
   .profile-tile-button__reveal-copy {
+  text-shadow:
+    0 0 0.6px rgba(224, 247, 250, 0.35),
+    0 0 10px rgba(224, 247, 250, 0.12);
   /*
    * 0%/100% keyframes use opacity 0.58; default opacity is 1. Without fill-mode,
    * the delay shows 1 then snaps to 0.58 → bright flash on the light ink.

@@ -17,13 +17,13 @@ title: 'Profile'
     --profile-tile-1-bg: url('/assets/pages/profile/illia-kholin-i51OubmBtw8-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 50%;
-    --profile-tile-1-pan-x: 10%;
-    --profile-tile-1-pan-y: 15%;
+    --profile-tile-1-pan-x: -16%;
+    --profile-tile-1-pan-y: 10%;
     --profile-tile-1-zoom: 1.5;
     --profile-tile-1-saturation: 1;
     --profile-tile-1-brightness: 1.2;
-    --profile-tile-1-contrast: 1;
-    --profile-tile-1-opacity: 0.8;
+    --profile-tile-1-contrast: 1.2;
+    --profile-tile-1-opacity: 0.7;
     --profile-tile-3-pos-x: 50%;
     --profile-tile-3-pos-y: 50%;
     --profile-tile-3-pan-x: 10%;
@@ -32,17 +32,17 @@ title: 'Profile'
     --profile-tile-3-saturation: 1;
     --profile-tile-3-brightness: 1.2;
     --profile-tile-3-contrast: 1;
-    --profile-tile-3-opacity: 0.8;
-    --profile-tile-4-bg: url('/assets/pages/profile/pedro-henrique-rWbEip80LN0-unsplash_dichrom.png');
+    --profile-tile-3-opacity: 0.7;
+    --profile-tile-4-bg: url('/assets/pages/profile/enrique-hoyos-lLah-3nSnQM-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 50%;
-    --profile-tile-4-pan-x: 15%;
-    --profile-tile-4-pan-y: 20%;
-    --profile-tile-4-zoom: 1.4;
+    --profile-tile-4-pan-x: 0%;
+    --profile-tile-4-pan-y: 0%;
+    --profile-tile-4-zoom: 1;
     --profile-tile-4-saturation: 1;
-    --profile-tile-4-brightness: 1.2;
+    --profile-tile-4-brightness: 1;
     --profile-tile-4-contrast: 1;
-    --profile-tile-4-opacity: 0.8;
+    --profile-tile-4-opacity: 0.7;
   "
 >
   <a
