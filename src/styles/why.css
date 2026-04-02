@@ -76,7 +76,7 @@
 }
 
 .why-page .why-content {
-  max-width: calc(var(--content-width) * 2 / 3);
+  max-width: 48ch;
   opacity: 1;
   transition: opacity 380ms ease-out;
 }
