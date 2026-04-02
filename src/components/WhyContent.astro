@@ -1,5 +1,6 @@
 <section class="why-wrapper">
   <div class="why-box">
+    <div class="why-end-cover" aria-hidden="true"></div>
     <div class="why-scroll">
       <div class="why-content why-content--pending-layout">
         <div class="why-spacer why-spacer--top" aria-hidden="true"></div>
@@ -70,6 +71,8 @@
   (function () {
     const scrollEl = document.querySelector('.why-page .why-scroll');
     if (!scrollEl) return;
+    const boxEl = scrollEl.closest('.why-box');
+    if (!boxEl) return;
     const contentEl = scrollEl.querySelector('.why-content');
     if (!contentEl) return;
     const topSpacer = scrollEl.querySelector('.why-spacer--top');
@@ -92,6 +95,7 @@
 
     function update() {
       rafId = 0;
+      const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
       const boxRect = scrollEl.getBoundingClientRect();
       const half = boxRect.height / 2;
       const center = boxRect.top + half;
@@ -102,6 +106,21 @@
       const scrollStyle = window.getComputedStyle(scrollEl);
       const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
       const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
+
+      // Near the very end, we fade in a top cover to hide earlier text that
+      // would otherwise linger while we keep the last lines stable.
+      const coverBandPx = Math.max(70, scrollEl.clientHeight * 0.22);
+      const coverProgress = maxScroll
+        ? clamp(
+            (scrollEl.scrollTop - (maxScroll - coverBandPx)) / coverBandPx,
+            0,
+            1,
+          )
+        : 0;
+      boxEl.style.setProperty(
+        '--why-end-cover-opacity',
+        smoothstep(coverProgress).toFixed(3),
+      );
 
       // Place the first line so its TOP edge sits on the box center line.
       // This keeps the lead text visually centered even when a GIF sits above it.

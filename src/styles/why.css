@@ -20,6 +20,23 @@
   color: var(--why-box-fg);
 }
 
+.why-page .why-end-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: clamp(125px, 17.2vh, 220px);
+  z-index: 4;
+  pointer-events: none;
+  opacity: var(--why-end-cover-opacity, 0);
+  background: linear-gradient(
+    to bottom,
+    var(--why-box-bg) 0%,
+    var(--why-box-bg) 48%,
+    rgba(17, 17, 17, 0) 100%
+  );
+}
+
 .why-page .why-box::before,
 .why-page .why-box::after {
   content: '';
