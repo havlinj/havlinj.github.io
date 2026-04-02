@@ -108,7 +108,14 @@
       // We then apply a small additional downward bias to match the desired composition.
       const leadDownPx = firstHeight * 0.18;
       const topSpacerPx = Math.max(0, half - padTop - gifHeight + leadDownPx);
-      const bottomSpacerPx = Math.max(0, half - padBottom - gifHeight);
+      // Allow a bit more room near the end so the last line doesn't get
+      // "stuck" too early. This is a bottom-only tweak, so earlier phases
+      // (including the start) remain stable.
+      const endScrollExtraPx = half * 0.32;
+      const bottomSpacerPx = Math.max(
+        0,
+        half - padBottom - gifHeight + endScrollExtraPx,
+      );
       topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
       bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
 
