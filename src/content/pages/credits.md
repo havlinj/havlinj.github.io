@@ -4,92 +4,95 @@ title: 'Credits'
 
 ### Photos
 
+All Unsplash media listed below are used according to the
+[Unsplash License](https://unsplash.com/license).
+
 - **Hero image (homepage)**
   - Author: [AltumCode](https://unsplash.com/@altumcode)
-  - Source: [Unsplash photo](https://unsplash.com/photos/oZ61KFUQsus)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/oZ61KFUQsus)
   - Edits: color treatment, grid effect
 
-- **Profile panel image**
-  - Author: [Dillon Shook](https://unsplash.com/@dillonjshook)
-  - Source: [Unsplash photo](https://unsplash.com/photos/ADxOq184yk8)
-  - License: [Unsplash License](https://unsplash.com/license)
-  - Edits: dichromatic treatment, vertically mirrored
+- **Profile portrait image**
+  - Author: [Pedro Henrique](https://unsplash.com/@pedrohrei)
+  - Source: [Unsplash](https://unsplash.com/photos/rWbEip80LN0)
+  - Edits: dichromatic treatment, portrait styling/composition
 
-- **Profile tile image 3**
-  - Author: [Tai Bui](https://unsplash.com/@agforl24)
-  - Source: [Unsplash photo](https://unsplash.com/photos/yKX7wC_VioM)
-  - License: [Unsplash License](https://unsplash.com/license)
+- **Profile tile image (Why)**
+  - Author: [Illia Kholin](https://unsplash.com/@illuha)
+  - Source: [Unsplash](https://unsplash.com/photos/i51OubmBtw8)
   - Edits: dichromatic treatment, additional grain styling in Profile CSS
 
-- **Profile tile image 4**
-  - Author: [Atelier by Vineeth](https://unsplash.com/@atelierbyvineeth)
-  - Source: [Unsplash photo](https://unsplash.com/photos/e9JnKvY6O5A)
-  - License: [Unsplash License](https://unsplash.com/license)
+- **Profile tile image (Foundations)**
+  - Author: [Enrique Hoyos](https://unsplash.com/@enriquebolarte)
+  - Source: [Unsplash](https://unsplash.com/photos/lLah-3nSnQM)
   - Edits: dichromatic treatment, additional grain styling in Profile CSS
 
 - **Writing page panel image**
   - Author: [Joschka Silzle](https://unsplash.com/@joschka_silzle)
-  - Source: [Unsplash photo](https://unsplash.com/photos/90pi4AI8MwA)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/90pi4AI8MwA)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Ellis Lee)**
+- **Writing pool image**
   - Author: [Ellis Lee](https://unsplash.com/@xllis_ly)
-  - Source: [Unsplash photo](https://unsplash.com/photos/rrNSejFCYxo)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/rrNSejFCYxo)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Haitam ELKADIRI)**
+- **Writing pool image**
   - Author: [Haitam ELKADIRI](https://unsplash.com/@haykad684)
-  - Source: [Unsplash photo](https://unsplash.com/photos/V0o-HzekVEw)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/V0o-HzekVEw)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Harrisun S)**
+- **Writing pool image**
   - Author: [Harrisun S](https://unsplash.com/@harrisunsdz)
-  - Source: [Unsplash photo](https://unsplash.com/photos/tCwfUrgAXKY)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/tCwfUrgAXKY)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Huanrui He)**
+- **Writing pool image**
   - Author: [Huanrui He](https://unsplash.com/@huan1997)
-  - Source: [Unsplash photo](https://unsplash.com/photos/dA0XLqHD3eU)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/dA0XLqHD3eU)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Julia Taubitz)**
+- **Writing pool image**
   - Author: [Julia Taubitz](https://unsplash.com/@justmejuliee)
-  - Source: [Unsplash photo](https://unsplash.com/photos/Sa4LRznG_DU)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/Sa4LRznG_DU)
   - Edits: dichromatic treatment
 
-- **Writing pool image (K8-4)**
+- **Writing pool image**
   - Author: [K8](https://unsplash.com/id/@_k8_)
-  - Source: [Unsplash photo](https://unsplash.com/photos/jjSmhXytw)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/jjSmhXytw)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Nguyen Hiep)**
+- **Writing pool image**
   - Author: [Nguyen Hiep](https://unsplash.com/@hieptltb97)
-  - Source: [Unsplash photo](https://unsplash.com/photos/mvYyxn02rjk)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/mvYyxn02rjk)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Samuel Regan-Asante)**
+- **Writing pool image**
   - Author: [Samuel Regan-Asante](https://unsplash.com/@reganography)
-  - Source: [Unsplash photo](https://unsplash.com/photos/POCZmzEPxNc)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/POCZmzEPxNc)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Thomas Kinto, 3WvTJrQBb38)**
+- **Writing pool image**
   - Author: [Thomas Kinto](https://unsplash.com/@thomaskinto)
-  - Source: [Unsplash photo](https://unsplash.com/photos/3WvTJrQBb38)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/3WvTJrQBb38)
   - Edits: dichromatic treatment
 
-- **Writing pool image (Thomas Kinto, fBTQhWKEf20)**
+- **Writing pool image**
   - Author: [Thomas Kinto](https://unsplash.com/@thomaskinto)
-  - Source: [Unsplash photo](https://unsplash.com/photos/fBTQhWKEf20)
-  - License: [Unsplash License](https://unsplash.com/license)
+  - Source: [Unsplash](https://unsplash.com/photos/fBTQhWKEf20)
   - Edits: dichromatic treatment
+
+### Videos
+
+All Pexels media listed below are used according to the
+[Pexels License](https://www.pexels.com/license/).
+
+- **Profile tile video (What I do)**
+  - Author: [Raddy](https://www.pexels.com/@raddy/)
+  - Source: [Pexels](https://www.pexels.com/video/13522186/)
+  - Edits: converted to GIF, dichromatic treatment
+
+- **Why section animated GIF**
+  - Author: [Nicola Narracci](https://www.pexels.com/@nicola-narracci/)
+  - Source: [Pexels](https://www.pexels.com/video/14570518/)
+  - Edits: converted to GIF, dichromatic treatment
