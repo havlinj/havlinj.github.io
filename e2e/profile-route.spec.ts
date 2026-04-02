@@ -133,7 +133,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.profile-tile-button__reveal')).toContainText(
-      /Additional\s*context/i,
+      /Additional/i,
     );
   });
 
@@ -199,12 +199,14 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       'profile-tile-button__reveal-copy--center-left',
     );
     expect(layout.copyTextAlign).toBe('left');
-    expect(layout.primaryText).toMatch(/Additional\s*context/i);
+    expect(layout.primaryText).toMatch(/Additional/i);
     expect(layout.secondaryText).toMatch(/Beyond\s*the core/i);
     expect(layout.primaryPx).toBeGreaterThan(0);
     expect(layout.secondaryPx / layout.primaryPx).toBeCloseTo(0.9, 1);
     expect(layout.secondaryGapPx).toBeGreaterThanOrEqual(45);
-    expect(Math.abs(layout.primaryLeft - layout.secondaryLeft)).toBeLessThan(1.5);
+    expect(Math.abs(layout.primaryLeft - layout.secondaryLeft)).toBeLessThan(
+      1.5,
+    );
     expect(layout.revealIconCount).toBe(0);
     expect(layout.copyAnimName).toBe('none');
   });

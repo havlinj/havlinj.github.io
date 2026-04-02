@@ -159,8 +159,7 @@
   margin: 0;
 
   transform: translateX(var(--why-line-inset, 0))
-    translateY(var(--why-gif-y, 0px))
-    scale(var(--why-line-scale, 1));
+    translateY(var(--why-gif-y, 0px)) scale(var(--why-line-scale, 1));
   transform-origin: left center;
   opacity: var(--why-gif-opacity, 1);
   transition: none;
@@ -202,7 +201,8 @@
 
   /* Dissolve corners: top-right + bottom-left.
      This version uses diagonal fades along the two diagonals. */
-  -webkit-mask-image: linear-gradient(
+  -webkit-mask-image:
+    linear-gradient(
       to bottom left,
       rgba(0, 0, 0, 0) 0%,
       rgba(0, 0, 0, 0) 10%,
@@ -223,19 +223,20 @@
     /* Extra dissolve near bottom-right corner:
        gradient runs from right-bottom towards left-top, but stays short. */
     linear-gradient(
-      325deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 12%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 24%,
-      rgba(0, 0, 0, 0.6) 30%,
-      rgba(0, 0, 0, 1) 36%
-    );
+        325deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 12%,
+        rgba(0, 0, 0, 0.12) 18%,
+        rgba(0, 0, 0, 0.26) 24%,
+        rgba(0, 0, 0, 0.6) 30%,
+        rgba(0, 0, 0, 1) 36%
+      );
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;
   -webkit-mask-composite: intersect;
 
-  mask-image: linear-gradient(
+  mask-image:
+    linear-gradient(
       to bottom left,
       rgba(0, 0, 0, 0) 0%,
       rgba(0, 0, 0, 0) 10%,

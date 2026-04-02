@@ -71,11 +71,30 @@ import '../styles/hero.css';
       };
       const SEL = {
         hero: '.hero',
+        heroBgImage: '.hero-bg__image',
         heroName: '.hero-name',
         heroRole: '.hero-role',
         heroNameBox: '.hero-name-box',
         fitText: '[data-fit-text]',
       };
+
+      function revealHeroWhenImageReady() {
+        const hero = document.querySelector(SEL.hero);
+        const heroImg = document.querySelector(SEL.heroBgImage);
+        if (!(hero instanceof HTMLElement)) return;
+        if (!(heroImg instanceof HTMLImageElement)) {
+          hero.classList.add('hero--ready');
+          return;
+        }
+
+        const reveal = () => hero.classList.add('hero--ready');
+        if (heroImg.complete && heroImg.naturalWidth > 0) {
+          reveal();
+          return;
+        }
+        heroImg.addEventListener('load', reveal, { once: true });
+        heroImg.addEventListener('error', reveal, { once: true });
+      }
 
       function fitTextToContainer(textEl, options = {}) {
         const container = textEl.parentElement;
@@ -168,6 +187,7 @@ import '../styles/hero.css';
       const resizeObserver = new ResizeObserver(scheduleHeroFit);
 
       function onLoad() {
+        revealHeroWhenImageReady();
         fitAllHeroNames();
         fitHeroRoles();
         document

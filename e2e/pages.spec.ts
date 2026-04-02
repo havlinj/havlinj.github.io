@@ -133,6 +133,22 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(page.locator('.site-header')).toBeVisible();
     await expectNavLinkActive(page, 'Profile');
   });
+
+  test('writing pointer in header appears only on /profile', async ({
+    page,
+  }) => {
+    await page.goto('/profile');
+    await expect(page.locator('.site-header__writing-pointer')).toHaveCount(1);
+
+    await page.goto('/why');
+    await expect(page.locator('.site-header__writing-pointer')).toHaveCount(0);
+
+    await page.goto('/what-i-do');
+    await expect(page.locator('.site-header__writing-pointer')).toHaveCount(0);
+
+    await page.goto('/foundations');
+    await expect(page.locator('.site-header__writing-pointer')).toHaveCount(0);
+  });
 });
 
 // ---------------------------------------------------------------------------

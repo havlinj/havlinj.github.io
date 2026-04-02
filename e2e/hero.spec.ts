@@ -165,4 +165,29 @@ test.describe('Hero page (/)', () => {
     await waitForHeroLoaded(page);
     await expect(page).toHaveScreenshot('hero-section.png');
   });
+
+  test('hero content reveals only after hero image is ready', async ({
+    page,
+  }) => {
+    await waitForHeroLoaded(page);
+
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(() => {
+            const hero = document.querySelector('.hero');
+            const content = document.querySelector('.hero-content');
+            if (!(hero instanceof HTMLElement))
+              throw new Error('missing .hero');
+            if (!(content instanceof HTMLElement))
+              throw new Error('missing .hero-content');
+            return {
+              ready: hero.classList.contains('hero--ready'),
+              opacity: getComputedStyle(content).opacity,
+            };
+          }),
+        { timeout: 2500, intervals: [80, 140, 220] },
+      )
+      .toEqual({ ready: true, opacity: '1' });
+  });
 });

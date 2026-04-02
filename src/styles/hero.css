@@ -70,6 +70,12 @@
   width: 100%;
   max-width: 100%;
   z-index: 2;
+  opacity: 0;
+  transition: opacity 0.22s ease-out;
+}
+
+.hero.hero--ready .hero-content {
+  opacity: 1;
 }
 
 .hero-grid {

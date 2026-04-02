@@ -95,7 +95,10 @@
 
     function update() {
       rafId = 0;
-      const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+      const maxScroll = Math.max(
+        0,
+        scrollEl.scrollHeight - scrollEl.clientHeight,
+      );
       const boxRect = scrollEl.getBoundingClientRect();
       const half = boxRect.height / 2;
       const center = boxRect.top + half;

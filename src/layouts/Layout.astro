@@ -5,7 +5,7 @@ import '../styles/site-header.css';
 import '../styles/footer.css';
 import '../styles/page-buttons.css';
 
-const { title, activeSection } = Astro.props;
+const { title, activeSection, showWritingPointer = false } = Astro.props;
 const pageTitle = title || 'Astro Basics';
 const navItems = [
   { href: '/profile', label: 'Profile', section: 'profile' },
@@ -39,7 +39,7 @@ const navItems = [
           <header
             class={
               'site-header' +
-              (activeSection === 'profile' ? ' site-header--profile' : '')
+              (showWritingPointer ? ' site-header--profile' : '')
             }
           >
             {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
@@ -49,7 +49,7 @@ const navItems = [
                   href={item.href}
                   class={
                     'site-header__item site-nav__link' +
-                    (activeSection === 'profile' && item.section === 'writing'
+                    (showWritingPointer && item.section === 'writing'
                       ? ' site-header__item--writing-anchor'
                       : '') +
                     (activeSection === item.section
@@ -58,8 +58,11 @@ const navItems = [
                   }
                 >
                   {item.label}
-                  {activeSection === 'profile' && item.section === 'writing' && (
-                    <span class="site-header__writing-pointer" aria-hidden="true"></span>
+                  {showWritingPointer && item.section === 'writing' && (
+                    <span
+                      class="site-header__writing-pointer"
+                      aria-hidden="true"
+                    />
                   )}
                 </a>
               ))}
