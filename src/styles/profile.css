@@ -385,7 +385,7 @@ article .profile-section:last-child {
   --profile-reveal-fade-delay: 0.18s;
   --profile-reveal-bg-duration: 0.52s;
   --profile-reveal-bg-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --profile-reveal-pulse-period: 1.8s;
+  --profile-reveal-pulse-period: 2s;
   --profile-reveal-pulse-delay: 0.45s;
 }
 
@@ -466,10 +466,11 @@ article .profile-section:last-child {
 .profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
+  .profile-tile-button__reveal-icon,
+.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
   .profile-tile-button__reveal-copy {
-  text-shadow:
-    0 0 0.6px rgba(224, 247, 250, 0.35),
-    0 0 10px rgba(224, 247, 250, 0.12);
   /*
    * 0%/100% keyframes use opacity 0.58; default opacity is 1. Without fill-mode,
    * the delay shows 1 then snaps to 0.58 → bright flash on the light ink.
@@ -477,6 +478,15 @@ article .profile-section:last-child {
   animation: profile-foundations-reveal-copy-breathe
     var(--profile-reveal-pulse-period, 2.2s) ease-in-out
     var(--profile-reveal-pulse-delay, 0.45s) infinite backwards;
+}
+
+.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
+  .profile-tile-button__reveal-copy {
+  text-shadow:
+    0 0 0.6px rgba(224, 247, 250, 0.35),
+    0 0 10px rgba(224, 247, 250, 0.12);
 }
 
 /* Fade reveal text out before returning to the default tile */
@@ -488,6 +498,8 @@ article .profile-section:last-child {
   animation: none;
 }
 
+.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
+  .profile-tile-button__reveal-icon,
 .profile-tile-button--foundations.is-revealed.is-reveal-fading-out
   .profile-tile-button__reveal-copy {
   animation: none;
@@ -510,6 +522,8 @@ article .profile-section:last-child {
   animation: none;
 }
 
+.profile-tile-button--foundations.is-reveal-opening
+  .profile-tile-button__reveal-icon,
 .profile-tile-button--foundations.is-reveal-opening
   .profile-tile-button__reveal-copy {
   animation: none;
@@ -552,11 +566,28 @@ article .profile-section:last-child {
   overflow: hidden;
 }
 
+.profile-tile-button__reveal-icon {
+  --profile-reveal-icon-size: 2.9em;
+  width: var(--profile-reveal-icon-size);
+  height: var(--profile-reveal-icon-size);
+  align-self: center;
+  margin-bottom: 0.8em;
+  background-color: var(--color-page-bg);
+  -webkit-mask-image: url('/assets/pages/profile/exclamation-triangle-icon.svg?v=2');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url('/assets/pages/profile/exclamation-triangle-icon.svg?v=2');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
 .profile-tile-button__reveal-copy--center-left {
   width: max-content;
   max-width: 100%;
   align-self: center;
-  text-align: left;
+  text-align: center;
 }
 
 .profile-tile-button__reveal-stanza {
@@ -572,7 +603,7 @@ article .profile-section:last-child {
   width: max-content;
   max-width: 100%;
   align-self: center;
-  text-align: left;
+  text-align: center;
 }
 
 .profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {
@@ -628,7 +659,7 @@ article .profile-section:last-child {
 @keyframes profile-foundations-reveal-copy-breathe {
   0%,
   100% {
-    opacity: 0.58;
+    opacity: 0.6;
   }
   50% {
     opacity: 1;
