@@ -47,7 +47,7 @@ title: 'Profile'
 >
   <a
     href="/why"
-    class="profile-tile profile-image-tile page-button profile-tile-button"
+    class="profile-tile profile-image-tile page-button prof-tile"
     style="
       --tile-bg: var(--profile-tile-1-bg);
       --tile-pos-x: var(--profile-tile-1-pos-x);
@@ -71,7 +71,7 @@ title: 'Profile'
   </a>
   <a
     href="/what-i-do"
-    class="profile-tile profile-gif-tile page-button profile-tile-button"
+    class="profile-tile profile-gif-tile page-button prof-tile"
     style="
       --tile-pos-x: var(--profile-tile-3-pos-x, 50%);
       --tile-pos-y: var(--profile-tile-3-pos-y, 50%);
@@ -119,7 +119,7 @@ title: 'Profile'
     </div>
     <a
       href="/foundations"
-      class="profile-tile profile-image-tile page-button profile-tile-button profile-tile-button--foundations"
+      class="profile-tile profile-image-tile page-button prof-tile prof-tile--foundations"
       style="
         --tile-bg: var(--profile-tile-4-bg);
         --tile-pos-x: var(--profile-tile-4-pos-x);
@@ -140,12 +140,12 @@ title: 'Profile'
       <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Foundations</span></span>
       <span class="page-button__text">Foundations</span>
     </span>
-    <span class="profile-tile-button__reveal" aria-hidden="true">
-      <span class="profile-tile-button__reveal-copy profile-tile-button__reveal-copy--center-left">
-        <span class="profile-tile-button__reveal-stanza profile-tile-button__reveal-stanza--center-left"
+    <span class="prof-tile__reveal" aria-hidden="true">
+      <span class="prof-tile__copy prof-tile__copy--left">
+        <span class="prof-tile__stanza prof-tile__stanza--main"
           >Additional</span
         >
-        <span class="profile-tile-button__reveal-stanza profile-tile-button__reveal-stanza--sub"
+        <span class="prof-tile__stanza prof-tile__stanza--sub"
           >Beyond<br />the core</span
         >
       </span>

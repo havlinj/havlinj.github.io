@@ -37,6 +37,23 @@
   );
 }
 
+.why-page .why-start-cover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(110px, 18.6vh, 195px);
+  z-index: 4;
+  pointer-events: none;
+  opacity: var(--why-start-cover-opacity, 1);
+  background: linear-gradient(
+    to top,
+    var(--why-box-bg) 0%,
+    var(--why-box-bg) 54%,
+    rgba(17, 17, 17, 0) 100%
+  );
+}
+
 .why-page .why-box::before,
 .why-page .why-box::after {
   content: '';

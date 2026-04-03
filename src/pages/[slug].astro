@@ -40,11 +40,7 @@ const PROFILE_PRELOADS = [
 ];
 ---
 
-<Layout
-  title={page.data.title}
-  activeSection={activeSection}
-  showWritingPointer={slug === 'profile'}
->
+<Layout title={page.data.title} activeSection={activeSection}>
   {
     isProfile &&
       PROFILE_PRELOADS.map((href) => (

@@ -1,6 +1,7 @@
 <section class="why-wrapper">
   <div class="why-box">
     <div class="why-end-cover" aria-hidden="true"></div>
+    <div class="why-start-cover" aria-hidden="true"></div>
     <div class="why-scroll">
       <div class="why-content why-content--pending-layout">
         <div class="why-spacer why-spacer--top" aria-hidden="true"></div>
@@ -52,7 +53,7 @@
         <div class="why-block why-block--close">
           <p>
             There are no project showcases here.<br />
-            Only thoughts and reflections.
+            Only thoughts and reflections — in Writing.
           </p>
 
           <p class="why-close">
@@ -109,6 +110,16 @@
       const scrollStyle = window.getComputedStyle(scrollEl);
       const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
       const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
+
+      // Early-phase bottom cover: briefly hide the initial partial line at the
+      // very bottom and dissolve it quickly as the reader starts scrolling.
+      const startBandPx = Math.max(85, scrollEl.clientHeight * 0.26);
+      const startProgress = clamp(scrollEl.scrollTop / startBandPx, 0, 1);
+      const startOpacity = 1 - smoothstep(startProgress);
+      boxEl.style.setProperty(
+        '--why-start-cover-opacity',
+        startOpacity.toFixed(3),
+      );
 
       // Near the very end, we fade in a top cover to hide earlier text that
       // would otherwise linger while we keep the last lines stable.

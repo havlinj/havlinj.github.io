@@ -22,15 +22,15 @@ const TYPE_FIT_EVENT = 'profileTileTypeFit';
 const SELECTORS = {
   profileSection: '.profile-section',
   pageTitle: 'article h1.page-title',
-  whyTile: 'a.profile-tile-button[href="/why"]',
-  whatIDoTile: 'a.profile-tile-button[href="/what-i-do"]',
+  whyTile: 'a.prof-tile[href="/why"]',
+  whatIDoTile: 'a.prof-tile[href="/what-i-do"]',
   pageButtonInner: '.page-button__inner',
   pageButtonText: '.page-button__text',
-  foundationsTile: '.profile-tile-button--foundations',
-  foundationsReveal: '.profile-tile-button__reveal',
+  foundationsTile: '.prof-tile--foundations',
+  foundationsReveal: '.prof-tile__reveal',
   foundationsRevealInTile:
-    '.profile-tile-button--foundations .profile-tile-button__reveal',
-  foundationsRevealStanza: '.profile-tile-button__reveal-stanza',
+    '.prof-tile--foundations .prof-tile__reveal',
+  foundationsRevealStanza: '.prof-tile__stanza',
   profileRightColumn: '.profile-right-column',
   profilePhotoShell: '.profile-photo-shell',
 } as const;

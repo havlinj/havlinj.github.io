@@ -17,32 +17,6 @@
   text-decoration: none;
 }
 
-.site-header__item--writing-anchor {
-  position: relative;
-  display: inline-flex;
-  align-items: baseline;
-}
-
-.site-header--profile {
-  --site-header-writing-pointer-image: url('/assets/pages/profile/on-a-more-serious-note.png');
-  --site-header-writing-pointer-size: min(25em, 15rem);
-  --site-header-writing-pointer-offset-x: -1.5em;
-  --site-header-writing-pointer-offset-y: -4.2em;
-}
-
-.site-header__writing-pointer {
-  position: absolute;
-  left: calc(100% + var(--site-header-writing-pointer-offset-x));
-  top: calc(100% + var(--site-header-writing-pointer-offset-y));
-  width: var(--site-header-writing-pointer-size);
-  height: var(--site-header-writing-pointer-size);
-  background-image: var(--site-header-writing-pointer-image);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  pointer-events: none;
-}
-
 .site-header__item:hover {
   text-decoration: underline;
 }

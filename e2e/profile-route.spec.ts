@@ -14,12 +14,12 @@ async function readFoundationsGeometry(
 ): Promise<FoundationsGeometry> {
   return page.evaluate(() => {
     const col = document.querySelector('.profile-right-column');
-    const tile = document.querySelector('.profile-tile-button--foundations');
+    const tile = document.querySelector('.prof-tile--foundations');
     const shell = document.querySelector('.profile-photo-shell');
     if (!(col instanceof HTMLElement))
       throw new Error('missing .profile-right-column');
     if (!(tile instanceof HTMLElement))
-      throw new Error('missing .profile-tile-button--foundations');
+      throw new Error('missing .prof-tile--foundations');
     if (!(shell instanceof HTMLElement))
       throw new Error('missing .profile-photo-shell');
 
@@ -47,9 +47,9 @@ async function readFoundationsGeometry(
 async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
   await page.evaluate((timeout) => {
     const tile = document.querySelector(
-      '.profile-tile-button--foundations',
+      '.prof-tile--foundations',
     ) as HTMLElement | null;
-    if (!tile) throw new Error('missing .profile-tile-button--foundations');
+    if (!tile) throw new Error('missing .prof-tile--foundations');
     tile.style.setProperty('--profile-reveal-timeout-ms', `${timeout}`);
   }, ms);
 }
@@ -95,7 +95,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const { revealPx, labelPx } = await page.evaluate(() => {
       const section = document.querySelector('.profile-section');
       const reveal = document.querySelector(
-        '.profile-tile-button--foundations .profile-tile-button__reveal',
+        '.prof-tile--foundations .prof-tile__reveal',
       );
       if (!(section instanceof HTMLElement))
         throw new Error('missing .profile-section');
@@ -123,7 +123,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
     await expect(tile).toHaveAttribute('href', '/foundations');
-    await expect(tile).toHaveClass(/profile-tile-button--foundations/);
+    await expect(tile).toHaveClass(/prof-tile--foundations/);
   });
 
   test('first click opens reveal and stays on /profile', async ({ page }) => {
@@ -132,7 +132,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
-    await expect(tile.locator('.profile-tile-button__reveal')).toContainText(
+    await expect(tile.locator('.prof-tile__reveal')).toContainText(
       /Additional/i,
     );
   });
@@ -147,14 +147,14 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
 
     const layout = await page.evaluate(() => {
       const reveal = document.querySelector(
-        '.profile-tile-button--foundations .profile-tile-button__reveal',
+        '.prof-tile--foundations .prof-tile__reveal',
       );
       const copy = document.querySelector(
-        '.profile-tile-button--foundations .profile-tile-button__reveal-copy',
+        '.prof-tile--foundations .prof-tile__copy',
       );
       const stanzas = Array.from(
         document.querySelectorAll(
-          '.profile-tile-button--foundations .profile-tile-button__reveal-stanza',
+          '.prof-tile--foundations .prof-tile__stanza',
         ),
       );
       if (!(reveal instanceof HTMLElement))
@@ -173,7 +173,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const primaryLeft = primary.getBoundingClientRect().left;
       const secondaryLeft = secondary.getBoundingClientRect().left;
       const revealIconCount = document.querySelectorAll(
-        '.profile-tile-button--foundations .profile-tile-button__reveal-icon',
+        '.prof-tile--foundations .prof-tile__reveal-icon',
       ).length;
       const copyAnimName = copyCs.animationName;
       return {
@@ -196,7 +196,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(layout.revealPadL).toBeCloseTo(32, 1);
     expect(layout.revealPadR).toBeCloseTo(32, 1);
     expect(layout.copyClass).toContain(
-      'profile-tile-button__reveal-copy--center-left',
+      'prof-tile__copy--left',
     );
     expect(layout.copyTextAlign).toBe('left');
     expect(layout.primaryText).toMatch(/Additional/i);
@@ -243,11 +243,11 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const info = await page.evaluate(() => {
       const section = document.querySelector('.profile-section');
       const tiles = Array.from(
-        document.querySelectorAll('.profile-tile-button'),
+        document.querySelectorAll('.prof-tile'),
       ) as HTMLElement[];
       if (!(section instanceof HTMLElement))
         throw new Error('missing .profile-section');
-      if (tiles.length === 0) throw new Error('missing .profile-tile-button');
+      if (tiles.length === 0) throw new Error('missing .prof-tile');
       const sectionCs = getComputedStyle(section);
       const frameVar = Number.parseFloat(
         sectionCs.getPropertyValue('--profile-photo-frame-size').trim(),
@@ -287,7 +287,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const readColors = async () =>
       page.evaluate(() => {
         const tile = Array.from(
-          document.querySelectorAll('a.profile-tile-button'),
+          document.querySelectorAll('a.prof-tile'),
         ).find(
           (el) =>
             (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why',

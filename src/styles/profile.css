@@ -89,7 +89,7 @@ article.has-buttons-panel {
   pointer-events: none; /* Clicks should always reach Foundations tile */
 }
 
-.profile-right-column .profile-tile-button--foundations {
+.profile-right-column .prof-tile--foundations {
   position: absolute;
   left: 0;
   right: 0;
@@ -101,7 +101,7 @@ article.has-buttons-panel {
 }
 
 /* state2: after click (is-revealed), Foundations smoothly expands to h_max */
-.profile-right-column:has(.profile-tile-button--foundations.is-revealed) {
+.profile-right-column:has(.prof-tile--foundations.is-revealed) {
   --portrait-effective-scale: 0.8;
   --profile-foundations-height: calc(
     var(--profile-right-height-px) - var(--profile-portrait-effective-px)
@@ -268,7 +268,7 @@ article .profile-section:last-child {
 }
 
 /* Clickable profile tiles (Why / What I do / Foundations) */
-.profile-tile-button {
+.prof-tile {
   height: 100%;
   max-height: none;
   min-height: 0;
@@ -279,7 +279,7 @@ article .profile-section:last-child {
   container-name: profile-tile;
 }
 
-.profile-tile-button .page-button__inner {
+.prof-tile .page-button__inner {
   padding: 0 var(--profile-tile-text-inset-x);
   box-sizing: border-box;
   max-width: 100%;
@@ -287,11 +287,11 @@ article .profile-section:last-child {
   justify-content: flex-start;
 }
 
-.profile-tile-button .page-button__bg {
+.prof-tile .page-button__bg {
   background-color: rgba(17, 17, 17, 0.1);
 }
 
-.profile-tile-button .page-button__overlay {
+.prof-tile .page-button__overlay {
   background: linear-gradient(
     90deg,
     rgba(17, 17, 17, 0.75) 0%,
@@ -307,7 +307,7 @@ article .profile-section:last-child {
   background: none;
 }
 
-.profile-tile-button .page-button__text {
+.prof-tile .page-button__text {
   color: #111;
   /* Inherited from .profile-section (fit from "PROFESSIONAL" on /what-i-do tile) */
   font-size: var(
@@ -324,7 +324,7 @@ article .profile-section:last-child {
 }
 
 /* Contrast strip under profile tile labels */
-.profile-tile-button .page-button__text::before {
+.prof-tile .page-button__text::before {
   content: '';
   position: absolute;
   top: -0.18em;
@@ -343,23 +343,23 @@ article .profile-section:last-child {
 }
 
 /* State1 invert: dark text by default, dark bg + light text on hover/focus */
-.profile-tile-button:not(.is-revealed):hover .page-button__bg,
-.profile-tile-button:not(.is-revealed):focus-visible .page-button__bg {
+.prof-tile:not(.is-revealed):hover .page-button__bg,
+.prof-tile:not(.is-revealed):focus-visible .page-button__bg {
   background-color: #111;
 }
 
-.profile-tile-button:not(.is-revealed):hover .page-button__overlay,
-.profile-tile-button:not(.is-revealed):focus-visible .page-button__overlay {
+.prof-tile:not(.is-revealed):hover .page-button__overlay,
+.prof-tile:not(.is-revealed):focus-visible .page-button__overlay {
   background: #111;
 }
 
-.profile-tile-button:not(.is-revealed):hover .page-button__text,
-.profile-tile-button:not(.is-revealed):focus-visible .page-button__text {
+.prof-tile:not(.is-revealed):hover .page-button__text,
+.prof-tile:not(.is-revealed):focus-visible .page-button__text {
   color: var(--color-page-bg);
 }
 
-.profile-tile-button:not(.is-revealed):hover .page-button__text::before,
-.profile-tile-button:not(.is-revealed):focus-visible
+.prof-tile:not(.is-revealed):hover .page-button__text::before,
+.prof-tile:not(.is-revealed):focus-visible
   .page-button__text::before {
   background-color: #111;
   border-color: var(--color-page-bg);
@@ -372,14 +372,14 @@ article .profile-section:last-child {
   );
 }
 
-.profile-section .profile-tile-button--foundations .page-button__text {
+.profile-section .prof-tile--foundations .page-button__text {
   --profile-label-strip-right: calc(
     var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
   );
 }
 
 /* Second state only: pointer — hover avoids transform (text raster “skube”); use soft bg instead */
-.profile-tile-button--foundations.is-revealed {
+.prof-tile--foundations.is-revealed {
   cursor: pointer;
   --profile-reveal-fade-duration: 0.18s;
   --profile-reveal-fade-delay: 0.18s;
@@ -390,21 +390,21 @@ article .profile-section:last-child {
 }
 
 /* Foundations reveal layer: opacity/visibility transitions only during reveal states */
-.profile-tile-button--foundations.is-revealed .page-button__bg,
-.profile-tile-button--foundations.is-revealed .page-button__overlay,
-.profile-tile-button--foundations.is-revealed .page-button__inner,
-.profile-tile-button--foundations.is-reveal-fading-out .page-button__bg,
-.profile-tile-button--foundations.is-reveal-fading-out .page-button__overlay,
-.profile-tile-button--foundations.is-reveal-fading-out .page-button__inner,
-.profile-tile-button--foundations.is-reveal-opening .page-button__bg,
-.profile-tile-button--foundations.is-reveal-opening .page-button__overlay,
-.profile-tile-button--foundations.is-reveal-opening .page-button__inner {
+.prof-tile--foundations.is-revealed .page-button__bg,
+.prof-tile--foundations.is-revealed .page-button__overlay,
+.prof-tile--foundations.is-revealed .page-button__inner,
+.prof-tile--foundations.is-reveal-fading-out .page-button__bg,
+.prof-tile--foundations.is-reveal-fading-out .page-button__overlay,
+.prof-tile--foundations.is-reveal-fading-out .page-button__inner,
+.prof-tile--foundations.is-reveal-opening .page-button__bg,
+.prof-tile--foundations.is-reveal-opening .page-button__overlay,
+.prof-tile--foundations.is-reveal-opening .page-button__inner {
   transition:
     opacity var(--profile-reveal-fade-duration, 0.18s) ease,
     visibility 0s linear var(--profile-reveal-fade-delay, 0.18s);
 }
 
-.profile-tile-button__reveal {
+.prof-tile__reveal {
   position: absolute;
   inset: 0;
   z-index: 4;
@@ -437,9 +437,9 @@ article .profile-section:last-child {
   overflow: hidden;
 }
 
-.profile-tile-button--foundations.is-revealed .page-button__bg,
-.profile-tile-button--foundations.is-revealed .page-button__overlay,
-.profile-tile-button--foundations.is-revealed .page-button__inner {
+.prof-tile--foundations.is-revealed .page-button__bg,
+.prof-tile--foundations.is-revealed .page-button__overlay,
+.prof-tile--foundations.is-revealed .page-button__inner {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -448,7 +448,7 @@ article .profile-section:last-child {
     visibility 0s linear 0.18s;
 }
 
-.profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
+.prof-tile--foundations.is-revealed .prof-tile__reveal {
   opacity: 1;
   visibility: visible;
   background-color: #111;
@@ -463,61 +463,61 @@ article .profile-section:last-child {
 
 /* "Alive" pulse: pulse the copy only (keep black reveal background stable). */
 
-.profile-tile-button--foundations.is-revealed:not(.is-reveal-fading-out):not(
+.prof-tile--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
-  .profile-tile-button__reveal-copy {
+  .prof-tile__copy {
   text-shadow:
     0 0 0.6px rgba(224, 247, 250, 0.35),
     0 0 10px rgba(224, 247, 250, 0.12);
 }
 
 /* Fade reveal text out before returning to the default tile */
-.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
-  .profile-tile-button__reveal {
+.prof-tile--foundations.is-revealed.is-reveal-fading-out
+  .prof-tile__reveal {
   opacity: 0;
   visibility: visible;
   transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease;
   animation: none;
 }
 
-.profile-tile-button--foundations.is-revealed.is-reveal-fading-out
-  .profile-tile-button__reveal-copy {
+.prof-tile--foundations.is-revealed.is-reveal-fading-out
+  .prof-tile__copy {
   animation: none;
 }
 
 /* One frame: base layers at opacity 0, no transition, then class removed → fade in */
-.profile-tile-button--foundations.is-reveal-opening .page-button__bg,
-.profile-tile-button--foundations.is-reveal-opening .page-button__overlay,
-.profile-tile-button--foundations.is-reveal-opening .page-button__inner {
+.prof-tile--foundations.is-reveal-opening .page-button__bg,
+.prof-tile--foundations.is-reveal-opening .page-button__overlay,
+.prof-tile--foundations.is-reveal-opening .page-button__inner {
   opacity: 0;
   visibility: visible;
   transition: none;
 }
 
-.profile-tile-button--foundations.is-reveal-opening
-  .profile-tile-button__reveal {
+.prof-tile--foundations.is-reveal-opening
+  .prof-tile__reveal {
   opacity: 0;
   visibility: hidden;
   transition: none;
   animation: none;
 }
 
-.profile-tile-button--foundations.is-reveal-opening
-  .profile-tile-button__reveal-copy {
+.prof-tile--foundations.is-reveal-opening
+  .prof-tile__copy {
   animation: none;
 }
 
 /* State1 stability: keep Foundations on the same hover timing model as other tiles */
-.profile-tile-button--foundations:not(.is-revealed):not(
+.prof-tile--foundations:not(.is-revealed):not(
     .is-reveal-fading-out
   ):not(.is-reveal-opening)
   .page-button__bg,
-.profile-tile-button--foundations:not(.is-revealed):not(
+.prof-tile--foundations:not(.is-revealed):not(
     .is-reveal-fading-out
   ):not(.is-reveal-opening)
   .page-button__overlay,
-.profile-tile-button--foundations:not(.is-revealed):not(
+.prof-tile--foundations:not(.is-revealed):not(
     .is-reveal-fading-out
   ):not(.is-reveal-opening)
   .page-button__inner {
@@ -526,16 +526,16 @@ article .profile-section:last-child {
   transition: background-color 0.14s ease;
 }
 
-.profile-tile-button--foundations:not(.is-revealed):not(
+.prof-tile--foundations:not(.is-revealed):not(
     .is-reveal-fading-out
   ):not(.is-reveal-opening)
-  .profile-tile-button__reveal {
+  .prof-tile__reveal {
   opacity: 0;
   visibility: hidden;
   transition: none;
 }
 
-.profile-tile-button__reveal-copy {
+.prof-tile__copy {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -545,14 +545,14 @@ article .profile-section:last-child {
   overflow: hidden;
 }
 
-.profile-tile-button__reveal-copy--center-left {
+.prof-tile__copy--left {
   width: 100%;
   max-width: 100%;
   align-self: stretch;
   text-align: left;
 }
 
-.profile-tile-button__reveal-stanza {
+.prof-tile__stanza {
   display: block;
   max-width: 100%;
   min-width: 0;
@@ -561,24 +561,24 @@ article .profile-section:last-child {
   letter-spacing: 0.012em;
 }
 
-.profile-tile-button__reveal-stanza--center-left {
+.prof-tile__stanza--main {
   width: 100%;
   max-width: 100%;
   align-self: stretch;
   text-align: left;
 }
 
-.profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza {
+.prof-tile__stanza + .prof-tile__stanza {
   margin-top: 1.35rem;
 }
 
-.profile-tile-button__reveal-stanza--sub {
+.prof-tile__stanza--sub {
   font-size: 0.9em;
   line-height: 1.18;
   letter-spacing: 0.014em;
 }
 
-.profile-tile-button__reveal-stanza + .profile-tile-button__reveal-stanza--sub {
+.prof-tile__stanza + .prof-tile__stanza--sub {
   margin-top: 3rem;
 }
 
@@ -602,7 +602,7 @@ article .profile-section:last-child {
 }
 
 /* state2: during expand (is-revealed), visually shrink portrait (~20%) */
-.profile-right-column:has(.profile-tile-button--foundations.is-revealed)
+.profile-right-column:has(.prof-tile--foundations.is-revealed)
   .profile-photo-shell {
   --portrait-shell-shrink: var(--portrait-effective-scale, 0.8);
 }
@@ -630,19 +630,19 @@ article .profile-section:last-child {
 
 @media (prefers-reduced-motion: reduce) {
   .profile-right-column .profile-photo-frame,
-  .profile-right-column .profile-tile-button--foundations {
+  .profile-right-column .prof-tile--foundations {
     transition: none;
   }
 
-  .profile-tile-button--foundations.is-revealed .profile-tile-button__reveal {
+  .prof-tile--foundations.is-revealed .prof-tile__reveal {
     transition:
       opacity var(--profile-reveal-fade-duration, 0.18s) ease,
       visibility 0s;
     animation: none !important;
   }
 
-  .profile-tile-button--foundations.is-revealed
-    .profile-tile-button__reveal-copy {
+  .prof-tile--foundations.is-revealed
+    .prof-tile__copy {
     animation: none !important;
     opacity: 1;
   }
