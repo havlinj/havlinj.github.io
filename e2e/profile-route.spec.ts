@@ -133,7 +133,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.prof-tile__reveal')).toContainText(
-      /Additional/i,
+      /Tried\s*Writing/i,
     );
   });
 
@@ -150,18 +150,18 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         '.prof-tile--foundations .prof-tile__reveal',
       );
       const copy = document.querySelector(
-        '.prof-tile--foundations .prof-tile__copy',
+        '.prof-tile--foundations .tile-state-secondary',
       );
       const stanzas = Array.from(
         document.querySelectorAll(
-          '.prof-tile--foundations .prof-tile__stanza',
+          '.prof-tile--foundations .tile-state-secondary .line-1, .prof-tile--foundations .tile-state-secondary .line-2',
         ),
       );
       if (!(reveal instanceof HTMLElement))
         throw new Error('missing foundations reveal node');
       if (!(copy instanceof HTMLElement))
-        throw new Error('missing foundations reveal copy node');
-      if (stanzas.length < 2) throw new Error('expected two reveal stanzas');
+        throw new Error('missing foundations tile-state-secondary node');
+      if (stanzas.length < 2) throw new Error('expected line-1 and line-2');
       const [primary, secondary] = stanzas as HTMLElement[];
       const revealCs = getComputedStyle(reveal);
       const copyCs = getComputedStyle(copy);
@@ -169,7 +169,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const secondaryCs = getComputedStyle(secondary);
       const primaryPx = Number.parseFloat(primaryCs.fontSize);
       const secondaryPx = Number.parseFloat(secondaryCs.fontSize);
-      const secondaryGapPx = Number.parseFloat(secondaryCs.marginTop) || 0;
+      const copyGapPx = Number.parseFloat(copyCs.gap) || 0;
       const primaryLeft = primary.getBoundingClientRect().left;
       const secondaryLeft = secondary.getBoundingClientRect().left;
       const revealIconCount = document.querySelectorAll(
@@ -185,7 +185,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         secondaryText: secondary.textContent?.replace(/\s+/g, ' ').trim() ?? '',
         primaryPx,
         secondaryPx,
-        secondaryGapPx,
+        copyGapPx,
         primaryLeft,
         secondaryLeft,
         revealIconCount,
@@ -195,15 +195,15 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
 
     expect(layout.revealPadL).toBeCloseTo(32, 1);
     expect(layout.revealPadR).toBeCloseTo(32, 1);
-    expect(layout.copyClass).toContain(
-      'prof-tile__copy--left',
-    );
+    expect(layout.copyClass).toContain('tile-state-secondary');
     expect(layout.copyTextAlign).toBe('left');
-    expect(layout.primaryText).toMatch(/Additional/i);
-    expect(layout.secondaryText).toMatch(/Beyond\s*the core/i);
+    expect(layout.primaryText).toMatch(/Tried\s*Writing\?/i);
+    expect(layout.secondaryText).toMatch(/Or\s*this\s*might\s*be\s*enough/i);
     expect(layout.primaryPx).toBeGreaterThan(0);
-    expect(layout.secondaryPx / layout.primaryPx).toBeCloseTo(0.9, 1);
-    expect(layout.secondaryGapPx).toBeGreaterThanOrEqual(45);
+    /* line-2 / line-1 rem sizes in profile.css (0.67rem / 0.76rem) */
+    expect(layout.secondaryPx / layout.primaryPx).toBeCloseTo(0.67 / 0.76, 2);
+    expect(layout.copyGapPx).toBeGreaterThan(2);
+    expect(layout.copyGapPx).toBeLessThan(12);
     expect(Math.abs(layout.primaryLeft - layout.secondaryLeft)).toBeLessThan(
       1.5,
     );

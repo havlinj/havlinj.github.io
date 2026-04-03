@@ -30,7 +30,8 @@ const SELECTORS = {
   foundationsReveal: '.prof-tile__reveal',
   foundationsRevealInTile:
     '.prof-tile--foundations .prof-tile__reveal',
-  foundationsRevealStanza: '.prof-tile__stanza',
+  foundationsRevealStanza:
+    '.tile-state-secondary .line-1, .tile-state-secondary .line-2',
   profileRightColumn: '.profile-right-column',
   profilePhotoShell: '.profile-photo-shell',
 } as const;
@@ -58,23 +59,6 @@ function titleCapFontPx(): number {
   const h1 = document.querySelector(SELECTORS.pageTitle);
   if (!(h1 instanceof HTMLElement)) return Math.min(40, rootRemPx() * 2.5);
   return parseFloat(getComputedStyle(h1).fontSize) || 40;
-}
-
-function stanzaLines(stanza: Element): string[] {
-  const lines: string[] = [];
-  let acc = '';
-  for (const node of stanza.childNodes) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      acc += node.textContent ?? '';
-    } else if (node instanceof HTMLBRElement) {
-      const t = acc.trim();
-      if (t) lines.push(t);
-      acc = '';
-    }
-  }
-  const tail = acc.trim();
-  if (tail) lines.push(tail);
-  return lines;
 }
 
 function measureLineWidth(
@@ -199,11 +183,10 @@ function fitTileLabels(section: HTMLElement): void {
 
 function collectRevealLines(reveal: HTMLElement): string[] {
   const lines: string[] = [];
-  reveal
-    .querySelectorAll(SELECTORS.foundationsRevealStanza)
-    .forEach((stanza) => {
-      lines.push(...stanzaLines(stanza));
-    });
+  reveal.querySelectorAll(SELECTORS.foundationsRevealStanza).forEach((lineEl) => {
+    const t = lineEl.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    if (t) lines.push(t);
+  });
   return lines;
 }
 

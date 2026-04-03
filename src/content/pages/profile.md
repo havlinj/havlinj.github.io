@@ -141,13 +141,12 @@ title: 'Profile'
       <span class="page-button__text">Foundations</span>
     </span>
     <span class="prof-tile__reveal" aria-hidden="true">
-      <span class="prof-tile__copy prof-tile__copy--left">
-        <span class="prof-tile__stanza prof-tile__stanza--main"
-          >Additional</span
+      <span class="tile-state-secondary">
+        <span class="line-1"
+          >Tried <span class="writing">Writing</span
+          ><span class="question-mark">?</span></span
         >
-        <span class="prof-tile__stanza prof-tile__stanza--sub"
-          >Beyond<br />the core</span
-        >
+        <span class="line-2">Or this might <br />be enough</span>
       </span>
     </span>
   </a>

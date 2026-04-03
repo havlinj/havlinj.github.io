@@ -425,7 +425,6 @@ article .profile-section:last-child {
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  text-transform: uppercase;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
@@ -466,7 +465,7 @@ article .profile-section:last-child {
 .prof-tile--foundations.is-revealed:not(.is-reveal-fading-out):not(
     .is-reveal-opening
   )
-  .prof-tile__copy {
+  .tile-state-secondary {
   text-shadow:
     0 0 0.6px rgba(224, 247, 250, 0.35),
     0 0 10px rgba(224, 247, 250, 0.12);
@@ -482,7 +481,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile--foundations.is-revealed.is-reveal-fading-out
-  .prof-tile__copy {
+  .tile-state-secondary {
   animation: none;
 }
 
@@ -504,7 +503,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile--foundations.is-reveal-opening
-  .prof-tile__copy {
+  .tile-state-secondary {
   animation: none;
 }
 
@@ -535,51 +534,52 @@ article .profile-section:last-child {
   transition: none;
 }
 
-.prof-tile__copy {
+/* Foundations state 2: secondary tile copy (scoped under reveal) */
+.prof-tile__reveal .tile-state-secondary {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  justify-content: center;
+  gap: 0.36rem;
   width: 100%;
+  height: 100%;
+  text-align: left;
+  flex: 1 1 auto;
+  min-height: 0;
   max-width: 100%;
-  min-width: 0;
+  align-self: stretch;
   overflow: hidden;
 }
 
-.prof-tile__copy--left {
-  width: 100%;
-  max-width: 100%;
-  align-self: stretch;
-  text-align: left;
-}
-
-.prof-tile__stanza {
-  display: block;
-  max-width: 100%;
-  min-width: 0;
-  white-space: nowrap;
-  line-height: 1.12;
-  letter-spacing: 0.012em;
-}
-
-.prof-tile__stanza--main {
-  width: 100%;
-  max-width: 100%;
-  align-self: stretch;
-  text-align: left;
-}
-
-.prof-tile__stanza + .prof-tile__stanza {
-  margin-top: 1.35rem;
-}
-
-.prof-tile__stanza--sub {
-  font-size: 0.9em;
+.prof-tile__reveal .tile-state-secondary .line-1 {
+  font-size: 0.76rem;
   line-height: 1.18;
-  letter-spacing: 0.014em;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.prof-tile__stanza + .prof-tile__stanza--sub {
-  margin-top: 3rem;
+.prof-tile__reveal .tile-state-secondary .line-2 {
+  font-size: 0.67rem;
+  line-height: 1.24;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+  max-width: 22ch;
+  text-transform: uppercase;
+}
+
+.prof-tile__reveal .tile-state-secondary .writing {
+  text-transform: none;
+  font-size: 0.8rem;
+  line-height: 1.18;
+  letter-spacing: 0.005em;
+  font-weight: 700;
+}
+
+.prof-tile__reveal .tile-state-secondary .question-mark {
+  margin-left: 0.15em;
+  font-size: 1em;
 }
 
 .profile-photo-box img {
@@ -642,7 +642,7 @@ article .profile-section:last-child {
   }
 
   .prof-tile--foundations.is-revealed
-    .prof-tile__copy {
+    .tile-state-secondary {
     animation: none !important;
     opacity: 1;
   }
