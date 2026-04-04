@@ -162,6 +162,21 @@ import AnimatedArrow from './AnimatedArrow.astro';
         smoothstep(coverProgress).toFixed(3),
       );
 
+      /*
+       * Opening: first two <p> only (lead + LinkedIn block ≈ three typographic lines).
+       * introBlend also drives --why-top-edge-opacity so .why-box::before does not sit
+       * semi-transparent over type at scrollTop 0 (that read as “dimmed” text).
+       */
+      const introLineCount = 2;
+      const introRampPx = Math.max(100, scrollEl.clientHeight * 0.22);
+      const introBlend = smoothstep(
+        clamp(scrollEl.scrollTop / introRampPx, 0, 1),
+      );
+      boxEl.style.setProperty(
+        '--why-top-edge-opacity',
+        introBlend.toFixed(3),
+      );
+
       // Place the first line so its TOP edge sits on the box center line.
       // This keeps the lead text visually centered even when a GIF sits above it.
       // We then apply a small additional downward bias to match the desired composition.
@@ -182,7 +197,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
       const centerBand = 0.4;
       const transitionBand = 0.45;
 
-      lines.forEach((line) => {
+      lines.forEach((line, lineIndex) => {
         const r = line.getBoundingClientRect();
         const mid = (r.top + r.bottom) / 2;
         const normalized = Math.abs(mid - center) / half; // 0..1
@@ -193,13 +208,15 @@ import AnimatedArrow from './AnimatedArrow.astro';
           1,
         );
         const eased = smoothstep(edgeProgress);
+        const gate = lineIndex < introLineCount ? introBlend : 1;
+        const blendedEased = eased * gate;
 
         const isLead = line.classList.contains('why-lead');
         // Lead line scales/insets less aggressively so its typographic emphasis remains visible.
         const scaleDrop = isLead ? 0.3 : 0.5;
         const maxInset = isLead ? 2.4 : 4;
-        const scale = 1 - scaleDrop * eased;
-        const inset = maxInset * eased;
+        const scale = 1 - scaleDrop * blendedEased;
+        const inset = maxInset * blendedEased;
 
         line.style.setProperty('--why-line-scale', scale.toFixed(3));
         line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
@@ -219,6 +236,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
           1,
         );
         const eased = smoothstep(edgeProgress);
+        const gifEased = eased * introBlend;
 
         // Visually lift the GIF higher than the lead line
         // without affecting the lead line centering math.
@@ -227,14 +245,14 @@ import AnimatedArrow from './AnimatedArrow.astro';
 
         const scaleDrop = 0.35;
         const maxInset = 3.2;
-        const scale = 1 - scaleDrop * eased;
-        const inset = maxInset * eased;
+        const scale = 1 - scaleDrop * gifEased;
+        const inset = maxInset * gifEased;
 
         gifEl.style.setProperty('--why-line-scale', scale.toFixed(3));
         gifEl.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
 
         const opacityDrop = 0.75;
-        const opacity = clamp(1 - opacityDrop * eased, 0, 1);
+        const opacity = clamp(1 - opacityDrop * gifEased, 0, 1);
         gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
       }
     }

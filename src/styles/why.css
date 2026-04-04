@@ -18,6 +18,8 @@
   overflow: hidden;
   background-color: var(--why-box-bg);
   color: var(--why-box-fg);
+  /* Fades in with scroll via WhyContent (was darkening opening lines at scrollTop 0). */
+  --why-top-edge-opacity: 1;
 }
 
 /* Downward scroll CTA (page-bg color); fades via --why-cta-opacity from WhyContent script */
@@ -65,20 +67,21 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* Taller band + longer opaque run so copy stays hidden; upper stops stay soft (no hard line). */
-  height: clamp(158px, 26vh, 258px);
+  /*
+   * Short band only; strong opaque core in lower ~62% hides the peeking line; feather confined
+   * to the top ~38% so mid-alpha does not reach as high as body copy (e.g. third line).
+   */
+  height: clamp(140px, 20.8vh, 218px);
   z-index: 4;
   pointer-events: none;
   opacity: var(--why-start-cover-opacity, 1);
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    var(--why-box-bg) 58%,
-    rgba(17, 17, 17, 0.96) 66%,
-    rgba(17, 17, 17, 0.82) 73%,
+    var(--why-box-bg) 62%,
+    rgba(17, 17, 17, 0.93) 69%,
     rgba(17, 17, 17, 0.55) 80%,
-    rgba(17, 17, 17, 0.3) 87%,
-    rgba(17, 17, 17, 0.12) 92%,
+    rgba(17, 17, 17, 0.18) 90%,
     rgba(17, 17, 17, 0.04) 96%,
     rgba(17, 17, 17, 0) 100%
   );
@@ -96,6 +99,7 @@
 
 .why-page .why-box::before {
   top: 0;
+  opacity: var(--why-top-edge-opacity, 1);
   /* Stronger top fade: text should evaporate before the top edge */
   height: clamp(130px, 22vh, 230px);
   background: linear-gradient(
@@ -112,18 +116,16 @@
 
 .why-page .why-box::after {
   bottom: 0;
-  /* Keep stronger/larger bottom hint */
-  height: clamp(130px, 24vh, 240px);
+  /* Same height as start-cover; mirrored shape so under-layer matches when cover fades */
+  height: clamp(140px, 20.8vh, 218px);
   background: linear-gradient(
     to bottom,
     rgba(17, 17, 17, 0) 0%,
-    rgba(17, 17, 17, 0.04) 10%,
-    rgba(17, 17, 17, 0.14) 18%,
-    rgba(17, 17, 17, 0.2) 22%,
-    rgba(17, 17, 17, 0.46) 40%,
-    rgba(17, 17, 17, 0.72) 60%,
-    rgba(17, 17, 17, 0.9) 78%,
-    rgba(17, 17, 17, 0.99) 90%,
+    rgba(17, 17, 17, 0.04) 4%,
+    rgba(17, 17, 17, 0.18) 10%,
+    rgba(17, 17, 17, 0.55) 20%,
+    rgba(17, 17, 17, 0.93) 31%,
+    var(--why-box-bg) 38%,
     var(--why-box-bg) 100%
   );
 }

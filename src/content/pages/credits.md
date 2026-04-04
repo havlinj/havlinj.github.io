@@ -12,11 +12,6 @@ All Unsplash media listed below are used according to the
   - Source: [Unsplash](https://unsplash.com/photos/oZ61KFUQsus)
   - Edits: color treatment, grid effect
 
-- **Profile portrait image**
-  - Author: [Pedro Henrique](https://unsplash.com/@pedrohrei)
-  - Source: [Unsplash](https://unsplash.com/photos/rWbEip80LN0)
-  - Edits: dichromatic treatment, portrait styling/composition
-
 - **Profile tile image (Why)**
   - Author: [Tommy](https://unsplash.com/@tommyluvi)
   - Source: [Unsplash](https://unsplash.com/photos/RCA--h6cmcU)
