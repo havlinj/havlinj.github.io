@@ -1,7 +1,23 @@
+---
+import AnimatedArrow from './AnimatedArrow.astro';
+---
+
 <section class="why-wrapper">
   <div class="why-box">
     <div class="why-end-cover" aria-hidden="true"></div>
     <div class="why-start-cover" aria-hidden="true"></div>
+    <div class="why-scroll-cta" aria-hidden="true">
+      <AnimatedArrow
+        direction="down"
+        sizeScale={1.5}
+        sizeMode="responsive"
+        color="#e0f7fa"
+        duration={2}
+        opacity={0.35}
+        grainOpacity={0.28}
+        grainSize={220}
+      />
+    </div>
     <div class="why-scroll">
       <div class="why-content why-content--pending-layout">
         <div class="why-spacer why-spacer--top" aria-hidden="true"></div>
@@ -22,9 +38,9 @@
         <div class="why-block why-block--intro">
           <p class="why-lead">I'm a software engineer.</p>
 
-          <p>
+          <p class="why-p--wide">
             Platforms like LinkedIn or GitHub are useful —<br />
-            but they say little about how someone actually&nbsp;thinks.
+            but they say little about how someone actually thinks.
           </p>
 
           <p class="why-anchor">
@@ -74,6 +90,7 @@
     if (!scrollEl) return;
     const boxEl = scrollEl.closest('.why-box');
     if (!boxEl) return;
+    const ctaEl = boxEl.querySelector('.why-scroll-cta');
     const contentEl = scrollEl.querySelector('.why-content');
     if (!contentEl) return;
     const topSpacer = scrollEl.querySelector('.why-spacer--top');
@@ -120,6 +137,15 @@
         '--why-start-cover-opacity',
         startOpacity.toFixed(3),
       );
+
+      // Scroll hint: hide quickly once the reader starts scrolling.
+      const ctaFadePx = 56;
+      const ctaProgress = clamp(scrollEl.scrollTop / ctaFadePx, 0, 1);
+      const ctaO = 1 - smoothstep(ctaProgress);
+      boxEl.style.setProperty('--why-cta-opacity', ctaO.toFixed(3));
+      if (ctaEl) {
+        ctaEl.style.visibility = ctaO < 0.002 ? 'hidden' : 'visible';
+      }
 
       // Near the very end, we fade in a top cover to hide earlier text that
       // would otherwise linger while we keep the last lines stable.

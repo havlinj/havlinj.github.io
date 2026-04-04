@@ -1,0 +1,304 @@
+---
+/**
+ * Segmented chevron with optional grain (SVG filter). The outer `<span>` has no opacity so the
+ * background (#111 on /why) does not get washed out.
+ *
+ * How to size it:
+ * - `size={N}` — width in pixels (always).
+ * - `sizeMode="fixed"` (default) — height follows the 220×170 viewBox; exact N px wide.
+ * - `sizeMode="responsive"` — same N as a *maximum*; width is a rem/vw clamp so it shrinks on
+ *   narrow viewports (similar idea to fluid type on the same page).
+ * - `sizeScale` — multiplier on top of `size` and on the rem/vw terms inside that clamp (default from
+ *   `DEFAULT_SIZE_SCALE` below, or pass `sizeScale` on the tag).
+ */
+interface Props {
+  size?: number;
+  sizeMode?: 'fixed' | 'responsive';
+  /** Relative size (1 = base). Multiplies `size` and responsive clamp rem/vw. */
+  sizeScale?: number;
+  color?: string;
+  duration?: number;
+  class?: string;
+  direction?: 'up' | 'down';
+  opacity?: number;
+  grainOpacity?: number;
+  /**
+   * Noise “tile” scale (same idea as profile tiles): ~180–260 = visible grain.
+   * Very small numbers push feTurbulence frequency so high the texture reads as flat gray.
+   */
+  grainSize?: number;
+}
+
+const VIEWBOX_W = 220;
+const VIEWBOX_H = 170;
+
+/** Defaults for `sizeMode="responsive"` (tweak here if the whole site’s type scale changes). */
+const RESPONSIVE_WIDTH = {
+  minRem: 2.55,
+  baseRem: 2.15,
+  vw: 1.05,
+  /** Lower clamp vs `size`: min(rem floor, size * this). */
+  minSizeFactor: 0.72,
+} as const;
+
+/** Global default for `sizeScale`; override per instance with `<AnimatedArrow sizeScale={…} />`. */
+const DEFAULT_SIZE_SCALE = 1;
+
+const props = Astro.props;
+
+const sizePx = (() => {
+  const n = Number(props.size);
+  return Number.isFinite(n) && n > 0 ? n : 120;
+})();
+
+const sizeScale = (() => {
+  const raw = Number(props.sizeScale ?? DEFAULT_SIZE_SCALE);
+  if (!Number.isFinite(raw) || raw <= 0) return DEFAULT_SIZE_SCALE;
+  return Math.min(3, Math.max(0.35, raw));
+})();
+
+const effectiveSizePx = Math.max(1, Math.round(sizePx * sizeScale));
+
+const sizeMode = props.sizeMode === 'responsive' ? 'responsive' : 'fixed';
+
+const color = props.color ?? '#111';
+const durationSec = Number(props.duration);
+const duration =
+  Number.isFinite(durationSec) && durationSec > 0 ? durationSec : 2.6;
+const className = props.class ?? '';
+const direction = props.direction === 'down' ? 'down' : 'up';
+
+const opacity = (() => {
+  const n = Number(props.opacity);
+  return Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 1;
+})();
+
+const grainOpacity = (() => {
+  const n = Number(props.grainOpacity);
+  return Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.2;
+})();
+
+const grainSize = (() => {
+  const n = Number(props.grainSize);
+  return Number.isFinite(n) && n > 0 ? n : 220;
+})();
+
+/* Stronger than the old 0.55× factor — overlay/soft-light on pale fills (#e0f7fa) needs more signal. */
+const grainNoiseSlope = Math.min(1, grainOpacity * 1.35).toFixed(4);
+const rawGrainFreq = (VIEWBOX_W / grainSize) * 0.85;
+const grainBaseFreq = Math.min(1.25, Math.max(0.42, rawGrainFreq)).toFixed(4);
+const grainFilterId = `animated-arrow-grain-${crypto.randomUUID()}`;
+
+function responsiveSvgStyle(scale: number): string {
+  const { minRem, baseRem, vw, minSizeFactor } = RESPONSIVE_WIDTH;
+  const mr = (minRem * scale).toFixed(4);
+  const br = (baseRem * scale).toFixed(4);
+  const vwS = (vw * scale).toFixed(4);
+  return [
+    'width: clamp(',
+    `min(${mr}rem, calc(var(--arrow-size-px) * ${minSizeFactor} * 1px)), `,
+    `min(${br}rem + ${vwS}vw, calc(var(--arrow-size-px) * 1px)), `,
+    'calc(var(--arrow-size-px) * 1px)); height: auto; aspect-ratio: 220 / 170',
+  ].join('');
+}
+
+const rootStyle = [
+  `--arrow-size-px: ${effectiveSizePx}`,
+  `--arrow-shape-opacity: ${opacity}`,
+  `--arrow-color: ${color}`,
+  `--arrow-duration: ${duration}s`,
+].join('; ');
+
+const dirClass = direction === 'down' ? 'animated-arrow--down' : '';
+const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
+---
+
+<span
+  class:list={['animated-arrow-root', dirClass]}
+  style={rootStyle}
+  aria-hidden="true"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox={`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`}
+    width={sizeMode === 'fixed' ? effectiveSizePx : undefined}
+    height={sizeMode === 'fixed' ? fixedHeight : undefined}
+    class:list={['animated-arrow', className]}
+    style={sizeMode === 'responsive' ? responsiveSvgStyle(sizeScale) : undefined}
+    aria-hidden="true"
+  >
+    <defs>
+      <filter
+        id={grainFilterId}
+        color-interpolation-filters="sRGB"
+        x="-35%"
+        y="-35%"
+        width="170%"
+        height="170%"
+      >
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency={grainBaseFreq}
+          numOctaves="3"
+          stitchTiles="stitch"
+          result="turb"
+        />
+        <feColorMatrix
+          in="turb"
+          type="saturate"
+          values="0"
+          result="turbGray"
+        />
+        <feComponentTransfer in="turbGray" result="turbA">
+          <feFuncA type="linear" slope={grainNoiseSlope} intercept="0" />
+        </feComponentTransfer>
+        <feComposite in="turbA" in2="SourceGraphic" operator="in" result="noiseClip" />
+        <feBlend in="SourceGraphic" in2="noiseClip" mode="soft-light" />
+      </filter>
+    </defs>
+    <g class="arrow-grain-group" filter={`url(#${grainFilterId})`}>
+      <polygon class="seg s1" points="30,148.564 190,148.564 180.762,132.564 39.238,132.564" />
+      <polygon class="seg s2" points="43.856,124.564 176.144,124.564 166.906,108.564 53.094,108.564" />
+      <polygon class="seg s3" points="57.713,100.564 162.287,100.564 153.050,84.564 66.950,84.564" />
+      <polygon class="seg s4" points="71.569,76.564 148.431,76.564 139.193,60.564 80.807,60.564" />
+      <polygon class="seg s5" points="85.426,52.564 134.574,52.564 125.337,36.564 94.663,36.564" />
+      <polygon class="seg s6" points="99.282,28.564 120.718,28.564 110,10" />
+    </g>
+  </svg>
+</span>
+
+<style>
+  .animated-arrow-root {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+    vertical-align: middle;
+  }
+
+  .animated-arrow-root .animated-arrow {
+    display: block;
+    opacity: var(--arrow-shape-opacity, 1);
+  }
+
+  .animated-arrow--down {
+    transform: rotate(180deg);
+    transform-origin: center center;
+  }
+
+  .animated-arrow .seg {
+    fill: var(--arrow-color);
+    opacity: 0;
+    animation-duration: var(--arrow-duration);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .animated-arrow .s1 {
+    animation-name: seg1;
+  }
+  .animated-arrow .s2 {
+    animation-name: seg2;
+  }
+  .animated-arrow .s3 {
+    animation-name: seg3;
+  }
+  .animated-arrow .s4 {
+    animation-name: seg4;
+  }
+  .animated-arrow .s5 {
+    animation-name: seg5;
+  }
+  .animated-arrow .s6 {
+    animation-name: seg6;
+  }
+
+  @keyframes seg1 {
+    0%,
+    8% {
+      opacity: 0;
+    }
+    8.01%,
+    58% {
+      opacity: 1;
+    }
+    58.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes seg2 {
+    0%,
+    16% {
+      opacity: 0;
+    }
+    16.01%,
+    66% {
+      opacity: 1;
+    }
+    66.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes seg3 {
+    0%,
+    24% {
+      opacity: 0;
+    }
+    24.01%,
+    74% {
+      opacity: 1;
+    }
+    74.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes seg4 {
+    0%,
+    32% {
+      opacity: 0;
+    }
+    32.01%,
+    82% {
+      opacity: 1;
+    }
+    82.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes seg5 {
+    0%,
+    40% {
+      opacity: 0;
+    }
+    40.01%,
+    90% {
+      opacity: 1;
+    }
+    90.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes seg6 {
+    0%,
+    48% {
+      opacity: 0;
+    }
+    48.01%,
+    98% {
+      opacity: 1;
+    }
+    98.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+</style>
