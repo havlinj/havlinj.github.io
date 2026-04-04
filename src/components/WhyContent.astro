@@ -149,6 +149,23 @@ import AnimatedArrow from './AnimatedArrow.astro';
         ctaEl.style.visibility = ctaO < 0.002 ? 'hidden' : 'visible';
       }
 
+      /** Expanded rect of the scroll CTA for overlap tests (px). */
+      let ctaZone = null;
+      if (ctaEl && ctaO > 0.04 && ctaEl.style.visibility !== 'hidden') {
+        const cr = ctaEl.getBoundingClientRect();
+        if (cr.width > 4 && cr.height > 4) {
+          const padH = Math.max(24, cr.width * 0.35);
+          const padTop = 16;
+          const padBottom = 28;
+          ctaZone = {
+            left: cr.left - padH,
+            right: cr.right + padH,
+            top: cr.top - padTop,
+            bottom: cr.bottom + padBottom,
+          };
+        }
+      }
+
       // Near the very end, we fade in a top cover to hide earlier text that
       // would otherwise linger while we keep the last lines stable.
       const coverBandPx = Math.max(70, scrollEl.clientHeight * 0.22);
@@ -236,6 +253,22 @@ import AnimatedArrow from './AnimatedArrow.astro';
 
         line.style.setProperty('--why-line-scale', scale.toFixed(3));
         line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
+
+        let lineOp = 1;
+        if (ctaZone) {
+          const lr = line.getBoundingClientRect();
+          const oy = Math.min(lr.bottom, ctaZone.bottom) - Math.max(lr.top, ctaZone.top);
+          if (oy > 0) {
+            const ox = Math.min(lr.right, ctaZone.right) - Math.max(lr.left, ctaZone.left);
+            if (ox > 0) {
+              const fracY = oy / Math.max(lr.height, 1);
+              const fracX = ox / Math.max(lr.width, 1);
+              const frac = Math.min(1, fracY * 0.92 + fracX * 0.12);
+              lineOp = 1 - smoothstep(frac);
+            }
+          }
+        }
+        line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
       });
 
       // Drive the GIF with the same center-based geometry as the text lines.
@@ -268,7 +301,20 @@ import AnimatedArrow from './AnimatedArrow.astro';
         gifEl.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
 
         const opacityDrop = 0.75;
-        const opacity = clamp(1 - opacityDrop * gifEased, 0, 1);
+        let opacity = clamp(1 - opacityDrop * gifEased, 0, 1);
+        if (ctaZone) {
+          const gr = gifEl.getBoundingClientRect();
+          const oy = Math.min(gr.bottom, ctaZone.bottom) - Math.max(gr.top, ctaZone.top);
+          if (oy > 0) {
+            const ox = Math.min(gr.right, ctaZone.right) - Math.max(gr.left, ctaZone.left);
+            if (ox > 0) {
+              const fracY = oy / Math.max(gr.height, 1);
+              const fracX = ox / Math.max(gr.width, 1);
+              const frac = Math.min(1, fracY * 0.9 + fracX * 0.1);
+              opacity *= 1 - smoothstep(frac);
+            }
+          }
+        }
         gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
       }
     }

@@ -73,4 +73,54 @@ test.describe('/why page', () => {
     });
     expect(afterBg).toMatch(/linear-gradient/i);
   });
+
+  test('paragraphs overlapping scroll CTA fade (line opacity)', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.setViewportSize({ width: 960, height: 460 });
+    await gotoWhyWhenReady(page);
+
+    const overlap = await page.evaluate(async () => {
+      const scrollEl = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      const box = document.querySelector('.why-page .why-box');
+      if (!scrollEl || !box) return null;
+
+      const waitFrames = () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
+
+      const scrollTops = [0, 8, 16, 24, 32];
+
+      for (const top of scrollTops) {
+        scrollEl.scrollTop = top;
+        await waitFrames();
+
+        const ctaOp = parseFloat(
+          getComputedStyle(box).getPropertyValue('--why-cta-opacity').trim() ||
+            '1',
+        );
+        if (ctaOp <= 0.08) continue;
+
+        const ps = [...scrollEl.querySelectorAll('p')];
+        let minOp = 1;
+        for (const p of ps) {
+          const o = parseFloat(getComputedStyle(p).opacity);
+          if (o < minOp) minOp = o;
+        }
+        if (minOp < 0.96) {
+          return { ok: true as const, scrollTop: top, ctaOp, minOp };
+        }
+      }
+
+      return {
+        ok: false as const,
+        reason: 'no paragraph opacity drop while CTA visible',
+      };
+    });
+
+    expect(overlap).not.toBeNull();
+    expect(overlap!.ok).toBe(true);
+  });
 });

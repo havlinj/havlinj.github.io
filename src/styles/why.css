@@ -201,12 +201,13 @@
   letter-spacing: -0.01em;
   padding-left: var(--why-base-inset);
   padding-right: 0;
+  opacity: var(--why-line-opacity, 1);
   transform: translateX(var(--why-line-inset, 0))
     scale(var(--why-line-scale, 1));
   transform-origin: left center;
   transition: none;
   backface-visibility: hidden;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .why-page .why-scroll p + p {
