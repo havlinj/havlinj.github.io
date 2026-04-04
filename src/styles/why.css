@@ -274,6 +274,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  isolation: isolate;
   /* Sharp top-left (aligns with text block); other corners stay soft */
   border-radius: 0 0.9rem 0.9rem 0.9rem;
   /* Match the box background so masked edges blend seamlessly. */
@@ -281,21 +282,59 @@
   position: relative;
 }
 
+/*
+ * Corners: mask alpha alone blends bright GIF with #111 and can read as a rim.
+ * Wash with the same panel color so the feather chromatically matches --why-box-bg.
+ */
+.why-page .why-gif-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      120% 100% at 100% 0%,
+      var(--why-box-bg) 0%,
+      color-mix(in srgb, var(--why-box-bg) 45%, transparent) 38%,
+      transparent 58%
+    ),
+    radial-gradient(
+      120% 100% at 0% 100%,
+      var(--why-box-bg) 0%,
+      color-mix(in srgb, var(--why-box-bg) 45%, transparent) 38%,
+      transparent 58%
+    ),
+    radial-gradient(
+      115% 95% at 100% 100%,
+      var(--why-box-bg) 0%,
+      color-mix(in srgb, var(--why-box-bg) 40%, transparent) 36%,
+      transparent 56%
+    );
+}
+
 .why-page .why-gif-frame::after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
-  /* Subtle bottom shading: narrow band, fades quickly upward. */
+  border-radius: inherit;
+  /* Same hue as panel — never pure black (rgba(0,0,0)) or the edge reads wrong vs #111. */
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.18) 0%,
-    rgba(0, 0, 0, 0.08) 18%,
-    rgba(0, 0, 0, 0) 45%
+    var(--why-box-bg) 0%,
+    color-mix(in srgb, var(--why-box-bg) 52%, transparent) 10%,
+    color-mix(in srgb, var(--why-box-bg) 22%, transparent) 20%,
+    color-mix(in srgb, var(--why-box-bg) 6%, transparent) 32%,
+    transparent 48%
   );
 }
 
 .why-page .why-gif {
+  position: relative;
+  z-index: 0;
   width: 100%;
   height: 100%;
   display: block;
