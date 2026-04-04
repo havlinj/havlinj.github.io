@@ -7,6 +7,14 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
     .waitFor({ state: 'visible', timeout: 10000 });
 }
 
+/** Why page: inline script removes pending class after spacer/GIF metrics settle. */
+export async function gotoWhyWhenReady(page: Page): Promise<void> {
+  await page.goto('/why');
+  await page
+    .locator('.why-page .why-content.why-content--ready')
+    .waitFor({ state: 'visible', timeout: 10000 });
+}
+
 export async function expectNavLinkActive(
   page: Page,
   linkName: string,
