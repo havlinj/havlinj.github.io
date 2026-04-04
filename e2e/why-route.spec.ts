@@ -123,4 +123,78 @@ test.describe('/why page', () => {
     expect(overlap).not.toBeNull();
     expect(overlap!.ok).toBe(true);
   });
+
+  test('lead stacks above bottom start cover (DOM + paint order)', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 420 });
+    await gotoWhyWhenReady(page);
+
+    const result = await page.evaluate(() => {
+      const scroll = document.querySelector('.why-page .why-scroll');
+      const cover = document.querySelector(
+        '.why-page .why-scroll > .why-start-cover',
+      );
+      const lead = document.querySelector('.why-page p.why-lead');
+      const box = document.querySelector('.why-page .why-box');
+      if (!scroll || !cover || !lead || !box) {
+        return { ok: false as const, reason: 'missing nodes' };
+      }
+
+      if (cover.parentElement !== scroll) {
+        return { ok: false as const, reason: 'cover not direct child of .why-scroll' };
+      }
+
+      const leadCs = getComputedStyle(lead);
+      if (leadCs.position !== 'relative' || leadCs.zIndex !== '6') {
+        return {
+          ok: false as const,
+          reason: `lead layer: position=${leadCs.position} z=${leadCs.zIndex}`,
+        };
+      }
+
+      const afterZ = getComputedStyle(box, '::after').zIndex;
+      if (afterZ !== '0') {
+        return { ok: false as const, reason: `box::after z-index=${afterZ}` };
+      }
+
+      const intro = document.querySelector('.why-page .why-block--intro');
+      if (intro && getComputedStyle(intro).zIndex !== 'auto') {
+        return {
+          ok: false as const,
+          reason: `intro should not create z trap, got z=${getComputedStyle(intro).zIndex}`,
+        };
+      }
+
+      const r = lead.getBoundingClientRect();
+      const cx = Math.min(
+        Math.max(Math.floor(r.left + r.width / 2), 0),
+        window.innerWidth - 1,
+      );
+      const cy = Math.min(
+        Math.max(Math.floor(r.top + r.height / 2), 0),
+        window.innerHeight - 1,
+      );
+      const hit = document.elementFromPoint(cx, cy);
+      if (!hit) {
+        return { ok: false as const, reason: 'elementFromPoint null' };
+      }
+      if (hit === cover || cover.contains(hit)) {
+        return { ok: false as const, reason: 'cover topmost at lead center' };
+      }
+      const hitEl = hit instanceof Element ? hit : null;
+      const overLead =
+        hit === lead ||
+        lead.contains(hit) ||
+        (hitEl !== null && hitEl.contains(lead));
+      if (!overLead) {
+        return {
+          ok: false as const,
+          reason: `unexpected topmost: ${hit.tagName}.${hit.className}`,
+        };
+      }
+
+      return { ok: true as const };
+    });
+
+    expect(result.ok, 'reason' in result ? result.reason : '').toBe(true);
+  });
 });

@@ -64,7 +64,8 @@
   );
 }
 
-.why-page .why-start-cover {
+/* Sibling of .why-content inside .why-scroll so stacking with p.why-lead can work */
+.why-page .why-scroll .why-start-cover {
   position: absolute;
   left: 0;
   right: 0;
@@ -95,12 +96,12 @@
   position: absolute;
   left: 0;
   right: 0;
-  z-index: 3;
   pointer-events: none;
 }
 
 .why-page .why-box::before {
   top: 0;
+  z-index: 3;
   opacity: var(--why-top-edge-opacity, 1);
   /* Stronger top fade: text should evaporate before the top edge */
   height: clamp(130px, 22vh, 230px);
@@ -118,6 +119,8 @@
 
 .why-page .why-box::after {
   bottom: 0;
+  /* Below .why-scroll (z-index 1) so text is not darkened; pairs with .why-start-cover inside scroll */
+  z-index: 0;
   /* Same height as start-cover; mirrored shape so under-layer matches when cover fades */
   height: clamp(140px, 20.8vh, 218px);
   background: linear-gradient(
@@ -168,7 +171,6 @@
      on spacer + padding math only — GIF is absolutely positioned and nudged via transform. */
   padding-top: var(--why-intro-gif-pad, 0);
   position: relative;
-  z-index: 1;
 }
 
 .why-page .why-scroll .why-block--intro > .why-lead,
@@ -215,6 +217,8 @@
 }
 
 .why-page .why-scroll p.why-lead {
+  position: relative;
+  z-index: 6;
   font-size: 1.22rem;
   line-height: 1.5;
   font-weight: 500;
