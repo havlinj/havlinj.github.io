@@ -23,9 +23,9 @@
 /* Downward scroll CTA (page-bg color); fades via --why-cta-opacity from WhyContent script */
 .why-page .why-scroll-cta {
   position: absolute;
-  /* Center of CTA on the ⅓ line from the left edge of .why-box */
-  left: calc(100% / 3);
-  bottom: clamp(2.9rem, 9.6vh, 4.85rem);
+  /* CTA anchor: slightly right of former ⅓; still centered on that point via translateX */
+  left: 38%;
+  bottom: clamp(3.35rem, 10.65vh, 5.45rem);
   z-index: 5;
   transform: translateX(-50%);
   pointer-events: none;
