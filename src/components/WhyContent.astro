@@ -9,11 +9,11 @@ import AnimatedArrow from './AnimatedArrow.astro';
     <div class="why-scroll-cta" aria-hidden="true">
       <AnimatedArrow
         direction="down"
-        sizeScale={1.5}
+        sizeScale={1.2}
         sizeMode="responsive"
         color="#e0f7fa"
         duration={2}
-        opacity={0.35}
+        opacity={0.23}
         grainOpacity={0.28}
         grainSize={220}
       />
@@ -105,6 +105,9 @@ import AnimatedArrow from './AnimatedArrow.astro';
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
     const smoothstep = (x) => x * x * (3 - 2 * x);
 
+    /** Extra translateY on the GIF only (px). Spacer and lead position ignore this. */
+    const GIF_NUDGE_Y_PX = 0;
+
     let rafId = 0;
     const schedule = () => {
       if (rafId) return;
@@ -192,6 +195,20 @@ import AnimatedArrow from './AnimatedArrow.astro';
       );
       topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
       bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
+
+      // GIF out of flow: top calc needs scroll padding (content sits below it) + translateY compensation.
+      contentEl.style.setProperty(
+        '--why-scroll-pad-top',
+        `${padTop.toFixed(2)}px`,
+      );
+      contentEl.style.setProperty(
+        '--why-intro-gif-pad',
+        `${gifHeight.toFixed(2)}px`,
+      );
+      contentEl.style.setProperty(
+        '--why-gif-nudge-y',
+        `${GIF_NUDGE_Y_PX.toFixed(2)}px`,
+      );
 
       // Wider transition zone to avoid abrupt threshold jumps.
       const centerBand = 0.4;

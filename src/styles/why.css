@@ -3,6 +3,8 @@
   --why-box-fg: var(--color-page-bg);
   /* Baseline inset for text inside the box */
   --why-base-inset: 2rem;
+  /* GIF top offset from scroll inner edge (can differ from text inset). */
+  --why-gif-top-inset: 2.3rem;
   max-width: none;
   margin-top: var(--page-title-rule-gap);
   padding-top: 0;
@@ -26,7 +28,7 @@
 .why-page .why-scroll-cta {
   position: absolute;
   /* CTA anchor: slightly right of former ⅓; still centered on that point via translateX */
-  left: 38%;
+  left: 18%;
   bottom: clamp(3.35rem, 10.65vh, 5.45rem);
   z-index: 5;
   transform: translateX(-50%);
@@ -144,6 +146,7 @@
 }
 
 .why-page .why-content {
+  position: relative;
   max-width: none;
   opacity: 1;
   transition: opacity 380ms ease-out;
@@ -161,6 +164,11 @@
  */
 .why-page .why-scroll .why-block--intro {
   max-width: min(72ch, 100%);
+  /* Reserves the same vertical band the in-flow GIF used to occupy; lead position stays
+     on spacer + padding math only — GIF is absolutely positioned and nudged via transform. */
+  padding-top: var(--why-intro-gif-pad, 0);
+  position: relative;
+  z-index: 1;
 }
 
 .why-page .why-scroll .why-block--intro > .why-lead,
@@ -228,14 +236,31 @@
 }
 
 .why-page .why-gif-holder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /*
+   * Same inset as text from the scroll padding box (inner panel edge), not from .why-content:
+   * .why-scroll has padding-top (often > 2rem via clamp), so we subtract it in JS (--why-scroll-pad-top).
+   * Subtract translateY total so the *painted* top stays at --why-gif-top-inset after transform.
+   */
+  top: calc(
+    var(--why-gif-top-inset) - var(--why-scroll-pad-top, 0px) -
+      (var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px))
+  );
+  z-index: 0;
   width: 100%;
   max-width: 48ch;
   padding-left: var(--why-base-inset);
   padding-right: 0;
   margin: 0;
+  box-sizing: border-box;
 
   transform: translateX(var(--why-line-inset, 0))
-    translateY(var(--why-gif-y, 0px)) scale(var(--why-line-scale, 1));
+    translateY(
+      calc(var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px))
+    )
+    scale(var(--why-line-scale, 1));
   transform-origin: left center;
   opacity: var(--why-gif-opacity, 1);
   transition: none;
@@ -249,7 +274,8 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 0.9rem;
+  /* Sharp top-left (aligns with text block); other corners stay soft */
+  border-radius: 0 0.9rem 0.9rem 0.9rem;
   /* Match the box background so masked edges blend seamlessly. */
   background: var(--why-box-bg);
   position: relative;
