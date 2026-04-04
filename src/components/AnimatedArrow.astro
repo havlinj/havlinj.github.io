@@ -1,20 +1,16 @@
 ---
 /**
- * Segmented chevron with optional grain (SVG filter). The outer `<span>` has no opacity so the
- * background (#111 on /why) does not get washed out.
+ * Segmented chevron with optional SVG grain (feTurbulence + soft-light). The root `<span>` is not
+ * faded so #111 panels behind the arrow (e.g. /why) don’t wash out.
  *
- * How to size it:
- * - `size={N}` — width in pixels (always).
- * - `sizeMode="fixed"` (default) — height follows the 220×170 viewBox; exact N px wide.
- * - `sizeMode="responsive"` — same N as a *maximum*; width is a rem/vw clamp so it shrinks on
- *   narrow viewports (similar idea to fluid type on the same page).
- * - `sizeScale` — multiplier on top of `size` and on the rem/vw terms inside that clamp (default from
- *   `DEFAULT_SIZE_SCALE` below, or pass `sizeScale` on the tag).
+ * Sizing: `size` = nominal width in px. `sizeMode="fixed"` — exact px; `responsive` — clamp(rem+vw, max=size).
+ * `sizeScale` multiplies both. See RESPONSIVE_WIDTH for responsive clamp coefficients.
  */
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars -- Astro `Props` → `Astro.props`
 interface Props {
   size?: number;
   sizeMode?: 'fixed' | 'responsive';
-  /** Relative size (1 = base). Multiplies `size` and responsive clamp rem/vw. */
+  /** Multiplies `size` and responsive rem/vw terms (default 1). */
   sizeScale?: number;
   color?: string;
   duration?: number;
@@ -22,17 +18,13 @@ interface Props {
   direction?: 'up' | 'down';
   opacity?: number;
   grainOpacity?: number;
-  /**
-   * Noise “tile” scale (same idea as profile tiles): ~180–260 = visible grain.
-   * Very small numbers push feTurbulence frequency so high the texture reads as flat gray.
-   */
+  /** Noise “tile” size in viewBox units; ~180–260 = visible grain, tiny values flatten. */
   grainSize?: number;
 }
 
 const VIEWBOX_W = 220;
 const VIEWBOX_H = 170;
 
-/** Defaults for `sizeMode="responsive"` (tweak here if the whole site’s type scale changes). */
 const RESPONSIVE_WIDTH = {
   minRem: 2.55,
   baseRem: 2.15,
@@ -41,7 +33,7 @@ const RESPONSIVE_WIDTH = {
   minSizeFactor: 0.72,
 } as const;
 
-/** Global default for `sizeScale`; override per instance with `<AnimatedArrow sizeScale={…} />`. */
+/** Default `sizeScale`; override per `<AnimatedArrow sizeScale={…} />`. */
 const DEFAULT_SIZE_SCALE = 1;
 
 const props = Astro.props;
@@ -83,7 +75,7 @@ const grainSize = (() => {
   return Number.isFinite(n) && n > 0 ? n : 220;
 })();
 
-/* Stronger than the old 0.55× factor — overlay/soft-light on pale fills (#e0f7fa) needs more signal. */
+// Slightly stronger than 1:1 with opacity — soft-light on pale fills needs more contrast.
 const grainNoiseSlope = Math.min(1, grainOpacity * 1.35).toFixed(4);
 const rawGrainFreq = (VIEWBOX_W / grainSize) * 0.85;
 const grainBaseFreq = Math.min(1.25, Math.max(0.42, rawGrainFreq)).toFixed(4);

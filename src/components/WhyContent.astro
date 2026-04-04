@@ -104,8 +104,19 @@ import AnimatedArrow from './AnimatedArrow.astro';
     const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
     const smoothstep = (x) => x * x * (3 - 2 * x);
 
-    /** Extra translateY on the GIF only (px). Spacer and lead position ignore this. */
-    const GIF_NUDGE_Y_PX = 0;
+    /**
+     * Intersection of `rect` with padded CTA zone. Returns 1 if no overlap, else 1 − smoothstep(blend).
+     * yWeight/xWeight tweak vertical vs horizontal sensitivity (text vs GIF use different pairs).
+     */
+    function ctaOverlapMultiplier(rect, zone, yWeight, xWeight) {
+      const oy = Math.min(rect.bottom, zone.bottom) - Math.max(rect.top, zone.top);
+      if (oy <= 0) return 1;
+      const ox = Math.min(rect.right, zone.right) - Math.max(rect.left, zone.left);
+      if (ox <= 0) return 1;
+      const fracY = oy / Math.max(rect.height, 1);
+      const fracX = ox / Math.max(rect.width, 1);
+      return 1 - smoothstep(Math.min(1, fracY * yWeight + fracX * xWeight));
+    }
 
     let rafId = 0;
     const schedule = () => {
@@ -130,8 +141,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
       const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
       const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
 
-      // Early-phase bottom cover: briefly hide the initial partial line at the
-      // very bottom and dissolve it quickly as the reader starts scrolling.
+      // Bottom start-cover: strong at scrollTop 0, fades as user scrolls (hides peeking last line).
       const startBandPx = Math.max(85, scrollEl.clientHeight * 0.26);
       const startProgress = clamp(scrollEl.scrollTop / startBandPx, 0, 1);
       const startOpacity = 1 - smoothstep(startProgress);
@@ -140,7 +150,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         startOpacity.toFixed(3),
       );
 
-      // Scroll hint: hide quickly once the reader starts scrolling.
+      // Scroll-hint arrow: fades out over first ~56px of scroll.
       const ctaFadePx = 56;
       const ctaProgress = clamp(scrollEl.scrollTop / ctaFadePx, 0, 1);
       const ctaO = 1 - smoothstep(ctaProgress);
@@ -149,7 +159,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         ctaEl.style.visibility = ctaO < 0.002 ? 'hidden' : 'visible';
       }
 
-      /** Expanded rect of the scroll CTA for overlap tests (px). */
+      // Expanded CTA bounds while arrow is visible — lines/GIF fade where they overlap (not .why-lead).
       let ctaZone = null;
       if (ctaEl && ctaO > 0.04 && ctaEl.style.visibility !== 'hidden') {
         const cr = ctaEl.getBoundingClientRect();
@@ -166,8 +176,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         }
       }
 
-      // Near the very end, we fade in a top cover to hide earlier text that
-      // would otherwise linger while we keep the last lines stable.
+      // Top end-cover: fades in near maxScroll so earlier lines don’t linger above the closing lines.
       const coverBandPx = Math.max(70, scrollEl.clientHeight * 0.22);
       const coverProgress = maxScroll
         ? clamp(
@@ -181,11 +190,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         smoothstep(coverProgress).toFixed(3),
       );
 
-      /*
-       * Opening: first two <p> only (lead + LinkedIn block ≈ three typographic lines).
-       * introBlend also drives --why-top-edge-opacity so .why-box::before does not sit
-       * semi-transparent over type at scrollTop 0 (that read as “dimmed” text).
-       */
+      // First two <p> (lead + wide block): gated by introBlend; same blend drives --why-top-edge-opacity (::before).
       const introLineCount = 2;
       const introRampPx = Math.max(100, scrollEl.clientHeight * 0.22);
       const introBlend = smoothstep(
@@ -196,14 +201,10 @@ import AnimatedArrow from './AnimatedArrow.astro';
         introBlend.toFixed(3),
       );
 
-      // Place the first line so its TOP edge sits on the box center line.
-      // This keeps the lead text visually centered even when a GIF sits above it.
-      // We then apply a small additional downward bias to match the desired composition.
+      // Lead line top on scroll-center; spacers + intro padding absorb GIF height (GIF is out of flow).
       const leadDownPx = firstHeight * 0.18;
       const topSpacerPx = Math.max(0, half - padTop - gifHeight + leadDownPx);
-      // Allow a bit more room near the end so the last line doesn't get
-      // "stuck" too early. This is a bottom-only tweak, so earlier phases
-      // (including the start) remain stable.
+      // Extra bottom scroll room only — keeps last line from sticking too early; start phase unchanged.
       const endScrollExtraPx = half * 0.32;
       const bottomSpacerPx = Math.max(
         0,
@@ -212,7 +213,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
       topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
       bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
 
-      // GIF out of flow: top calc needs scroll padding (content sits below it) + translateY compensation.
+      // CSS vars for .why-gif-holder top calc and .why-block--intro padding-top.
       contentEl.style.setProperty(
         '--why-scroll-pad-top',
         `${padTop.toFixed(2)}px`,
@@ -221,19 +222,16 @@ import AnimatedArrow from './AnimatedArrow.astro';
         '--why-intro-gif-pad',
         `${gifHeight.toFixed(2)}px`,
       );
-      contentEl.style.setProperty(
-        '--why-gif-nudge-y',
-        `${GIF_NUDGE_Y_PX.toFixed(2)}px`,
-      );
+      contentEl.style.setProperty('--why-gif-nudge-y', '0px');
 
-      // Wider transition zone to avoid abrupt threshold jumps.
+      // Distance from center (normalized) → scale/inset; wide bands = smoother thresholds.
       const centerBand = 0.4;
       const transitionBand = 0.45;
 
       lines.forEach((line, lineIndex) => {
         const r = line.getBoundingClientRect();
         const mid = (r.top + r.bottom) / 2;
-        const normalized = Math.abs(mid - center) / half; // 0..1
+        const normalized = Math.abs(mid - center) / half;
 
         const edgeProgress = clamp(
           (normalized - centerBand) / transitionBand,
@@ -245,7 +243,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         const blendedEased = eased * gate;
 
         const isLead = line.classList.contains('why-lead');
-        // Lead line scales/insets less aggressively so its typographic emphasis remains visible.
+        // Lead stays visually heavier than body lines.
         const scaleDrop = isLead ? 0.3 : 0.5;
         const maxInset = isLead ? 2.4 : 4;
         const scale = 1 - scaleDrop * blendedEased;
@@ -255,29 +253,22 @@ import AnimatedArrow from './AnimatedArrow.astro';
         line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
 
         let lineOp = 1;
-        if (ctaZone) {
-          const lr = line.getBoundingClientRect();
-          const oy = Math.min(lr.bottom, ctaZone.bottom) - Math.max(lr.top, ctaZone.top);
-          if (oy > 0) {
-            const ox = Math.min(lr.right, ctaZone.right) - Math.max(lr.left, ctaZone.left);
-            if (ox > 0) {
-              const fracY = oy / Math.max(lr.height, 1);
-              const fracX = ox / Math.max(lr.width, 1);
-              const frac = Math.min(1, fracY * 0.92 + fracX * 0.12);
-              lineOp = 1 - smoothstep(frac);
-            }
-          }
+        if (ctaZone && !isLead) {
+          lineOp = ctaOverlapMultiplier(
+            line.getBoundingClientRect(),
+            ctaZone,
+            0.92,
+            0.12,
+          );
         }
         line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
       });
 
-      // Drive the GIF with the same center-based geometry as the text lines.
-      // We fade it out as it moves away from the box center, while also applying
-      // the same scale + inset feel as the paragraphs.
+      // GIF: same center-distance easing as text; lift via --why-gif-y doesn’t affect spacer math.
       if (gifEl) {
         const r = gifEl.getBoundingClientRect();
         const mid = (r.top + r.bottom) / 2;
-        const normalized = Math.abs(mid - center) / half; // 0..1
+        const normalized = Math.abs(mid - center) / half;
 
         const edgeProgress = clamp(
           (normalized - centerBand) / transitionBand,
@@ -287,9 +278,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
         const eased = smoothstep(edgeProgress);
         const gifEased = eased * introBlend;
 
-        // Visually lift the GIF higher than the lead line
-        // without affecting the lead line centering math.
-        const liftPx = firstHeight * 0.75;
+        const liftPx = firstHeight * 0.75; // optical: GIF sits slightly above lead
         gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(2)}px`);
 
         const scaleDrop = 0.35;
@@ -303,17 +292,12 @@ import AnimatedArrow from './AnimatedArrow.astro';
         const opacityDrop = 0.75;
         let opacity = clamp(1 - opacityDrop * gifEased, 0, 1);
         if (ctaZone) {
-          const gr = gifEl.getBoundingClientRect();
-          const oy = Math.min(gr.bottom, ctaZone.bottom) - Math.max(gr.top, ctaZone.top);
-          if (oy > 0) {
-            const ox = Math.min(gr.right, ctaZone.right) - Math.max(gr.left, ctaZone.left);
-            if (ox > 0) {
-              const fracY = oy / Math.max(gr.height, 1);
-              const fracX = ox / Math.max(gr.width, 1);
-              const frac = Math.min(1, fracY * 0.9 + fracX * 0.1);
-              opacity *= 1 - smoothstep(frac);
-            }
-          }
+          opacity *= ctaOverlapMultiplier(
+            gifEl.getBoundingClientRect(),
+            ctaZone,
+            0.9,
+            0.1,
+          );
         }
         gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
       }
@@ -324,16 +308,14 @@ import AnimatedArrow from './AnimatedArrow.astro';
     }
 
     function revealAfterStableLayout() {
-      // Run two passes so spacer math settles after style/layout changes.
       update();
-      update();
+      update(); // second pass after spacer/GIF vars settle layout
       contentEl.classList.remove('why-content--pending-layout');
       contentEl.classList.add('why-content--ready');
     }
 
     function init() {
-      // Wait for font metrics to settle to avoid first-paint jump.
-      const fontsReady = document.fonts?.ready ?? Promise.resolve();
+      const fontsReady = document.fonts?.ready ?? Promise.resolve(); // avoid first-frame metric jump
       fontsReady.finally(() => afterTwoFrames(revealAfterStableLayout));
     }
 

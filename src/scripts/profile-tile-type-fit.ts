@@ -1,11 +1,9 @@
 /**
- * Profile grid:
- * - Default tile labels: one shared fit from the longest of the three visible
- *   profile tile labels (Why, What I do, Foundations); --profile-tile-label-font-size on
- *   .profile-section (all tiles inherit).
- * - Foundations reveal: separate --profile-reveal-font-size on the reveal box.
- * CSS provides clamp fallbacks when JS is off.
- * Dispatches `profileTileTypeFit` when done so Layout can show the grid (no FOUC).
+ * Profile grid typography:
+ * - Shared tile label size from the longest of Why / What I do / Foundations → --profile-tile-label-font-size.
+ * - Foundations reveal → --profile-reveal-font-size (often derived from tile size).
+ * - Portrait column geometry → --profile-right-height-px, --profile-portrait-side-px.
+ * Dispatches `profileTileTypeFit` when ready so Layout can drop the loading veil (with CSS clamp fallbacks if JS is off).
  */
 
 const LABEL_VAR = '--profile-tile-label-font-size';
@@ -17,7 +15,7 @@ const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
 
-/** Layout.astro waits for this before fading the profile grid in (avoids font-size FOUC). */
+/** Layout.astro listens (once) before fading `.profile-section--loading` away. */
 const TYPE_FIT_EVENT = 'profileTileTypeFit';
 const SELECTORS = {
   profileSection: '.profile-section',
@@ -44,8 +42,7 @@ const REVEAL_CLASSES = {
 function queryElement<T extends Element>(
   root: ParentNode,
   selector: string,
-  // eslint-disable-next-line no-unused-vars -- type-level constructor signature only
-  ctor: { new (...args: never[]): T },
+  ctor: { new (): T },
 ): T | null {
   const el = root.querySelector(selector);
   return el instanceof ctor ? el : null;
@@ -96,8 +93,8 @@ function maxLineWidth(
   return m;
 }
 
-/** Measures max line width at the given font size (px). */
-// eslint-disable-next-line no-unused-vars -- parameter names a type-only callback contract
+/** Callback: measured width at a trial font size (px). */
+// eslint-disable-next-line no-unused-vars
 type FontMeasure = (fontSizePx: number) => number;
 
 function fitFontSize(
@@ -161,10 +158,7 @@ function fitTileLabels(section: HTMLElement): void {
   const rem = rootRemPx();
   const minPx = rem * 0.7;
   const available = contentWidthWithoutHorizontalPadding(inner);
-  /*
-   * For tile labels we want true max-width utilization.
-   * Do not cap by page-title size; use the tile content width as the practical upper bound.
-   */
+  // Use full inner width as max — tiles should use the column, not cap to page-title optical size.
   const maxPx = Math.max(minPx, available);
   const tcs = getComputedStyle(textEl);
   const lines = Array.from(
@@ -208,7 +202,7 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   const maxPx = titleCapFontPx();
   const rcs = getComputedStyle(reveal);
   const available = contentWidthWithoutHorizontalPadding(reveal);
-  /* Grid/transition can yield a one-frame width of 0; skip write to avoid a flash */
+  // Grid animation can report 0× width for a frame; skip to avoid a visible font flash.
   if (available < 4) return;
   const lines = collectRevealLines(reveal);
   if (lines.length === 0) return;
@@ -367,7 +361,7 @@ function wireResize(): void {
   window.addEventListener('orientationchange', scheduleFitAll);
 }
 
-/** Reveal width changes while column expands/compresses in state2; observe it directly. */
+/** Reveal box width changes in Foundations tile state2 — refit without polling the whole section. */
 function wireFoundationsRevealResize(): void {
   const reveal = queryElement(
     document,

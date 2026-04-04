@@ -8,7 +8,7 @@ const compat = new FlatCompat({
 export default [
   // ignore Astro generated files
   {
-    ignores: ['.astro/**/*.d.ts'],
+    ignores: ['.astro/**/*.d.ts', 'dist/**'],
   },
 
   // use legacy config via compat layer
