@@ -18,13 +18,13 @@ All Unsplash media listed below are used according to the
   - Edits: dichromatic treatment, portrait styling/composition
 
 - **Profile tile image (Why)**
-  - Author: [Illia Kholin](https://unsplash.com/@illuha)
-  - Source: [Unsplash](https://unsplash.com/photos/i51OubmBtw8)
+  - Author: [Tommy](https://unsplash.com/@tommyluvi)
+  - Source: [Unsplash](https://unsplash.com/photos/RCA--h6cmcU)
   - Edits: dichromatic treatment, additional grain styling in Profile CSS
 
 - **Profile tile image (Foundations)**
-  - Author: [Enrique Hoyos](https://unsplash.com/@enriquebolarte)
-  - Source: [Unsplash](https://unsplash.com/photos/lLah-3nSnQM)
+  - Author: [Evgeniy Sholokh](https://unsplash.com/@xovom)
+  - Source: [Unsplash](https://unsplash.com/photos/5Xf2hLm6yj8)
   - Edits: dichromatic treatment, additional grain styling in Profile CSS
 
 - **Writing page panel image**
