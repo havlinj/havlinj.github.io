@@ -3,7 +3,6 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import WhyContent from '../components/WhyContent.astro';
 import '../styles/profile.css';
-import '../styles/why.css';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');

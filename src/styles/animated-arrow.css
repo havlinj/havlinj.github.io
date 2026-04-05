@@ -1,0 +1,135 @@
+/* Segmented chevron (AnimatedArrow.astro); class names are unique site-wide. */
+
+.animated-arrow-root {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.animated-arrow-root .animated-arrow {
+  display: block;
+  opacity: var(--arrow-shape-opacity, 1);
+}
+
+.animated-arrow--down {
+  transform: rotate(180deg);
+  transform-origin: center center;
+}
+
+.animated-arrow .seg {
+  fill: var(--arrow-color);
+  opacity: 0;
+  animation-duration: var(--arrow-duration);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animated-arrow .s1 {
+  animation-name: animated-arrow-seg1;
+}
+.animated-arrow .s2 {
+  animation-name: animated-arrow-seg2;
+}
+.animated-arrow .s3 {
+  animation-name: animated-arrow-seg3;
+}
+.animated-arrow .s4 {
+  animation-name: animated-arrow-seg4;
+}
+.animated-arrow .s5 {
+  animation-name: animated-arrow-seg5;
+}
+.animated-arrow .s6 {
+  animation-name: animated-arrow-seg6;
+}
+
+@keyframes animated-arrow-seg1 {
+  0%,
+  8% {
+    opacity: 0;
+  }
+  8.01%,
+  58% {
+    opacity: 1;
+  }
+  58.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animated-arrow-seg2 {
+  0%,
+  16% {
+    opacity: 0;
+  }
+  16.01%,
+  66% {
+    opacity: 1;
+  }
+  66.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animated-arrow-seg3 {
+  0%,
+  24% {
+    opacity: 0;
+  }
+  24.01%,
+  74% {
+    opacity: 1;
+  }
+  74.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animated-arrow-seg4 {
+  0%,
+  32% {
+    opacity: 0;
+  }
+  32.01%,
+  82% {
+    opacity: 1;
+  }
+  82.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animated-arrow-seg5 {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  40.01%,
+  90% {
+    opacity: 1;
+  }
+  90.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animated-arrow-seg6 {
+  0%,
+  48% {
+    opacity: 0;
+  }
+  48.01%,
+  98% {
+    opacity: 1;
+  }
+  98.01%,
+  100% {
+    opacity: 0;
+  }
+}
