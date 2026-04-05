@@ -359,8 +359,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile:not(.is-revealed):hover .page-button__text::before,
-.prof-tile:not(.is-revealed):focus-visible
-  .page-button__text::before {
+.prof-tile:not(.is-revealed):focus-visible .page-button__text::before {
   background-color: #111;
   border-color: var(--color-page-bg);
 }
@@ -472,16 +471,14 @@ article .profile-section:last-child {
 }
 
 /* Fade reveal text out before returning to the default tile */
-.prof-tile--foundations.is-revealed.is-reveal-fading-out
-  .prof-tile__reveal {
+.prof-tile--foundations.is-revealed.is-reveal-fading-out .prof-tile__reveal {
   opacity: 0;
   visibility: visible;
   transition: opacity var(--profile-reveal-fade-duration, 0.18s) ease;
   animation: none;
 }
 
-.prof-tile--foundations.is-revealed.is-reveal-fading-out
-  .tile-state-secondary {
+.prof-tile--foundations.is-revealed.is-reveal-fading-out .tile-state-secondary {
   animation: none;
 }
 
@@ -494,40 +491,38 @@ article .profile-section:last-child {
   transition: none;
 }
 
-.prof-tile--foundations.is-reveal-opening
-  .prof-tile__reveal {
+.prof-tile--foundations.is-reveal-opening .prof-tile__reveal {
   opacity: 0;
   visibility: hidden;
   transition: none;
   animation: none;
 }
 
-.prof-tile--foundations.is-reveal-opening
-  .tile-state-secondary {
+.prof-tile--foundations.is-reveal-opening .tile-state-secondary {
   animation: none;
 }
 
 /* State1 stability: keep Foundations on the same hover timing model as other tiles */
-.prof-tile--foundations:not(.is-revealed):not(
-    .is-reveal-fading-out
-  ):not(.is-reveal-opening)
+.prof-tile--foundations:not(.is-revealed):not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
   .page-button__bg,
-.prof-tile--foundations:not(.is-revealed):not(
-    .is-reveal-fading-out
-  ):not(.is-reveal-opening)
+.prof-tile--foundations:not(.is-revealed):not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
   .page-button__overlay,
-.prof-tile--foundations:not(.is-revealed):not(
-    .is-reveal-fading-out
-  ):not(.is-reveal-opening)
+.prof-tile--foundations:not(.is-revealed):not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
   .page-button__inner {
   opacity: 1;
   visibility: visible;
   transition: background-color 0.14s ease;
 }
 
-.prof-tile--foundations:not(.is-revealed):not(
-    .is-reveal-fading-out
-  ):not(.is-reveal-opening)
+.prof-tile--foundations:not(.is-revealed):not(.is-reveal-fading-out):not(
+    .is-reveal-opening
+  )
   .prof-tile__reveal {
   opacity: 0;
   visibility: hidden;
@@ -640,8 +635,7 @@ article .profile-section:last-child {
     animation: none !important;
   }
 
-  .prof-tile--foundations.is-revealed
-    .tile-state-secondary {
+  .prof-tile--foundations.is-revealed .tile-state-secondary {
     animation: none !important;
     opacity: 1;
   }

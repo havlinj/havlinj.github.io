@@ -286,9 +286,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
 
     const readColors = async () =>
       page.evaluate(() => {
-        const tile = Array.from(
-          document.querySelectorAll('a.prof-tile'),
-        ).find(
+        const tile = Array.from(document.querySelectorAll('a.prof-tile')).find(
           (el) =>
             (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why',
         );

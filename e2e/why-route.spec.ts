@@ -74,7 +74,9 @@ test.describe('/why page', () => {
     expect(afterBg).toMatch(/linear-gradient/i);
   });
 
-  test('paragraphs overlapping scroll CTA fade (line opacity)', async ({ page }) => {
+  test('paragraphs overlapping scroll CTA fade (line opacity)', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.setViewportSize({ width: 960, height: 460 });
     await gotoWhyWhenReady(page);
@@ -124,7 +126,9 @@ test.describe('/why page', () => {
     expect(overlap!.ok).toBe(true);
   });
 
-  test('lead stacks above bottom start cover (DOM + paint order)', async ({ page }) => {
+  test('lead stacks above bottom start cover (DOM + paint order)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 900, height: 420 });
     await gotoWhyWhenReady(page);
 
@@ -140,7 +144,10 @@ test.describe('/why page', () => {
       }
 
       if (cover.parentElement !== scroll) {
-        return { ok: false as const, reason: 'cover not direct child of .why-scroll' };
+        return {
+          ok: false as const,
+          reason: 'cover not direct child of .why-scroll',
+        };
       }
 
       const leadCs = getComputedStyle(lead);
@@ -173,9 +180,23 @@ test.describe('/why page', () => {
         Math.max(Math.floor(r.top + r.height / 2), 0),
         window.innerHeight - 1,
       );
-      const hit = document.elementFromPoint(cx, cy);
+
+      const isDevHit = (el: Element) => {
+        const t = el.tagName;
+        if (t.startsWith('ASTRO-DEV')) return true;
+        if (t === 'VITE-ERROR-OVERLAY') return true;
+        return el.closest('astro-dev-toolbar') !== null;
+      };
+
+      const stack = document.elementsFromPoint(cx, cy);
+      const hit = stack.find(
+        (n): n is Element => n instanceof Element && !isDevHit(n),
+      );
       if (!hit) {
-        return { ok: false as const, reason: 'elementFromPoint null' };
+        return {
+          ok: false as const,
+          reason: 'elementsFromPoint: only dev overlay at lead center',
+        };
       }
       if (hit === cover || cover.contains(hit)) {
         return { ok: false as const, reason: 'cover topmost at lead center' };

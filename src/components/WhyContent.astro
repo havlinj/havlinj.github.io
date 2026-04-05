@@ -109,9 +109,11 @@ import AnimatedArrow from './AnimatedArrow.astro';
      * yWeight/xWeight tweak vertical vs horizontal sensitivity (text vs GIF use different pairs).
      */
     function ctaOverlapMultiplier(rect, zone, yWeight, xWeight) {
-      const oy = Math.min(rect.bottom, zone.bottom) - Math.max(rect.top, zone.top);
+      const oy =
+        Math.min(rect.bottom, zone.bottom) - Math.max(rect.top, zone.top);
       if (oy <= 0) return 1;
-      const ox = Math.min(rect.right, zone.right) - Math.max(rect.left, zone.left);
+      const ox =
+        Math.min(rect.right, zone.right) - Math.max(rect.left, zone.left);
       if (ox <= 0) return 1;
       const fracY = oy / Math.max(rect.height, 1);
       const fracX = ox / Math.max(rect.width, 1);
@@ -196,10 +198,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
       const introBlend = smoothstep(
         clamp(scrollEl.scrollTop / introRampPx, 0, 1),
       );
-      boxEl.style.setProperty(
-        '--why-top-edge-opacity',
-        introBlend.toFixed(3),
-      );
+      boxEl.style.setProperty('--why-top-edge-opacity', introBlend.toFixed(3));
 
       // Lead line top on scroll-center; spacers + intro padding absorb GIF height (GIF is out of flow).
       const leadDownPx = firstHeight * 0.18;

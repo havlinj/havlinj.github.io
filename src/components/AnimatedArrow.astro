@@ -116,7 +116,9 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     width={sizeMode === 'fixed' ? effectiveSizePx : undefined}
     height={sizeMode === 'fixed' ? fixedHeight : undefined}
     class:list={['animated-arrow', className]}
-    style={sizeMode === 'responsive' ? responsiveSvgStyle(sizeScale) : undefined}
+    style={sizeMode === 'responsive'
+      ? responsiveSvgStyle(sizeScale)
+      : undefined}
     aria-hidden="true"
   >
     <defs>
@@ -133,28 +135,44 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
           baseFrequency={grainBaseFreq}
           numOctaves="3"
           stitchTiles="stitch"
-          result="turb"
-        />
-        <feColorMatrix
-          in="turb"
-          type="saturate"
-          values="0"
-          result="turbGray"
-        />
+          result="turb"></feTurbulence>
+        <feColorMatrix in="turb" type="saturate" values="0" result="turbGray"
+        ></feColorMatrix>
         <feComponentTransfer in="turbGray" result="turbA">
-          <feFuncA type="linear" slope={grainNoiseSlope} intercept="0" />
+          <feFuncA type="linear" slope={grainNoiseSlope} intercept="0"
+          ></feFuncA>
         </feComponentTransfer>
-        <feComposite in="turbA" in2="SourceGraphic" operator="in" result="noiseClip" />
-        <feBlend in="SourceGraphic" in2="noiseClip" mode="soft-light" />
+        <feComposite
+          in="turbA"
+          in2="SourceGraphic"
+          operator="in"
+          result="noiseClip"></feComposite>
+        <feBlend in="SourceGraphic" in2="noiseClip" mode="soft-light"></feBlend>
       </filter>
     </defs>
     <g class="arrow-grain-group" filter={`url(#${grainFilterId})`}>
-      <polygon class="seg s1" points="30,148.564 190,148.564 180.762,132.564 39.238,132.564" />
-      <polygon class="seg s2" points="43.856,124.564 176.144,124.564 166.906,108.564 53.094,108.564" />
-      <polygon class="seg s3" points="57.713,100.564 162.287,100.564 153.050,84.564 66.950,84.564" />
-      <polygon class="seg s4" points="71.569,76.564 148.431,76.564 139.193,60.564 80.807,60.564" />
-      <polygon class="seg s5" points="85.426,52.564 134.574,52.564 125.337,36.564 94.663,36.564" />
-      <polygon class="seg s6" points="99.282,28.564 120.718,28.564 110,10" />
+      <polygon
+        class="seg s1"
+        points="30,148.564 190,148.564 180.762,132.564 39.238,132.564"
+      ></polygon>
+      <polygon
+        class="seg s2"
+        points="43.856,124.564 176.144,124.564 166.906,108.564 53.094,108.564"
+      ></polygon>
+      <polygon
+        class="seg s3"
+        points="57.713,100.564 162.287,100.564 153.050,84.564 66.950,84.564"
+      ></polygon>
+      <polygon
+        class="seg s4"
+        points="71.569,76.564 148.431,76.564 139.193,60.564 80.807,60.564"
+      ></polygon>
+      <polygon
+        class="seg s5"
+        points="85.426,52.564 134.574,52.564 125.337,36.564 94.663,36.564"
+      ></polygon>
+      <polygon class="seg s6" points="99.282,28.564 120.718,28.564 110,10"
+      ></polygon>
     </g>
   </svg>
 </span>

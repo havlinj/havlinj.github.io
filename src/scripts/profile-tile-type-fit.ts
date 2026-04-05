@@ -26,8 +26,7 @@ const SELECTORS = {
   pageButtonText: '.page-button__text',
   foundationsTile: '.prof-tile--foundations',
   foundationsReveal: '.prof-tile__reveal',
-  foundationsRevealInTile:
-    '.prof-tile--foundations .prof-tile__reveal',
+  foundationsRevealInTile: '.prof-tile--foundations .prof-tile__reveal',
   foundationsRevealStanza:
     '.tile-state-secondary .line-1, .tile-state-secondary .line-2',
   profileRightColumn: '.profile-right-column',
@@ -177,10 +176,12 @@ function fitTileLabels(section: HTMLElement): void {
 
 function collectRevealLines(reveal: HTMLElement): string[] {
   const lines: string[] = [];
-  reveal.querySelectorAll(SELECTORS.foundationsRevealStanza).forEach((lineEl) => {
-    const t = lineEl.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-    if (t) lines.push(t);
-  });
+  reveal
+    .querySelectorAll(SELECTORS.foundationsRevealStanza)
+    .forEach((lineEl) => {
+      const t = lineEl.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+      if (t) lines.push(t);
+    });
   return lines;
 }
 

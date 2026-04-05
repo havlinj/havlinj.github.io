@@ -133,7 +133,6 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(page.locator('.site-header')).toBeVisible();
     await expectNavLinkActive(page, 'Profile');
   });
-
 });
 
 // ---------------------------------------------------------------------------

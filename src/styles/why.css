@@ -262,9 +262,7 @@
   box-sizing: border-box;
 
   transform: translateX(var(--why-line-inset, 0))
-    translateY(
-      calc(var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px))
-    )
+    translateY(calc(var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px)))
     scale(var(--why-line-scale, 1));
   transform-origin: left center;
   opacity: var(--why-gif-opacity, 1);

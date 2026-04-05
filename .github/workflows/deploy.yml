@@ -79,6 +79,9 @@ jobs:
       - name: Lint, format and test
         run: bash ./scripts/all.sh
         working-directory: ${{ env.BUILD_PATH }}
+        env:
+          # Runners are often 2 vCPU; local all.sh defaults to 12 workers without this.
+          PW_WORKERS: '4'
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \

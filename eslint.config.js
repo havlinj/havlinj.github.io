@@ -6,9 +6,14 @@ const compat = new FlatCompat({
 });
 
 export default [
-  // ignore Astro generated files
+  // ignore Astro / build / Playwright artifacts (report bundles are minified vendor JS)
   {
-    ignores: ['.astro/**/*.d.ts', 'dist/**'],
+    ignores: [
+      '.astro/**/*.d.ts',
+      'dist/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
 
   // use legacy config via compat layer
