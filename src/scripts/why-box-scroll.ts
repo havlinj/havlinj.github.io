@@ -117,10 +117,7 @@ import {
         const minGapPx = Math.max(40, firstHeight * 0.6);
         const gap = ctaBase.top - firstRect.bottom;
         let pushDown = Math.max(0, minGapPx - gap);
-        const maxPush = Math.max(
-          0,
-          boxOuterRect.bottom - ctaBase.bottom - 16,
-        );
+        const maxPush = Math.max(0, boxOuterRect.bottom - ctaBase.bottom - 16);
         pushDown = Math.min(pushDown, maxPush);
         ctaEl.style.transform =
           pushDown > 0

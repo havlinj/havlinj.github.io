@@ -25,4 +25,12 @@ test.describe('/foundations page', () => {
       page.locator('main.content article').getByRole('heading', { level: 1 }),
     ).toHaveText('Foundations');
   });
+
+  test('does not mount Why panel chrome (why.css only with WhyContent)', async ({
+    page,
+  }) => {
+    await expect(page.locator('.why-box')).toHaveCount(0);
+    await expect(page.locator('.why-wrapper')).toHaveCount(0);
+    await expect(page.locator('.why-scroll-cta')).toHaveCount(0);
+  });
 });

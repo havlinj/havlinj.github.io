@@ -15,6 +15,16 @@ export async function gotoWhyWhenReady(page: Page): Promise<void> {
     .waitFor({ state: 'visible', timeout: 10000 });
 }
 
+/** Two rAF ticks so layout / why-box-scroll `update()` after scrollTop settle. */
+export async function waitTwoFrames(page: Page): Promise<void> {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
+}
+
 export async function expectNavLinkActive(
   page: Page,
   linkName: string,

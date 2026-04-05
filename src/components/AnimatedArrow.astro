@@ -181,19 +181,17 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     width={sizeMode === 'fixed' ? effectiveSizePx : undefined}
     height={sizeMode === 'fixed' ? fixedHeight : undefined}
     class:list={['animated-arrow', className]}
-    style={
-      sizeMode === 'responsive'
-        ? responsiveSvgStyle(
-            sizeScale,
-            responsiveClampMaxPx,
-            responsiveMaxVmin,
-            responsiveMaxCqmin,
-            responsiveMaxCqw,
-          )
-        : sizeMode === 'container'
-          ? containerSvgStyle(containerCqw)
-          : undefined
-    }
+    style={sizeMode === 'responsive'
+      ? responsiveSvgStyle(
+          sizeScale,
+          responsiveClampMaxPx,
+          responsiveMaxVmin,
+          responsiveMaxCqmin,
+          responsiveMaxCqw,
+        )
+      : sizeMode === 'container'
+        ? containerSvgStyle(containerCqw)
+        : undefined}
     aria-hidden="true"
   >
     <defs>

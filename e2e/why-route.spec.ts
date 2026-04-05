@@ -8,7 +8,7 @@ import {
   WHY_SCROLL_CTA_CONTAINER_CQW,
 } from './constants';
 import { RGB_INK } from '../src/constants/colors';
-import { gotoWhyWhenReady } from './helpers';
+import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
 
 test.describe('/why page', () => {
   test.beforeEach(async ({ page }) => {
@@ -66,7 +66,8 @@ test.describe('/why page', () => {
       ([leadTrack, edgeMinPx, edgeWidthFrac]) => {
         const box = document.querySelector('.why-page .why-box');
         const lead = document.querySelector('.why-page p.why-lead');
-        if (!box || !lead) return { ok: false as const, reason: 'missing nodes' };
+        if (!box || !lead)
+          return { ok: false as const, reason: 'missing nodes' };
 
         const leftVar = getComputedStyle(box)
           .getPropertyValue('--why-cta-left')
@@ -158,6 +159,131 @@ test.describe('/why page', () => {
       return getComputedStyle(frame, '::after').backgroundImage;
     });
     expect(afterBg).toMatch(/linear-gradient/i);
+  });
+
+  test('scroll phases: start-cover at top, CTA fades after hint band, end-cover near bottom', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.setViewportSize({ width: 880, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const read = () =>
+      page.evaluate(() => {
+        const box = document.querySelector('.why-page .why-box');
+        const scroll = document.querySelector(
+          '.why-page .why-scroll',
+        ) as HTMLElement | null;
+        const cta = document.querySelector(
+          '.why-page .why-scroll-cta',
+        ) as HTMLElement | null;
+        if (!box || !scroll || !cta) return null;
+        const cs = getComputedStyle(box);
+        const maxScroll = Math.max(
+          0,
+          scroll.scrollHeight - scroll.clientHeight,
+        );
+        return {
+          startOp: parseFloat(
+            cs.getPropertyValue('--why-start-cover-opacity').trim() || '1',
+          ),
+          endOp: parseFloat(
+            cs.getPropertyValue('--why-end-cover-opacity').trim() || '0',
+          ),
+          ctaOp: parseFloat(
+            cs.getPropertyValue('--why-cta-opacity').trim() || '1',
+          ),
+          ctaVisibility: getComputedStyle(cta).visibility,
+          maxScroll,
+        };
+      });
+
+    await page.evaluate(() => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
+      scroll.scrollTop = 0;
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await waitTwoFrames(page);
+    const atTop = await read();
+    expect(atTop).not.toBeNull();
+    expect(atTop!.maxScroll).toBeGreaterThanOrEqual(
+      100,
+      '/why needs scroll room for end-cover phase (try a shorter viewport height)',
+    );
+    expect(atTop!.startOp, 'start-cover visible at scroll 0').toBeGreaterThan(
+      0.85,
+    );
+    expect(atTop!.endOp, 'end-cover off at scroll 0').toBeLessThan(0.15);
+    expect(atTop!.ctaOp, 'CTA visible at scroll 0').toBeGreaterThan(0.9);
+
+    await page.evaluate(() => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
+      scroll.scrollTop = 100;
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await waitTwoFrames(page);
+    await expect
+      .poll(
+        async () => {
+          const v = await read();
+          return v?.ctaOp ?? 2;
+        },
+        {
+          timeout: 4000,
+          message: 'CTA opacity should drop after scroll past ~56px hint band',
+        },
+      )
+      .toBeLessThan(0.08);
+    const afterHint = await read();
+    expect(afterHint).not.toBeNull();
+    expect(afterHint!.ctaVisibility).toBe('hidden');
+
+    // Scroll to real bottom after layout may have changed (do not use stale atTop.maxScroll).
+    await page.evaluate(() => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
+      scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await waitTwoFrames(page);
+    await expect
+      .poll(
+        async () => {
+          const v = await read();
+          return v?.endOp ?? 0;
+        },
+        {
+          timeout: 4000,
+          message: 'end-cover should ramp in the last scroll band',
+        },
+      )
+      .toBeGreaterThan(0.75);
+  });
+
+  test('prefers-reduced-motion hides scroll CTA regardless of scroll', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 900, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const cta = page.locator('.why-page .why-scroll-cta');
+    await expect(cta).toHaveCSS('opacity', '0');
+    await expect(cta).toHaveCSS('visibility', 'hidden');
+
+    await page.evaluate(() => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
+      scroll.scrollTop = 0;
+    });
+    await waitTwoFrames(page);
+    await expect(cta).toHaveCSS('opacity', '0');
   });
 
   test('paragraphs overlapping scroll CTA fade (line opacity)', async ({
