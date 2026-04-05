@@ -1,17 +1,22 @@
 import { test, expect } from '@playwright/test';
-import { MIN_CONTENT_WIDTH_CH, MIN_CONTENT_WIDTH_PX } from './constants';
+import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
+import {
+  MAX_CONTENT_WIDTH_CH,
+  MIN_CONTENT_WIDTH_CH,
+  MIN_CONTENT_WIDTH_PX,
+} from './constants';
 
 test.describe('Global colors', () => {
   test('body has correct background color', async ({ page }) => {
     await page.goto('/');
     const body = page.locator('body');
-    await expect(body).toHaveCSS('background-color', 'rgb(224, 247, 250)');
+    await expect(body).toHaveCSS('background-color', RGB_PAGE_BG);
   });
 
   test('body has correct text color', async ({ page }) => {
     await page.goto('/');
     const body = page.locator('body');
-    await expect(body).toHaveCSS('color', 'rgb(17, 17, 17)');
+    await expect(body).toHaveCSS('color', RGB_INK);
   });
 });
 
@@ -68,7 +73,7 @@ test.describe('Content width limits', () => {
       const max = main ? getComputedStyle(main).maxWidth : '';
       return [root, max];
     });
-    expect(rootVar).toBe('70ch');
+    expect(rootVar).toBe(`${MAX_CONTENT_WIDTH_CH}ch`);
     expect(mainMaxWidth).toMatch(/^\d+px$/);
   });
 

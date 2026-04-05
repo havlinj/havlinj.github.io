@@ -10,3 +10,12 @@ export const MIN_CONTENT_WIDTH_CH = 40; /* --content-min-width */
 export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
 /** Approx min width in px for assertions (40ch ≈ 320px at Inter 16px). */
 export const MIN_CONTENT_WIDTH_PX = 320;
+
+/** /why layout — single source: `src/constants/why-layout.ts` */
+export {
+  WHY_CTA_EDGE_MIN_PX,
+  WHY_CTA_EDGE_WIDTH_FRAC,
+  WHY_CTA_LEAD_TRACK,
+  WHY_GIF_TOP_INSET,
+  WHY_SCROLL_CTA_CONTAINER_CQW,
+} from '../src/constants/why-layout';

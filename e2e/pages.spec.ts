@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
 import { expectNavLinkActive, gotoProfileWhenReady, mustBox } from './helpers';
 
@@ -210,13 +211,13 @@ test.describe('Writing page (/writing)', () => {
     const bg = button.locator('.page-button__bg');
 
     await expect(button).toBeVisible();
-    await expect(text).toHaveCSS('color', 'rgb(17, 17, 17)');
-    await expect(bg).toHaveCSS('background-color', 'rgb(224, 247, 250)');
+    await expect(text).toHaveCSS('color', RGB_INK);
+    await expect(bg).toHaveCSS('background-color', RGB_PAGE_BG);
 
     await button.hover();
 
-    await expect(text).toHaveCSS('color', 'rgb(224, 247, 250)');
-    await expect(bg).toHaveCSS('background-color', 'rgb(17, 17, 17)');
+    await expect(text).toHaveCSS('color', RGB_PAGE_BG);
+    await expect(bg).toHaveCSS('background-color', RGB_INK);
   });
 
   test('writing background rotates across visits using localStorage index', async ({

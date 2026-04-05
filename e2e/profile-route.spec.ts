@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { RGB_INK } from '../src/constants/colors';
 import { gotoProfileWhenReady, mustBox } from './helpers';
 
 type FoundationsGeometry = {
@@ -273,7 +274,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       expect(tile.borderRight).toBeCloseTo(info.frameVar, 1);
       expect(tile.borderBottom).toBeCloseTo(info.frameVar, 1);
       expect(tile.borderLeft).toBeCloseTo(info.frameVar, 1);
-      expect(tile.borderColor).toBe('rgb(17, 17, 17)');
+      expect(tile.borderColor).toBe(RGB_INK);
     }
   });
 
@@ -313,14 +314,14 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       });
 
     const before = await readColors();
-    expect(before.textColor).toBe('rgb(17, 17, 17)');
+    expect(before.textColor).toBe(RGB_INK);
 
     await tile.hover();
     await expect
       .poll(readColors, { timeout: 2000, intervals: [80, 140, 220] })
       .toMatchObject({
         textColor: before.pageBgColorResolved,
-        bgColor: 'rgb(17, 17, 17)',
+        bgColor: RGB_INK,
       });
   });
 

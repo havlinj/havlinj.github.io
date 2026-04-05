@@ -1,4 +1,13 @@
 import { test, expect } from '@playwright/test';
+import {
+  LAYOUT_TOLERANCE,
+  WHY_CTA_EDGE_MIN_PX,
+  WHY_CTA_EDGE_WIDTH_FRAC,
+  WHY_CTA_LEAD_TRACK,
+  WHY_GIF_TOP_INSET,
+  WHY_SCROLL_CTA_CONTAINER_CQW,
+} from './constants';
+import { RGB_INK } from '../src/constants/colors';
 import { gotoWhyWhenReady } from './helpers';
 
 test.describe('/why page', () => {
@@ -24,8 +33,85 @@ test.describe('/why page', () => {
   test('GIF frame and box use panel background #111', async ({ page }) => {
     const box = page.locator('.why-page .why-box');
     const frame = page.locator('.why-page .why-gif-frame');
-    await expect(box).toHaveCSS('background-color', 'rgb(17, 17, 17)');
-    await expect(frame).toHaveCSS('background-color', 'rgb(17, 17, 17)');
+    await expect(box).toHaveCSS('background-color', RGB_INK);
+    await expect(frame).toHaveCSS('background-color', RGB_INK);
+  });
+
+  test('.why-box is a size container (arrow cqw)', async ({ page }) => {
+    const box = page.locator('.why-page .why-box');
+    await expect(box).toHaveCSS('container-type', 'size');
+  });
+
+  test('scroll CTA arrow uses container width (cqw) in inline SVG style', async ({
+    page,
+  }) => {
+    const svg = page.locator('.why-page .why-scroll-cta svg.animated-arrow');
+    await expect(svg).toBeVisible();
+    const styleAttr = await svg.getAttribute('style');
+    expect(styleAttr).toBeTruthy();
+    expect(styleAttr).toMatch(/cqw/i);
+    expect(styleAttr).toMatch(/aspect-ratio/i);
+    expect(styleAttr).toMatch(
+      new RegExp(`${WHY_SCROLL_CTA_CONTAINER_CQW}\\.\\d+cqw`, 'i'),
+    );
+  });
+
+  test('--why-cta-left tracks lead first line (inset + WHY_CTA_LEAD_TRACK × line width)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 900, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const check = await page.evaluate(
+      ([leadTrack, edgeMinPx, edgeWidthFrac]) => {
+        const box = document.querySelector('.why-page .why-box');
+        const lead = document.querySelector('.why-page p.why-lead');
+        if (!box || !lead) return { ok: false as const, reason: 'missing nodes' };
+
+        const leftVar = getComputedStyle(box)
+          .getPropertyValue('--why-cta-left')
+          .trim();
+        if (!/^\d+(\.\d+)?px$/.test(leftVar)) {
+          return {
+            ok: false as const,
+            reason: `bad --why-cta-left: "${leftVar}"`,
+          };
+        }
+        const setPx = parseFloat(leftVar);
+
+        const range = document.createRange();
+        range.selectNodeContents(lead);
+        const fr = range.getClientRects();
+        if (!fr.length) {
+          return { ok: false as const, reason: 'lead has no client rects' };
+        }
+        const r0 = fr[0];
+        const br = box.getBoundingClientRect();
+        const edge = Math.max(edgeMinPx, br.width * edgeWidthFrac);
+        let expected = r0.left - br.left + leadTrack * r0.width;
+        expected = Math.min(Math.max(expected, edge), br.width - edge);
+
+        return {
+          ok: true as const,
+          setPx,
+          expected,
+          delta: Math.abs(setPx - expected),
+        };
+      },
+      [
+        WHY_CTA_LEAD_TRACK,
+        WHY_CTA_EDGE_MIN_PX,
+        WHY_CTA_EDGE_WIDTH_FRAC,
+      ] as const,
+    );
+
+    expect(check.ok, !check.ok ? check.reason : '').toBe(true);
+    if (check.ok) {
+      expect(
+        check.delta,
+        `setPx=${check.setPx} expected≈${check.expected}`,
+      ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+    }
   });
 
   test('GIF holder is out of flow; JS sets scroll pad and intro GIF band', async ({
@@ -56,7 +142,7 @@ test.describe('/why page', () => {
     expect(parseFloat(metrics!.scrollPad)).toBeGreaterThan(0);
     expect(metrics!.introGifPad).toMatch(/^\d+(\.\d+)?px$/);
     expect(parseFloat(metrics!.introGifPad)).toBeGreaterThan(0);
-    expect(metrics!.gifTopInset).toBe('2.3rem');
+    expect(metrics!.gifTopInset).toBe(WHY_GIF_TOP_INSET);
     expect(parseFloat(metrics!.introPaddingTop)).toBeCloseTo(
       parseFloat(metrics!.introGifPad),
       0,

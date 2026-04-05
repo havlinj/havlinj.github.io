@@ -3,15 +3,25 @@
  * Segmented chevron with optional SVG grain (feTurbulence + soft-light). The root `<span>` is not
  * faded so #111 panels behind the arrow (e.g. /why) don’t wash out.
  *
- * Sizing: `size` = nominal width in px. `sizeMode="fixed"` — exact px; `responsive` — clamp(rem+vw, max=size).
- * `sizeScale` multiplies both. See RESPONSIVE_WIDTH for responsive clamp coefficients.
+ * Sizing: `fixed` — `size` px; `responsive` — clamp(rem+vw) capped by `size` (scales faster than layout at zoom).
+ * `container` — `width: N cqw` on a `container-type: size` ancestor (arrow tracks that box; tame page zoom).
  */
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars -- Astro `Props` → `Astro.props`
 interface Props {
   size?: number;
-  sizeMode?: 'fixed' | 'responsive';
+  sizeMode?: 'fixed' | 'responsive' | 'container';
+  /** With `sizeMode="container"`: width as % of named container width (`cqw`). Ancestor needs `container-type: size`. */
+  containerCqw?: number;
   /** Multiplies `size` and responsive rem/vw terms (default 1). */
   sizeScale?: number;
+  /** Responsive only: max arrow width in px after the rem/vw clamp (outer cap, not the clamp’s own `size` ceiling). */
+  responsiveClampMaxPx?: number;
+  /** Responsive only: `min(clamp(...), N vmin)` (viewport-based). */
+  responsiveMaxVmin?: number;
+  /** Responsive only: `min(clamp(...), N cqmin)`; ancestor must set `container-type: size` (e.g. .why-box). */
+  responsiveMaxCqmin?: number;
+  /** Responsive only: `min(clamp(...), N cqw)` — cap as % of container width (good when zoom shrinks the box). */
+  responsiveMaxCqw?: number;
   color?: string;
   duration?: number;
   class?: string;
@@ -51,7 +61,44 @@ const sizeScale = (() => {
 
 const effectiveSizePx = Math.max(1, Math.round(sizePx * sizeScale));
 
-const sizeMode = props.sizeMode === 'responsive' ? 'responsive' : 'fixed';
+const sizeMode = (() => {
+  const m = props.sizeMode;
+  if (m === 'responsive') return 'responsive' as const;
+  if (m === 'container') return 'container' as const;
+  return 'fixed' as const;
+})();
+
+const containerCqw = (() => {
+  if (sizeMode !== 'container') return 0;
+  const n = Number(props.containerCqw);
+  if (!Number.isFinite(n) || n <= 0) return 10;
+  return Math.min(35, Math.max(2.5, n));
+})();
+
+const responsiveMaxVmin = (() => {
+  const n = Number(props.responsiveMaxVmin);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(72, Math.max(8, n));
+})();
+
+const responsiveMaxCqmin = (() => {
+  const n = Number(props.responsiveMaxCqmin);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(80, Math.max(6, n));
+})();
+
+const responsiveMaxCqw = (() => {
+  const n = Number(props.responsiveMaxCqw);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(40, Math.max(4, n));
+})();
+
+const responsiveClampMaxPx = (() => {
+  const n = Number(props.responsiveClampMaxPx);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  // Sub-40 caps are allowed (previously floored at 40, which made small values ineffective).
+  return Math.min(200, Math.max(12, Math.round(n)));
+})();
 
 const color = props.color ?? '#111';
 const durationSec = Number(props.duration);
@@ -81,17 +128,34 @@ const rawGrainFreq = (VIEWBOX_W / grainSize) * 0.85;
 const grainBaseFreq = Math.min(1.25, Math.max(0.42, rawGrainFreq)).toFixed(4);
 const grainFilterId = `animated-arrow-grain-${crypto.randomUUID()}`;
 
-function responsiveSvgStyle(scale: number): string {
+function containerSvgStyle(cqw: number): string {
+  return `width: ${cqw.toFixed(3)}cqw; height: auto; aspect-ratio: 220 / 170`;
+}
+
+function responsiveSvgStyle(
+  scale: number,
+  clampMaxPx: number,
+  maxVmin: number,
+  maxCqmin: number,
+  maxCqw: number,
+): string {
   const { minRem, baseRem, vw, minSizeFactor } = RESPONSIVE_WIDTH;
   const mr = (minRem * scale).toFixed(4);
   const br = (baseRem * scale).toFixed(4);
   const vwS = (vw * scale).toFixed(4);
-  return [
-    'width: clamp(',
+  const clamped = [
+    'clamp(',
     `min(${mr}rem, calc(var(--arrow-size-px) * ${minSizeFactor} * 1px)), `,
     `min(${br}rem + ${vwS}vw, calc(var(--arrow-size-px) * 1px)), `,
-    'calc(var(--arrow-size-px) * 1px)); height: auto; aspect-ratio: 220 / 170',
+    'calc(var(--arrow-size-px) * 1px))',
   ].join('');
+  const parts: string[] = [clamped];
+  if (clampMaxPx > 0) parts.push(`${clampMaxPx}px`);
+  if (maxVmin > 0) parts.push(`${maxVmin.toFixed(2)}vmin`);
+  if (maxCqmin > 0) parts.push(`${maxCqmin.toFixed(2)}cqmin`);
+  if (maxCqw > 0) parts.push(`${maxCqw.toFixed(2)}cqw`);
+  const width = parts.length > 1 ? `min(${parts.join(', ')})` : clamped;
+  return `width: ${width}; height: auto; aspect-ratio: 220 / 170`;
 }
 
 const rootStyle = [
@@ -116,9 +180,19 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     width={sizeMode === 'fixed' ? effectiveSizePx : undefined}
     height={sizeMode === 'fixed' ? fixedHeight : undefined}
     class:list={['animated-arrow', className]}
-    style={sizeMode === 'responsive'
-      ? responsiveSvgStyle(sizeScale)
-      : undefined}
+    style={
+      sizeMode === 'responsive'
+        ? responsiveSvgStyle(
+            sizeScale,
+            responsiveClampMaxPx,
+            responsiveMaxVmin,
+            responsiveMaxCqmin,
+            responsiveMaxCqw,
+          )
+        : sizeMode === 'container'
+          ? containerSvgStyle(containerCqw)
+          : undefined
+    }
     aria-hidden="true"
   >
     <defs>

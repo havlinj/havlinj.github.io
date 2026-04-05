@@ -3,8 +3,7 @@
   --why-box-fg: var(--color-page-bg);
   /* Baseline inset for text inside the box */
   --why-base-inset: 2rem;
-  /* GIF top offset from scroll inner edge (can differ from text inset). */
-  --why-gif-top-inset: 2.3rem;
+  /* --why-gif-top-inset: set on this element from WhyContent (src/constants/why-layout.ts). */
   max-width: none;
   margin-top: var(--page-title-rule-gap);
   padding-top: 0;
@@ -22,13 +21,16 @@
   color: var(--why-box-fg);
   /* Fades in with scroll via WhyContent (was darkening opening lines at scrollTop 0). */
   --why-top-edge-opacity: 1;
+  /* CTA arrow uses `cqw` in AnimatedArrow (`sizeMode="container"`) so it scales with this panel. */
+  container-type: size;
+  container-name: why-box;
 }
 
 /* Downward scroll CTA (page-bg color); fades via --why-cta-opacity from WhyContent script */
 .why-page .why-scroll-cta {
   position: absolute;
-  /* CTA anchor: slightly right of former ⅓; still centered on that point via translateX */
-  left: 18%;
+  /* Horizontal: --why-cta-left from JS (see src/constants/why-layout.ts WHY_CTA_LEAD_TRACK); fallback ~old % */
+  left: var(--why-cta-left, 20%);
   bottom: clamp(3.35rem, 10.65vh, 5.45rem);
   z-index: 5;
   transform: translateX(-50%);
