@@ -31,9 +31,14 @@
   position: absolute;
   /* Horizontal: --why-cta-left from JS (see src/constants/why-layout.ts WHY_CTA_LEAD_TRACK); fallback ~old % */
   left: var(--why-cta-left, 20%);
-  bottom: clamp(3.35rem, 10.65vh, 5.45rem);
+  /*
+   * Vertical: --why-cta-top from why-box-scroll.ts — from .why-box bottom, 55% of the gap up to
+   * the last line of .why-p--wide (px from box top). Center via translate(-50%, -50%).
+   */
+  top: var(--why-cta-top, 72%);
+  bottom: auto;
   z-index: 5;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: var(--why-cta-opacity, 1);
 }

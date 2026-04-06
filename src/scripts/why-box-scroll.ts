@@ -53,6 +53,10 @@ import {
     CTA_ZONE_PAD_H_FRAC: 0.35,
     CTA_ZONE_PAD_TOP: 16,
     CTA_ZONE_PAD_BOTTOM: 28,
+    /** 0.5 = halfway between ref line bottom and box bottom; higher = closer to box bottom. */
+    CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM: 0.55,
+    /** Keep CTA vertical center inside the box if geometry goes odd while scrolling. */
+    CTA_TOP_CLAMP_MARGIN: 8,
     END_COVER_BAND_MIN: 70,
     END_COVER_BAND_FRAC: 0.22,
     INTRO_LINE_COUNT: 2,
@@ -68,6 +72,10 @@ import {
     GIF_MIN_LEAD_MULT: 0.68,
     GIF_MIN_BOX_FRAC: 0.065,
     GIF_MIN_ABS_PX: 24,
+    /** Extra intro padding below the GIF band, as a fraction of lead line height (proportional air). */
+    GIF_TO_LEAD_CLEARANCE_MULT: 0.26,
+    /** Cap intro GIF pad vs scroll height so tiny boxes don’t collapse. */
+    GIF_INTRO_PAD_MAX_FRAC: 0.48,
     GIF_BASE_SCALE_MIN: 0.5,
     LEAD_DOWN_FRAC: 0.18,
     END_SCROLL_EXTRA_FRAC: 0.32,
@@ -77,10 +85,8 @@ import {
     BODY_SCALE_DROP: 0.5,
     LEAD_MAX_INSET_REM: 2.4,
     BODY_MAX_INSET_REM: 4,
-    CTA_GAP_MIN_PX: 40,
-    CTA_GAP_LEAD_MULT: 0.6,
-    CTA_PUSH_BOTTOM_MARGIN: 16,
-    GIF_LIFT_LEAD_MULT: 0.75,
+    /** Lower = GIF sits slightly lower, more air above lead (optical gap). */
+    GIF_LIFT_LEAD_MULT: 0.62,
     GIF_SCALE_DROP: 0.35,
     GIF_MAX_INSET_REM: 3.2,
     GIF_OPACITY_DROP: 0.75,
@@ -91,6 +97,25 @@ import {
   };
 
   let whyFontScale = 1;
+
+  /**
+   * Pre-transform layout height of the GIF column (16:9 frame). Do not use
+   * getBoundingClientRect() on `.why-gif-holder` — scale() is applied there and
+   * would feed back into footprint math (flicker / stuck mid-zoom).
+   */
+  function gifLayoutHeightPx() {
+    if (!gifEl) return 0;
+    let h = gifEl.offsetHeight;
+    if (h <= 0) {
+      const frame = gifEl.querySelector('.why-gif-frame');
+      if (frame) h = frame.offsetHeight;
+    }
+    if (h <= 0) {
+      const w = gifEl.offsetWidth;
+      if (w > 0) h = (w * 9) / 16;
+    }
+    return h;
+  }
 
   function wideColumnContentWidthPx() {
     if (!(wideP instanceof HTMLElement)) return 0;
@@ -144,7 +169,7 @@ import {
     const leadEl = leadForCta ?? lines[0];
     const leadRect = leadEl.getBoundingClientRect();
     const leadHeight = leadRect.height || 0;
-    const gifHeightRaw = gifEl ? gifEl.getBoundingClientRect().height || 0 : 0;
+    const gifLayoutHeight = gifLayoutHeightPx();
     const scrollStyle = window.getComputedStyle(scrollEl);
     const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
     const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
@@ -159,7 +184,7 @@ import {
       leadEl,
       leadRect,
       leadHeight,
-      gifHeightRaw,
+      gifLayoutHeight,
       padTop,
       padBottom,
     };
@@ -242,27 +267,44 @@ import {
     }
   }
 
-  function applyCtaVerticalPush(m, ctaO) {
+  /**
+   * Vertical center of the CTA: from `.why-box` bottom, go up by
+   * CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM × (distance from that bottom to the bottom of the last
+   * line of `.why-p--wide`). `top` + translate(-50%, -50%) places the arrow’s center there.
+   */
+  function applyCtaVerticalMidpoint(m) {
     if (!ctaEl) return;
-    let transform = 'translateX(-50%)';
-    if (ctaO >= T.CTA_O_HIDDEN) {
-      const ctaBase = ctaEl.getBoundingClientRect();
-      const minGapPx = Math.max(
-        T.CTA_GAP_MIN_PX,
-        m.leadHeight * T.CTA_GAP_LEAD_MULT,
-      );
-      const gap = ctaBase.top - m.leadRect.bottom;
-      let pushDown = Math.max(0, minGapPx - gap);
-      const maxPush = Math.max(
-        0,
-        m.boxOuterRect.bottom - ctaBase.bottom - T.CTA_PUSH_BOTTOM_MARGIN,
-      );
-      pushDown = Math.min(pushDown, maxPush);
-      if (pushDown > 0) {
-        transform = `translateX(-50%) translateY(${pushDown}px)`;
+    const boxTop = m.boxOuterRect.top;
+    const boxBottom = m.boxOuterRect.bottom;
+    const boxH = m.boxOuterRect.height;
+    const f = T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM;
+    let refLineBottom = null;
+    if (wideP instanceof HTMLElement) {
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(wideP);
+        const rects = range.getClientRects();
+        if (rects.length > 0) {
+          refLineBottom = rects[rects.length - 1].bottom;
+        }
+      } catch {
+        /* ignore */
       }
     }
-    ctaEl.style.transform = transform;
+    let targetY;
+    if (refLineBottom == null || !Number.isFinite(refLineBottom)) {
+      targetY = boxBottom - f * boxH;
+    } else {
+      const gap = boxBottom - refLineBottom;
+      targetY = boxBottom - f * gap;
+    }
+    let topPx = targetY - boxTop;
+    topPx = clamp(
+      topPx,
+      T.CTA_TOP_CLAMP_MARGIN,
+      Math.max(T.CTA_TOP_CLAMP_MARGIN, boxH - T.CTA_TOP_CLAMP_MARGIN),
+    );
+    boxEl.style.setProperty('--why-cta-top', `${topPx.toFixed(2)}px`);
   }
 
   /** @returns {null | { left: number, right: number, top: number, bottom: number }} */
@@ -312,9 +354,16 @@ import {
     return introBlend;
   }
 
+  /**
+   * Vertical budget for the intro band:
+   * - `baseDisplayPx`: how tall the GIF is drawn (uniform scale, 16:9 frame unchanged).
+   * - `gifFootprintPx` (returned): padding-top for intro = display height + clearance vs lead
+   *   so the gap scales with lead size without stretching the asset.
+   */
   function computeGifFootprintPx(m) {
-    let gifFootprintPx = m.gifHeightRaw;
-    if (m.gifHeightRaw > 0 && gifEl) {
+    const layoutH = m.gifLayoutHeight;
+    let gifFootprintPx = layoutH;
+    if (layoutH > 0 && gifEl) {
       const narrowness = clamp(
         (T.GIF_NARROW_REF_PX - m.boxRect.width) / T.GIF_NARROW_RANGE,
         0,
@@ -333,43 +382,69 @@ import {
         m.boxOuterRect.height * T.GIF_MIN_BOX_FRAC,
         T.GIF_MIN_ABS_PX,
       );
-      gifFootprintPx = clamp(
-        Math.min(m.gifHeightRaw, maxByBox),
+      const baseDisplayPx = clamp(
+        Math.min(layoutH, maxByBox),
         minByLead,
-        m.gifHeightRaw,
+        layoutH,
       );
+      const clearancePx = m.leadHeight * T.GIF_TO_LEAD_CLEARANCE_MULT;
+      const padMax = m.boxRect.height * T.GIF_INTRO_PAD_MAX_FRAC;
+      const desiredPad = baseDisplayPx + clearancePx;
+      gifFootprintPx = Math.max(
+        baseDisplayPx,
+        Math.min(desiredPad, padMax),
+      );
+
       const gifBaseScale = clamp(
-        gifFootprintPx / m.gifHeightRaw,
+        baseDisplayPx / layoutH,
         T.GIF_BASE_SCALE_MIN,
         1,
       );
-      gifEl.style.setProperty('--why-gif-base-scale', gifBaseScale.toFixed(3));
+      const scaleStr = gifBaseScale.toFixed(3);
+      if (scaleStr !== lastGifBaseScaleStr) {
+        lastGifBaseScaleStr = scaleStr;
+        gifEl.style.setProperty('--why-gif-base-scale', scaleStr);
+      }
+    } else if (gifEl && lastGifBaseScaleStr !== '1.000') {
+      lastGifBaseScaleStr = '1.000';
+      gifEl.style.setProperty('--why-gif-base-scale', '1.000');
     }
     return gifFootprintPx;
   }
 
   function applySpacersAndIntroVars(m, gifFootprintPx) {
+    const padQuantized = Math.round(gifFootprintPx * 4) / 4;
     const leadDownPx = m.leadHeight * T.LEAD_DOWN_FRAC;
     const topSpacerPx = Math.max(
       0,
-      m.half - m.padTop - gifFootprintPx + leadDownPx,
+      m.half - m.padTop - padQuantized + leadDownPx,
     );
     const endScrollExtraPx = m.half * T.END_SCROLL_EXTRA_FRAC;
     const bottomSpacerPx = Math.max(
       0,
-      m.half - m.padBottom - gifFootprintPx + endScrollExtraPx,
+      m.half - m.padBottom - padQuantized + endScrollExtraPx,
     );
-    topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
-    bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
+    const topStr = `${topSpacerPx.toFixed(2)}px`;
+    const botStr = `${bottomSpacerPx.toFixed(2)}px`;
+    if (topStr !== lastTopSpacerStr) {
+      lastTopSpacerStr = topStr;
+      topSpacer.style.height = topStr;
+    }
+    if (botStr !== lastBottomSpacerStr) {
+      lastBottomSpacerStr = botStr;
+      bottomSpacer.style.height = botStr;
+    }
 
-    contentEl.style.setProperty(
-      '--why-scroll-pad-top',
-      `${m.padTop.toFixed(2)}px`,
-    );
-    contentEl.style.setProperty(
-      '--why-intro-gif-pad',
-      `${gifFootprintPx.toFixed(2)}px`,
-    );
+    const padTopStr = `${m.padTop.toFixed(2)}px`;
+    const introPadStr = `${padQuantized.toFixed(2)}px`;
+    if (padTopStr !== lastScrollPadTopStr) {
+      lastScrollPadTopStr = padTopStr;
+      contentEl.style.setProperty('--why-scroll-pad-top', padTopStr);
+    }
+    if (introPadStr !== lastIntroGifPadStr) {
+      lastIntroGifPadStr = introPadStr;
+      contentEl.style.setProperty('--why-intro-gif-pad', introPadStr);
+    }
     contentEl.style.setProperty('--why-gif-nudge-y', '0px');
   }
 
@@ -472,6 +547,13 @@ import {
 
   let rafId = 0;
   let settleFrames = 0;
+  /** Dedupe style writes to cut layout thrash during zoom. */
+  let lastGifBaseScaleStr = '';
+  let lastTopSpacerStr = '';
+  let lastBottomSpacerStr = '';
+  let lastScrollPadTopStr = '';
+  let lastIntroGifPadStr = '';
+  let resizeQuietTimer = 0;
 
   const requestZoomSettle = (frames = 4) => {
     settleFrames = Math.max(settleFrames, frames);
@@ -483,6 +565,17 @@ import {
     rafId = requestAnimationFrame(update);
   };
 
+  /** One rAF per burst while resizing; extra passes only after zoom/resize is quiet. */
+  function onViewportResize() {
+    schedule();
+    if (resizeQuietTimer) window.clearTimeout(resizeQuietTimer);
+    resizeQuietTimer = window.setTimeout(() => {
+      resizeQuietTimer = 0;
+      settleFrames = Math.max(settleFrames, 4);
+      schedule();
+    }, 110);
+  }
+
   function update() {
     rafId = 0;
 
@@ -493,7 +586,7 @@ import {
     applyStartCover(m);
     const ctaO = applyCtaFade(m);
     applyCtaHorizontalAnchor(m);
-    applyCtaVerticalPush(m, ctaO);
+    applyCtaVerticalMidpoint(m);
     const ctaZone = buildCtaZone(m, ctaO);
 
     applyEndCover(m);
@@ -536,7 +629,7 @@ import {
     },
     { passive: true },
   );
-  window.addEventListener('resize', () => requestZoomSettle(8));
-  window.visualViewport?.addEventListener('resize', () => requestZoomSettle(8));
+  window.addEventListener('resize', onViewportResize);
+  window.visualViewport?.addEventListener('resize', onViewportResize);
   init();
 })();
