@@ -45,6 +45,10 @@ import {
     FIT_SAFETY_PX: 3,
     START_COVER_BAND_MIN: 85,
     START_COVER_BAND_FRAC: 0.26,
+    /** Keep bottom fade band below `.why-p--wide` last line (+ this gap); drives --why-start-cover-height. */
+    START_COVER_BELOW_WIDE_REM: 0.5,
+    /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
+    START_COVER_HEIGHT_MAX: 300,
     CTA_FADE_PX: 56,
     CTA_O_HIDDEN: 0.002,
     CTA_ZONE_MIN_O: 0.04,
@@ -228,6 +232,57 @@ import {
       '--why-start-cover-opacity',
       startOpacity.toFixed(3),
     );
+  }
+
+  /**
+   * Size the bottom start-cover (and matching .why-box::after) so its top sits at
+   * last line of `.why-p--wide` + START_COVER_BELOW_WIDE_REM. Stops the gradient
+   * from washing out that line at odd zoom/viewport heights (fixed vh clamp was too tall).
+   */
+  function applyStartCoverBandSizing() {
+    const rootRem =
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const marginPx = T.START_COVER_BELOW_WIDE_REM * rootRem;
+    let lineBottom = null;
+    if (wideP instanceof HTMLElement) {
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(wideP);
+        const rects = range.getClientRects();
+        if (rects.length > 0) lineBottom = rects[rects.length - 1].bottom;
+      } catch {
+        /* ignore */
+      }
+      if (lineBottom == null || !Number.isFinite(lineBottom)) {
+        lineBottom = wideP.getBoundingClientRect().bottom;
+      }
+    }
+
+    const scrollB = scrollEl.getBoundingClientRect();
+    const cs = window.getComputedStyle(scrollEl);
+    const borderBottom = Number.parseFloat(cs.borderBottomWidth) || 0;
+    const innerBottom = scrollB.bottom - borderBottom;
+
+    let hStr = null;
+    if (lineBottom != null && Number.isFinite(lineBottom)) {
+      const raw = innerBottom - lineBottom - marginPx;
+      if (raw >= 8) {
+        const hPx = Math.min(T.START_COVER_HEIGHT_MAX, raw);
+        hStr = `${Math.round(hPx * 4) / 4}px`;
+      }
+    }
+
+    if (hStr == null) {
+      if (lastStartCoverHeightStr !== '') {
+        lastStartCoverHeightStr = '';
+        boxEl.style.removeProperty('--why-start-cover-height');
+      }
+      return;
+    }
+    if (hStr !== lastStartCoverHeightStr) {
+      lastStartCoverHeightStr = hStr;
+      boxEl.style.setProperty('--why-start-cover-height', hStr);
+    }
   }
 
   /** @returns {number} CTA opacity 0–1 */
@@ -553,6 +608,7 @@ import {
   let lastBottomSpacerStr = '';
   let lastScrollPadTopStr = '';
   let lastIntroGifPadStr = '';
+  let lastStartCoverHeightStr = '';
   let resizeQuietTimer = 0;
 
   const requestZoomSettle = (frames = 4) => {
@@ -594,6 +650,7 @@ import {
 
     const gifFootprintPx = computeGifFootprintPx(m);
     applySpacersAndIntroVars(m, gifFootprintPx);
+    applyStartCoverBandSizing();
 
     applyLineRevolver(m, introBlend, ctaZone);
     const active = pickActiveLineForGif(m);
