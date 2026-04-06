@@ -186,6 +186,11 @@ function collectRevealLines(reveal: HTMLElement): string[] {
 }
 
 function fitFoundationsReveal(reveal: HTMLElement): void {
+  const rem = rootRemPx();
+  // Allow deeper downscale under aggressive browser zoom to avoid right-edge clipping.
+  const minPx = Math.max(2, rem * 0.32);
+  let preferredPx = titleCapFontPx();
+
   const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
   if (section) {
     const baseRaw = getComputedStyle(section)
@@ -193,23 +198,68 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
       .trim();
     const basePx = Number.parseFloat(baseRaw);
     if (Number.isFinite(basePx) && basePx > 0) {
-      reveal.style.setProperty(REVEAL_VAR, `${roundPx(basePx * 0.85)}px`);
-      return;
+      // Keep existing desktop look as preference; actual cap is always real box size.
+      preferredPx = Math.min(preferredPx, basePx * 0.85);
     }
   }
 
-  const rem = rootRemPx();
-  const minPx = rem * 0.65;
-  const maxPx = titleCapFontPx();
-  const rcs = getComputedStyle(reveal);
-  const available = contentWidthWithoutHorizontalPadding(reveal);
-  // Grid animation can report 0× width for a frame; skip to avoid a visible font flash.
-  if (available < 4) return;
-  const lines = collectRevealLines(reveal);
-  if (lines.length === 0) return;
-  const fontPx = fitFontSize(available, minPx, maxPx, (fp) =>
-    maxLineWidth(lines, fp, rcs),
+  const stanza = queryElement(reveal, '.tile-state-secondary', HTMLElement);
+  if (!stanza) return;
+
+  // Grid animation can report 0× box for a frame; skip to avoid visible font flash.
+  if (stanza.clientWidth < 4 || stanza.clientHeight < 4) return;
+
+  // Hard cap by current rendered box: never allow a font larger than the box can physically host.
+  const boxCapPx = Math.max(
+    minPx,
+    Math.min(stanza.clientWidth, stanza.clientHeight),
   );
+  const maxPx = Math.max(minPx, Math.min(boxCapPx, preferredPx));
+
+  const fits = (fontSizePx: number): boolean => {
+    reveal.style.setProperty(REVEAL_VAR, `${roundPx(fontSizePx)}px`);
+    // Real rendered fit check (both axes) + small safety margin for glyph antialiasing.
+    const hSafetyPx = 6;
+    const vSafetyPx = 1;
+    const line1 = queryElement(
+      reveal,
+      '.tile-state-secondary .line-1',
+      HTMLElement,
+    );
+    const rightBufferPx = line1
+      ? Number.parseFloat(getComputedStyle(line1).paddingRight) || 0
+      : 0;
+    // Reserve explicit visual room behind "?" so font sizing accounts for this buffer.
+    const maxW = Math.max(0, stanza.clientWidth - hSafetyPx - rightBufferPx);
+    const maxH = Math.max(0, stanza.clientHeight - vSafetyPx);
+    const boxFits =
+      stanza.scrollWidth <= maxW && stanza.scrollHeight <= maxH;
+
+    if (!line1) return boxFits;
+    const lineRect = line1.getBoundingClientRect();
+    const stanzaRect = stanza.getBoundingClientRect();
+    // Extra geometric guard: keep first line safely inside with explicit right-side buffer.
+    const rightEdgeFits = lineRect.right <= stanzaRect.right - rightBufferPx;
+    return boxFits && rightEdgeFits;
+  };
+
+  if (!fits(minPx)) {
+    reveal.style.setProperty(REVEAL_VAR, `${roundPx(minPx)}px`);
+    return;
+  }
+  if (fits(maxPx)) {
+    reveal.style.setProperty(REVEAL_VAR, `${roundPx(maxPx)}px`);
+    return;
+  }
+
+  let lo = minPx;
+  let hi = maxPx;
+  for (let i = 0; i < 26; i++) {
+    const mid = (lo + hi) / 2;
+    if (fits(mid)) lo = mid;
+    else hi = mid;
+  }
+  const fontPx = lo;
   reveal.style.setProperty(REVEAL_VAR, `${roundPx(fontPx)}px`);
 }
 
@@ -314,11 +364,22 @@ function wireFoundationsReveal(): void {
   };
 
   const openReveal = () => {
+    const reveal = queryElement(
+      foundationsTile,
+      SELECTORS.foundationsReveal,
+      HTMLElement,
+    );
     foundationsTile.classList.remove(
       REVEAL_CLASSES.fadingOut,
       REVEAL_CLASSES.opening,
     );
     foundationsTile.classList.add(REVEAL_CLASSES.revealed);
+    if (reveal) {
+      requestAnimationFrame(() => {
+        fitFoundationsReveal(reveal);
+        requestAnimationFrame(() => fitFoundationsReveal(reveal));
+      });
+    }
     clearRevealTimers();
     revealTimeoutId = window.setTimeout(() => {
       revealTimeoutId = 0;
@@ -360,6 +421,8 @@ function wireResize(): void {
   const ro = new ResizeObserver(scheduleFitAll);
   ro.observe(section);
   window.addEventListener('orientationchange', scheduleFitAll);
+  // Pinch/browser zoom can change visual viewport without triggering element ResizeObserver.
+  window.visualViewport?.addEventListener('resize', scheduleFitAll);
 }
 
 /** Reveal box width changes in Foundations tile state2 — refit without polling the whole section. */
