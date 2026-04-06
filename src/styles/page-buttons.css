@@ -191,15 +191,24 @@
   transition: color 0.18s ease;
 }
 
-/* Invert button/text colors on hover or keyboard focus */
-.page-button:hover .page-button__bg,
-.page-button:hover .page-button__overlay,
+/* Invert on keyboard focus */
 .page-button:focus-visible .page-button__bg,
 .page-button:focus-visible .page-button__overlay {
   background-color: #111;
 }
 
-.page-button:hover .page-button__text,
 .page-button:focus-visible .page-button__text {
   color: var(--color-page-bg);
+}
+
+/* Hover invert only when primary input can hover (avoids sticky :hover after tap on touch). */
+@media (hover: hover) {
+  .page-button:hover .page-button__bg,
+  .page-button:hover .page-button__overlay {
+    background-color: #111;
+  }
+
+  .page-button:hover .page-button__text {
+    color: var(--color-page-bg);
+  }
 }

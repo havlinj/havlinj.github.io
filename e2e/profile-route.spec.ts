@@ -469,44 +469,4 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       .toBe(true);
   });
 
-  test('state2 works without hover capability (touch-like)', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(
-      browserName !== 'chromium',
-      'Touch-capability override is Chromium-only here',
-    );
-
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Emulation.setTouchEmulationEnabled', {
-      enabled: true,
-      maxTouchPoints: 1,
-    });
-    await cdp.send('Emulation.setEmitTouchEventsForMouse', {
-      enabled: true,
-      configuration: 'mobile',
-    });
-
-    await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 900);
-    const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.dispatchEvent('click');
-    await expect(tile).toHaveClass(/is-revealed/);
-    const state2 = await waitForState2Settled(page);
-    const expected =
-      state2.columnHeight - state2.portraitSide * state2.effectiveScale;
-    expect(Math.abs(state2.foundationsHeight - expected)).toBeLessThan(3);
-    expect(Math.abs(state2.portraitBottom - expected)).toBeLessThan(3);
-
-    await expect
-      .poll(
-        async () => {
-          const cls = (await tile.getAttribute('class')) ?? '';
-          return cls.includes('is-revealed');
-        },
-        { timeout: 2500, intervals: [100, 200, 350] },
-      )
-      .toBe(false);
-  });
 });

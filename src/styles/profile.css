@@ -342,26 +342,42 @@ article .profile-section:last-child {
     opacity 0.14s ease;
 }
 
-/* State1 invert: dark text by default, dark bg + light text on hover/focus */
-.prof-tile:not(.is-revealed):hover .page-button__bg,
+/* State1 invert: dark text by default; light-on-dark on focus (keyboard) */
 .prof-tile:not(.is-revealed):focus-visible .page-button__bg {
   background-color: #111;
 }
 
-.prof-tile:not(.is-revealed):hover .page-button__overlay,
 .prof-tile:not(.is-revealed):focus-visible .page-button__overlay {
   background: #111;
 }
 
-.prof-tile:not(.is-revealed):hover .page-button__text,
 .prof-tile:not(.is-revealed):focus-visible .page-button__text {
   color: var(--color-page-bg);
 }
 
-.prof-tile:not(.is-revealed):hover .page-button__text::before,
 .prof-tile:not(.is-revealed):focus-visible .page-button__text::before {
   background-color: #111;
   border-color: var(--color-page-bg);
+}
+
+/* Hover invert only when the primary input can hover (not touch — avoids sticky :hover after Foundations reveal closes). */
+@media (hover: hover) {
+  .prof-tile:not(.is-revealed):hover .page-button__bg {
+    background-color: #111;
+  }
+
+  .prof-tile:not(.is-revealed):hover .page-button__overlay {
+    background: #111;
+  }
+
+  .prof-tile:not(.is-revealed):hover .page-button__text {
+    color: var(--color-page-bg);
+  }
+
+  .prof-tile:not(.is-revealed):hover .page-button__text::before {
+    background-color: #111;
+    border-color: var(--color-page-bg);
+  }
 }
 
 .profile-section > a[href='/why'] .page-button__text,
