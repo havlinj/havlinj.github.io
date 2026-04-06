@@ -1,8 +1,11 @@
 .why-page .why-wrapper {
   --why-box-bg: #111;
   --why-box-fg: var(--color-page-bg);
-  /* Baseline inset for text inside the box */
-  --why-base-inset: 2rem;
+  /*
+   * In `em` (resolves on each `p`): tuned ≈ 2rem at ~1.09rem body (2/1.09), not literal 2em
+   * (that overshoots because body clamp is > 1rem).
+   */
+  --why-base-inset: 1.84em;
   /* --why-gif-top-inset: set on this element from WhyContent (src/constants/why-layout.ts). */
   max-width: none;
   margin-top: var(--page-title-rule-gap);
@@ -143,16 +146,21 @@
 }
 
 .why-page .why-scroll {
-  /* sync: WHY_TEXT_RIGHT_GUTTER_REM in src/constants/why-layout.ts */
-  --why-text-right-gutter: 3rem;
+  /* sync: WHY_TEXT_RIGHT_GUTTER_REM (JS px fallback) — ~3rem at ~1.09rem body (3/1.09) */
+  --why-text-right-gutter: 2.75em;
   /* 1 = design (100%); below 1 shrinks copy when the reference line needs more room. */
   --why-font-scale: 1;
+  --why-copy-font-size: calc(
+    clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale, 1)
+  );
+  font-size: var(--why-copy-font-size);
   position: relative;
   z-index: 1;
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: clamp(2rem, 5vw, 3rem);
+  /* ~clamp(2rem,5vw,3rem) in “old rem” terms; em leg tracks --why-font-scale via font-size above */
+  padding: clamp(1.84em, 5vw, 2.75em);
   padding-right: 0;
   padding-left: 0;
   scroll-behavior: smooth;
@@ -212,10 +220,7 @@
 
 .why-page .why-scroll p {
   margin: 0;
-  /* Keep desktop feel, but allow a bit more shrink on compact/mobile widths. */
-  font-size: calc(
-    clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale, 1)
-  );
+  font-size: inherit;
   line-height: 1.75;
   letter-spacing: -0.01em;
   padding-left: var(--why-base-inset);
@@ -230,7 +235,7 @@
 }
 
 .why-page .why-scroll p + p {
-  margin-top: calc(1.5rem * var(--why-font-scale, 1));
+  margin-top: 1.38em;
 }
 
 .why-page .why-scroll p.why-lead {
@@ -245,23 +250,22 @@
 }
 
 .why-page .why-anchor {
-  margin-top: calc(2rem * var(--why-font-scale, 1)) !important;
+  margin-top: 1.84em !important;
 }
 
 /* Extra air after the wide LinkedIn / GitHub paragraph before “This site…”. */
 .why-page .why-scroll .why-p--wide + .why-anchor {
-  margin-top: calc(3rem * var(--why-font-scale, 1)) !important;
+  margin-top: 2.75em !important;
 }
 
 .why-page .why-close {
-  margin-top: calc(2rem * var(--why-font-scale, 1)) !important;
+  margin-top: 1.84em !important;
   font-size: inherit;
   line-height: 1.7;
 }
 
 /*
- * Off-screen probe: same body `font-size` math as `.why-scroll p` (keep in sync).
- * Text is set from WHY_FIT_REFERENCE_LINE in why-box-scroll.ts.
+ * Off-screen probe: inherits `.why-scroll` body font-size (WHY_FIT_REFERENCE_LINE fit).
  */
 .why-page .why-scroll .why-fit-probe {
   position: absolute;
@@ -275,9 +279,7 @@
   padding: 0;
   font-family: inherit;
   font-weight: 400;
-  font-size: calc(
-    clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale, 1)
-  );
+  font-size: inherit;
   line-height: 1.75;
   letter-spacing: -0.01em;
 }
@@ -288,7 +290,7 @@
   right: 0;
   /*
    * Same inset as text from the scroll padding box (inner panel edge), not from .why-content:
-   * .why-scroll has padding-top (often > 2rem via clamp), so we subtract it in JS (--why-scroll-pad-top).
+   * .why-scroll has padding-top (clamp em + vw), subtracted in JS as --why-scroll-pad-top.
    * Subtract translateY total so the *painted* top stays at --why-gif-top-inset after transform.
    */
   top: calc(

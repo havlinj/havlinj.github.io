@@ -14,16 +14,17 @@ export const WHY_CTA_EDGE_WIDTH_FRAC = 0.02;
 
 /**
  * GIF band from scroll inner edge (custom property on `.why-wrapper`).
+ * ~2.3rem at ~1.09rem body (2.3/1.09); `em` resolves on `.why-gif-holder` (inherits scroll font-size).
  * Set from `WhyContent.astro`; do not redefine in `why.css`.
  */
-export const WHY_GIF_TOP_INSET = '2.3rem';
+export const WHY_GIF_TOP_INSET = '2.11em';
 
 /** Scroll-hint arrow: `AnimatedArrow` `containerCqw` (width vs `.why-box`). */
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
 
 /**
- * Min gap from longest line to inner right of `.why-scroll` (paragraph padding-right).
- * sync: `--why-text-right-gutter` in `src/styles/why.css`
+ * JS fallback when computed padding-right is missing (≈ 3rem at 16px root).
+ * sync: `--why-text-right-gutter: 2.75em` in `src/styles/why.css`
  */
 export const WHY_TEXT_RIGHT_GUTTER_REM = 3;
 

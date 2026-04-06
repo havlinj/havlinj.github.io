@@ -66,13 +66,18 @@ import {
     INTRO_LINE_COUNT: 2,
     INTRO_RAMP_MIN: 100,
     INTRO_RAMP_FRAC: 0.22,
+    /**
+     * Top of `.why-lead` sits at LEAD_TOP_FRAC × .why-box height from the box top (scroll panel).
+     * padTop + topSpacer + introGifPad = H * LEAD_TOP_FRAC − padTop. (Older “from bottom” baseline
+     * wording differed; this matches “horní okraj leadu na polovině výšky”.)
+     */
+    LEAD_TOP_FRAC: 0.5,
     GIF_NARROW_REF_PX: 520,
     GIF_NARROW_RANGE: 220,
-    GIF_MAX_FRAC: 0.34,
-    GIF_MAX_FRAC_NARROW: 0.1,
-    FONT_EASE_BASE: 0.72,
-    FONT_EASE_MULT: 0.28,
-    FONT_EASE_MIN: 0.68,
+    /** Target drawn GIF height vs `.why-box` outer height (uniform scale); not tied to font zoom. */
+    GIF_MAX_BOX_FRAC: 0.4,
+    /** On narrow panels, max GIF height × (1 − this × narrowness). */
+    GIF_BOX_NARROW_SHAVE: 0.12,
     GIF_MIN_LEAD_MULT: 0.68,
     GIF_MIN_BOX_FRAC: 0.065,
     GIF_MIN_ABS_PX: 24,
@@ -81,7 +86,6 @@ import {
     /** Cap intro GIF pad vs scroll height so tiny boxes don’t collapse. */
     GIF_INTRO_PAD_MAX_FRAC: 0.48,
     GIF_BASE_SCALE_MIN: 0.5,
-    LEAD_DOWN_FRAC: 0.18,
     END_SCROLL_EXTRA_FRAC: 0.32,
     REVOLVER_CENTER_BAND: 0.4,
     REVOLVER_TRANSITION_BAND: 0.45,
@@ -414,8 +418,9 @@ import {
    * - `baseDisplayPx`: how tall the GIF is drawn (uniform scale, 16:9 frame unchanged).
    * - `gifFootprintPx` (returned): padding-top for intro = display height + clearance vs lead
    *   so the gap scales with lead size without stretching the asset.
+   * - `footprintMaxPx` caps intro pad so lead anchor (padTop + topSpacer + pad) stays fixed.
    */
-  function computeGifFootprintPx(m) {
+  function computeGifFootprintPx(m, footprintMaxPx) {
     const layoutH = m.gifLayoutHeight;
     let gifFootprintPx = layoutH;
     if (layoutH > 0 && gifEl) {
@@ -424,31 +429,42 @@ import {
         0,
         1,
       );
-      const fontEase = clamp(
-        T.FONT_EASE_BASE + T.FONT_EASE_MULT * whyFontScale,
-        T.FONT_EASE_MIN,
+      const narrowFactor = clamp(
+        1 - T.GIF_BOX_NARROW_SHAVE * narrowness,
+        0.65,
         1,
       );
-      const maxBoxFrac =
-        (T.GIF_MAX_FRAC - T.GIF_MAX_FRAC_NARROW * narrowness) * fontEase;
-      const maxByBox = m.boxRect.height * maxBoxFrac;
+      const boxH = m.boxOuterRect.height;
+      const maxByBox =
+        boxH * T.GIF_MAX_BOX_FRAC * narrowFactor;
       const minByLead = Math.max(
         m.leadHeight * T.GIF_MIN_LEAD_MULT,
-        m.boxOuterRect.height * T.GIF_MIN_BOX_FRAC,
+        boxH * T.GIF_MIN_BOX_FRAC,
         T.GIF_MIN_ABS_PX,
       );
-      const baseDisplayPx = clamp(
+      let baseDisplayPx = clamp(
         Math.min(layoutH, maxByBox),
         minByLead,
         layoutH,
       );
       const clearancePx = m.leadHeight * T.GIF_TO_LEAD_CLEARANCE_MULT;
-      const padMax = m.boxRect.height * T.GIF_INTRO_PAD_MAX_FRAC;
+      const padMax = boxH * T.GIF_INTRO_PAD_MAX_FRAC;
       const desiredPad = baseDisplayPx + clearancePx;
       gifFootprintPx = Math.max(
         baseDisplayPx,
         Math.min(desiredPad, padMax),
       );
+      gifFootprintPx = Math.min(gifFootprintPx, footprintMaxPx);
+
+      const maxBaseForFootprint = Math.max(0, gifFootprintPx - clearancePx);
+      if (baseDisplayPx > maxBaseForFootprint) {
+        baseDisplayPx = clamp(
+          maxBaseForFootprint,
+          T.GIF_MIN_ABS_PX,
+          Math.min(layoutH, maxByBox),
+        );
+      }
+      baseDisplayPx = Math.min(baseDisplayPx, gifFootprintPx);
 
       const gifBaseScale = clamp(
         baseDisplayPx / layoutH,
@@ -467,13 +483,15 @@ import {
     return gifFootprintPx;
   }
 
-  function applySpacersAndIntroVars(m, gifFootprintPx) {
+  /** Sum (topSpacer + introGifPad) so lead top = LEAD_TOP_FRAC × why-box height from box top. */
+  function leadAnchorCombinedScrollPx(m) {
+    const H = m.boxOuterRect.height;
+    return Math.max(0, H * T.LEAD_TOP_FRAC - m.padTop);
+  }
+
+  function applySpacersAndIntroVars(m, gifFootprintPx, combinedForLeadPx) {
     const padQuantized = Math.round(gifFootprintPx * 4) / 4;
-    const leadDownPx = m.leadHeight * T.LEAD_DOWN_FRAC;
-    const topSpacerPx = Math.max(
-      0,
-      m.half - m.padTop - padQuantized + leadDownPx,
-    );
+    const topSpacerPx = Math.max(0, combinedForLeadPx - padQuantized);
     const endScrollExtraPx = m.half * T.END_SCROLL_EXTRA_FRAC;
     const bottomSpacerPx = Math.max(
       0,
@@ -648,8 +666,9 @@ import {
     applyEndCover(m);
     const introBlend = applyIntroTopEdge(m);
 
-    const gifFootprintPx = computeGifFootprintPx(m);
-    applySpacersAndIntroVars(m, gifFootprintPx);
+    const combinedForLead = leadAnchorCombinedScrollPx(m);
+    const gifFootprintPx = computeGifFootprintPx(m, combinedForLead);
+    applySpacersAndIntroVars(m, gifFootprintPx, combinedForLead);
     applyStartCoverBandSizing();
 
     applyLineRevolver(m, introBlend, ctaZone);
