@@ -27,6 +27,21 @@ import {
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
   const smoothstep = (x) => x * x * (3 - 2 * x);
 
+  function lineTextStartLeftPx(lineEl) {
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(lineEl);
+      const rects = range.getClientRects();
+      if (rects.length > 0) return rects[0].left;
+    } catch {
+      /* ignore Range errors and use fallback */
+    }
+    const rr = lineEl.getBoundingClientRect();
+    const cs = getComputedStyle(lineEl);
+    const padL = Number.parseFloat(cs.paddingLeft) || 0;
+    return rr.left + padL;
+  }
+
   /**
    * Intersection of `rect` with padded CTA zone. Returns 1 if no overlap, else 1 − smoothstep(blend).
    * yWeight/xWeight tweak vertical vs horizontal sensitivity (text vs GIF use different pairs).
@@ -44,6 +59,13 @@ import {
   }
 
   let rafId = 0;
+  let settleFrames = 0;
+
+  const requestZoomSettle = (frames = 4) => {
+    settleFrames = Math.max(settleFrames, frames);
+    schedule();
+  };
+
   const schedule = () => {
     if (rafId) return;
     rafId = requestAnimationFrame(update);
@@ -56,13 +78,14 @@ import {
       scrollEl.scrollHeight - scrollEl.clientHeight,
     );
     const boxRect = scrollEl.getBoundingClientRect();
+    const contentRect = contentEl.getBoundingClientRect();
     const boxOuterRect = boxEl.getBoundingClientRect();
     const half = boxRect.height / 2;
     const center = boxRect.top + half;
     const firstLine = lines[0];
     const firstRect = firstLine.getBoundingClientRect();
     const firstHeight = firstRect.height || 0;
-    const gifHeight = gifEl ? gifEl.getBoundingClientRect().height || 0 : 0;
+    const gifHeightRaw = gifEl ? gifEl.getBoundingClientRect().height || 0 : 0;
     const scrollStyle = window.getComputedStyle(scrollEl);
     const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
     const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
@@ -165,14 +188,29 @@ import {
     );
     boxEl.style.setProperty('--why-top-edge-opacity', introBlend.toFixed(3));
 
-    // Lead line top on scroll-center; spacers + intro padding absorb GIF height (GIF is out of flow).
+    // Keep GIF footprint proportional to the panel on compact screens:
+    // the visual system (lead near center) should dominate over GIF height.
+    let gifFootprintPx = gifHeightRaw;
+    if (gifHeightRaw > 0) {
+      // Narrow/zoom-like viewports should allocate relatively less vertical budget to GIF.
+      const narrowness = clamp((520 - boxRect.width) / 220, 0, 1);
+      const maxBoxFrac = 0.34 - 0.1 * narrowness; // ~34% desktop -> ~24% compact
+      const maxByBox = boxRect.height * maxBoxFrac;
+      // Keep some visible GIF presence, but do not force a large minimum near the lead row.
+      const minByLead = Math.max(firstHeight * 0.55, 24);
+      gifFootprintPx = clamp(Math.min(gifHeightRaw, maxByBox), minByLead, gifHeightRaw);
+      const gifBaseScale = clamp(gifFootprintPx / gifHeightRaw, 0.5, 1);
+      gifEl?.style.setProperty('--why-gif-base-scale', gifBaseScale.toFixed(3));
+    }
+
+    // Lead line top on scroll-center; spacers + intro padding absorb the normalized GIF footprint.
     const leadDownPx = firstHeight * 0.18;
-    const topSpacerPx = Math.max(0, half - padTop - gifHeight + leadDownPx);
+    const topSpacerPx = Math.max(0, half - padTop - gifFootprintPx + leadDownPx);
     // Extra bottom scroll room only — keeps last line from sticking too early; start phase unchanged.
     const endScrollExtraPx = half * 0.32;
     const bottomSpacerPx = Math.max(
       0,
-      half - padBottom - gifHeight + endScrollExtraPx,
+      half - padBottom - gifFootprintPx + endScrollExtraPx,
     );
     topSpacer.style.height = `${topSpacerPx.toFixed(2)}px`;
     bottomSpacer.style.height = `${bottomSpacerPx.toFixed(2)}px`;
@@ -184,7 +222,7 @@ import {
     );
     contentEl.style.setProperty(
       '--why-intro-gif-pad',
-      `${gifHeight.toFixed(2)}px`,
+      `${gifFootprintPx.toFixed(2)}px`,
     );
     contentEl.style.setProperty('--why-gif-nudge-y', '0px');
 
@@ -213,8 +251,8 @@ import {
       const scale = 1 - scaleDrop * blendedEased;
       const inset = maxInset * blendedEased;
 
-      line.style.setProperty('--why-line-scale', scale.toFixed(3));
-      line.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
+      line.style.setProperty('--why-line-scale', scale.toFixed(2));
+      line.style.setProperty('--why-line-inset', `${inset.toFixed(2)}rem`);
 
       let lineOp = 1;
       if (ctaZone && !isLead) {
@@ -226,6 +264,23 @@ import {
         );
       }
       line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
+    });
+
+    // Re-read line geometry after transforms were written this frame.
+    // This avoids 1-frame stale alignment and keeps GIF X attached to the truly centered line.
+    let activeLineInset = 0;
+    let activeLineDist = Number.POSITIVE_INFINITY;
+    let activeLineLeftPx = Number.NaN;
+    lines.forEach((line) => {
+      const rr = line.getBoundingClientRect();
+      const dist = Math.abs((rr.top + rr.bottom) / 2 - center);
+      if (dist < activeLineDist) {
+        activeLineDist = dist;
+        activeLineLeftPx = lineTextStartLeftPx(line) - contentRect.left;
+        const insetRaw = line.style.getPropertyValue('--why-line-inset').trim();
+        const insetRem = Number.parseFloat(insetRaw);
+        activeLineInset = Number.isFinite(insetRem) ? insetRem : 0;
+      }
     });
 
     // GIF: same center-distance easing as text; lift via --why-gif-y doesn’t affect spacer math.
@@ -243,15 +298,21 @@ import {
       const gifEased = eased * introBlend;
 
       const liftPx = firstHeight * 0.75; // optical: GIF sits slightly above lead
-      gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(2)}px`);
+      gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(1)}px`);
 
       const scaleDrop = 0.35;
       const maxInset = 3.2;
       const scale = 1 - scaleDrop * gifEased;
-      const inset = maxInset * gifEased;
+      const inset = activeLineInset;
 
-      gifEl.style.setProperty('--why-line-scale', scale.toFixed(3));
-      gifEl.style.setProperty('--why-line-inset', `${inset.toFixed(3)}rem`);
+      gifEl.style.setProperty('--why-line-scale', scale.toFixed(2));
+      gifEl.style.setProperty('--why-line-inset', `${inset.toFixed(2)}rem`);
+      if (Number.isFinite(activeLineLeftPx)) {
+        gifEl.style.setProperty(
+          '--why-gif-align-x',
+          `${activeLineLeftPx.toFixed(2)}px`,
+        );
+      }
 
       const opacityDrop = 0.75;
       let opacity = clamp(1 - opacityDrop * gifEased, 0, 1);
@@ -264,6 +325,10 @@ import {
         );
       }
       gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+    }
+    if (settleFrames > 0) {
+      settleFrames -= 1;
+      schedule();
     }
   }
 
@@ -284,6 +349,14 @@ import {
   }
 
   scrollEl.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', schedule);
+  scrollEl.addEventListener(
+    'wheel',
+    (event) => {
+      if (event.ctrlKey) requestZoomSettle(5);
+    },
+    { passive: true },
+  );
+  window.addEventListener('resize', () => requestZoomSettle(4));
+  window.visualViewport?.addEventListener('resize', () => requestZoomSettle(4));
   init();
 })();
