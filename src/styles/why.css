@@ -138,6 +138,10 @@
 }
 
 .why-page .why-scroll {
+  /* sync: WHY_TEXT_RIGHT_GUTTER_REM in src/constants/why-layout.ts */
+  --why-text-right-gutter: 3rem;
+  /* 1 = design (100%); below 1 shrinks copy when the reference line needs more room. */
+  --why-font-scale: 1;
   position: relative;
   z-index: 1;
   width: 100%;
@@ -190,21 +194,27 @@
 }
 
 .why-page .why-block--body {
-  margin-top: clamp(4rem, 7vh, 5.5rem);
+  margin-top: calc(
+    clamp(4rem, 7vh, 5.5rem) * var(--why-font-scale, 1)
+  );
 }
 
 .why-page .why-block--close {
-  margin-top: clamp(4.5rem, 8vh, 6.5rem);
+  margin-top: calc(
+    clamp(4.5rem, 8vh, 6.5rem) * var(--why-font-scale, 1)
+  );
 }
 
 .why-page .why-scroll p {
   margin: 0;
   /* Keep desktop feel, but allow a bit more shrink on compact/mobile widths. */
-  font-size: clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem);
+  font-size: calc(
+    clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale, 1)
+  );
   line-height: 1.75;
   letter-spacing: -0.01em;
   padding-left: var(--why-base-inset);
-  padding-right: 0;
+  padding-right: var(--why-text-right-gutter);
   opacity: var(--why-line-opacity, 1);
   transform: translateX(var(--why-line-inset, 0))
     scale(var(--why-line-scale, 1));
@@ -215,31 +225,56 @@
 }
 
 .why-page .why-scroll p + p {
-  margin-top: 1.5rem;
+  margin-top: calc(1.5rem * var(--why-font-scale, 1));
 }
 
 .why-page .why-scroll p.why-lead {
   position: relative;
   z-index: 6;
-  font-size: clamp(1.02rem, 0.95rem + 0.74vw, 1.22rem);
+  font-size: calc(
+    clamp(1.02rem, 0.95rem + 0.74vw, 1.22rem) * var(--why-font-scale, 1)
+  );
   line-height: 1.5;
   font-weight: 500;
   letter-spacing: -0.015em;
 }
 
 .why-page .why-anchor {
-  margin-top: 2rem !important;
+  margin-top: calc(2rem * var(--why-font-scale, 1)) !important;
 }
 
 /* Extra air after the wide LinkedIn / GitHub paragraph before “This site…”. */
 .why-page .why-scroll .why-p--wide + .why-anchor {
-  margin-top: 3rem !important;
+  margin-top: calc(3rem * var(--why-font-scale, 1)) !important;
 }
 
 .why-page .why-close {
-  margin-top: 2rem !important;
+  margin-top: calc(2rem * var(--why-font-scale, 1)) !important;
   font-size: inherit;
   line-height: 1.7;
+}
+
+/*
+ * Off-screen probe: same body `font-size` math as `.why-scroll p` (keep in sync).
+ * Text is set from WHY_FIT_REFERENCE_LINE in why-box-scroll.ts.
+ */
+.why-page .why-scroll .why-fit-probe {
+  position: absolute;
+  left: -20000px;
+  top: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: calc(
+    clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale, 1)
+  );
+  line-height: 1.75;
+  letter-spacing: -0.01em;
 }
 
 .why-page .why-gif-holder {

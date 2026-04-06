@@ -20,3 +20,12 @@ export const WHY_GIF_TOP_INSET = '2.3rem';
 
 /** Scroll-hint arrow: `AnimatedArrow` `containerCqw` (width vs `.why-box`). */
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
+
+/**
+ * Min gap from longest line to inner right of `.why-scroll` (paragraph padding-right).
+ * sync: `--why-text-right-gutter` in `src/styles/why.css`
+ */
+export const WHY_TEXT_RIGHT_GUTTER_REM = 3;
+
+/** Max revolver translateX (rem) for non-lead lines; must match `why-box-scroll.ts` / CSS revolver. */
+export const WHY_BODY_MAX_INSET_REM = 4;

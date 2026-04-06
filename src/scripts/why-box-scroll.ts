@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment -- intentional for this DOM-only entry */
 // @ts-nocheck — DOM-heavy client script; early returns narrow types; full HTMLElement typing is noisy.
+import { WHY_FIT_REFERENCE_LINE } from '../constants/why-fit-reference';
 import {
+  WHY_BODY_MAX_INSET_REM,
   WHY_CTA_EDGE_MIN_PX,
   WHY_CTA_EDGE_WIDTH_FRAC,
   WHY_CTA_LEAD_TRACK,
+  WHY_TEXT_RIGHT_GUTTER_REM,
 } from '../constants/why-layout';
 
 (function () {
@@ -23,9 +26,45 @@ import {
 
   const gifEl = scrollEl.querySelector('.why-gif-holder');
   const leadForCta = scrollEl.querySelector('p.why-lead');
+  const wideP = scrollEl.querySelector('.why-p--wide');
+  const fitProbe = scrollEl.querySelector('.why-fit-probe');
+  if (fitProbe) {
+    fitProbe.textContent = WHY_FIT_REFERENCE_LINE;
+  }
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
   const smoothstep = (x) => x * x * (3 - 2 * x);
+
+  /** Smoothly approaches target from reference line fit; 1 = CSS design at 100%. */
+  let whyFontScale = 1;
+  const WHY_FONT_MIN = 0.52;
+  const WHY_FONT_LERP = 0.22;
+  const WHY_FONT_SNAP = 0.004;
+
+  function computeWhyFontTarget() {
+    if (!(wideP instanceof HTMLElement) || !(fitProbe instanceof HTMLElement))
+      return 1;
+    const rootRem =
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+      16;
+    const pCs = getComputedStyle(wideP);
+    const padL = Number.parseFloat(pCs.paddingLeft) || 0;
+    const padR =
+      Number.parseFloat(pCs.paddingRight) ||
+      WHY_TEXT_RIGHT_GUTTER_REM * rootRem;
+    /* Intro column can be narrower than .why-scroll (max-width: 72ch). */
+    const innerW = Math.max(0, wideP.clientWidth - padL - padR);
+    const reserveRevolver = WHY_BODY_MAX_INSET_REM * rootRem;
+    const safetyPx = 3;
+    const contentW = Math.max(0, innerW - reserveRevolver - safetyPx);
+
+    scrollEl.style.setProperty('--why-font-scale', whyFontScale.toFixed(4));
+    void scrollEl.offsetWidth;
+    const w = fitProbe.getBoundingClientRect().width;
+    if (w < 2) return 1;
+    const wPerUnit = w / Math.max(1e-4, whyFontScale);
+    return clamp(contentW / wPerUnit, WHY_FONT_MIN, 1);
+  }
 
   function lineTextStartLeftPx(lineEl) {
     try {
@@ -73,6 +112,17 @@ import {
 
   function update() {
     rafId = 0;
+
+    const fontTarget = computeWhyFontTarget();
+    whyFontScale += (fontTarget - whyFontScale) * WHY_FONT_LERP;
+    if (Math.abs(fontTarget - whyFontScale) < WHY_FONT_SNAP) {
+      whyFontScale = fontTarget;
+    }
+    scrollEl.style.setProperty('--why-font-scale', whyFontScale.toFixed(4));
+    if (Math.abs(fontTarget - whyFontScale) > WHY_FONT_SNAP * 2) {
+      settleFrames = Math.max(settleFrames, 2);
+    }
+
     const maxScroll = Math.max(
       0,
       scrollEl.scrollHeight - scrollEl.clientHeight,
@@ -194,10 +244,15 @@ import {
     if (gifHeightRaw > 0) {
       // Narrow/zoom-like viewports should allocate relatively less vertical budget to GIF.
       const narrowness = clamp((520 - boxRect.width) / 220, 0, 1);
-      const maxBoxFrac = 0.34 - 0.1 * narrowness; // ~34% desktop -> ~24% compact
+      const fontEase = clamp(0.72 + 0.28 * whyFontScale, 0.68, 1);
+      const maxBoxFrac = (0.34 - 0.1 * narrowness) * fontEase;
       const maxByBox = boxRect.height * maxBoxFrac;
-      // Keep some visible GIF presence, but do not force a large minimum near the lead row.
-      const minByLead = Math.max(firstHeight * 0.55, 24);
+      // Keep GIF from crowding the lead as type scales down / box shrinks.
+      const minByLead = Math.max(
+        firstHeight * 0.68,
+        boxOuterRect.height * 0.065,
+        24,
+      );
       gifFootprintPx = clamp(Math.min(gifHeightRaw, maxByBox), minByLead, gifHeightRaw);
       const gifBaseScale = clamp(gifFootprintPx / gifHeightRaw, 0.5, 1);
       gifEl?.style.setProperty('--why-gif-base-scale', gifBaseScale.toFixed(3));
@@ -352,11 +407,11 @@ import {
   scrollEl.addEventListener(
     'wheel',
     (event) => {
-      if (event.ctrlKey) requestZoomSettle(5);
+      if (event.ctrlKey) requestZoomSettle(8);
     },
     { passive: true },
   );
-  window.addEventListener('resize', () => requestZoomSettle(4));
-  window.visualViewport?.addEventListener('resize', () => requestZoomSettle(4));
+  window.addEventListener('resize', () => requestZoomSettle(8));
+  window.visualViewport?.addEventListener('resize', () => requestZoomSettle(8));
   init();
 })();

@@ -8,11 +8,40 @@ import {
   WHY_SCROLL_CTA_CONTAINER_CQW,
 } from './constants';
 import { RGB_INK } from '../src/constants/colors';
+import { WHY_FIT_REFERENCE_LINE } from '../src/constants/why-fit-reference';
 import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
 
 test.describe('/why page', () => {
   test.beforeEach(async ({ page }) => {
     await gotoWhyWhenReady(page);
+  });
+
+  test('WHY_FIT_REFERENCE_LINE matches longest line among /why copy', async ({
+    page,
+  }) => {
+    await gotoWhyWhenReady(page);
+    const { maxLen, longest, refPresent } = await page.evaluate(() => {
+      const scroll = document.querySelector('.why-page .why-scroll');
+      if (!scroll) {
+        return { maxLen: 0, longest: '', refPresent: false };
+      }
+      const lines: string[] = [];
+      scroll.querySelectorAll('.why-content p').forEach((p) => {
+        p.innerText.split('\n').forEach((raw) => {
+          const t = raw.replace(/\s+/g, ' ').trim();
+          if (t.length > 0) lines.push(t);
+        });
+      });
+      const max = lines.reduce((m, s) => Math.max(m, s.length), 0);
+      const longestLine = lines.reduce(
+        (a, b) => (a.length >= b.length ? a : b),
+        '',
+      );
+      return { maxLen: max, longest: longestLine, refPresent: lines.length > 0 };
+    });
+    expect(refPresent).toBe(true);
+    expect(WHY_FIT_REFERENCE_LINE.length).toBe(maxLen);
+    expect(longest).toBe(WHY_FIT_REFERENCE_LINE);
   });
 
   test('shows Why title, lead copy, and GIF asset', async ({ page }) => {
