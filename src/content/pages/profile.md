@@ -13,7 +13,6 @@ title: 'Profile'
     --portrait-brightness: 1;
     --portrait-contrast: 1;
     --portrait-opacity: 0.85;
-    --profile-reveal-text-scale: 1.35;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;
@@ -40,6 +39,7 @@ title: 'Profile'
     --profile-tile-4-brightness: 0.9;
     --profile-tile-4-contrast: 1.2;
     --profile-tile-4-opacity: 0.8;
+    --profile-reveal-text-scale: 1.35;
   "
 >
   <a

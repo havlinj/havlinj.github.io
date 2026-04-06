@@ -420,6 +420,12 @@ article .profile-section:last-child {
 }
 
 .prof-tile__reveal {
+  --profile-reveal-clip-safe-right: 0px;
+  /*
+   * Empirical compositor/raster compensation for the right edge of "?"
+   * under aggressive zoom. Keep small and tune only if clipping returns.
+   */
+  --profile-reveal-right-edge-comp: -3px;
   position: absolute;
   inset: 0;
   z-index: 4;
@@ -427,7 +433,12 @@ article .profile-section:last-child {
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  padding: 1.2rem var(--profile-tile-text-inset-x);
+  padding-block: 1.2rem;
+  padding-inline-start: var(--profile-tile-text-inset-x);
+  padding-inline-end: calc(
+    var(--profile-tile-text-inset-x) + var(--profile-reveal-clip-safe-right) +
+      var(--profile-reveal-right-edge-comp)
+  );
   box-sizing: border-box;
   text-align: left;
   background: #111;
@@ -547,7 +558,7 @@ article .profile-section:last-child {
 
 /* Foundations state 2: secondary tile copy (scoped under reveal) */
 .prof-tile__reveal .tile-state-secondary {
-  --profile-reveal-right-buffer: 0.16em;
+  --profile-reveal-tail-buffer: 0.18em;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -566,7 +577,6 @@ article .profile-section:last-child {
   display: inline-block;
   box-sizing: border-box;
   max-width: 100%;
-  padding-right: var(--profile-reveal-right-buffer);
   font-size: calc(1.68em * var(--profile-reveal-text-scale, 1));
   line-height: 1.18;
   font-weight: 500;
@@ -595,8 +605,17 @@ article .profile-section:last-child {
 }
 
 .prof-tile__reveal .tile-state-secondary .question-mark {
+  display: inline-flex;
+  align-items: baseline;
   margin-left: 0.15em;
   font-size: 1em;
+}
+
+.prof-tile__reveal .tile-state-secondary .question-mark::after {
+  content: '';
+  display: inline-block;
+  width: var(--profile-reveal-tail-buffer);
+  flex: 0 0 auto;
 }
 
 .profile-photo-box img {

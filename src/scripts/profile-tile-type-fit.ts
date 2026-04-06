@@ -218,29 +218,23 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
 
   const fits = (fontSizePx: number): boolean => {
     reveal.style.setProperty(REVEAL_VAR, `${roundPx(fontSizePx)}px`);
-    // Real rendered fit check (both axes) + small safety margin for glyph antialiasing.
-    const hSafetyPx = 6;
+    // Real rendered fit check (both axes) using measured line geometry.
+    const hSafetyPx = 2;
     const vSafetyPx = 1;
     const line1 = queryElement(
       reveal,
       '.tile-state-secondary .line-1',
       HTMLElement,
     );
-    const rightBufferPx = line1
-      ? Number.parseFloat(getComputedStyle(line1).paddingRight) || 0
-      : 0;
-    // Reserve explicit visual room behind "?" so font sizing accounts for this buffer.
-    const maxW = Math.max(0, stanza.clientWidth - hSafetyPx - rightBufferPx);
     const maxH = Math.max(0, stanza.clientHeight - vSafetyPx);
-    const boxFits =
-      stanza.scrollWidth <= maxW && stanza.scrollHeight <= maxH;
+    const boxFits = stanza.scrollHeight <= maxH;
 
     if (!line1) return boxFits;
     const lineRect = line1.getBoundingClientRect();
     const stanzaRect = stanza.getBoundingClientRect();
-    // Extra geometric guard: keep first line safely inside with explicit right-side buffer.
-    const rightEdgeFits = lineRect.right <= stanzaRect.right - rightBufferPx;
-    return boxFits && rightEdgeFits;
+    // Tail buffer is part of .line-1 width via .question-mark::after, so this check is deterministic.
+    const lineFits = lineRect.width <= stanzaRect.width - hSafetyPx;
+    return boxFits && lineFits;
   };
 
   if (!fits(minPx)) {

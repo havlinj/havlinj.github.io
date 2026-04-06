@@ -29,16 +29,41 @@ test.describe('/profile mobile regressions', () => {
               '.prof-tile--foundations .prof-tile__reveal',
             );
             const stanza = reveal?.querySelector('.tile-state-secondary');
+            const line1 = reveal?.querySelector('.tile-state-secondary .line-1');
             if (!(stanza instanceof HTMLElement))
               throw new Error('missing .tile-state-secondary');
+            if (!(line1 instanceof HTMLElement)) throw new Error('missing .line-1');
+            const stanzaRect = stanza.getBoundingClientRect();
+            const lineRect = line1.getBoundingClientRect();
             return {
               wFits: stanza.scrollWidth <= stanza.clientWidth + 1,
               hFits: stanza.scrollHeight <= stanza.clientHeight + 1,
+              rightGap: stanzaRect.right - lineRect.right,
             };
           }),
         { timeout: 2500, intervals: [100, 180, 300] },
       )
-      .toEqual({ wFits: true, hFits: true });
+      .toMatchObject({ wFits: true, hFits: true });
+
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const reveal = document.querySelector(
+              '.prof-tile--foundations .prof-tile__reveal',
+            );
+            const stanza = reveal?.querySelector('.tile-state-secondary');
+            const line1 = reveal?.querySelector('.tile-state-secondary .line-1');
+            if (!(stanza instanceof HTMLElement))
+              throw new Error('missing .tile-state-secondary');
+            if (!(line1 instanceof HTMLElement)) throw new Error('missing .line-1');
+            const stanzaRect = stanza.getBoundingClientRect();
+            const lineRect = line1.getBoundingClientRect();
+            return stanzaRect.right - lineRect.right;
+          }),
+        { timeout: 2500, intervals: [100, 180, 300] },
+      )
+      .toBeGreaterThan(1);
   });
 
   test('Foundations returns to state1 colors after state2 timeout', async ({
