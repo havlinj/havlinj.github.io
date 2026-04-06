@@ -249,6 +249,11 @@
   letter-spacing: -0.015em;
 }
 
+/* Gentler than full Inter italic for <em> (e.g. LinkedIn / GitHub). Tune deg if needed. */
+.why-page .why-scroll em {
+  font-style: oblique 6deg;
+}
+
 .why-page .why-anchor {
   margin-top: 1.84em !important;
 }
@@ -313,7 +318,8 @@
    * Center-origin scaling introduced a visible top gap drift under zoom-like mobile conditions.
    */
   transform-origin: left top;
-  opacity: var(--why-gif-opacity, 1);
+  /* --why-gif-opacity: revolver/CTA from why-box-scroll.ts; --why-gif-base-opacity: WhyContent / why-layout */
+  opacity: calc(var(--why-gif-opacity, 1) * var(--why-gif-base-opacity, 1));
   transition: none;
 
   backface-visibility: hidden;

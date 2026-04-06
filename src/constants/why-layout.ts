@@ -19,6 +19,12 @@ export const WHY_CTA_EDGE_WIDTH_FRAC = 0.02;
  */
 export const WHY_GIF_TOP_INSET = '2.11em';
 
+/**
+ * Multiplier for GIF opacity (0–1). Final opacity = scroll-script factor × this.
+ * Set on `.why-wrapper` as `--why-gif-base-opacity`; sync `why.css` `.why-gif-holder`.
+ */
+export const WHY_GIF_BASE_OPACITY = 0.7;
+
 /** Scroll-hint arrow: `AnimatedArrow` `containerCqw` (width vs `.why-box`). */
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
 

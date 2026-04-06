@@ -1,6 +1,7 @@
 ---
 import AnimatedArrow from './AnimatedArrow.astro';
 import {
+  WHY_GIF_BASE_OPACITY,
   WHY_GIF_TOP_INSET,
   WHY_SCROLL_CTA_CONTAINER_CQW,
 } from '../constants/why-layout';
@@ -9,7 +10,10 @@ import '../styles/why.css';
 
 <section
   class="why-wrapper"
-  style={{ '--why-gif-top-inset': WHY_GIF_TOP_INSET }}
+  style={{
+    '--why-gif-top-inset': WHY_GIF_TOP_INSET,
+    '--why-gif-base-opacity': String(WHY_GIF_BASE_OPACITY),
+  }}
 >
   <div class="why-box">
     <div class="why-end-cover" aria-hidden="true"></div>
@@ -19,8 +23,8 @@ import '../styles/why.css';
         sizeMode="container"
         containerCqw={WHY_SCROLL_CTA_CONTAINER_CQW}
         color="#e0f7fa"
-        duration={2}
-        opacity={0.2}
+        duration={2.5}
+        opacity={0.3}
         grainOpacity={0.28}
         grainSize={220}
       />
@@ -46,7 +50,7 @@ import '../styles/why.css';
           <p class="why-lead">I'm a software engineer.</p>
 
           <p class="why-p--wide">
-            Platforms like LinkedIn or GitHub are useful —<br />
+            Platforms like <em>LinkedIn</em> or <em>GitHub</em> are useful —<br />
             but they say little about how someone actually thinks.
           </p>
 
