@@ -216,6 +216,9 @@ test.describe('/why page', () => {
           startOp: parseFloat(
             cs.getPropertyValue('--why-start-cover-opacity').trim() || '1',
           ),
+          bottomVeilOp: parseFloat(
+            cs.getPropertyValue('--why-bottom-veil-opacity').trim() || '0',
+          ),
           endOp: parseFloat(
             cs.getPropertyValue('--why-end-cover-opacity').trim() || '0',
           ),
@@ -244,6 +247,10 @@ test.describe('/why page', () => {
     expect(atTop!.startOp, 'start-cover visible at scroll 0').toBeGreaterThan(
       0.85,
     );
+    expect(
+      atTop!.bottomVeilOp,
+      'scroll bottom veil off at scroll 0',
+    ).toBeLessThan(0.08);
     expect(atTop!.endOp, 'end-cover off at scroll 0').toBeLessThan(0.15);
     expect(atTop!.ctaOp, 'CTA visible at scroll 0').toBeGreaterThan(0.9);
 
@@ -270,6 +277,10 @@ test.describe('/why page', () => {
     const afterHint = await read();
     expect(afterHint).not.toBeNull();
     expect(afterHint!.ctaVisibility).toBe('hidden');
+    expect(
+      afterHint!.bottomVeilOp,
+      'bottom veil ramps in after intro band',
+    ).toBeGreaterThan(0.35);
 
     // Scroll to real bottom after layout may have changed (do not use stale atTop.maxScroll).
     await page.evaluate(() => {

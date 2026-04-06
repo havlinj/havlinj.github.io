@@ -22,6 +22,9 @@
   overflow: hidden;
   background-color: var(--why-box-bg);
   color: var(--why-box-fg);
+  /* Horní ::before; spodní clona je o kousek vyšší + intenzivnější gradient (viz .why-box-bottom-veil). */
+  --why-edge-veil-height: clamp(130px, 22vh, 230px);
+  --why-bottom-veil-height: clamp(152px, 27vh, 268px);
   /* Fades in with scroll via WhyContent (was darkening opening lines at scrollTop 0). */
   --why-top-edge-opacity: 1;
   /* CTA arrow uses `cqw` in AnimatedArrow (`sizeMode="container"`) so it scales with this panel. */
@@ -100,6 +103,32 @@
   );
 }
 
+/*
+ * Post-intro spodní clona: zrcadlí tvar horního pásu, o něco vyšší a s mírně silnějšími alphy
+ * (pořád plynulé). Síla vrstvy: --why-bottom-veil-opacity.
+ */
+.why-page .why-box > .why-box-bottom-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--why-bottom-veil-height);
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--why-bottom-veil-opacity, 0);
+  background: linear-gradient(
+    to top,
+    var(--why-box-bg) 0%,
+    rgba(17, 17, 17, 0.99) 10%,
+    rgba(17, 17, 17, 0.93) 24%,
+    rgba(17, 17, 17, 0.8) 40%,
+    rgba(17, 17, 17, 0.58) 58%,
+    rgba(17, 17, 17, 0.34) 74%,
+    rgba(17, 17, 17, 0.12) 90%,
+    rgba(17, 17, 17, 0) 100%
+  );
+}
+
 .why-page .why-box::before,
 .why-page .why-box::after {
   content: '';
@@ -113,8 +142,7 @@
   top: 0;
   z-index: 3;
   opacity: var(--why-top-edge-opacity, 1);
-  /* Stronger top fade: text should evaporate before the top edge */
-  height: clamp(130px, 22vh, 230px);
+  height: var(--why-edge-veil-height);
   background: linear-gradient(
     to top,
     rgba(17, 17, 17, 0) 0%,
@@ -129,8 +157,9 @@
 
 .why-page .why-box::after {
   bottom: 0;
-  /* Below .why-scroll (z-index 1) so text is not darkened; pairs with .why-start-cover inside scroll */
+  /* Below .why-scroll (z-index 1); mirrors intro start-cover only — fades with it */
   z-index: 0;
+  opacity: var(--why-start-cover-opacity, 1);
   /* Same height as .why-start-cover (set on .why-box as --why-start-cover-height) */
   height: var(--why-start-cover-height, clamp(140px, 20.8vh, 218px));
   background: linear-gradient(

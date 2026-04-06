@@ -49,6 +49,8 @@ import {
     START_COVER_BELOW_WIDE_REM: 0.5,
     /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
     START_COVER_HEIGHT_MAX: 300,
+    /** After intro band: 1 = stejná „plná“ intenzita vrstvy jako horní ::before (jen násobí gradient). */
+    BOTTOM_VEIL_MAX_O: 1,
     CTA_FADE_PX: 56,
     CTA_O_HIDDEN: 0.002,
     CTA_ZONE_MIN_O: 0.04,
@@ -235,6 +237,11 @@ import {
     boxEl.style.setProperty(
       '--why-start-cover-opacity',
       startOpacity.toFixed(3),
+    );
+    const veilOpacity = smoothstep(startProgress) * T.BOTTOM_VEIL_MAX_O;
+    boxEl.style.setProperty(
+      '--why-bottom-veil-opacity',
+      veilOpacity.toFixed(3),
     );
   }
 
