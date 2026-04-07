@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import {
   LAYOUT_TOLERANCE,
   WHY_CTA_EDGE_MIN_PX,
@@ -581,6 +581,151 @@ test.describe('/why page @serial', () => {
       expect(p.s).toBeGreaterThan(0.98);
       expect(Math.abs(p.i)).toBeLessThan(0.08);
     }
+  });
+
+  async function whyWheelScrollDeltaPx(
+    page: Page,
+    rawDeltaY: number,
+  ): Promise<number> {
+    const scroll = page.locator('.why-page .why-scroll');
+    const box = await scroll.boundingBox();
+    expect(box).toBeTruthy();
+    await page.mouse.move(
+      box!.x + box!.width / 2,
+      box!.y + box!.height / 2,
+    );
+    await page.evaluate(() => {
+      const el = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
+      el.scrollTop = 0;
+    });
+    await waitTwoFrames(page);
+    await waitTwoFrames(page);
+    await page.mouse.wheel(0, rawDeltaY);
+    await waitTwoFrames(page);
+    await waitTwoFrames(page);
+    return page.evaluate(
+      () =>
+        (document.querySelector('.why-page .why-scroll') as HTMLElement)
+          .scrollTop,
+    );
+  }
+
+  test('mouse wheel uses damped scroll when motion is allowed', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const rawDelta = 240;
+    const moved = await whyWheelScrollDeltaPx(page, rawDelta);
+
+    // Playwright/Chromium maps wheel deltas; handler applies WHEEL_SCROLL_FACTOR (~0.78).
+    // Assert meaningful scroll but strictly less than the nominal delta (damping).
+    expect(moved, 'wheel should scroll down').toBeGreaterThan(28);
+    expect(
+      moved,
+      'damped wheel moves less than nominal deltaY (custom handler)',
+    ).toBeLessThan(rawDelta * 0.92);
+  });
+
+  test('prefers-reduced-motion: wheel bypasses damped handler (reload for media)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    const rawDelta = 240;
+
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await gotoWhyWhenReady(page);
+    const damped = await whyWheelScrollDeltaPx(page, rawDelta);
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload();
+    await page
+      .locator('.why-page .why-content.why-content--ready')
+      .waitFor({ state: 'visible', timeout: 10000 });
+    const nativeRm = await whyWheelScrollDeltaPx(page, rawDelta);
+
+    expect(damped, 'damped path should move').toBeGreaterThan(28);
+    expect(
+      nativeRm,
+      'reduce: no preventDefault → browser scroll exceeds damped distance',
+    ).toBeGreaterThan(damped + 6);
+  });
+
+  test('near top: first two paragraphs stay flat while a later line can revolve', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const found = await page.evaluate(async () => {
+      const scrollEl = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      if (!scrollEl) return { ok: false as const, reason: 'no scroll' };
+      const ps = [...scrollEl.querySelectorAll('p')] as HTMLElement[];
+      if (ps.length < 3) {
+        return { ok: false as const, reason: 'need ≥3 paragraphs' };
+      }
+
+      const waitFrames = (n: number) =>
+        new Promise<void>((resolve) => {
+          const step = (left: number) => {
+            if (left <= 0) return resolve();
+            requestAnimationFrame(() => step(left - 1));
+          };
+          step(n);
+        });
+
+      // Mirrors why-box-scroll.ts INTRO_RAMP_* and isStrictStartLock (× 0.35).
+      const introRampPx = Math.max(
+        100,
+        scrollEl.clientHeight * 0.22,
+      );
+      const maxTop = Math.min(
+        Math.floor(introRampPx * 0.34),
+        Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight - 4),
+      );
+
+      const read = (p: HTMLElement) => {
+        const cs = getComputedStyle(p);
+        return {
+          s: parseFloat(cs.getPropertyValue('--why-line-scale') || '1'),
+          i: parseFloat(cs.getPropertyValue('--why-line-inset') || '0'),
+        };
+      };
+
+      for (let top = 6; top <= maxTop; top += 3) {
+        scrollEl.scrollTop = top;
+        scrollEl.dispatchEvent(new Event('scroll', { bubbles: true }));
+        await waitFrames(5);
+
+        const a = read(ps[0]!);
+        const b = read(ps[1]!);
+        const c = read(ps[2]!);
+        const introFlat =
+          a.s > 0.97 &&
+          b.s > 0.97 &&
+          Math.abs(a.i) < 0.12 &&
+          Math.abs(b.i) < 0.12;
+        const bodyRevolved =
+          c.s < 0.985 || Math.abs(c.i) > 0.04;
+        if (introFlat && bodyRevolved) {
+          return { ok: true as const, scrollTop: top };
+        }
+      }
+
+      return {
+        ok: false as const,
+        reason: 'no scrollTop in strict-start band showed intro flat + body revolver',
+      };
+    });
+
+    expect(found.ok, 'ok' in found && !found.ok ? found.reason : '').toBe(true);
   });
 
   test('start state keeps first two paragraphs identical and fully untransformed', async ({
