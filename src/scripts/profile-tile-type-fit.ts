@@ -216,35 +216,18 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
       HTMLElement,
     );
     const maxH = Math.max(0, stanza.clientHeight - vSafetyPx);
-    const maxW = Math.max(0, stanza.clientWidth - hSafetyPx);
     const boxFitsH = stanza.scrollHeight <= maxH;
-    const boxFitsW = stanza.scrollWidth <= maxW;
 
-    if (!line1) return boxFitsH && boxFitsW;
+    if (!line1) return boxFitsH;
     const lineRect = line1.getBoundingClientRect();
     const stanzaRect = stanza.getBoundingClientRect();
     // Tail buffer is part of .line-1 width via .question-mark::after, so this check is deterministic.
     const lineFits = lineRect.width <= stanzaRect.width - hSafetyPx;
-    return boxFitsH && boxFitsW && lineFits;
+    return boxFitsH && lineFits;
   };
 
   if (!fits(minPx)) {
-    // Emergency fallback for narrow/mobile edge cases:
-    // if the nominal minimum still overflows horizontally, allow a small
-    // undershoot so the reveal text always stays inside the tile box.
-    const emergencyMinPx = 1;
-    if (!fits(emergencyMinPx)) {
-      reveal.style.setProperty(REVEAL_VAR, `${roundPx(emergencyMinPx)}px`);
-      return;
-    }
-    let lo = emergencyMinPx;
-    let hi = minPx;
-    for (let i = 0; i < 22; i++) {
-      const mid = (lo + hi) / 2;
-      if (fits(mid)) hi = mid;
-      else lo = mid;
-    }
-    reveal.style.setProperty(REVEAL_VAR, `${roundPx(hi)}px`);
+    reveal.style.setProperty(REVEAL_VAR, `${roundPx(minPx)}px`);
     return;
   }
   if (fits(maxPx)) {

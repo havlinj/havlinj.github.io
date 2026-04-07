@@ -425,7 +425,7 @@ article .profile-section:last-child {
    * Empirical compositor/raster compensation for the right edge of "?"
    * under aggressive zoom. Keep small and tune only if clipping returns.
    */
-  --profile-reveal-right-edge-comp: 0px;
+  --profile-reveal-right-edge-comp: -4px;
   position: absolute;
   inset: 0;
   z-index: 4;
