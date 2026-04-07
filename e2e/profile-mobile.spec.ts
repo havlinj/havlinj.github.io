@@ -20,6 +20,7 @@ test.describe('/profile mobile regressions @serial', () => {
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
+    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
 
     const reveal = page.locator('.prof-tile--foundations .prof-tile__reveal');
     await expect(reveal).toBeVisible();
@@ -33,6 +34,7 @@ test.describe('/profile mobile regressions @serial', () => {
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
+    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
 
     await expect
       .poll(

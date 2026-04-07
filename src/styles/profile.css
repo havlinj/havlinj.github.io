@@ -404,6 +404,34 @@ article .profile-section:last-child {
   --profile-reveal-pulse-delay: 0.45s;
 }
 
+/*
+ * Tile photo + grain sit on the anchor (::before / ::after). While .page-button__bg fades out
+ * for reveal, those layers would otherwise show through → image “blink”. Same during
+ * is-reveal-opening when bg is forced opacity:0 but hover hasn’t repainted yet.
+ */
+.profile-image-tile.prof-tile--foundations::before,
+.profile-image-tile.prof-tile--foundations::after {
+  transition: opacity 0.18s ease;
+}
+
+.profile-image-tile.prof-tile--foundations.is-revealed::before,
+.profile-image-tile.prof-tile--foundations.is-revealed::after,
+.profile-image-tile.prof-tile--foundations.is-reveal-fading-out::before,
+.profile-image-tile.prof-tile--foundations.is-reveal-fading-out::after,
+.profile-image-tile.prof-tile--foundations.is-reveal-opening::before,
+.profile-image-tile.prof-tile--foundations.is-reveal-opening::after {
+  opacity: 0;
+  /* Hide immediately when entering reveal choreography; fade back in when returning to state1 */
+  transition: opacity 0s linear;
+}
+
+/* While photo/grain are hidden, the anchor’s default fill is page-bg — use panel black instead */
+.profile-image-tile.prof-tile--foundations.is-revealed,
+.profile-image-tile.prof-tile--foundations.is-reveal-fading-out,
+.profile-image-tile.prof-tile--foundations.is-reveal-opening {
+  background: #111;
+}
+
 /* Foundations reveal layer: opacity/visibility transitions only during reveal states */
 .prof-tile--foundations.is-revealed .page-button__bg,
 .prof-tile--foundations.is-revealed .page-button__overlay,
@@ -484,6 +512,31 @@ article .profile-section:last-child {
     visibility 0s,
     background-color var(--profile-reveal-bg-duration, 0.52s)
       var(--profile-reveal-bg-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/*
+ * Hide reveal stanza until profile-tile-type-fit.ts adds .is-reveal-typefit-ready
+ * (after fit + paint) so light copy does not flash or smear during reflow.
+ */
+.prof-tile--foundations.is-revealed:not(.is-reveal-typefit-ready):not(
+    .is-reveal-fading-out
+  ):not(.is-reveal-opening)
+  .prof-tile__reveal
+  .tile-state-secondary {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+  text-shadow: none;
+}
+
+.prof-tile--foundations.is-revealed.is-reveal-typefit-ready:not(
+    .is-reveal-fading-out
+  ):not(.is-reveal-opening)
+  .prof-tile__reveal
+  .tile-state-secondary {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease;
 }
 
 /* "Alive" pulse: pulse the copy only (keep black reveal background stable). */
@@ -679,6 +732,14 @@ article .profile-section:last-child {
   .prof-tile--foundations.is-revealed .tile-state-secondary {
     animation: none !important;
     opacity: 1;
+  }
+
+  .prof-tile--foundations.is-revealed.is-reveal-typefit-ready:not(
+      .is-reveal-fading-out
+    )
+    .prof-tile__reveal
+    .tile-state-secondary {
+    transition: none;
   }
 }
 

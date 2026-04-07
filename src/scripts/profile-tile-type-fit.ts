@@ -36,7 +36,14 @@ const REVEAL_CLASSES = {
   revealed: 'is-revealed',
   fadingOut: 'is-reveal-fading-out',
   opening: 'is-reveal-opening',
+  /** Set after fit + layout so reveal copy does not flash at wrong size. */
+  typefitReady: 'is-reveal-typefit-ready',
 } as const;
+
+/** After this, show copy even if layout never stabilised (broken layout beats invisible). */
+const REVEAL_COPY_FALLBACK_MS = 1400;
+/** Consecutive frames with identical stanza box + font var after fit (post-CSS-transition). */
+const REVEAL_LAYOUT_STABLE_FRAMES = 3;
 
 function queryElement<T extends Element>(
   root: ParentNode,
@@ -304,6 +311,8 @@ function wireFoundationsReveal(): void {
 
   let revealTimeoutId = 0;
   let revealCloseStepId = 0;
+  let revealCopyFallbackId = 0;
+  let revealStableRafId = 0;
   const revealTimeoutMs = (): number => {
     const raw = getComputedStyle(foundationsTile)
       .getPropertyValue('--profile-reveal-timeout-ms')
@@ -317,8 +326,14 @@ function wireFoundationsReveal(): void {
   const clearRevealTimers = () => {
     window.clearTimeout(revealTimeoutId);
     window.clearTimeout(revealCloseStepId);
+    window.clearTimeout(revealCopyFallbackId);
+    if (revealStableRafId) {
+      window.cancelAnimationFrame(revealStableRafId);
+      revealStableRafId = 0;
+    }
     revealTimeoutId = 0;
     revealCloseStepId = 0;
+    revealCopyFallbackId = 0;
   };
 
   const isRevealed = (): boolean =>
@@ -332,6 +347,7 @@ function wireFoundationsReveal(): void {
     foundationsTile.classList.remove(
       REVEAL_CLASSES.revealed,
       REVEAL_CLASSES.fadingOut,
+      REVEAL_CLASSES.typefitReady,
     );
     foundationsTile.classList.add(REVEAL_CLASSES.opening);
     void foundationsTile.offsetWidth;
@@ -355,15 +371,72 @@ function wireFoundationsReveal(): void {
     foundationsTile.classList.remove(
       REVEAL_CLASSES.fadingOut,
       REVEAL_CLASSES.opening,
+      REVEAL_CLASSES.typefitReady,
     );
     foundationsTile.classList.add(REVEAL_CLASSES.revealed);
-    if (reveal) {
-      requestAnimationFrame(() => {
-        fitFoundationsReveal(reveal);
-        requestAnimationFrame(() => fitFoundationsReveal(reveal));
-      });
-    }
     clearRevealTimers();
+    if (reveal) {
+      const showRevealCopy = () => {
+        if (revealStableRafId) {
+          window.cancelAnimationFrame(revealStableRafId);
+          revealStableRafId = 0;
+        }
+        if (revealCopyFallbackId) {
+          window.clearTimeout(revealCopyFallbackId);
+          revealCopyFallbackId = 0;
+        }
+        foundationsTile.classList.add(REVEAL_CLASSES.typefitReady);
+      };
+      revealCopyFallbackId = window.setTimeout(() => {
+        revealCopyFallbackId = 0;
+        if (foundationsTile.classList.contains(REVEAL_CLASSES.revealed)) {
+          showRevealCopy();
+        }
+      }, REVEAL_COPY_FALLBACK_MS);
+
+      /*
+       * Tile height and portrait scale animate (~--profile-motion-duration). Early rAF fits
+       * target a mid-transition box; ResizeObserver then refits → visible “smear”. Wait until
+       * stanza size and reveal font var match for several frames after each fit.
+       */
+      let lastW = NaN;
+      let lastH = NaN;
+      let lastVar = '';
+      let stableFrames = 0;
+      const tick = () => {
+        revealStableRafId = 0;
+        if (!foundationsTile.classList.contains(REVEAL_CLASSES.revealed)) return;
+        fitFoundationsReveal(reveal);
+        const stanza = queryElement(
+          reveal,
+          '.tile-state-secondary',
+          HTMLElement,
+        );
+        if (!stanza || stanza.clientWidth < 4 || stanza.clientHeight < 4) {
+          revealStableRafId = window.requestAnimationFrame(tick);
+          return;
+        }
+        const w = Math.round(stanza.clientWidth);
+        const h = Math.round(stanza.clientHeight);
+        const v = getComputedStyle(reveal).getPropertyValue(REVEAL_VAR).trim();
+        if (w === lastW && h === lastH && v === lastVar) {
+          stableFrames++;
+          if (stableFrames >= REVEAL_LAYOUT_STABLE_FRAMES) {
+            showRevealCopy();
+            return;
+          }
+        } else {
+          stableFrames = 0;
+          lastW = w;
+          lastH = h;
+          lastVar = v;
+        }
+        revealStableRafId = window.requestAnimationFrame(tick);
+      };
+      revealStableRafId = window.requestAnimationFrame(tick);
+    } else {
+      foundationsTile.classList.add(REVEAL_CLASSES.typefitReady);
+    }
     revealTimeoutId = window.setTimeout(() => {
       revealTimeoutId = 0;
       runRevealCloseSequence();

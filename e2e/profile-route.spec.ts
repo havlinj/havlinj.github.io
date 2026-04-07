@@ -96,6 +96,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
+    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
     const { revealPx, labelPx } = await page.evaluate(() => {
       const section = document.querySelector('.profile-section');
       const reveal = document.querySelector(
@@ -137,6 +138,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
+    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.prof-tile__reveal')).toContainText(
       /Tried\s*Writing/i,
@@ -150,6 +152,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
+    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
 
     const layout = await page.evaluate(() => {
       const reveal = document.querySelector(
