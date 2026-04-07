@@ -25,6 +25,11 @@
   /* Horní ::before; spodní clona je o kousek vyšší + intenzivnější gradient (viz .why-box-bottom-veil). */
   --why-edge-veil-height: clamp(130px, 22vh, 230px);
   --why-bottom-veil-height: clamp(152px, 27vh, 268px);
+  /* End phase (set from JS): 0 = normal, 1 = final scroll band near bottom. */
+  --why-end-phase: 0;
+  /* In final phase keep veils shallow so they do not wash over the last centered paragraphs. */
+  --why-edge-veil-end-height: clamp(42px, 8vh, 86px);
+  --why-bottom-veil-end-height: clamp(48px, 9vh, 96px);
   /* Fades in with scroll via WhyContent (was darkening opening lines at scrollTop 0). */
   --why-top-edge-opacity: 1;
   /* CTA arrow uses `cqw` in AnimatedArrow (`sizeMode="container"`) so it scales with this panel. */
@@ -112,7 +117,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: var(--why-bottom-veil-height);
+  height: calc(
+    var(--why-bottom-veil-height) -
+      (var(--why-bottom-veil-height) - var(--why-bottom-veil-end-height)) *
+      var(--why-end-phase, 0)
+  );
   z-index: 2;
   pointer-events: none;
   opacity: var(--why-bottom-veil-opacity, 0);
@@ -142,7 +151,11 @@
   top: 0;
   z-index: 3;
   opacity: var(--why-top-edge-opacity, 1);
-  height: var(--why-edge-veil-height);
+  height: calc(
+    var(--why-edge-veil-height) -
+      (var(--why-edge-veil-height) - var(--why-edge-veil-end-height)) *
+      var(--why-end-phase, 0)
+  );
   background: linear-gradient(
     to top,
     rgba(17, 17, 17, 0) 0%,

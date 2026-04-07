@@ -401,9 +401,11 @@ import {
           1,
         )
       : 0;
+    const endPhase = smoothstep(coverProgress);
+    boxEl.style.setProperty('--why-end-phase', endPhase.toFixed(3));
     boxEl.style.setProperty(
       '--why-end-cover-opacity',
-      smoothstep(coverProgress).toFixed(3),
+      endPhase.toFixed(3),
     );
   }
 
