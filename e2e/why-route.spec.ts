@@ -621,7 +621,7 @@ test.describe('/why page @serial', () => {
     expect(Math.abs(start!.i0 - start!.i1)).toBeLessThan(0.08);
   });
 
-  test('edge veils shrink in end phase versus middle phase', async ({
+  test('edge veils: top extends at scroll end, bottom shrinks versus middle', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 920, height: 520 });
@@ -679,7 +679,8 @@ test.describe('/why page @serial', () => {
     });
 
     expect(heights).not.toBeNull();
-    expect(heights!.end.topH).toBeLessThan(heights!.mid.topH - 8);
+    /* ::before height is JS-driven near maxScroll (grows toward close copy); mid-scroll is shorter. */
+    expect(heights!.end.topH).toBeGreaterThan(heights!.mid.topH + 8);
     expect(heights!.end.bottomH).toBeLessThan(heights!.mid.bottomH - 8);
   });
 });

@@ -27,6 +27,8 @@
   --why-bottom-veil-height: clamp(152px, 27vh, 268px);
   /* End phase (set from JS): 0 = normal, 1 = final scroll band near bottom. */
   --why-end-phase: 0;
+  /* 0–1: top veil extension + opacity boost near maxScroll (why-box-scroll.ts). */
+  --why-end-top-veil-grow: 0;
   /* In final phase keep veils shallow so they do not wash over the last centered paragraphs. */
   --why-edge-veil-end-height: clamp(42px, 8vh, 86px);
   --why-bottom-veil-end-height: clamp(48px, 9vh, 96px);
@@ -73,7 +75,14 @@
   height: clamp(125px, 17.2vh, 220px);
   z-index: 4;
   pointer-events: none;
-  opacity: var(--why-end-cover-opacity, 0);
+  /* Same scroll band as ::before grow — a bit more ink when the close block is settling. */
+  opacity: min(
+    1,
+    calc(
+      var(--why-end-cover-opacity, 0) *
+        (1 + 0.55 * var(--why-end-top-veil-grow, 0))
+    )
+  );
   background: linear-gradient(
     to bottom,
     var(--why-box-bg) 0%,
@@ -150,22 +159,54 @@
 .why-page .why-box::before {
   top: 0;
   z-index: 3;
-  opacity: var(--why-top-edge-opacity, 1);
-  height: calc(
-    var(--why-edge-veil-height) -
-      (var(--why-edge-veil-height) - var(--why-edge-veil-end-height)) *
-      var(--why-end-phase, 0)
+  /*
+   * Base opacity ramps with --why-end-top-veil-grow (scroll near maxScroll).
+   * Second gradient layer (below) adds extra density toward the veil bottom — reads as “more cover”.
+   */
+  opacity: min(
+    1,
+    calc(
+      var(--why-top-edge-opacity, 1) *
+        (1 + 0.72 * var(--why-end-top-veil-grow, 0))
+    )
   );
-  background: linear-gradient(
-    to top,
-    rgba(17, 17, 17, 0) 0%,
-    rgba(17, 17, 17, 0.2) 16%,
-    rgba(17, 17, 17, 0.46) 34%,
-    rgba(17, 17, 17, 0.72) 56%,
-    rgba(17, 17, 17, 0.9) 74%,
-    rgba(17, 17, 17, 0.99) 88%,
-    var(--why-box-bg) 100%
+  /* JS sets pixel height near end so the clona reaches toward the close-block lead; fallback = pre-JS. */
+  height: var(
+    --why-top-veil-current-height-px,
+    calc(
+      var(--why-edge-veil-height) -
+        (var(--why-edge-veil-height) - var(--why-edge-veil-end-height)) *
+        var(--why-end-phase, 0)
+    )
   );
+  background-image:
+    /* Denser through the mid band (between bottom feather and top solid). */
+    linear-gradient(
+      to top,
+      rgba(17, 17, 17, 0) 0%,
+      rgba(17, 17, 17, 0.36) 10%,
+      rgba(17, 17, 17, 0.7) 22%,
+      rgba(17, 17, 17, 0.9) 36%,
+      rgba(17, 17, 17, 0.98) 50%,
+      rgba(17, 17, 17, 0.99) 66%,
+      var(--why-box-bg) 100%
+    ),
+    /*
+     * Grow-driven layer: strong cover from the veil bottom well into the middle,
+     * then soft falloff (not only a thin strip at the bottom edge).
+     */
+    linear-gradient(
+      to top,
+      rgba(17, 17, 17, calc(1 * var(--why-end-top-veil-grow, 0))) 0%,
+      rgba(17, 17, 17, calc(0.97 * var(--why-end-top-veil-grow, 0))) 9%,
+      rgba(17, 17, 17, calc(0.9 * var(--why-end-top-veil-grow, 0))) 22%,
+      rgba(17, 17, 17, calc(0.74 * var(--why-end-top-veil-grow, 0))) 38%,
+      rgba(17, 17, 17, calc(0.48 * var(--why-end-top-veil-grow, 0))) 52%,
+      rgba(17, 17, 17, calc(0.22 * var(--why-end-top-veil-grow, 0))) 68%,
+      rgba(17, 17, 17, calc(0.06 * var(--why-end-top-veil-grow, 0))) 80%,
+      transparent 92%
+    );
+  background-repeat: no-repeat;
 }
 
 .why-page .why-box::after {

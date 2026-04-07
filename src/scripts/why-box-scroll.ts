@@ -40,8 +40,9 @@ import {
    */
   const T = {
     FONT_MIN: 0.52,
-    FONT_LERP: 0.22,
-    FONT_SNAP: 0.004,
+    /** Slower = less hunt with browser zoom / fractional layout. */
+    FONT_LERP: 0.12,
+    FONT_SNAP: 0.012,
     FIT_SAFETY_PX: 3,
     START_COVER_BAND_MIN: 85,
     START_COVER_BAND_FRAC: 0.26,
@@ -65,6 +66,13 @@ import {
     CTA_TOP_CLAMP_MARGIN: 8,
     END_COVER_BAND_MIN: 70,
     END_COVER_BAND_FRAC: 0.22,
+    /** Wider band (px): top ::before grows toward showcase line as scroll nears maxScroll. */
+    END_TOP_VEIL_GROW_BAND_MIN: 100,
+    END_TOP_VEIL_GROW_BAND_FRAC: 0.34,
+    /** Clearance above “There are no project showcases…” (matches --why-edge-veil-height vh terms). */
+    END_TOP_VEIL_MARGIN_ABOVE_SHOWCASE_REM: 0.62,
+    /** Do not let the top veil swallow almost the whole panel. */
+    END_TOP_VEIL_MAX_FRAC_OF_BOX: 0.78,
     INTRO_LINE_COUNT: 2,
     INTRO_RAMP_MIN: 100,
     INTRO_RAMP_FRAC: 0.22,
@@ -96,7 +104,7 @@ import {
     REVOLVER_CENTER_BAND: 0.28,
     REVOLVER_TRANSITION_BAND: 0.38,
     /** Temporal smoothing for revolver transforms (middle phase feels less jittery). */
-    REVOLVER_BLEND_SNAP: 0.002,
+    REVOLVER_BLEND_SNAP: 0.01,
     LEAD_SCALE_DROP: 0.3,
     BODY_SCALE_DROP: 0.5,
     LEAD_MAX_INSET_REM: 2.4,
@@ -110,15 +118,68 @@ import {
     LINE_OVERLAP_X: 0.12,
     GIF_OVERLAP_Y: 0.9,
     GIF_OVERLAP_X: 0.1,
+    /**
+     * Compare integer scrollTop so subpixel / zoom noise does not flip “is scrolling”.
+     */
+    REVOLVER_SCROLL_SNAP_PX: 1,
+    /**
+     * If |ΔscrollTop| is below this, treat as idle for skip + snap lerp (px).
+     */
+    REVOLVER_SCROLL_IDLE_EPS: 2.75,
+    /** Ignore maxScroll jitter below this when deciding layout changed (px). */
+    REVOLVER_MAX_SCROLL_JITTER_EPS: 3,
+    /** Consecutive “would idle” rAF passes before we stop writing revolver (needs settle/font rAF). */
+    REVOLVER_IDLE_FRAMES: 3,
+    /** Snap revolver blend to target when scroll movement is tiny (stops ring at zoom). */
+    REVOLVER_LERP_INSTANT_BELOW_PX: 2.5,
+    /** Quantize --why-font-scale steps to reduce wrap-width ping-pong at odd zoom. */
+    FONT_SCALE_QUANT: 0.005,
   };
 
   let whyFontScale = 1;
+  let fontScaleSettled = false;
   const lineBlendState = lines.map(() => 0);
   let gifBlendState = 0;
-  let lastScrollTop = scrollEl.scrollTop;
+  let lastScrollTopSnapped = Math.round(scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX);
+  let lastMaxScrollForRevolverFreeze = -1;
+  let hasAppliedRevolverOnce = false;
+  let revolverIdleStreak = 0;
+  /** When true, skip font fit this frame — breaks measure↔scale feedback while revolver is frozen. */
+  let prevFrameRevolverIdle = false;
+  const lineLastRevolverStyles = new WeakMap();
+  let gifLastRevolverKey = '';
 
   function revolverLerpForDelta(scrollDeltaPx) {
+    if (scrollDeltaPx < T.REVOLVER_LERP_INSTANT_BELOW_PX) return 1;
     return clamp(0.16 + scrollDeltaPx / 240, 0.16, 0.34);
+  }
+
+  /** Coarsen normalized distance so edgeProgress does not flutter at fractional zoom. */
+  function quantizeRevolverNormalized(n) {
+    if (!Number.isFinite(n)) return n;
+    return Math.round(n * 40) / 40;
+  }
+
+  /** Integer-safe center of the scrollport in content Y (avoids subpixel scrollTop noise). */
+  function viewportCenterContentYStable() {
+    const st = Math.round(scrollEl.scrollTop);
+    const ch = Math.round(scrollEl.clientHeight);
+    return st + ch * 0.5;
+  }
+
+  function applyLineRevolverStylesIfChanged(line, scaleStr, insetStr, opStr) {
+    const prev = lineLastRevolverStyles.get(line);
+    if (prev && prev.s === scaleStr && prev.i === insetStr && prev.o === opStr) {
+      return;
+    }
+    line.style.setProperty('--why-line-scale', scaleStr);
+    line.style.setProperty('--why-line-inset', insetStr);
+    line.style.setProperty('--why-line-opacity', opStr);
+    lineLastRevolverStyles.set(line, {
+      s: scaleStr,
+      i: insetStr,
+      o: opStr,
+    });
   }
 
   function isStrictStartLock() {
@@ -213,10 +274,31 @@ import {
     if (Math.abs(fontTarget - whyFontScale) < T.FONT_SNAP) {
       whyFontScale = fontTarget;
     }
-    scrollEl.style.setProperty('--why-font-scale', whyFontScale.toFixed(4));
+    const q =
+      Math.round(whyFontScale / T.FONT_SCALE_QUANT) * T.FONT_SCALE_QUANT;
+    scrollEl.style.setProperty('--why-font-scale', q.toFixed(4));
+    whyFontScale = q;
+    fontScaleSettled =
+      Math.abs(fontTarget - whyFontScale) <= T.FONT_SNAP * 2.5;
     if (Math.abs(fontTarget - whyFontScale) > T.FONT_SNAP * 2) {
       settleFrames = Math.max(settleFrames, 2);
     }
+  }
+
+  /**
+   * Vertical center of `el` in .why-scroll **content** coordinates (ignores CSS transform on lines),
+   * so revolver targets do not feedback from getBoundingClientRect + scale/translate jitter at zoom.
+   */
+  function elementCenterYInScrollContent(el) {
+    if (!(el instanceof Element)) return Number.NaN;
+    let top = 0;
+    let n = el;
+    while (n && n !== scrollEl) {
+      top += n.offsetTop;
+      n = n.offsetParent;
+    }
+    if (n !== scrollEl) return Number.NaN;
+    return Math.round((top + el.offsetHeight * 0.5) * 4) / 4;
   }
 
   function readLayoutMetrics() {
@@ -446,21 +528,78 @@ import {
     };
   }
 
-  function applyEndCover(m) {
+  /** Matches why.css clamp(130px, 22vh, 230px) / clamp(42px, 8vh, 86px). */
+  function edgeVeilHeightPx() {
+    const vh = window.innerHeight;
+    return clamp(130, vh * 0.22, 230);
+  }
+
+  function edgeVeilEndHeightPx() {
+    const vh = window.innerHeight;
+    return clamp(42, vh * 0.08, 86);
+  }
+
+  function computeEndPhase(maxScroll) {
     const coverBandPx = Math.max(
       T.END_COVER_BAND_MIN,
       scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
     );
-    const coverProgress = m.maxScroll
+    const coverProgress = maxScroll
       ? clamp(
-          (scrollEl.scrollTop - (m.maxScroll - coverBandPx)) / coverBandPx,
+          (scrollEl.scrollTop - (maxScroll - coverBandPx)) / coverBandPx,
           0,
           1,
         )
       : 0;
-    const endPhase = smoothstep(coverProgress);
+    return smoothstep(coverProgress);
+  }
+
+  function applyEndPhaseCss(endPhase) {
     boxEl.style.setProperty('--why-end-phase', endPhase.toFixed(3));
     boxEl.style.setProperty('--why-end-cover-opacity', endPhase.toFixed(3));
+  }
+
+  /**
+   * Near maxScroll, extend the top ::before veil downward toward the close-block lead
+   * (“There are no project showcases…”) so coverage ramps smoothly at the real stop.
+   */
+  function applyTopVeilHeight(maxScroll, endPhase) {
+    const baseVeil = edgeVeilHeightPx();
+    const endVeil = edgeVeilEndHeightPx();
+    const hShrunk = baseVeil - (baseVeil - endVeil) * endPhase;
+
+    const growBandPx = Math.max(
+      T.END_TOP_VEIL_GROW_BAND_MIN,
+      scrollEl.clientHeight * T.END_TOP_VEIL_GROW_BAND_FRAC,
+    );
+    const distFromEnd = Math.max(0, maxScroll - scrollEl.scrollTop);
+    const growT =
+      maxScroll > 1 && growBandPx > 0
+        ? 1 - clamp(distFromEnd / growBandPx, 0, 1)
+        : 0;
+    const growPhase = smoothstep(growT);
+
+    const showcaseP = scrollEl.querySelector(
+      '.why-block--close > p:not(.why-close)',
+    );
+    const boxRect = boxEl.getBoundingClientRect();
+    const maxH = boxRect.height * T.END_TOP_VEIL_MAX_FRAC_OF_BOX;
+
+    let targetH = hShrunk;
+    if (showcaseP instanceof HTMLElement && maxScroll > 1) {
+      const pRect = showcaseP.getBoundingClientRect();
+      const rootRem =
+        Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+        16;
+      const margin = T.END_TOP_VEIL_MARGIN_ABOVE_SHOWCASE_REM * rootRem;
+      const rawTarget = pRect.top - boxRect.top - margin;
+      targetH = clamp(Math.max(rawTarget, hShrunk), hShrunk, maxH);
+    }
+
+    const hFinal = hShrunk + (targetH - hShrunk) * growPhase;
+    const hStr = `${Math.round(hFinal * 4) / 4}px`;
+    boxEl.style.setProperty('--why-top-veil-current-height-px', hStr);
+    boxEl.style.setProperty('--why-end-top-veil-grow', growPhase.toFixed(3));
   }
 
   /** @returns {number} intro blend 0–1 */
@@ -616,10 +755,19 @@ import {
     const lerp = revolverLerpForDelta(scrollDeltaPx);
     const strictStart = isStrictStartLock();
     const strictEnd = isStrictEndLock(m);
+    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
+    const viewportCenterContentY = viewportCenterContentYStable();
     lines.forEach((line, lineIndex) => {
-      const r = line.getBoundingClientRect();
-      const mid = (r.top + r.bottom) / 2;
-      const normalized = Math.abs(mid - m.center) / m.half;
+      const lineCY = elementCenterYInScrollContent(line);
+      let normalized;
+      if (Number.isFinite(lineCY) && halfContent > 1) {
+        normalized = Math.abs(lineCY - viewportCenterContentY) / halfContent;
+      } else {
+        const r = line.getBoundingClientRect();
+        const mid = (r.top + r.bottom) / 2;
+        normalized = Math.abs(mid - m.center) / m.half;
+      }
+      normalized = quantizeRevolverNormalized(normalized);
 
       const edgeProgress = clamp(
         (normalized - T.REVOLVER_CENTER_BAND) / T.REVOLVER_TRANSITION_BAND,
@@ -631,8 +779,6 @@ import {
       const targetBlend = eased * gate * phaseGate;
       if (phaseGate <= 0.001 || strictStart || strictEnd) {
         lineBlendState[lineIndex] = 0;
-        line.style.setProperty('--why-line-scale', '1.00');
-        line.style.setProperty('--why-line-inset', '0.00rem');
         let lineOp = 1;
         if (ctaZone && !line.classList.contains('why-lead')) {
           lineOp = ctaOverlapMultiplier(
@@ -642,7 +788,12 @@ import {
             T.LINE_OVERLAP_X,
           );
         }
-        line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
+        applyLineRevolverStylesIfChanged(
+          line,
+          '1.00',
+          '0.00rem',
+          lineOp.toFixed(3),
+        );
         return;
       }
       const prevBlend = lineBlendState[lineIndex] ?? 0;
@@ -658,9 +809,6 @@ import {
       const scale = 1 - scaleDrop * blendedEased;
       const inset = maxInset * blendedEased;
 
-      line.style.setProperty('--why-line-scale', scale.toFixed(2));
-      line.style.setProperty('--why-line-inset', `${inset.toFixed(2)}rem`);
-
       let lineOp = 1;
       if (ctaZone && !isLead) {
         lineOp = ctaOverlapMultiplier(
@@ -670,7 +818,12 @@ import {
           T.LINE_OVERLAP_X,
         );
       }
-      line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
+      applyLineRevolverStylesIfChanged(
+        line,
+        scale.toFixed(2),
+        `${inset.toFixed(2)}rem`,
+        lineOp.toFixed(3),
+      );
     });
   }
 
@@ -678,9 +831,14 @@ import {
     let activeLineInset = 0;
     let activeLineDist = Number.POSITIVE_INFINITY;
     let activeLineLeftPx = Number.NaN;
+    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
+    const viewportCenterContentY = viewportCenterContentYStable();
     lines.forEach((line) => {
+      const lineCY = elementCenterYInScrollContent(line);
       const rr = line.getBoundingClientRect();
-      const dist = Math.abs((rr.top + rr.bottom) / 2 - m.center);
+      const dist = Number.isFinite(lineCY)
+        ? Math.abs(lineCY - viewportCenterContentY)
+        : Math.abs((rr.top + rr.bottom) / 2 - m.center);
       if (dist < activeLineDist) {
         activeLineDist = dist;
         activeLineLeftPx = lineTextStartLeftPx(line) - m.contentRect.left;
@@ -704,9 +862,18 @@ import {
     const lerp = revolverLerpForDelta(scrollDeltaPx);
     const strictStart = isStrictStartLock();
     const strictEnd = isStrictEndLock(m);
-    const r = gifEl.getBoundingClientRect();
-    const mid = (r.top + r.bottom) / 2;
-    const normalized = Math.abs(mid - m.center) / m.half;
+    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
+    const viewportCenterContentY = viewportCenterContentYStable();
+    const gifCY = elementCenterYInScrollContent(gifEl);
+    let normalized =
+      Number.isFinite(gifCY) && halfContent > 1
+        ? Math.abs(gifCY - viewportCenterContentY) / halfContent
+        : (() => {
+            const r = gifEl.getBoundingClientRect();
+            const mid = (r.top + r.bottom) / 2;
+            return Math.abs(mid - m.center) / m.half;
+          })();
+    normalized = quantizeRevolverNormalized(normalized);
 
     const edgeProgress = clamp(
       (normalized - T.REVOLVER_CENTER_BAND) / T.REVOLVER_TRANSITION_BAND,
@@ -717,9 +884,6 @@ import {
     const gifTarget = eased * introBlend * phaseGate;
     if (phaseGate <= 0.001 || strictStart || strictEnd) {
       gifBlendState = 0;
-      gifEl.style.setProperty('--why-line-scale', '1.00');
-      gifEl.style.setProperty('--why-line-inset', '0.00rem');
-      gifEl.style.removeProperty('--why-gif-align-x');
       let opacity = 1;
       if (ctaZone) {
         opacity *= ctaOverlapMultiplier(
@@ -729,7 +893,14 @@ import {
           T.GIF_OVERLAP_X,
         );
       }
-      gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+      const key = `z|1.00|0.00rem||${opacity.toFixed(3)}`;
+      if (key !== gifLastRevolverKey) {
+        gifLastRevolverKey = key;
+        gifEl.style.setProperty('--why-line-scale', '1.00');
+        gifEl.style.setProperty('--why-line-inset', '0.00rem');
+        gifEl.style.removeProperty('--why-gif-align-x');
+        gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+      }
       return;
     }
     let gifEased = gifBlendState + (gifTarget - gifBlendState) * lerp;
@@ -738,21 +909,19 @@ import {
     }
     gifBlendState = gifEased;
 
-    const liftPx = m.leadHeight * T.GIF_LIFT_LEAD_MULT;
-    gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(1)}px`);
+    const leadHStable =
+      leadForCta && leadForCta.offsetHeight > 0
+        ? leadForCta.offsetHeight
+        : m.leadHeight;
+    const liftPx = leadHStable * T.GIF_LIFT_LEAD_MULT;
+    const liftStr = `${(-liftPx).toFixed(1)}px`;
 
     const scale = 1 - T.GIF_SCALE_DROP * gifEased;
-    gifEl.style.setProperty('--why-line-scale', scale.toFixed(2));
-    gifEl.style.setProperty(
-      '--why-line-inset',
-      `${active.activeLineInset.toFixed(2)}rem`,
-    );
-    if (Number.isFinite(active.activeLineLeftPx)) {
-      gifEl.style.setProperty(
-        '--why-gif-align-x',
-        `${active.activeLineLeftPx.toFixed(2)}px`,
-      );
-    }
+    const scaleStr = scale.toFixed(2);
+    const insetStr = `${active.activeLineInset.toFixed(2)}rem`;
+    const alignStr = Number.isFinite(active.activeLineLeftPx)
+      ? `${active.activeLineLeftPx.toFixed(2)}px`
+      : '';
 
     let opacity = clamp(1 - T.GIF_OPACITY_DROP * gifEased, 0, 1);
     if (ctaZone) {
@@ -763,7 +932,20 @@ import {
         T.GIF_OVERLAP_X,
       );
     }
-    gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+    const opStr = opacity.toFixed(3);
+    const key = `${liftStr}|${scaleStr}|${insetStr}|${alignStr}|${opStr}`;
+    if (key !== gifLastRevolverKey) {
+      gifLastRevolverKey = key;
+      gifEl.style.setProperty('--why-gif-y', liftStr);
+      gifEl.style.setProperty('--why-line-scale', scaleStr);
+      gifEl.style.setProperty('--why-line-inset', insetStr);
+      if (alignStr) {
+        gifEl.style.setProperty('--why-gif-align-x', alignStr);
+      } else {
+        gifEl.style.removeProperty('--why-gif-align-x');
+      }
+      gifEl.style.setProperty('--why-gif-opacity', opStr);
+    }
   }
 
   let rafId = 0;
@@ -789,6 +971,9 @@ import {
 
   /** One rAF per burst while resizing; extra passes only after zoom/resize is quiet. */
   function onViewportResize() {
+    prevFrameRevolverIdle = false;
+    revolverIdleStreak = 0;
+    gifLastRevolverKey = '';
     schedule();
     if (resizeQuietTimer) window.clearTimeout(resizeQuietTimer);
     resizeQuietTimer = window.setTimeout(() => {
@@ -801,11 +986,18 @@ import {
   function update() {
     rafId = 0;
 
-    applyFontScaleStep();
+    if (!prevFrameRevolverIdle) {
+      applyFontScaleStep();
+    }
 
     const m = readLayoutMetrics();
-    const scrollDeltaPx = Math.abs(scrollEl.scrollTop - lastScrollTop);
-    lastScrollTop = scrollEl.scrollTop;
+    const scrollSnapStep = Math.round(
+      scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX,
+    );
+    const scrollDeltaPx =
+      Math.abs(scrollSnapStep - lastScrollTopSnapped) *
+      T.REVOLVER_SCROLL_SNAP_PX;
+    lastScrollTopSnapped = scrollSnapStep;
 
     applyStartCover();
     const ctaO = applyCtaFade();
@@ -813,7 +1005,6 @@ import {
     applyCtaVerticalMidpoint(m);
     const ctaZone = buildCtaZone(m, ctaO);
 
-    applyEndCover(m);
     const introBlend = applyIntroTopEdge();
     const phaseGate = middlePhaseRevolverGate(m);
 
@@ -822,9 +1013,40 @@ import {
     applySpacersAndIntroVars(m, gifFootprintPx, combinedForLead);
     applyStartCoverBandSizing();
 
-    applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
-    const active = pickActiveLineForGif(m);
-    applyGifRevolver(m, introBlend, ctaZone, active, scrollDeltaPx, phaseGate);
+    const maxScrollNow = Math.max(
+      0,
+      scrollEl.scrollHeight - scrollEl.clientHeight,
+    );
+    const maxScrollChangedForRevolver =
+      lastMaxScrollForRevolverFreeze >= 0 &&
+      Math.abs(maxScrollNow - lastMaxScrollForRevolverFreeze) >
+        T.REVOLVER_MAX_SCROLL_JITTER_EPS;
+    lastMaxScrollForRevolverFreeze = maxScrollNow;
+
+    const endPhaseNow = computeEndPhase(maxScrollNow);
+    applyEndPhaseCss(endPhaseNow);
+    applyTopVeilHeight(maxScrollNow, endPhaseNow);
+
+    const rawRevolverIdle =
+      scrollDeltaPx < T.REVOLVER_SCROLL_IDLE_EPS &&
+      settleFrames === 0 &&
+      fontScaleSettled &&
+      !maxScrollChangedForRevolver;
+    if (rawRevolverIdle) revolverIdleStreak++;
+    else revolverIdleStreak = 0;
+
+    const revolverIdle =
+      hasAppliedRevolverOnce &&
+      revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
+
+    if (!revolverIdle) {
+      applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
+      const active = pickActiveLineForGif(m);
+      applyGifRevolver(m, introBlend, ctaZone, active, scrollDeltaPx, phaseGate);
+      hasAppliedRevolverOnce = true;
+    }
+
+    prevFrameRevolverIdle = revolverIdle;
 
     if (settleFrames > 0) {
       settleFrames -= 1;
