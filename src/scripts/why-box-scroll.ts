@@ -141,12 +141,12 @@ import {
     /** Quantize --why-font-scale steps to reduce wrap-width ping-pong at odd zoom. */
     FONT_SCALE_QUANT: 0.005,
     /** <1 = mouse wheel moves the panel slower (only when we handle wheel below). */
-    WHEEL_SCROLL_FACTOR: 0.68,
+    WHEEL_SCROLL_FACTOR: 0.78,
     /**
      * ~1 keeps revolver catching up while lines move through the band (too low = they never
      * read as smaller + inset). Wheel damping already slows scroll; lerp stays fairly snappy.
      */
-    REVOLVER_LERP_SPEED: 0.92,
+    REVOLVER_LERP_SPEED: 0.94,
   };
 
   let whyFontScale = 1;
