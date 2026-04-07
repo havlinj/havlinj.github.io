@@ -137,7 +137,7 @@ title: 'Profile'
     <span class="prof-tile__reveal" aria-hidden="true">
       <span class="tile-state-secondary">
         <span class="line-1"
-          >Tried <span class="writing">Writing</span
+          >Tried<span class="writing">Writing</span
           ><span class="question-mark">?</span></span
         >
         <span class="line-2">Or this might <br />be enough</span>

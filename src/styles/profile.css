@@ -558,7 +558,7 @@ article .profile-section:last-child {
 
 /* Foundations state 2: secondary tile copy (scoped under reveal) */
 .prof-tile__reveal .tile-state-secondary {
-  --profile-reveal-tail-buffer: 0.18em;
+  --profile-reveal-writing-gap: 0.17em;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -596,26 +596,26 @@ article .profile-section:last-child {
 }
 
 .prof-tile__reveal .tile-state-secondary .writing {
+  display: inline-block;
   text-transform: none;
   /* IMPORTANT: this em multiplies .line-1 (parent), so keep it only slightly above 1 to preserve proportions. */
-  font-size: 1.06em;
+  font-size: 1.025em;
   line-height: 1.18;
   letter-spacing: 0.005em;
   font-weight: 700;
 }
 
+.prof-tile__reveal .tile-state-secondary .writing::before {
+  content: '';
+  display: inline-block;
+  width: var(--profile-reveal-writing-gap);
+}
+
 .prof-tile__reveal .tile-state-secondary .question-mark {
   display: inline-flex;
   align-items: baseline;
-  margin-left: 0.15em;
+  margin-left: 0.14em;
   font-size: 1em;
-}
-
-.prof-tile__reveal .tile-state-secondary .question-mark::after {
-  content: '';
-  display: inline-block;
-  width: var(--profile-reveal-tail-buffer);
-  flex: 0 0 auto;
 }
 
 .profile-photo-box img {
