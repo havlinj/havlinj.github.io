@@ -153,7 +153,9 @@ import {
   let fontScaleSettled = false;
   const lineBlendState = lines.map(() => 0);
   let gifBlendState = 0;
-  let lastScrollTopSnapped = Math.round(scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX);
+  let lastScrollTopSnapped = Math.round(
+    scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX,
+  );
   let lastMaxScrollForRevolverFreeze = -1;
   let hasAppliedRevolverOnce = false;
   let revolverIdleStreak = 0;
@@ -194,7 +196,12 @@ import {
 
   function applyLineRevolverStylesIfChanged(line, scaleStr, insetStr, opStr) {
     const prev = lineLastRevolverStyles.get(line);
-    if (prev && prev.s === scaleStr && prev.i === insetStr && prev.o === opStr) {
+    if (
+      prev &&
+      prev.s === scaleStr &&
+      prev.i === insetStr &&
+      prev.o === opStr
+    ) {
       return;
     }
     line.style.setProperty('--why-line-scale', scaleStr);
@@ -303,8 +310,7 @@ import {
       Math.round(whyFontScale / T.FONT_SCALE_QUANT) * T.FONT_SCALE_QUANT;
     scrollEl.style.setProperty('--why-font-scale', q.toFixed(4));
     whyFontScale = q;
-    fontScaleSettled =
-      Math.abs(fontTarget - whyFontScale) <= T.FONT_SNAP * 2.5;
+    fontScaleSettled = Math.abs(fontTarget - whyFontScale) <= T.FONT_SNAP * 2.5;
     if (Math.abs(fontTarget - whyFontScale) > T.FONT_SNAP * 2) {
       settleFrames = Math.max(settleFrames, 2);
     }
@@ -402,8 +408,7 @@ import {
     const outwardRamp = sm * T.BOTTOM_VEIL_MAX_O;
     /* Double ease so intro veil eases out more gradually into the post-intro ramp. */
     const introEaseOut = smoothstep(sm);
-    const introBottomVeil =
-      (1 - introEaseOut) * T.INTRO_BOTTOM_VEIL_BASE;
+    const introBottomVeil = (1 - introEaseOut) * T.INTRO_BOTTOM_VEIL_BASE;
     const veilOpacity = Math.min(1, outwardRamp + introBottomVeil);
     boxEl.style.setProperty(
       '--why-bottom-veil-opacity',
@@ -620,8 +625,9 @@ import {
     if (showcaseP instanceof HTMLElement && maxScroll > 1) {
       const pRect = showcaseP.getBoundingClientRect();
       const rootRem =
-        Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
-        16;
+        Number.parseFloat(
+          getComputedStyle(document.documentElement).fontSize,
+        ) || 16;
       const margin = T.END_TOP_VEIL_MARGIN_ABOVE_SHOWCASE_REM * rootRem;
       const rawTarget = pRect.top - boxRect.top - margin;
       targetH = clamp(Math.max(rawTarget, hShrunk), hShrunk, maxH);
@@ -808,8 +814,7 @@ import {
       const eased = smoothstep(edgeProgress);
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
       const targetBlend = eased * gate * phaseGate;
-      const strictStartThisLine =
-        strictStart && lineIndex < T.INTRO_LINE_COUNT;
+      const strictStartThisLine = strictStart && lineIndex < T.INTRO_LINE_COUNT;
       if (phaseGate <= 0.001 || strictStartThisLine || strictEnd) {
         lineBlendState[lineIndex] = 0;
         let lineOp = 1;
@@ -864,7 +869,6 @@ import {
     let activeLineInset = 0;
     let activeLineDist = Number.POSITIVE_INFINITY;
     let activeLineLeftPx = Number.NaN;
-    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
     const viewportCenterContentY = viewportCenterContentYStable();
     lines.forEach((line) => {
       const lineCY = elementCenterYInScrollContent(line);
@@ -1069,13 +1073,19 @@ import {
     else revolverIdleStreak = 0;
 
     const revolverIdle =
-      hasAppliedRevolverOnce &&
-      revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
+      hasAppliedRevolverOnce && revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
 
     if (!revolverIdle) {
       applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
       const active = pickActiveLineForGif(m);
-      applyGifRevolver(m, introBlend, ctaZone, active, scrollDeltaPx, phaseGate);
+      applyGifRevolver(
+        m,
+        introBlend,
+        ctaZone,
+        active,
+        scrollDeltaPx,
+        phaseGate,
+      );
       hasAppliedRevolverOnce = true;
     }
 

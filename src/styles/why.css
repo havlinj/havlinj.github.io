@@ -198,16 +198,16 @@
      * then soft falloff (not only a thin strip at the bottom edge).
      */
     linear-gradient(
-      to top,
-      rgba(17, 17, 17, calc(1 * var(--why-end-top-veil-grow, 0))) 0%,
-      rgba(17, 17, 17, calc(0.97 * var(--why-end-top-veil-grow, 0))) 9%,
-      rgba(17, 17, 17, calc(0.9 * var(--why-end-top-veil-grow, 0))) 22%,
-      rgba(17, 17, 17, calc(0.74 * var(--why-end-top-veil-grow, 0))) 38%,
-      rgba(17, 17, 17, calc(0.48 * var(--why-end-top-veil-grow, 0))) 52%,
-      rgba(17, 17, 17, calc(0.22 * var(--why-end-top-veil-grow, 0))) 68%,
-      rgba(17, 17, 17, calc(0.06 * var(--why-end-top-veil-grow, 0))) 80%,
-      transparent 92%
-    );
+        to top,
+        rgba(17, 17, 17, calc(1 * var(--why-end-top-veil-grow, 0))) 0%,
+        rgba(17, 17, 17, calc(0.97 * var(--why-end-top-veil-grow, 0))) 9%,
+        rgba(17, 17, 17, calc(0.9 * var(--why-end-top-veil-grow, 0))) 22%,
+        rgba(17, 17, 17, calc(0.74 * var(--why-end-top-veil-grow, 0))) 38%,
+        rgba(17, 17, 17, calc(0.48 * var(--why-end-top-veil-grow, 0))) 52%,
+        rgba(17, 17, 17, calc(0.22 * var(--why-end-top-veil-grow, 0))) 68%,
+        rgba(17, 17, 17, calc(0.06 * var(--why-end-top-veil-grow, 0))) 80%,
+        transparent 92%
+      );
   background-repeat: no-repeat;
 }
 

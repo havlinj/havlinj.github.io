@@ -590,14 +590,9 @@ test.describe('/why page @serial', () => {
     const scroll = page.locator('.why-page .why-scroll');
     const box = await scroll.boundingBox();
     expect(box).toBeTruthy();
-    await page.mouse.move(
-      box!.x + box!.width / 2,
-      box!.y + box!.height / 2,
-    );
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
     await page.evaluate(() => {
-      const el = document.querySelector(
-        '.why-page .why-scroll',
-      ) as HTMLElement;
+      const el = document.querySelector('.why-page .why-scroll') as HTMLElement;
       el.scrollTop = 0;
     });
     await waitTwoFrames(page);
@@ -682,10 +677,7 @@ test.describe('/why page @serial', () => {
         });
 
       // Mirrors why-box-scroll.ts INTRO_RAMP_* and isStrictStartLock (× 0.35).
-      const introRampPx = Math.max(
-        100,
-        scrollEl.clientHeight * 0.22,
-      );
+      const introRampPx = Math.max(100, scrollEl.clientHeight * 0.22);
       const maxTop = Math.min(
         Math.floor(introRampPx * 0.34),
         Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight - 4),
@@ -712,8 +704,7 @@ test.describe('/why page @serial', () => {
           b.s > 0.97 &&
           Math.abs(a.i) < 0.12 &&
           Math.abs(b.i) < 0.12;
-        const bodyRevolved =
-          c.s < 0.985 || Math.abs(c.i) > 0.04;
+        const bodyRevolved = c.s < 0.985 || Math.abs(c.i) > 0.04;
         if (introFlat && bodyRevolved) {
           return { ok: true as const, scrollTop: top };
         }
@@ -721,7 +712,8 @@ test.describe('/why page @serial', () => {
 
       return {
         ok: false as const,
-        reason: 'no scrollTop in strict-start band showed intro flat + body revolver',
+        reason:
+          'no scrollTop in strict-start band showed intro flat + body revolver',
       };
     });
 

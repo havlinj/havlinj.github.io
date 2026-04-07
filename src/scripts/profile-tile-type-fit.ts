@@ -405,7 +405,8 @@ function wireFoundationsReveal(): void {
       let stableFrames = 0;
       const tick = () => {
         revealStableRafId = 0;
-        if (!foundationsTile.classList.contains(REVEAL_CLASSES.revealed)) return;
+        if (!foundationsTile.classList.contains(REVEAL_CLASSES.revealed))
+          return;
         fitFoundationsReveal(reveal);
         const stanza = queryElement(
           reveal,
