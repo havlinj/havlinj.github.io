@@ -22,7 +22,7 @@ I have never stopped being fascinated by how things are done elsewhere or by abs
 
 Travel, for me, is not frequent but meaningful. It creates space to think. Time to reflect on things I would not normally consider during the year, including my own direction and plans for the future.
 
-I tend to see myself as a global citizen. In a way, I belong anywhere, even though there are moments when the opposite feeling appears.
+I tend to see myself as a global citizen.
 
 ---
 

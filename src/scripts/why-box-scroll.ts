@@ -500,10 +500,36 @@ import {
     const padQuantized = Math.round(gifFootprintPx * 4) / 4;
     const topSpacerPx = Math.max(0, combinedForLeadPx - padQuantized);
     const endScrollExtraPx = m.half * T.END_SCROLL_EXTRA_FRAC;
-    const bottomSpacerPx = Math.max(
-      0,
-      m.half - m.padBottom - padQuantized + endScrollExtraPx,
-    );
+
+    // Keep the end stop stable: at max scroll, midpoint of the last 2 paragraphs
+    // should sit on the viewport center regardless of zoom/font scaling.
+    const lastTwo = lines.slice(-2);
+    let bottomSpacerPx = 0;
+    if (lastTwo.length === 2) {
+      const c0 =
+        (lastTwo[0].getBoundingClientRect().top +
+          lastTwo[0].getBoundingClientRect().bottom) /
+        2;
+      const c1 =
+        (lastTwo[1].getBoundingClientRect().top +
+          lastTwo[1].getBoundingClientRect().bottom) /
+        2;
+      const targetCenterContentY =
+        (c0 + c1) / 2 + scrollEl.scrollTop - m.boxRect.top;
+      const requiredMaxScroll = Math.max(0, targetCenterContentY - m.half);
+      const currentBottomSpacerPx = bottomSpacer.offsetHeight || 0;
+      const contentWithoutBottomSpacer =
+        scrollEl.scrollHeight - currentBottomSpacerPx;
+      const neededBottomSpacerPx =
+        requiredMaxScroll + scrollEl.clientHeight - contentWithoutBottomSpacer;
+      const legacyFloor = m.half - m.padBottom - padQuantized + endScrollExtraPx;
+      bottomSpacerPx = Math.max(0, neededBottomSpacerPx, legacyFloor);
+    } else {
+      bottomSpacerPx = Math.max(
+        0,
+        m.half - m.padBottom - padQuantized + endScrollExtraPx,
+      );
+    }
     const topStr = `${topSpacerPx.toFixed(2)}px`;
     const botStr = `${bottomSpacerPx.toFixed(2)}px`;
     if (topStr !== lastTopSpacerStr) {
