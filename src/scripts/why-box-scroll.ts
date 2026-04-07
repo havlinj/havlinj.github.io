@@ -89,8 +89,14 @@ import {
     GIF_INTRO_PAD_MAX_FRAC: 0.48,
     GIF_BASE_SCALE_MIN: 0.5,
     END_SCROLL_EXTRA_FRAC: 0.32,
-    REVOLVER_CENTER_BAND: 0.4,
-    REVOLVER_TRANSITION_BAND: 0.45,
+    /*
+     * Narrower center focus band: fewer lines stay at "max scale + min inset".
+     * This makes the highlighted reading window tighter in the middle phase.
+     */
+    REVOLVER_CENTER_BAND: 0.28,
+    REVOLVER_TRANSITION_BAND: 0.38,
+    /** Temporal smoothing for revolver transforms (middle phase feels less jittery). */
+    REVOLVER_BLEND_SNAP: 0.002,
     LEAD_SCALE_DROP: 0.3,
     BODY_SCALE_DROP: 0.5,
     LEAD_MAX_INSET_REM: 2.4,
@@ -107,6 +113,35 @@ import {
   };
 
   let whyFontScale = 1;
+  const lineBlendState = lines.map(() => 0);
+  let gifBlendState = 0;
+  let lastScrollTop = scrollEl.scrollTop;
+
+  function revolverLerpForDelta(scrollDeltaPx) {
+    return clamp(0.16 + scrollDeltaPx / 240, 0.16, 0.34);
+  }
+
+  /**
+   * Revolver should be strongest in the middle scroll phase only.
+   * - start edge: keep opening paragraphs fully stable (no revolver transform)
+   * - end edge: keep final paragraphs fully stable (no revolver transform)
+   * Smooth ramps preserve continuity into/out of the effect.
+   */
+  function middlePhaseRevolverGate(m) {
+    if (m.maxScroll <= 1) return 0;
+    const introRampPx = Math.max(
+      T.INTRO_RAMP_MIN,
+      scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
+    );
+    const endBandPx = Math.max(
+      T.END_COVER_BAND_MIN,
+      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
+    );
+    const startGate = smoothstep(clamp(scrollEl.scrollTop / introRampPx, 0, 1));
+    const distFromEnd = Math.max(0, m.maxScroll - scrollEl.scrollTop);
+    const endGate = smoothstep(clamp(distFromEnd / endBandPx, 0, 1));
+    return startGate * endGate;
+  }
 
   /**
    * Pre-transform layout height of the GIF column (16:9 frame). Do not use
@@ -534,13 +569,16 @@ import {
     }
     const topStr = `${topSpacerPx.toFixed(2)}px`;
     const botStr = `${bottomSpacerPx.toFixed(2)}px`;
+    let spacerChanged = false;
     if (topStr !== lastTopSpacerStr) {
       lastTopSpacerStr = topStr;
       topSpacer.style.height = topStr;
+      spacerChanged = true;
     }
     if (botStr !== lastBottomSpacerStr) {
       lastBottomSpacerStr = botStr;
       bottomSpacer.style.height = botStr;
+      spacerChanged = true;
     }
 
     const padTopStr = `${m.padTop.toFixed(2)}px`;
@@ -554,9 +592,15 @@ import {
       contentEl.style.setProperty('--why-intro-gif-pad', introPadStr);
     }
     contentEl.style.setProperty('--why-gif-nudge-y', '0px');
+    if (spacerChanged) {
+      // Spacer changes alter scrollHeight/maxScroll; force a couple of follow-up frames
+      // so edge-phase gating settles correctly even after fast wheel/touch bursts.
+      settleFrames = Math.max(settleFrames, 2);
+    }
   }
 
-  function applyLineRevolver(m, introBlend, ctaZone) {
+  function applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate) {
+    const lerp = revolverLerpForDelta(scrollDeltaPx);
     lines.forEach((line, lineIndex) => {
       const r = line.getBoundingClientRect();
       const mid = (r.top + r.bottom) / 2;
@@ -569,7 +613,29 @@ import {
       );
       const eased = smoothstep(edgeProgress);
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
-      const blendedEased = eased * gate;
+      const targetBlend = eased * gate * phaseGate;
+      if (phaseGate <= 0.001) {
+        lineBlendState[lineIndex] = 0;
+        line.style.setProperty('--why-line-scale', '1.00');
+        line.style.setProperty('--why-line-inset', '0.00rem');
+        let lineOp = 1;
+        if (ctaZone && !line.classList.contains('why-lead')) {
+          lineOp = ctaOverlapMultiplier(
+            line.getBoundingClientRect(),
+            ctaZone,
+            T.LINE_OVERLAP_Y,
+            T.LINE_OVERLAP_X,
+          );
+        }
+        line.style.setProperty('--why-line-opacity', lineOp.toFixed(3));
+        return;
+      }
+      const prevBlend = lineBlendState[lineIndex] ?? 0;
+      let blendedEased = prevBlend + (targetBlend - prevBlend) * lerp;
+      if (Math.abs(targetBlend - blendedEased) < T.REVOLVER_BLEND_SNAP) {
+        blendedEased = targetBlend;
+      }
+      lineBlendState[lineIndex] = blendedEased;
 
       const isLead = line.classList.contains('why-lead');
       const scaleDrop = isLead ? T.LEAD_SCALE_DROP : T.BODY_SCALE_DROP;
@@ -611,8 +677,16 @@ import {
     return { activeLineInset, activeLineLeftPx };
   }
 
-  function applyGifRevolver(m, introBlend, ctaZone, active) {
+  function applyGifRevolver(
+    m,
+    introBlend,
+    ctaZone,
+    active,
+    scrollDeltaPx,
+    phaseGate,
+  ) {
     if (!gifEl) return;
+    const lerp = revolverLerpForDelta(scrollDeltaPx);
     const r = gifEl.getBoundingClientRect();
     const mid = (r.top + r.bottom) / 2;
     const normalized = Math.abs(mid - m.center) / m.half;
@@ -623,7 +697,28 @@ import {
       1,
     );
     const eased = smoothstep(edgeProgress);
-    const gifEased = eased * introBlend;
+    const gifTarget = eased * introBlend * phaseGate;
+    if (phaseGate <= 0.001) {
+      gifBlendState = 0;
+      gifEl.style.setProperty('--why-line-scale', '1.00');
+      gifEl.style.setProperty('--why-line-inset', `${active.activeLineInset.toFixed(2)}rem`);
+      let opacity = 1;
+      if (ctaZone) {
+        opacity *= ctaOverlapMultiplier(
+          gifEl.getBoundingClientRect(),
+          ctaZone,
+          T.GIF_OVERLAP_Y,
+          T.GIF_OVERLAP_X,
+        );
+      }
+      gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
+      return;
+    }
+    let gifEased = gifBlendState + (gifTarget - gifBlendState) * lerp;
+    if (Math.abs(gifTarget - gifEased) < T.REVOLVER_BLEND_SNAP) {
+      gifEased = gifTarget;
+    }
+    gifBlendState = gifEased;
 
     const liftPx = m.leadHeight * T.GIF_LIFT_LEAD_MULT;
     gifEl.style.setProperty('--why-gif-y', `${(-liftPx).toFixed(1)}px`);
@@ -691,6 +786,8 @@ import {
     applyFontScaleStep();
 
     const m = readLayoutMetrics();
+    const scrollDeltaPx = Math.abs(scrollEl.scrollTop - lastScrollTop);
+    lastScrollTop = scrollEl.scrollTop;
 
     applyStartCover(m);
     const ctaO = applyCtaFade(m);
@@ -700,15 +797,16 @@ import {
 
     applyEndCover(m);
     const introBlend = applyIntroTopEdge(m);
+    const phaseGate = middlePhaseRevolverGate(m);
 
     const combinedForLead = leadAnchorCombinedScrollPx(m);
     const gifFootprintPx = computeGifFootprintPx(m, combinedForLead);
     applySpacersAndIntroVars(m, gifFootprintPx, combinedForLead);
     applyStartCoverBandSizing();
 
-    applyLineRevolver(m, introBlend, ctaZone);
+    applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
     const active = pickActiveLineForGif(m);
-    applyGifRevolver(m, introBlend, ctaZone, active);
+    applyGifRevolver(m, introBlend, ctaZone, active, scrollDeltaPx, phaseGate);
 
     if (settleFrames > 0) {
       settleFrames -= 1;

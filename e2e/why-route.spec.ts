@@ -470,4 +470,180 @@ test.describe('/why page', () => {
 
     expect(result.ok, 'reason' in result ? result.reason : '').toBe(true);
   });
+
+  test('revolver edge gating stays stable under fast top/bottom jumps', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const state = await page.evaluate(async () => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      const box = document.querySelector('.why-page .why-box');
+      if (!scroll || !box) return null;
+      const ps = [...scroll.querySelectorAll('p')] as HTMLElement[];
+      if (ps.length < 4) return null;
+
+      const waitFrames = (n = 2) =>
+        new Promise<void>((resolve) => {
+          const run = (left: number) => {
+            if (left <= 0) return resolve();
+            requestAnimationFrame(() => run(left - 1));
+          };
+          run(n);
+        });
+
+      const read = (els: HTMLElement[]) =>
+        els.map((p) => {
+          const cs = getComputedStyle(p);
+          return {
+            s: parseFloat(cs.getPropertyValue('--why-line-scale') || '1'),
+            i: parseFloat(cs.getPropertyValue('--why-line-inset') || '0'),
+          };
+        });
+
+      const jumpBottom = () => {
+        scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      };
+      const jumpTop = () => {
+        scroll.scrollTop = 0;
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      };
+      const jumpMid = () => {
+        scroll.scrollTop = Math.max(
+          0,
+          (scroll.scrollHeight - scroll.clientHeight) * 0.52,
+        );
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      };
+
+      // Simulate aggressive user bursts: top -> mid -> bottom -> top -> bottom.
+      jumpTop();
+      await waitFrames(1);
+      jumpMid();
+      await waitFrames(1);
+      jumpBottom();
+      await waitFrames(1);
+      jumpTop();
+      await waitFrames(1);
+      jumpBottom();
+      await waitFrames(6);
+
+      const topTwo = read(ps.slice(0, 2));
+      const lastTwo = read(ps.slice(-2));
+      const endPhase = parseFloat(
+        getComputedStyle(box).getPropertyValue('--why-end-phase') || '0',
+      );
+      return { topTwo, lastTwo, endPhase };
+    });
+
+    expect(state).not.toBeNull();
+    expect(state!.endPhase).toBeGreaterThan(0.9);
+    for (const p of state!.lastTwo) {
+      expect(p.s).toBeGreaterThan(0.98);
+      expect(Math.abs(p.i)).toBeLessThan(0.08);
+    }
+    // After settling from fast jumps, opening lines should also remain clean when revisited.
+    for (const p of state!.topTwo) {
+      expect(p.s).toBeGreaterThan(0.98);
+      expect(Math.abs(p.i)).toBeLessThan(0.08);
+    }
+  });
+
+  test('start state keeps first two paragraphs identical and fully untransformed', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const start = await page.evaluate(async () => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      if (!scroll) return null;
+      const ps = [...scroll.querySelectorAll('p')] as HTMLElement[];
+      if (ps.length < 2) return null;
+      scroll.scrollTop = 0;
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+      );
+      const a = getComputedStyle(ps[0]);
+      const b = getComputedStyle(ps[1]);
+      return {
+        s0: parseFloat(a.getPropertyValue('--why-line-scale') || '1'),
+        s1: parseFloat(b.getPropertyValue('--why-line-scale') || '1'),
+        i0: parseFloat(a.getPropertyValue('--why-line-inset') || '0'),
+        i1: parseFloat(b.getPropertyValue('--why-line-inset') || '0'),
+      };
+    });
+
+    expect(start).not.toBeNull();
+    expect(start!.s0).toBeGreaterThan(0.98);
+    expect(start!.s1).toBeGreaterThan(0.98);
+    expect(Math.abs(start!.i0)).toBeLessThan(0.08);
+    expect(Math.abs(start!.i1)).toBeLessThan(0.08);
+    expect(Math.abs(start!.s0 - start!.s1)).toBeLessThan(0.02);
+    expect(Math.abs(start!.i0 - start!.i1)).toBeLessThan(0.08);
+  });
+
+  test('edge veils shrink in end phase versus middle phase', async ({ page }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const heights = await page.evaluate(async () => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      const box = document.querySelector('.why-page .why-box');
+      const bottomVeil = document.querySelector(
+        '.why-page .why-box-bottom-veil',
+      ) as HTMLElement | null;
+      if (!scroll || !box || !bottomVeil) return null;
+
+      const waitFrames = (n = 2) =>
+        new Promise<void>((resolve) => {
+          const run = (left: number) => {
+            if (left <= 0) return resolve();
+            requestAnimationFrame(() => run(left - 1));
+          };
+          run(n);
+        });
+
+      const read = () => {
+        const topH = parseFloat(getComputedStyle(box, '::before').height || '0');
+        const bottomH = parseFloat(getComputedStyle(bottomVeil).height || '0');
+        const endPhase = parseFloat(
+          getComputedStyle(box).getPropertyValue('--why-end-phase') || '0',
+        );
+        return { topH, bottomH, endPhase };
+      };
+
+      scroll.scrollTop = Math.max(
+        0,
+        (scroll.scrollHeight - scroll.clientHeight) * 0.5,
+      );
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      await waitFrames(4);
+      const mid = read();
+
+      scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+      await waitFrames(6);
+      const end = read();
+
+      return { mid, end };
+    });
+
+    expect(heights).not.toBeNull();
+    expect(heights!.mid.endPhase).toBeLessThan(0.5);
+    expect(heights!.end.endPhase).toBeGreaterThan(0.9);
+    expect(heights!.end.topH).toBeLessThan(heights!.mid.topH - 8);
+    expect(heights!.end.bottomH).toBeLessThan(heights!.mid.bottomH - 8);
+  });
 });
