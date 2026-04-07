@@ -134,15 +134,17 @@
   z-index: 2;
   pointer-events: none;
   opacity: var(--why-bottom-veil-opacity, 0);
+  /* Longer, softer feather so the mask reads less “hard” at moderate opacity. */
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    rgba(17, 17, 17, 0.99) 10%,
-    rgba(17, 17, 17, 0.93) 24%,
-    rgba(17, 17, 17, 0.8) 40%,
-    rgba(17, 17, 17, 0.58) 58%,
-    rgba(17, 17, 17, 0.34) 74%,
-    rgba(17, 17, 17, 0.12) 90%,
+    var(--why-box-bg) 5%,
+    rgba(17, 17, 17, 0.97) 14%,
+    rgba(17, 17, 17, 0.9) 28%,
+    rgba(17, 17, 17, 0.72) 44%,
+    rgba(17, 17, 17, 0.48) 60%,
+    rgba(17, 17, 17, 0.26) 76%,
+    rgba(17, 17, 17, 0.1) 88%,
     rgba(17, 17, 17, 0) 100%
   );
 }
@@ -308,6 +310,7 @@
   transform: translateX(var(--why-line-inset, 0))
     scale(var(--why-line-scale, 1));
   transform-origin: left center;
+  /* No CSS transition on transform: revolver is scroll-synced in JS; easing here hid the “emerge”. */
   transition: none;
   backface-visibility: hidden;
   will-change: transform, opacity;

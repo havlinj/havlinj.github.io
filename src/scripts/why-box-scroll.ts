@@ -52,6 +52,12 @@ import {
     START_COVER_HEIGHT_MAX: 300,
     /** After intro band: 1 = stejná „plná“ intenzita vrstvy jako horní ::before (jen násobí gradient). */
     BOTTOM_VEIL_MAX_O: 1,
+    /**
+     * At scrollTop ≈ 0, add this much .why-box-bottom-veil opacity (fades out with start band).
+     * Fills the gap where .why-start-cover is sized to the wide paragraph — incoming body lines
+     * otherwise peek full-size at the viewport bottom before revolver reads clearly.
+     */
+    INTRO_BOTTOM_VEIL_BASE: 0.97,
     CTA_FADE_PX: 56,
     CTA_O_HIDDEN: 0.002,
     CTA_ZONE_MIN_O: 0.04,
@@ -134,6 +140,13 @@ import {
     REVOLVER_LERP_INSTANT_BELOW_PX: 2.5,
     /** Quantize --why-font-scale steps to reduce wrap-width ping-pong at odd zoom. */
     FONT_SCALE_QUANT: 0.005,
+    /** <1 = mouse wheel moves the panel slower (only when we handle wheel below). */
+    WHEEL_SCROLL_FACTOR: 0.68,
+    /**
+     * ~1 keeps revolver catching up while lines move through the band (too low = they never
+     * read as smaller + inset). Wheel damping already slows scroll; lerp stays fairly snappy.
+     */
+    REVOLVER_LERP_SPEED: 0.92,
   };
 
   let whyFontScale = 1;
@@ -151,7 +164,19 @@ import {
 
   function revolverLerpForDelta(scrollDeltaPx) {
     if (scrollDeltaPx < T.REVOLVER_LERP_INSTANT_BELOW_PX) return 1;
-    return clamp(0.16 + scrollDeltaPx / 240, 0.16, 0.34);
+    const raw = clamp(0.15 + scrollDeltaPx / 250, 0.15, 0.34);
+    return raw * T.REVOLVER_LERP_SPEED;
+  }
+
+  function wheelDeltaToPixels(ev) {
+    let d = ev.deltaY + (ev.deltaZ || 0);
+    if (ev.deltaMode === 1) d *= 16;
+    else if (ev.deltaMode === 2) d *= scrollEl.clientHeight || 1;
+    return d;
+  }
+
+  function whyScrollPrefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   /** Coarsen normalized distance so edgeProgress does not flutter at fractional zoom. */
@@ -187,7 +212,7 @@ import {
       T.INTRO_RAMP_MIN,
       scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
     );
-    // At the very start keep the opening scene fully fixed.
+    // Near scroll top: opening scene fixed — applied only to first INTRO_LINE_COUNT lines in revolver.
     return scrollEl.scrollTop <= introRampPx * 0.35;
   }
 
@@ -373,7 +398,13 @@ import {
       '--why-start-cover-opacity',
       startOpacity.toFixed(3),
     );
-    const veilOpacity = smoothstep(startProgress) * T.BOTTOM_VEIL_MAX_O;
+    const sm = smoothstep(startProgress);
+    const outwardRamp = sm * T.BOTTOM_VEIL_MAX_O;
+    /* Double ease so intro veil eases out more gradually into the post-intro ramp. */
+    const introEaseOut = smoothstep(sm);
+    const introBottomVeil =
+      (1 - introEaseOut) * T.INTRO_BOTTOM_VEIL_BASE;
+    const veilOpacity = Math.min(1, outwardRamp + introBottomVeil);
     boxEl.style.setProperty(
       '--why-bottom-veil-opacity',
       veilOpacity.toFixed(3),
@@ -777,7 +808,9 @@ import {
       const eased = smoothstep(edgeProgress);
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
       const targetBlend = eased * gate * phaseGate;
-      if (phaseGate <= 0.001 || strictStart || strictEnd) {
+      const strictStartThisLine =
+        strictStart && lineIndex < T.INTRO_LINE_COUNT;
+      if (phaseGate <= 0.001 || strictStartThisLine || strictEnd) {
         lineBlendState[lineIndex] = 0;
         let lineOp = 1;
         if (ctaZone && !line.classList.contains('why-lead')) {
@@ -1074,9 +1107,21 @@ import {
   scrollEl.addEventListener(
     'wheel',
     (event) => {
-      if (event.ctrlKey) requestZoomSettle(8);
+      if (event.ctrlKey) {
+        requestZoomSettle(8);
+        return;
+      }
+      if (whyScrollPrefersReducedMotion()) return;
+      event.preventDefault();
+      const maxScroll = Math.max(
+        0,
+        scrollEl.scrollHeight - scrollEl.clientHeight,
+      );
+      const dy = wheelDeltaToPixels(event) * T.WHEEL_SCROLL_FACTOR;
+      scrollEl.scrollTop = clamp(scrollEl.scrollTop + dy, 0, maxScroll);
+      schedule();
     },
-    { passive: true },
+    { passive: false },
   );
   window.addEventListener('resize', onViewportResize);
   window.visualViewport?.addEventListener('resize', onViewportResize);

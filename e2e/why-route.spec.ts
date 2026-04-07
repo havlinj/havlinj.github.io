@@ -253,8 +253,9 @@ test.describe('/why page @serial', () => {
     );
     expect(
       atTop!.bottomVeilOp,
-      'scroll bottom veil off at scroll 0',
-    ).toBeLessThan(0.08);
+      'very strong box bottom veil at scroll 0 softens incoming copy at viewport edge',
+    ).toBeGreaterThan(0.92);
+    expect(atTop!.bottomVeilOp).toBeLessThanOrEqual(1);
     expect(atTop!.endOp, 'end-cover off at scroll 0').toBeLessThan(0.15);
     expect(atTop!.ctaOp, 'CTA visible at scroll 0').toBeGreaterThan(0.9);
 
