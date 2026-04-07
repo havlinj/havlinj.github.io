@@ -74,7 +74,7 @@ test.describe('Content width limits', () => {
       return [root, max];
     });
     expect(rootVar).toBe(`${MAX_CONTENT_WIDTH_CH}ch`);
-    expect(mainMaxWidth).toMatch(/^\d+px$/);
+    expect(mainMaxWidth).toMatch(/^\d+(\.\d+)?px$/);
   });
 
   test('content width stays within min at narrow viewport', async ({

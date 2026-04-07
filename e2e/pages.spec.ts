@@ -336,8 +336,8 @@ test.describe('Contact page (/contact)', () => {
     await expect(page.getByLabel('Message')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send' })).toBeVisible();
 
-    // Turnstile placeholder should be present in the DOM
-    await expect(page.locator('.cf-turnstile')).toBeVisible();
+    // Turnstile placeholder should be present in the DOM (widget can stay hidden in headless).
+    await expect(page.locator('.cf-turnstile')).toHaveCount(1);
   });
 
   test('shows first intro line and contact form id', async ({ page }) => {

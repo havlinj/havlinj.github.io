@@ -249,15 +249,11 @@
 }
 
 .why-page .why-block--body {
-  margin-top: calc(
-    clamp(4rem, 7vh, 5.5rem) * var(--why-font-scale, 1)
-  );
+  margin-top: calc(clamp(4rem, 7vh, 5.5rem) * var(--why-font-scale, 1));
 }
 
 .why-page .why-block--close {
-  margin-top: calc(
-    clamp(4.5rem, 8vh, 6.5rem) * var(--why-font-scale, 1)
-  );
+  margin-top: calc(clamp(4.5rem, 8vh, 6.5rem) * var(--why-font-scale, 1));
 }
 
 .why-page .why-scroll p {

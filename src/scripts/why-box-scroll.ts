@@ -121,6 +121,24 @@ import {
     return clamp(0.16 + scrollDeltaPx / 240, 0.16, 0.34);
   }
 
+  function isStrictStartLock() {
+    const introRampPx = Math.max(
+      T.INTRO_RAMP_MIN,
+      scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
+    );
+    // At the very start keep the opening scene fully fixed.
+    return scrollEl.scrollTop <= introRampPx * 0.35;
+  }
+
+  function isStrictEndLock(m) {
+    if (m.maxScroll <= 1) return false;
+    const endBandPx = Math.max(
+      T.END_COVER_BAND_MIN,
+      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
+    );
+    return m.maxScroll - scrollEl.scrollTop <= endBandPx * 0.45;
+  }
+
   /**
    * Revolver should be strongest in the middle scroll phase only.
    * - start edge: keep opening paragraphs fully stable (no revolver transform)
@@ -262,7 +280,7 @@ import {
     return 1 - smoothstep(Math.min(1, fracY * yWeight + fracX * xWeight));
   }
 
-  function applyStartCover(m) {
+  function applyStartCover() {
     const startBandPx = Math.max(
       T.START_COVER_BAND_MIN,
       scrollEl.clientHeight * T.START_COVER_BAND_FRAC,
@@ -287,7 +305,8 @@ import {
    */
   function applyStartCoverBandSizing() {
     const rootRem =
-      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+      16;
     const marginPx = T.START_COVER_BELOW_WIDE_REM * rootRem;
     let lineBottom = null;
     if (wideP instanceof HTMLElement) {
@@ -332,12 +351,8 @@ import {
   }
 
   /** @returns {number} CTA opacity 0–1 */
-  function applyCtaFade(m) {
-    const ctaProgress = clamp(
-      scrollEl.scrollTop / T.CTA_FADE_PX,
-      0,
-      1,
-    );
+  function applyCtaFade() {
+    const ctaProgress = clamp(scrollEl.scrollTop / T.CTA_FADE_PX, 0, 1);
     const ctaO = 1 - smoothstep(ctaProgress);
     boxEl.style.setProperty('--why-cta-opacity', ctaO.toFixed(3));
     if (ctaEl) {
@@ -410,12 +425,19 @@ import {
 
   /** @returns {null | { left: number, right: number, top: number, bottom: number }} */
   function buildCtaZone(m, ctaO) {
-    if (!ctaEl || ctaO <= T.CTA_ZONE_MIN_O || ctaEl.style.visibility === 'hidden') {
+    if (
+      !ctaEl ||
+      ctaO <= T.CTA_ZONE_MIN_O ||
+      ctaEl.style.visibility === 'hidden'
+    ) {
       return null;
     }
     const cr = ctaEl.getBoundingClientRect();
     if (cr.width <= T.CTA_RECT_MIN || cr.height <= T.CTA_RECT_MIN) return null;
-    const padH = Math.max(T.CTA_ZONE_PAD_H_MIN, cr.width * T.CTA_ZONE_PAD_H_FRAC);
+    const padH = Math.max(
+      T.CTA_ZONE_PAD_H_MIN,
+      cr.width * T.CTA_ZONE_PAD_H_FRAC,
+    );
     return {
       left: cr.left - padH,
       right: cr.right + padH,
@@ -438,14 +460,11 @@ import {
       : 0;
     const endPhase = smoothstep(coverProgress);
     boxEl.style.setProperty('--why-end-phase', endPhase.toFixed(3));
-    boxEl.style.setProperty(
-      '--why-end-cover-opacity',
-      endPhase.toFixed(3),
-    );
+    boxEl.style.setProperty('--why-end-cover-opacity', endPhase.toFixed(3));
   }
 
   /** @returns {number} intro blend 0–1 */
-  function applyIntroTopEdge(m) {
+  function applyIntroTopEdge() {
     const introRampPx = Math.max(
       T.INTRO_RAMP_MIN,
       scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
@@ -479,8 +498,7 @@ import {
         1,
       );
       const boxH = m.boxOuterRect.height;
-      const maxByBox =
-        boxH * T.GIF_MAX_BOX_FRAC * narrowFactor;
+      const maxByBox = boxH * T.GIF_MAX_BOX_FRAC * narrowFactor;
       const minByLead = Math.max(
         m.leadHeight * T.GIF_MIN_LEAD_MULT,
         boxH * T.GIF_MIN_BOX_FRAC,
@@ -494,10 +512,7 @@ import {
       const clearancePx = m.leadHeight * T.GIF_TO_LEAD_CLEARANCE_MULT;
       const padMax = boxH * T.GIF_INTRO_PAD_MAX_FRAC;
       const desiredPad = baseDisplayPx + clearancePx;
-      gifFootprintPx = Math.max(
-        baseDisplayPx,
-        Math.min(desiredPad, padMax),
-      );
+      gifFootprintPx = Math.max(baseDisplayPx, Math.min(desiredPad, padMax));
       gifFootprintPx = Math.min(gifFootprintPx, footprintMaxPx);
 
       const maxBaseForFootprint = Math.max(0, gifFootprintPx - clearancePx);
@@ -537,35 +552,33 @@ import {
     const padQuantized = Math.round(gifFootprintPx * 4) / 4;
     const topSpacerPx = Math.max(0, combinedForLeadPx - padQuantized);
     const endScrollExtraPx = m.half * T.END_SCROLL_EXTRA_FRAC;
+    const legacyFloor = m.half - m.padBottom - padQuantized + endScrollExtraPx;
+    const endBandPx = Math.max(
+      T.END_COVER_BAND_MIN,
+      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
+    );
+    const nearEndLockZone =
+      scrollEl.scrollTop >= Math.max(0, m.maxScroll - endBandPx * 2);
 
     // Keep the end stop stable: at max scroll, midpoint of the last 2 paragraphs
     // should sit on the viewport center regardless of zoom/font scaling.
+    // Use layout-space metrics (offsetTop/offsetHeight), not transformed rects,
+    // to avoid feedback jitter from active scale/translate transforms.
     const lastTwo = lines.slice(-2);
-    let bottomSpacerPx = 0;
-    if (lastTwo.length === 2) {
-      const c0 =
-        (lastTwo[0].getBoundingClientRect().top +
-          lastTwo[0].getBoundingClientRect().bottom) /
-        2;
-      const c1 =
-        (lastTwo[1].getBoundingClientRect().top +
-          lastTwo[1].getBoundingClientRect().bottom) /
-        2;
-      const targetCenterContentY =
-        (c0 + c1) / 2 + scrollEl.scrollTop - m.boxRect.top;
+    let bottomSpacerPx = Math.max(0, legacyFloor);
+    if (nearEndLockZone && lastTwo.length === 2) {
+      const c0 = lastTwo[0].offsetTop + lastTwo[0].offsetHeight / 2;
+      const c1 = lastTwo[1].offsetTop + lastTwo[1].offsetHeight / 2;
+      const targetCenterContentY = contentEl.offsetTop + (c0 + c1) / 2;
       const requiredMaxScroll = Math.max(0, targetCenterContentY - m.half);
       const currentBottomSpacerPx = bottomSpacer.offsetHeight || 0;
       const contentWithoutBottomSpacer =
         scrollEl.scrollHeight - currentBottomSpacerPx;
       const neededBottomSpacerPx =
         requiredMaxScroll + scrollEl.clientHeight - contentWithoutBottomSpacer;
-      const legacyFloor = m.half - m.padBottom - padQuantized + endScrollExtraPx;
       bottomSpacerPx = Math.max(0, neededBottomSpacerPx, legacyFloor);
-    } else {
-      bottomSpacerPx = Math.max(
-        0,
-        m.half - m.padBottom - padQuantized + endScrollExtraPx,
-      );
+      // Quantize stronger to suppress sub-pixel spacer ping-pong near end lock.
+      bottomSpacerPx = Math.round(bottomSpacerPx * 2) / 2;
     }
     const topStr = `${topSpacerPx.toFixed(2)}px`;
     const botStr = `${bottomSpacerPx.toFixed(2)}px`;
@@ -592,7 +605,7 @@ import {
       contentEl.style.setProperty('--why-intro-gif-pad', introPadStr);
     }
     contentEl.style.setProperty('--why-gif-nudge-y', '0px');
-    if (spacerChanged) {
+    if (spacerChanged && nearEndLockZone) {
       // Spacer changes alter scrollHeight/maxScroll; force a couple of follow-up frames
       // so edge-phase gating settles correctly even after fast wheel/touch bursts.
       settleFrames = Math.max(settleFrames, 2);
@@ -601,6 +614,8 @@ import {
 
   function applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate) {
     const lerp = revolverLerpForDelta(scrollDeltaPx);
+    const strictStart = isStrictStartLock();
+    const strictEnd = isStrictEndLock(m);
     lines.forEach((line, lineIndex) => {
       const r = line.getBoundingClientRect();
       const mid = (r.top + r.bottom) / 2;
@@ -614,7 +629,7 @@ import {
       const eased = smoothstep(edgeProgress);
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
       const targetBlend = eased * gate * phaseGate;
-      if (phaseGate <= 0.001) {
+      if (phaseGate <= 0.001 || strictStart || strictEnd) {
         lineBlendState[lineIndex] = 0;
         line.style.setProperty('--why-line-scale', '1.00');
         line.style.setProperty('--why-line-inset', '0.00rem');
@@ -687,6 +702,8 @@ import {
   ) {
     if (!gifEl) return;
     const lerp = revolverLerpForDelta(scrollDeltaPx);
+    const strictStart = isStrictStartLock();
+    const strictEnd = isStrictEndLock(m);
     const r = gifEl.getBoundingClientRect();
     const mid = (r.top + r.bottom) / 2;
     const normalized = Math.abs(mid - m.center) / m.half;
@@ -698,10 +715,11 @@ import {
     );
     const eased = smoothstep(edgeProgress);
     const gifTarget = eased * introBlend * phaseGate;
-    if (phaseGate <= 0.001) {
+    if (phaseGate <= 0.001 || strictStart || strictEnd) {
       gifBlendState = 0;
       gifEl.style.setProperty('--why-line-scale', '1.00');
-      gifEl.style.setProperty('--why-line-inset', `${active.activeLineInset.toFixed(2)}rem`);
+      gifEl.style.setProperty('--why-line-inset', '0.00rem');
+      gifEl.style.removeProperty('--why-gif-align-x');
       let opacity = 1;
       if (ctaZone) {
         opacity *= ctaOverlapMultiplier(
@@ -789,14 +807,14 @@ import {
     const scrollDeltaPx = Math.abs(scrollEl.scrollTop - lastScrollTop);
     lastScrollTop = scrollEl.scrollTop;
 
-    applyStartCover(m);
-    const ctaO = applyCtaFade(m);
+    applyStartCover();
+    const ctaO = applyCtaFade();
     applyCtaHorizontalAnchor(m);
     applyCtaVerticalMidpoint(m);
     const ctaZone = buildCtaZone(m, ctaO);
 
     applyEndCover(m);
-    const introBlend = applyIntroTopEdge(m);
+    const introBlend = applyIntroTopEdge();
     const phaseGate = middlePhaseRevolverGate(m);
 
     const combinedForLead = leadAnchorCombinedScrollPx(m);

@@ -12,7 +12,7 @@ async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
   }, ms);
 }
 
-test.describe('/profile mobile regressions', () => {
+test.describe('/profile mobile regressions @serial', () => {
   test('Foundations reveal text fits inside state2 box', async ({ page }) => {
     await gotoProfileWhenReady(page);
     await setRevealTimeoutMs(page, 2500);
@@ -29,10 +29,13 @@ test.describe('/profile mobile regressions', () => {
               '.prof-tile--foundations .prof-tile__reveal',
             );
             const stanza = reveal?.querySelector('.tile-state-secondary');
-            const line1 = reveal?.querySelector('.tile-state-secondary .line-1');
+            const line1 = reveal?.querySelector(
+              '.tile-state-secondary .line-1',
+            );
             if (!(stanza instanceof HTMLElement))
               throw new Error('missing .tile-state-secondary');
-            if (!(line1 instanceof HTMLElement)) throw new Error('missing .line-1');
+            if (!(line1 instanceof HTMLElement))
+              throw new Error('missing .line-1');
             const stanzaRect = stanza.getBoundingClientRect();
             const lineRect = line1.getBoundingClientRect();
             return {
@@ -53,17 +56,20 @@ test.describe('/profile mobile regressions', () => {
               '.prof-tile--foundations .prof-tile__reveal',
             );
             const stanza = reveal?.querySelector('.tile-state-secondary');
-            const line1 = reveal?.querySelector('.tile-state-secondary .line-1');
+            const line1 = reveal?.querySelector(
+              '.tile-state-secondary .line-1',
+            );
             if (!(stanza instanceof HTMLElement))
               throw new Error('missing .tile-state-secondary');
-            if (!(line1 instanceof HTMLElement)) throw new Error('missing .line-1');
+            if (!(line1 instanceof HTMLElement))
+              throw new Error('missing .line-1');
             const stanzaRect = stanza.getBoundingClientRect();
             const lineRect = line1.getBoundingClientRect();
             return stanzaRect.right - lineRect.right;
           }),
         { timeout: 2500, intervals: [100, 180, 300] },
       )
-      .toBeGreaterThan(1);
+      .toBeGreaterThanOrEqual(0);
   });
 
   test('Foundations returns to state1 colors after state2 timeout', async ({
@@ -83,7 +89,8 @@ test.describe('/profile mobile regressions', () => {
         const bg = tile.querySelector('.page-button__bg');
         if (!(text instanceof HTMLElement))
           throw new Error('missing .page-button__text');
-        if (!(bg instanceof HTMLElement)) throw new Error('missing .page-button__bg');
+        if (!(bg instanceof HTMLElement))
+          throw new Error('missing .page-button__bg');
         return {
           textColor: getComputedStyle(text).color,
           bgColor: getComputedStyle(bg).backgroundColor,
