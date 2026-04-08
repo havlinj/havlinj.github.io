@@ -400,4 +400,165 @@ test.describe('Contact page (/contact)', () => {
       '/assets/pages/contact/InBug-Black.png',
     );
   });
+
+  test('submits to /api/contact, sends form payload, and shows success', async ({
+    page,
+  }) => {
+    let payload = '';
+    await page.route('**/api/contact', async (route) => {
+      payload = route.request().postData() || '';
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/contact');
+    await page.getByLabel('Name').fill('Jan Test');
+    await page.getByLabel('Email').fill('jan@example.com');
+    await page.getByLabel('Message').fill(
+      'This is a test message long enough.',
+    );
+
+    await page.getByRole('button', { name: 'Send' }).click();
+    await expect(page.locator('#status')).toHaveText(
+      'Thanks! Your message has been sent.',
+    );
+
+    expect(payload).toContain('name="name"');
+    expect(payload).toContain('Jan Test');
+    expect(payload).toContain('name="email"');
+    expect(payload).toContain('jan@example.com');
+    expect(payload).toContain('name="message"');
+    expect(payload).toContain('test message long enough');
+    expect(payload).toContain('name="company"');
+
+    await expect(page.getByLabel('Name')).toHaveValue('');
+    await expect(page.getByLabel('Email')).toHaveValue('');
+    await expect(page.getByLabel('Message')).toHaveValue('');
+  });
+
+  test('shows API error and resets turnstile only when requested', async ({
+    page,
+  }) => {
+    await page.route('**/api/contact', async (route) => {
+      await route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          error: 'Validation failed.',
+          resetTurnstile: true,
+        }),
+      });
+    });
+
+    await page.goto('/contact');
+    await page.evaluate(() => {
+      (window as unknown as { __turnstileResetCount: number }).__turnstileResetCount = 0;
+      (
+        window as unknown as { turnstile: { reset: () => void } }
+      ).turnstile = {
+        reset: () => {
+          (
+            window as unknown as { __turnstileResetCount: number }
+          ).__turnstileResetCount += 1;
+        },
+      };
+    });
+
+    await page.getByLabel('Name').fill('Jan Test');
+    await page.getByLabel('Email').fill('jan@example.com');
+    await page.getByLabel('Message').fill(
+      'This is a test message long enough.',
+    );
+    await page.getByRole('button', { name: 'Send' }).click();
+
+    await expect(page.locator('#status')).toHaveText('Validation failed.');
+    const resets = await page.evaluate(
+      () =>
+        (window as unknown as { __turnstileResetCount: number })
+          .__turnstileResetCount,
+    );
+    expect(resets).toBe(1);
+  });
+
+  test('shows network error and resets turnstile', async ({ page }) => {
+    await page.route('**/api/contact', async (route) => {
+      await route.abort();
+    });
+
+    await page.goto('/contact');
+    await page.evaluate(() => {
+      (window as unknown as { __turnstileResetCount: number }).__turnstileResetCount = 0;
+      (
+        window as unknown as { turnstile: { reset: () => void } }
+      ).turnstile = {
+        reset: () => {
+          (
+            window as unknown as { __turnstileResetCount: number }
+          ).__turnstileResetCount += 1;
+        },
+      };
+    });
+
+    await page.getByLabel('Name').fill('Jan Test');
+    await page.getByLabel('Email').fill('jan@example.com');
+    await page.getByLabel('Message').fill(
+      'This is a test message long enough.',
+    );
+    await page.getByRole('button', { name: 'Send' }).click();
+
+    await expect(page.locator('#status')).toHaveText(
+      'Network error. Please try again.',
+    );
+    const resets = await page.evaluate(
+      () =>
+        (window as unknown as { __turnstileResetCount: number })
+          .__turnstileResetCount,
+    );
+    expect(resets).toBe(1);
+  });
+
+  test('prevents double submit while request is pending', async ({ page }) => {
+    let requests = 0;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+
+    await page.route('**/api/contact', async (route) => {
+      requests += 1;
+      await gate;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/contact');
+    await page.getByLabel('Name').fill('Jan Test');
+    await page.getByLabel('Email').fill('jan@example.com');
+    await page.getByLabel('Message').fill(
+      'This is a test message long enough.',
+    );
+
+    const send = page.getByRole('button', { name: 'Send' });
+    await page.evaluate(() => {
+      const form = document.querySelector('#contact-form') as HTMLFormElement;
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    await expect(send).toBeDisabled();
+    await page.waitForTimeout(120);
+    expect(requests).toBe(1);
+
+    release();
+    await expect(page.locator('#status')).toHaveText(
+      'Thanks! Your message has been sent.',
+    );
+    await expect(send).toBeEnabled();
+  });
 });
