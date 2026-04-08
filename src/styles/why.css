@@ -149,6 +149,29 @@
   );
 }
 
+/*
+ * Intro-only bottom veil: narrower band used only at scroll start so first two intro
+ * paragraphs remain fully bright while we still soften incoming body lines at the edge.
+ */
+.why-page .why-box > .why-box-intro-bottom-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px));
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--why-intro-bottom-veil-opacity, 0);
+  background: linear-gradient(
+    to top,
+    var(--why-box-bg) 0%,
+    var(--why-box-bg) 22%,
+    rgba(17, 17, 17, 0.68) 52%,
+    rgba(17, 17, 17, 0.22) 76%,
+    rgba(17, 17, 17, 0) 100%
+  );
+}
+
 .why-page .why-box::before,
 .why-page .why-box::after {
   content: '';

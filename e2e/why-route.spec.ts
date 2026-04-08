@@ -257,6 +257,9 @@ test.describe('/why page @serial', () => {
           startOp: parseFloat(
             cs.getPropertyValue('--why-start-cover-opacity').trim() || '1',
           ),
+          introBottomVeilOp: parseFloat(
+            cs.getPropertyValue('--why-intro-bottom-veil-opacity').trim() || '0',
+          ),
           bottomVeilOp: parseFloat(
             cs.getPropertyValue('--why-bottom-veil-opacity').trim() || '0',
           ),
@@ -289,10 +292,14 @@ test.describe('/why page @serial', () => {
       0.85,
     );
     expect(
-      atTop!.bottomVeilOp,
-      'very strong box bottom veil at scroll 0 softens incoming copy at viewport edge',
+      atTop!.introBottomVeilOp,
+      'intro-only narrow bottom veil is strong at scroll 0',
     ).toBeGreaterThan(0.92);
-    expect(atTop!.bottomVeilOp).toBeLessThanOrEqual(1);
+    expect(atTop!.introBottomVeilOp).toBeLessThanOrEqual(1);
+    expect(
+      atTop!.bottomVeilOp,
+      'post-intro bottom veil should be off at strict start',
+    ).toBeLessThan(0.12);
     expect(atTop!.endOp, 'end-cover off at scroll 0').toBeLessThan(0.15);
     expect(atTop!.ctaOp, 'CTA visible at scroll 0').toBeGreaterThan(0.9);
 

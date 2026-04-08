@@ -57,11 +57,16 @@ import {
     /** After intro band: 1 = stejná „plná“ intenzita vrstvy jako horní ::before (jen násobí gradient). */
     BOTTOM_VEIL_MAX_O: 1,
     /**
-     * At scrollTop ≈ 0, add this much .why-box-bottom-veil opacity (fades out with start band).
-     * Fills the gap where .why-start-cover is sized to the wide paragraph — incoming body lines
-     * otherwise peek full-size at the viewport bottom before revolver reads clearly.
+     * At scrollTop ≈ 0, intro-only narrow bottom veil opacity (separate layer).
+     * Keeps incoming body lines softened at the viewport edge without dimming the second intro line.
      */
-    INTRO_BOTTOM_VEIL_BASE: 0.97,
+    INTRO_BOTTOM_VEIL_BASE: 0.96,
+    /** Intro-only veil fades out faster than start-cover so only the opening moment is affected. */
+    INTRO_BOTTOM_VEIL_FADE_BAND_FRAC: 0.48,
+    /** Narrower intro-only veil height relative to measured start-cover height. */
+    INTRO_BOTTOM_VEIL_HEIGHT_FRAC: 0.46,
+    INTRO_BOTTOM_VEIL_HEIGHT_MIN: 52,
+    INTRO_BOTTOM_VEIL_HEIGHT_MAX: 92,
     CTA_FADE_PX: 56,
     CTA_O_HIDDEN: 0.002,
     CTA_ZONE_MIN_O: 0.04,
@@ -410,13 +415,23 @@ import {
     );
     const sm = smoothstep(startProgress);
     const outwardRamp = sm * T.BOTTOM_VEIL_MAX_O;
-    /* Double ease so intro veil eases out more gradually into the post-intro ramp. */
-    const introEaseOut = smoothstep(sm);
-    const introBottomVeil = (1 - introEaseOut) * T.INTRO_BOTTOM_VEIL_BASE;
-    const veilOpacity = Math.min(1, outwardRamp + introBottomVeil);
+    const veilOpacity = Math.min(1, outwardRamp);
     boxEl.style.setProperty(
       '--why-bottom-veil-opacity',
       veilOpacity.toFixed(3),
+    );
+
+    // Separate intro-only narrow veil: strong at scrollTop 0, gone quickly.
+    const introFadeBandPx = Math.max(
+      1,
+      startBandPx * T.INTRO_BOTTOM_VEIL_FADE_BAND_FRAC,
+    );
+    const introProgress = clamp(scrollEl.scrollTop / introFadeBandPx, 0, 1);
+    const introOpacity =
+      (1 - smoothstep(introProgress)) * T.INTRO_BOTTOM_VEIL_BASE;
+    boxEl.style.setProperty(
+      '--why-intro-bottom-veil-opacity',
+      introOpacity.toFixed(3),
     );
   }
 
@@ -456,6 +471,15 @@ import {
       if (raw >= 8) {
         const hPx = Math.min(T.START_COVER_HEIGHT_MAX, raw);
         hStr = `${Math.round(hPx * 4) / 4}px`;
+        const introVeilHeight = clamp(
+          hPx * T.INTRO_BOTTOM_VEIL_HEIGHT_FRAC,
+          T.INTRO_BOTTOM_VEIL_HEIGHT_MIN,
+          T.INTRO_BOTTOM_VEIL_HEIGHT_MAX,
+        );
+        boxEl.style.setProperty(
+          '--why-intro-bottom-veil-height',
+          `${Math.round(introVeilHeight)}px`,
+        );
       }
     }
 
@@ -464,6 +488,7 @@ import {
         lastStartCoverHeightStr = '';
         boxEl.style.removeProperty('--why-start-cover-height');
       }
+      boxEl.style.removeProperty('--why-intro-bottom-veil-height');
       return;
     }
     if (hStr !== lastStartCoverHeightStr) {
