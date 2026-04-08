@@ -71,6 +71,12 @@ async function waitForState2Settled(page: Page): Promise<FoundationsGeometry> {
   return readFoundationsGeometry(page);
 }
 
+async function openFoundationsReveal(tile: ReturnType<Page['getByRole']>) {
+  await tile.click();
+  await expect(tile).toHaveClass(/is-revealed/);
+  await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+}
+
 test.describe('/profile — type fit, Foundations tile, reveal', () => {
   test.use({
     viewport: { width: 1280, height: 900 },
@@ -94,9 +100,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await openFoundationsReveal(tile);
     const { revealPx, labelPx } = await page.evaluate(() => {
       const section = document.querySelector('.profile-section');
       const reveal = document.querySelector(
@@ -136,9 +140,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   test('first click opens reveal and stays on /profile', async ({ page }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await openFoundationsReveal(tile);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.prof-tile__reveal')).toContainText(
       /Tried\s*Writing/i,
@@ -150,9 +152,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await openFoundationsReveal(tile);
 
     const layout = await page.evaluate(() => {
       const reveal = document.querySelector(
@@ -228,8 +228,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     await gotoProfileWhenReady(page);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
+    await openFoundationsReveal(tile);
     await tile.click();
     await expect(page).toHaveURL(/\/foundations\/?$/);
   });

@@ -19,12 +19,17 @@ if (!page) {
 }
 const { Content } = await render(page);
 
-const profileSlugs = new Set(['profile', 'why', 'what-i-do', 'foundations']);
+const PROFILE_SECTION_SLUGS = new Set([
+  'profile',
+  'why',
+  'what-i-do',
+  'foundations',
+]);
 const sectionBySlug: Record<string, string> = {
   contact: 'contact',
   credits: 'credits',
 };
-const activeSection = profileSlugs.has(slug)
+const activeSection = PROFILE_SECTION_SLUGS.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
 const isProfile = slug === 'profile';

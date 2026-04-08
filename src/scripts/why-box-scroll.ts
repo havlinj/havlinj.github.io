@@ -227,6 +227,39 @@ import {
     });
   }
 
+  function readRootRemPx() {
+    return (
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
+      16
+    );
+  }
+
+  function firstLineRectInElement(el) {
+    if (!(el instanceof HTMLElement)) return null;
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const rects = range.getClientRects();
+      if (rects.length > 0) return rects[0];
+    } catch {
+      /* ignore Range errors */
+    }
+    return null;
+  }
+
+  function lastLineBottomInElement(el) {
+    if (!(el instanceof HTMLElement)) return null;
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const rects = range.getClientRects();
+      if (rects.length > 0) return rects[rects.length - 1].bottom;
+    } catch {
+      /* ignore Range errors */
+    }
+    return null;
+  }
+
   function isStrictStartLock() {
     const introRampPx = Math.max(
       T.INTRO_RAMP_MIN,
@@ -284,9 +317,7 @@ import {
 
   function wideColumnContentWidthPx() {
     if (!(wideP instanceof HTMLElement)) return 0;
-    const rootRem =
-      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
-      16;
+    const rootRem = readRootRemPx();
     const pCs = getComputedStyle(wideP);
     const padL = Number.parseFloat(pCs.paddingLeft) || 0;
     const padR =
@@ -441,23 +472,14 @@ import {
    * from washing out that line at odd zoom/viewport heights (fixed vh clamp was too tall).
    */
   function applyStartCoverBandSizing() {
-    const rootRem =
-      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
-      16;
+    const rootRem = readRootRemPx();
     const marginPx = T.START_COVER_BELOW_WIDE_REM * rootRem;
-    let lineBottom = null;
-    if (wideP instanceof HTMLElement) {
-      try {
-        const range = document.createRange();
-        range.selectNodeContents(wideP);
-        const rects = range.getClientRects();
-        if (rects.length > 0) lineBottom = rects[rects.length - 1].bottom;
-      } catch {
-        /* ignore */
-      }
-      if (lineBottom == null || !Number.isFinite(lineBottom)) {
-        lineBottom = wideP.getBoundingClientRect().bottom;
-      }
+    let lineBottom = lastLineBottomInElement(wideP);
+    if (
+      (lineBottom == null || !Number.isFinite(lineBottom)) &&
+      wideP instanceof HTMLElement
+    ) {
+      lineBottom = wideP.getBoundingClientRect().bottom;
     }
 
     const scrollB = scrollEl.getBoundingClientRect();
@@ -510,24 +532,16 @@ import {
 
   function applyCtaHorizontalAnchor(m) {
     if (!ctaEl || !(leadForCta instanceof HTMLElement)) return;
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(leadForCta);
-      const fr = range.getClientRects();
-      if (fr.length > 0) {
-        const r0 = fr[0];
-        let anchor =
-          r0.left - m.boxOuterRect.left + WHY_CTA_LEAD_TRACK * r0.width;
-        const edge = Math.max(
-          WHY_CTA_EDGE_MIN_PX,
-          m.boxOuterRect.width * WHY_CTA_EDGE_WIDTH_FRAC,
-        );
-        anchor = clamp(anchor, edge, m.boxOuterRect.width - edge);
-        boxEl.style.setProperty('--why-cta-left', `${anchor.toFixed(2)}px`);
-      }
-    } catch {
-      /* ignore Range errors */
-    }
+    const firstLine = firstLineRectInElement(leadForCta);
+    if (!firstLine) return;
+    let anchor =
+      firstLine.left - m.boxOuterRect.left + WHY_CTA_LEAD_TRACK * firstLine.width;
+    const edge = Math.max(
+      WHY_CTA_EDGE_MIN_PX,
+      m.boxOuterRect.width * WHY_CTA_EDGE_WIDTH_FRAC,
+    );
+    anchor = clamp(anchor, edge, m.boxOuterRect.width - edge);
+    boxEl.style.setProperty('--why-cta-left', `${anchor.toFixed(2)}px`);
   }
 
   /**
@@ -541,19 +555,7 @@ import {
     const boxBottom = m.boxOuterRect.bottom;
     const boxH = m.boxOuterRect.height;
     const f = T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM;
-    let refLineBottom = null;
-    if (wideP instanceof HTMLElement) {
-      try {
-        const range = document.createRange();
-        range.selectNodeContents(wideP);
-        const rects = range.getClientRects();
-        if (rects.length > 0) {
-          refLineBottom = rects[rects.length - 1].bottom;
-        }
-      } catch {
-        /* ignore */
-      }
-    }
+    const refLineBottom = lastLineBottomInElement(wideP);
     let targetY;
     if (refLineBottom == null || !Number.isFinite(refLineBottom)) {
       targetY = boxBottom - f * boxH;
@@ -894,7 +896,7 @@ import {
     });
   }
 
-  function pickActiveLineForGif(m) {
+  function pickActiveLineForGif() {
     let activeLineInset = 0;
     let activeLineDist = Number.POSITIVE_INFINITY;
     let activeLineLeftPx = Number.NaN;
@@ -1106,7 +1108,7 @@ import {
 
     if (!revolverIdle) {
       applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
-      const active = pickActiveLineForGif(m);
+      const active = pickActiveLineForGif();
       applyGifRevolver(
         m,
         introBlend,

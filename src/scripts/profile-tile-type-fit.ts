@@ -34,6 +34,8 @@ const SELECTORS = {
   foundationsTile: '.prof-tile--foundations',
   foundationsReveal: '.prof-tile__reveal',
   foundationsRevealInTile: '.prof-tile--foundations .prof-tile__reveal',
+  foundationsRevealStateSecondary: '.tile-state-secondary',
+  foundationsRevealLine1: '.tile-state-secondary .line-1',
   foundationsRevealStanza:
     '.tile-state-secondary .line-1, .tile-state-secondary .line-2',
   profileRightColumn: '.profile-right-column',
@@ -63,6 +65,14 @@ function queryElement<T extends Element>(
 
 function rootRemPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+}
+
+function setPxCustomProperty(
+  el: HTMLElement,
+  propertyName: string,
+  valuePx: number,
+): void {
+  el.style.setProperty(propertyName, `${roundPx(valuePx)}px`);
 }
 
 function titleCapFontPx(): number {
@@ -178,7 +188,11 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     }
   }
 
-  const stanza = queryElement(reveal, '.tile-state-secondary', HTMLElement);
+  const stanza = queryElement(
+    reveal,
+    SELECTORS.foundationsRevealStateSecondary,
+    HTMLElement,
+  );
   if (!stanza) return;
 
   // Grid animation can report 0× box for a frame; skip to avoid visible font flash.
@@ -198,7 +212,7 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     const vSafetyPx = 1;
     const line1 = queryElement(
       reveal,
-      '.tile-state-secondary .line-1',
+      SELECTORS.foundationsRevealLine1,
       HTMLElement,
     );
     const maxH = Math.max(0, stanza.clientHeight - vSafetyPx);
@@ -213,11 +227,11 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   };
 
   if (!fits(minPx)) {
-    reveal.style.setProperty(REVEAL_VAR, `${roundPx(minPx)}px`);
+    setPxCustomProperty(reveal, REVEAL_VAR, minPx);
     return;
   }
   if (fits(maxPx)) {
-    reveal.style.setProperty(REVEAL_VAR, `${roundPx(maxPx)}px`);
+    setPxCustomProperty(reveal, REVEAL_VAR, maxPx);
     return;
   }
 
@@ -229,7 +243,7 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     else hi = mid;
   }
   const fontPx = lo;
-  reveal.style.setProperty(REVEAL_VAR, `${roundPx(fontPx)}px`);
+  setPxCustomProperty(reveal, REVEAL_VAR, fontPx);
 }
 
 function fitAll(): void {
@@ -274,11 +288,8 @@ function measurePortraitGeometryPx(): void {
   );
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
-  rightColumn.style.setProperty(
-    PROFILE_RIGHT_HEIGHT_VAR,
-    `${roundPx(rcHeight)}px`,
-  );
-  rightColumn.style.setProperty(PROFILE_PORTRAIT_SIDE_VAR, `${roundPx(w)}px`);
+  setPxCustomProperty(rightColumn, PROFILE_RIGHT_HEIGHT_VAR, rcHeight);
+  setPxCustomProperty(rightColumn, PROFILE_PORTRAIT_SIDE_VAR, w);
 }
 
 function wireFoundationsReveal(): void {
@@ -390,7 +401,7 @@ function wireFoundationsReveal(): void {
         fitFoundationsReveal(reveal);
         const stanza = queryElement(
           reveal,
-          '.tile-state-secondary',
+          SELECTORS.foundationsRevealStateSecondary,
           HTMLElement,
         );
         if (!stanza || stanza.clientWidth < 4 || stanza.clientHeight < 4) {

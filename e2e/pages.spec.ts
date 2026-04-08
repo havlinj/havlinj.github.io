@@ -1,7 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
-import { expectNavLinkActive, gotoProfileWhenReady, mustBox } from './helpers';
+import {
+  expectNavLinkActive,
+  fillContactFormWithValidData,
+  gotoProfileWhenReady,
+  installTurnstileResetCounter,
+  mustBox,
+  readTurnstileResetCount,
+} from './helpers';
 
 // ---------------------------------------------------------------------------
 // Profile page (/profile, /why)
@@ -424,11 +431,7 @@ test.describe('Contact page (/contact)', () => {
     });
 
     await page.goto('/contact');
-    await page.getByLabel('Name').fill('Jan Test');
-    await page.getByLabel('Email').fill('jan@example.com');
-    await page
-      .getByLabel('Message')
-      .fill('This is a test message long enough.');
+    await fillContactFormWithValidData(page);
 
     await page.getByRole('button', { name: 'Send' }).click();
     await expect(page.locator('#status')).toHaveText(
@@ -464,32 +467,12 @@ test.describe('Contact page (/contact)', () => {
     });
 
     await page.goto('/contact');
-    await page.evaluate(() => {
-      (
-        window as unknown as { __turnstileResetCount: number }
-      ).__turnstileResetCount = 0;
-      (window as unknown as { turnstile: { reset: () => void } }).turnstile = {
-        reset: () => {
-          (
-            window as unknown as { __turnstileResetCount: number }
-          ).__turnstileResetCount += 1;
-        },
-      };
-    });
-
-    await page.getByLabel('Name').fill('Jan Test');
-    await page.getByLabel('Email').fill('jan@example.com');
-    await page
-      .getByLabel('Message')
-      .fill('This is a test message long enough.');
+    await installTurnstileResetCounter(page);
+    await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
 
     await expect(page.locator('#status')).toHaveText('Validation failed.');
-    const resets = await page.evaluate(
-      () =>
-        (window as unknown as { __turnstileResetCount: number })
-          .__turnstileResetCount,
-    );
+    const resets = await readTurnstileResetCount(page);
     expect(resets).toBe(1);
   });
 
@@ -499,34 +482,14 @@ test.describe('Contact page (/contact)', () => {
     });
 
     await page.goto('/contact');
-    await page.evaluate(() => {
-      (
-        window as unknown as { __turnstileResetCount: number }
-      ).__turnstileResetCount = 0;
-      (window as unknown as { turnstile: { reset: () => void } }).turnstile = {
-        reset: () => {
-          (
-            window as unknown as { __turnstileResetCount: number }
-          ).__turnstileResetCount += 1;
-        },
-      };
-    });
-
-    await page.getByLabel('Name').fill('Jan Test');
-    await page.getByLabel('Email').fill('jan@example.com');
-    await page
-      .getByLabel('Message')
-      .fill('This is a test message long enough.');
+    await installTurnstileResetCounter(page);
+    await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
 
     await expect(page.locator('#status')).toHaveText(
       'Network error. Please try again.',
     );
-    const resets = await page.evaluate(
-      () =>
-        (window as unknown as { __turnstileResetCount: number })
-          .__turnstileResetCount,
-    );
+    const resets = await readTurnstileResetCount(page);
     expect(resets).toBe(1);
   });
 
@@ -548,11 +511,7 @@ test.describe('Contact page (/contact)', () => {
     });
 
     await page.goto('/contact');
-    await page.getByLabel('Name').fill('Jan Test');
-    await page.getByLabel('Email').fill('jan@example.com');
-    await page
-      .getByLabel('Message')
-      .fill('This is a test message long enough.');
+    await fillContactFormWithValidData(page);
 
     const send = page.getByRole('button', { name: 'Send' });
     await page.evaluate(() => {

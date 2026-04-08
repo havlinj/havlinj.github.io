@@ -94,9 +94,9 @@ const defaultWritingBg = writingPoolUrls[0]
         return;
 
       const storageKey = 'writing-bg-index';
-      const rawValue = window.localStorage.getItem(storageKey);
-      const parsed = Number.parseInt(rawValue ?? '0', 10);
-      const currentIndex = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+      const currentIndex = readNonNegativeInt(
+        window.localStorage.getItem(storageKey),
+      );
       const selectedUrl =
         writingPoolUrls[currentIndex % writingPoolUrls.length];
       const nextIndex = (currentIndex + 1) % writingPoolUrls.length;
@@ -106,6 +106,11 @@ const defaultWritingBg = writingPoolUrls[0]
       const writingArticle = document.querySelector('article.writing-page');
       if (!writingArticle) return;
       writingArticle.style.setProperty('--panel-bg', `url('${selectedUrl}')`);
+
+      function readNonNegativeInt(rawValue) {
+        const parsed = Number.parseInt(rawValue ?? '0', 10);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+      }
     })();
   </script>
 </Layout>

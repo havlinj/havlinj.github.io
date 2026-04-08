@@ -11,6 +11,22 @@ import { RGB_INK } from '../src/constants/colors';
 import { WHY_FIT_REFERENCE_LINE } from '../src/constants/why-fit-reference';
 import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
 
+async function setWhyScrollTop(page: Page, top: number): Promise<void> {
+  await page.evaluate((value) => {
+    const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
+    scroll.scrollTop = value;
+    scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+  }, top);
+}
+
+async function setWhyScrollBottom(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
+    scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+    scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+  });
+}
+
 test.describe('/why page @serial', () => {
   test.beforeEach(async ({ page }) => {
     await gotoWhyWhenReady(page);
@@ -274,13 +290,7 @@ test.describe('/why page @serial', () => {
         };
       });
 
-    await page.evaluate(() => {
-      const scroll = document.querySelector(
-        '.why-page .why-scroll',
-      ) as HTMLElement;
-      scroll.scrollTop = 0;
-      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
-    });
+    await setWhyScrollTop(page, 0);
     await waitTwoFrames(page);
     const atTop = await read();
     expect(atTop).not.toBeNull();
@@ -303,13 +313,7 @@ test.describe('/why page @serial', () => {
     expect(atTop!.endOp, 'end-cover off at scroll 0').toBeLessThan(0.15);
     expect(atTop!.ctaOp, 'CTA visible at scroll 0').toBeGreaterThan(0.9);
 
-    await page.evaluate(() => {
-      const scroll = document.querySelector(
-        '.why-page .why-scroll',
-      ) as HTMLElement;
-      scroll.scrollTop = 100;
-      scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
-    });
+    await setWhyScrollTop(page, 100);
     await waitTwoFrames(page);
     await expect
       .poll(
@@ -354,16 +358,7 @@ test.describe('/why page @serial', () => {
     await expect
       .poll(
         async () => {
-          await page.evaluate(() => {
-            const scroll = document.querySelector(
-              '.why-page .why-scroll',
-            ) as HTMLElement;
-            scroll.scrollTop = Math.max(
-              0,
-              scroll.scrollHeight - scroll.clientHeight,
-            );
-            scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
-          });
+          await setWhyScrollBottom(page);
           const v = await read();
           return v?.endOp ?? 0;
         },
@@ -387,9 +382,7 @@ test.describe('/why page @serial', () => {
     await expect(cta).toHaveCSS('visibility', 'hidden');
 
     await page.evaluate(() => {
-      const scroll = document.querySelector(
-        '.why-page .why-scroll',
-      ) as HTMLElement;
+      const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
       scroll.scrollTop = 0;
     });
     await waitTwoFrames(page);

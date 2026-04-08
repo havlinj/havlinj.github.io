@@ -73,6 +73,9 @@ const navItems = [
         /* Profile: fade grid in only after portrait is ready AND tile type-fit JS ran
            (register type-fit listener synchronously — module may run before DOMContentLoaded). */
 
+        var TYPE_FIT_FALLBACK_TIMEOUT_MS = 8000;
+        var PORTRAIT_READY_TIMEOUT_MS = 4000;
+
         var section = document.querySelector('.profile-section--loading');
         if (!section) return;
 
@@ -84,21 +87,23 @@ const navItems = [
           section.classList.remove('profile-section--loading');
         }
 
+        function markTypeFitReady() {
+          if (typeFitReady) return;
+          typeFitReady = true;
+          tryReveal();
+        }
+
         document.addEventListener(
           'profileTileTypeFit',
           function onTypeFit() {
-            typeFitReady = true;
-            tryReveal();
+            markTypeFitReady();
           },
           { once: true },
         );
 
         setTimeout(function () {
-          if (!typeFitReady) {
-            typeFitReady = true;
-            tryReveal();
-          }
-        }, 8000);
+          markTypeFitReady();
+        }, TYPE_FIT_FALLBACK_TIMEOUT_MS);
 
         function wirePortrait() {
           var img = section.querySelector('.profile-photo-frame img');
@@ -128,7 +133,7 @@ const navItems = [
           }
           img.addEventListener('load', onReady);
           img.addEventListener('error', reveal);
-          timeoutId = setTimeout(reveal, 4000);
+          timeoutId = setTimeout(reveal, PORTRAIT_READY_TIMEOUT_MS);
         }
 
         if (document.readyState === 'loading') {
