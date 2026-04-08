@@ -6,6 +6,13 @@
  * Dispatches `profileTileTypeFit` when ready so Layout can drop the loading veil (with CSS clamp fallbacks if JS is off).
  */
 
+import {
+  baseWidthFromEffectiveScale,
+  fitFontSize,
+  normalizePositiveScale,
+  roundPx,
+} from '../utils/profile-fit-math';
+
 const LABEL_VAR = '--profile-tile-label-font-size';
 const REVEAL_VAR = '--profile-reveal-font-size';
 const PROFILE_RIGHT_HEIGHT_VAR = '--profile-right-height-px';
@@ -97,34 +104,6 @@ function maxLineWidth(
     m = Math.max(m, measureLineWidth(line, fontSizePx, style));
   }
   return m;
-}
-
-/** Callback: measured width at a trial font size (px). */
-// eslint-disable-next-line no-unused-vars
-type FontMeasure = (fontSizePx: number) => number;
-
-function fitFontSize(
-  available: number,
-  minPx: number,
-  maxPx: number,
-  measure: FontMeasure,
-): number {
-  if (available <= 1) return minPx;
-  const cap = available * 0.996;
-  if (measure(maxPx) <= cap) return maxPx;
-  if (measure(minPx) > cap) return minPx;
-  let lo = minPx;
-  let hi = maxPx;
-  for (let i = 0; i < 26; i++) {
-    const mid = (lo + hi) / 2;
-    if (measure(mid) <= cap) lo = mid;
-    else hi = mid;
-  }
-  return lo;
-}
-
-function roundPx(n: number): number {
-  return Math.round(n * 100) / 100;
 }
 
 function contentWidthWithoutHorizontalPadding(el: HTMLElement): number {
@@ -288,10 +267,11 @@ function measurePortraitGeometryPx(): void {
   // Keep this as BASE width (before visual scale in state2), otherwise c gets scaled twice.
   const cs = getComputedStyle(rightColumn);
   const rawScale = cs.getPropertyValue('--portrait-effective-scale').trim();
-  const parsedScale = Number.parseFloat(rawScale);
-  const effectiveScale =
-    Number.isFinite(parsedScale) && parsedScale > 0 ? parsedScale : 1;
-  const w = shell.getBoundingClientRect().width / effectiveScale;
+  const effectiveScale = normalizePositiveScale(rawScale);
+  const w = baseWidthFromEffectiveScale(
+    shell.getBoundingClientRect().width,
+    effectiveScale,
+  );
   if (!Number.isFinite(w) || w < 4) return; // keep waiting for layout
 
   rightColumn.style.setProperty(

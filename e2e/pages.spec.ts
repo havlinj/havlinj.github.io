@@ -426,9 +426,9 @@ test.describe('Contact page (/contact)', () => {
     await page.goto('/contact');
     await page.getByLabel('Name').fill('Jan Test');
     await page.getByLabel('Email').fill('jan@example.com');
-    await page.getByLabel('Message').fill(
-      'This is a test message long enough.',
-    );
+    await page
+      .getByLabel('Message')
+      .fill('This is a test message long enough.');
 
     await page.getByRole('button', { name: 'Send' }).click();
     await expect(page.locator('#status')).toHaveText(
@@ -465,10 +465,10 @@ test.describe('Contact page (/contact)', () => {
 
     await page.goto('/contact');
     await page.evaluate(() => {
-      (window as unknown as { __turnstileResetCount: number }).__turnstileResetCount = 0;
       (
-        window as unknown as { turnstile: { reset: () => void } }
-      ).turnstile = {
+        window as unknown as { __turnstileResetCount: number }
+      ).__turnstileResetCount = 0;
+      (window as unknown as { turnstile: { reset: () => void } }).turnstile = {
         reset: () => {
           (
             window as unknown as { __turnstileResetCount: number }
@@ -479,9 +479,9 @@ test.describe('Contact page (/contact)', () => {
 
     await page.getByLabel('Name').fill('Jan Test');
     await page.getByLabel('Email').fill('jan@example.com');
-    await page.getByLabel('Message').fill(
-      'This is a test message long enough.',
-    );
+    await page
+      .getByLabel('Message')
+      .fill('This is a test message long enough.');
     await page.getByRole('button', { name: 'Send' }).click();
 
     await expect(page.locator('#status')).toHaveText('Validation failed.');
@@ -500,10 +500,10 @@ test.describe('Contact page (/contact)', () => {
 
     await page.goto('/contact');
     await page.evaluate(() => {
-      (window as unknown as { __turnstileResetCount: number }).__turnstileResetCount = 0;
       (
-        window as unknown as { turnstile: { reset: () => void } }
-      ).turnstile = {
+        window as unknown as { __turnstileResetCount: number }
+      ).__turnstileResetCount = 0;
+      (window as unknown as { turnstile: { reset: () => void } }).turnstile = {
         reset: () => {
           (
             window as unknown as { __turnstileResetCount: number }
@@ -514,9 +514,9 @@ test.describe('Contact page (/contact)', () => {
 
     await page.getByLabel('Name').fill('Jan Test');
     await page.getByLabel('Email').fill('jan@example.com');
-    await page.getByLabel('Message').fill(
-      'This is a test message long enough.',
-    );
+    await page
+      .getByLabel('Message')
+      .fill('This is a test message long enough.');
     await page.getByRole('button', { name: 'Send' }).click();
 
     await expect(page.locator('#status')).toHaveText(
@@ -550,15 +550,19 @@ test.describe('Contact page (/contact)', () => {
     await page.goto('/contact');
     await page.getByLabel('Name').fill('Jan Test');
     await page.getByLabel('Email').fill('jan@example.com');
-    await page.getByLabel('Message').fill(
-      'This is a test message long enough.',
-    );
+    await page
+      .getByLabel('Message')
+      .fill('This is a test message long enough.');
 
     const send = page.getByRole('button', { name: 'Send' });
     await page.evaluate(() => {
       const form = document.querySelector('#contact-form') as HTMLFormElement;
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      form.dispatchEvent(
+        new Event('submit', { bubbles: true, cancelable: true }),
+      );
+      form.dispatchEvent(
+        new Event('submit', { bubbles: true, cancelable: true }),
+      );
     });
     await expect(send).toBeDisabled();
     await page.waitForTimeout(120);

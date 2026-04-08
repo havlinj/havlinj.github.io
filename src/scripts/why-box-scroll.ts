@@ -8,6 +8,13 @@ import {
   WHY_CTA_LEAD_TRACK,
   WHY_TEXT_RIGHT_GUTTER_REM,
 } from '../constants/why-layout';
+import {
+  clamp,
+  middlePhaseRevolverGate as computeMiddlePhaseRevolverGate,
+  revolverLerpForDelta as computeRevolverLerpForDelta,
+  smoothstep,
+  wheelDeltaToPixels as toWheelPixels,
+} from '../utils/why-scroll-math';
 
 (function () {
   const scrollEl = document.querySelector('.why-page .why-scroll');
@@ -31,9 +38,6 @@ import {
   if (fitProbe) {
     fitProbe.textContent = WHY_FIT_REFERENCE_LINE;
   }
-
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-  const smoothstep = (x) => x * x * (3 - 2 * x);
 
   /**
    * Magic numbers for /why scroll script only (tune here; behavior should stay intentional).
@@ -165,16 +169,20 @@ import {
   let gifLastRevolverKey = '';
 
   function revolverLerpForDelta(scrollDeltaPx) {
-    if (scrollDeltaPx < T.REVOLVER_LERP_INSTANT_BELOW_PX) return 1;
-    const raw = clamp(0.15 + scrollDeltaPx / 250, 0.15, 0.34);
-    return raw * T.REVOLVER_LERP_SPEED;
+    return computeRevolverLerpForDelta(
+      scrollDeltaPx,
+      T.REVOLVER_LERP_INSTANT_BELOW_PX,
+      T.REVOLVER_LERP_SPEED,
+    );
   }
 
   function wheelDeltaToPixels(ev) {
-    let d = ev.deltaY + (ev.deltaZ || 0);
-    if (ev.deltaMode === 1) d *= 16;
-    else if (ev.deltaMode === 2) d *= scrollEl.clientHeight || 1;
-    return d;
+    return toWheelPixels(
+      ev.deltaY,
+      ev.deltaZ || 0,
+      ev.deltaMode,
+      scrollEl.clientHeight || 1,
+    );
   }
 
   function whyScrollPrefersReducedMotion() {
@@ -239,19 +247,15 @@ import {
    * Smooth ramps preserve continuity into/out of the effect.
    */
   function middlePhaseRevolverGate(m) {
-    if (m.maxScroll <= 1) return 0;
-    const introRampPx = Math.max(
+    return computeMiddlePhaseRevolverGate(
+      scrollEl.scrollTop,
+      m.maxScroll,
+      scrollEl.clientHeight,
       T.INTRO_RAMP_MIN,
-      scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
-    );
-    const endBandPx = Math.max(
+      T.INTRO_RAMP_FRAC,
       T.END_COVER_BAND_MIN,
-      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
+      T.END_COVER_BAND_FRAC,
     );
-    const startGate = smoothstep(clamp(scrollEl.scrollTop / introRampPx, 0, 1));
-    const distFromEnd = Math.max(0, m.maxScroll - scrollEl.scrollTop);
-    const endGate = smoothstep(clamp(distFromEnd / endBandPx, 0, 1));
-    return startGate * endGate;
   }
 
   /**
