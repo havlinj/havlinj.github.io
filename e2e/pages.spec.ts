@@ -399,6 +399,15 @@ test.describe('Contact page (/contact)', () => {
       'src',
       '/assets/pages/contact/InBug-Black.png',
     );
+    await expect(github).toHaveAttribute('href', 'https://github.com/havlinj');
+    await expect(linkedin).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/jan-havlin',
+    );
+    await expect(github).toHaveAttribute('target', '_blank');
+    await expect(linkedin).toHaveAttribute('target', '_blank');
+    await expect(github).toHaveAttribute('rel', /noopener/);
+    await expect(linkedin).toHaveAttribute('rel', /noopener/);
   });
 
   test('submits to /api/contact, sends form payload, and shows success', async ({

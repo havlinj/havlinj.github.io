@@ -56,19 +56,41 @@ const title = 'Contact — Jan Havlín';
     const status = document.getElementById('status');
 
     if (form && status) {
+      // Build profile URLs from segmented parts to avoid plain static href strings.
+      const assembleUrl = (parts) => parts.join('');
+      const githubUrl = assembleUrl([
+        'https',
+        '://',
+        'github',
+        '.com',
+        '/',
+        'havlinj',
+      ]);
+      const linkedInUrl = assembleUrl([
+        'https',
+        '://',
+        'www',
+        '.',
+        'linkedin',
+        '.com',
+        '/',
+        'in',
+        '/',
+        'jan-havlin',
+      ]);
+
       // Insert 2 additional organization links right after the Send button.
-      // Replace the placeholder href/iconSrc values with your final URLs.
       const sendButton = form.querySelector('button[type="submit"]');
       if (sendButton && !form.querySelector('.contact-extra-links-wrapper')) {
         const extraLinks = [
           {
-            href: '__REPLACE_WITH_YOUR_URL_1__',
+            href: githubUrl,
             iconSrc: '/assets/pages/contact/github.svg',
             iconAlt: 'GitHub',
             label: 'GitHub',
           },
           {
-            href: '__REPLACE_WITH_YOUR_URL_2__',
+            href: linkedInUrl,
             iconSrc: '/assets/pages/contact/InBug-Black.png',
             iconAlt: 'LinkedIn',
             label: 'LinkedIn',
@@ -90,6 +112,8 @@ const title = 'Contact — Jan Havlín';
           const a = document.createElement('a');
           a.className = 'contact-extra-link';
           a.href = href;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
 
           const img = document.createElement('img');
           img.className = 'contact-extra-link__icon';
