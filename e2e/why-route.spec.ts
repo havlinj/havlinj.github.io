@@ -89,6 +89,43 @@ test.describe('/why page @serial', () => {
     );
   });
 
+  test('scroll CTA arrow maps texture image into segment fills', async ({
+    page,
+  }) => {
+    const data = await page.evaluate(() => {
+      const svg = document.querySelector(
+        '.why-page .why-scroll-cta svg.animated-arrow',
+      );
+      if (!(svg instanceof SVGElement)) return null;
+
+      const patternImage = svg.querySelector('defs pattern image');
+      const imageHref =
+        patternImage?.getAttribute('href') ||
+        patternImage?.getAttribute('xlink:href') ||
+        '';
+
+      const segs = [...svg.querySelectorAll('polygon.seg')];
+      const texturedCount = segs.filter((seg) =>
+        /fill:\s*url\(#animated-arrow-texture-/i.test(
+          seg.getAttribute('style') || '',
+        ),
+      ).length;
+
+      return {
+        imageHref,
+        segCount: segs.length,
+        texturedCount,
+      };
+    });
+
+    expect(data).not.toBeNull();
+    expect(data!.imageHref).toBe(
+      '/assets/pages/profile/why/leo-wieling-fNorkpLdc-Y-unsplash_dichrom_cropped.png',
+    );
+    expect(data!.segCount).toBeGreaterThanOrEqual(6);
+    expect(data!.texturedCount).toBe(data!.segCount);
+  });
+
   test('--why-cta-left tracks lead first line (inset + WHY_CTA_LEAD_TRACK × line width)', async ({
     page,
   }) => {
