@@ -36,6 +36,48 @@ test.describe('/why page @serial', () => {
     await gotoWhyWhenReady(page);
   });
 
+  test('reveals Why content and emits no runtime page errors on init', async ({
+    page,
+  }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => {
+      pageErrors.push(error.message);
+    });
+
+    await page.goto('/why', { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    await expect(
+      page.locator('.why-page .why-content.why-content--ready'),
+    ).toBeVisible();
+    await expect(page.locator('.why-page .why-content--pending-layout')).toHaveCount(
+      0,
+    );
+    await expect(page.locator('.why-page .why-content')).toHaveCSS('opacity', '1');
+    await expect(page.locator('.why-page .why-gif')).toBeVisible();
+
+    const scroll = page.locator('.why-page .why-scroll');
+    await expect(scroll).toBeVisible();
+    await scroll.evaluate((el) => {
+      const box = el as HTMLElement;
+      const max = Math.max(0, box.scrollHeight - box.clientHeight);
+      box.scrollTop = Math.min(max, 240);
+      box.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await waitTwoFrames(page);
+    await scroll.evaluate((el) => {
+      const box = el as HTMLElement;
+      box.scrollTop = 0;
+      box.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await waitTwoFrames(page);
+    await expect(page.locator('.why-page .why-content')).toHaveCSS('opacity', '1');
+    await expect(page.locator('.why-page .why-gif')).toBeVisible();
+
+    await page.waitForTimeout(200);
+    expect(pageErrors, `Runtime errors: ${pageErrors.join(' | ')}`).toEqual([]);
+  });
+
   test('WHY_FIT_REFERENCE_LINE matches longest line among /why copy', async ({
     page,
   }) => {

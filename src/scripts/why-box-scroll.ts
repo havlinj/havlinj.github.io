@@ -898,7 +898,7 @@ import {
     });
   }
 
-  function pickActiveLineForGif() {
+  function pickActiveLineForGif(m) {
     let activeLineInset = 0;
     let activeLineDist = Number.POSITIVE_INFINITY;
     let activeLineLeftPx = Number.NaN;
@@ -1110,7 +1110,7 @@ import {
 
     if (!revolverIdle) {
       applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
-      const active = pickActiveLineForGif();
+      const active = pickActiveLineForGif(m);
       applyGifRevolver(
         m,
         introBlend,
