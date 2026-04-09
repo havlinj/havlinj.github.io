@@ -448,12 +448,12 @@ article .profile-section:last-child {
 }
 
 .prof-tile__reveal {
-  --profile-reveal-clip-safe-right: 0px;
+  --profile-reveal-clip-safe-right: 2px;
   /*
    * Empirical compositor/raster compensation for the right edge of "?"
    * under aggressive zoom. Keep small and tune only if clipping returns.
    */
-  --profile-reveal-right-edge-comp: -4px;
+  --profile-reveal-right-edge-comp: 0px;
   position: absolute;
   inset: 0;
   z-index: 4;
@@ -464,18 +464,16 @@ article .profile-section:last-child {
   padding-block: 1.2rem;
   padding-inline-start: var(--profile-tile-text-inset-x);
   padding-inline-end: calc(
-    var(--profile-tile-text-inset-x) + var(--profile-reveal-clip-safe-right) +
+    var(--profile-tile-text-inset-x) * 1.3 +
+      var(--profile-reveal-clip-safe-right) +
       var(--profile-reveal-right-edge-comp)
   );
   box-sizing: border-box;
   text-align: left;
   background: #111;
   color: var(--color-page-bg);
-  /* --profile-reveal-font-size from profile-tile-type-fit.ts (measured) */
-  font-size: var(
-    --profile-reveal-font-size,
-    clamp(0.65rem, 4.5cqi, var(--page-title-font-size))
-  );
+  /* Set only from profile-tile-type-fit.ts (inline). Single rem fallback if JS is off — no clamp/cqi (narrow viewports could overshoot). */
+  font-size: var(--profile-reveal-font-size, 0.65rem);
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -614,8 +612,9 @@ article .profile-section:last-child {
   --profile-reveal-writing-gap: 0.17em;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
-  gap: 0.36rem;
+  gap: 0;
   width: 100%;
   height: 100%;
   text-align: left;
@@ -624,6 +623,17 @@ article .profile-section:last-child {
   max-width: 100%;
   align-self: stretch;
   overflow: hidden;
+}
+
+/* One unit for uniform scale on viewport squeeze (keeps line breaks + ? stable). */
+.prof-tile__reveal .tile-state-secondary__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.36rem;
+  transform: scale(var(--foundations-reveal-uniform-scale, 1));
+  transform-origin: left center;
+  will-change: transform;
 }
 
 .prof-tile__reveal .tile-state-secondary .line-1 {
@@ -644,7 +654,8 @@ article .profile-section:last-child {
   font-weight: 400;
   letter-spacing: 0.08em;
   opacity: 0.72;
-  max-width: 22ch;
+  /* Same column as line-1 so type-fit can reserve one width for both rows. */
+  max-width: 100%;
   text-transform: uppercase;
 }
 
@@ -667,8 +678,18 @@ article .profile-section:last-child {
 .prof-tile__reveal .tile-state-secondary .question-mark {
   display: inline-flex;
   align-items: baseline;
-  margin-left: 0.14em;
+  margin-left: 0.12em;
   font-size: 1em;
+}
+
+@media (max-width: 360px) {
+  .prof-tile__reveal .tile-state-secondary .line-1 {
+    letter-spacing: 0.06em;
+  }
+
+  .prof-tile__reveal .tile-state-secondary .question-mark {
+    margin-left: 0.08em;
+  }
 }
 
 .profile-photo-box img {

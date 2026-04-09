@@ -23,7 +23,11 @@ if ! npm run lint; then
 fi
 
 echo "Running Astro check..."
-ASTRO_CHECK_OUTPUT="$(npm run check:astro 2>&1)"
+if ! ASTRO_CHECK_OUTPUT="$(npm run check:astro 2>&1)"; then
+  echo "$ASTRO_CHECK_OUTPUT"
+  echo "Astro check failed."
+  exit 1
+fi
 echo "$ASTRO_CHECK_OUTPUT"
 
 # Keep all.sh strict: fail when Astro reports any non-zero warnings/hints.

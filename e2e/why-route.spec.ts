@@ -50,10 +50,13 @@ test.describe('/why page @serial', () => {
     await expect(
       page.locator('.why-page .why-content.why-content--ready'),
     ).toBeVisible();
-    await expect(page.locator('.why-page .why-content--pending-layout')).toHaveCount(
-      0,
+    await expect(
+      page.locator('.why-page .why-content--pending-layout'),
+    ).toHaveCount(0);
+    await expect(page.locator('.why-page .why-content')).toHaveCSS(
+      'opacity',
+      '1',
     );
-    await expect(page.locator('.why-page .why-content')).toHaveCSS('opacity', '1');
     await expect(page.locator('.why-page .why-gif')).toBeVisible();
 
     const scroll = page.locator('.why-page .why-scroll');
@@ -71,7 +74,10 @@ test.describe('/why page @serial', () => {
       box.dispatchEvent(new Event('scroll', { bubbles: true }));
     });
     await waitTwoFrames(page);
-    await expect(page.locator('.why-page .why-content')).toHaveCSS('opacity', '1');
+    await expect(page.locator('.why-page .why-content')).toHaveCSS(
+      'opacity',
+      '1',
+    );
     await expect(page.locator('.why-page .why-gif')).toBeVisible();
 
     await page.waitForTimeout(200);

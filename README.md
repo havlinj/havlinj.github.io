@@ -3,16 +3,19 @@
 Astro-based personal website focused on clean UX, deterministic behavior, and engineering quality.
 
 This project serves as:
+
 - a self-defined professional space to present expertise on my own terms, without being constrained by generic social-network formats,
 - a first full-scope frontend + UX implementation in this portfolio,
 - an intentional bridge between backend engineering depth and visual/interaction craft.
 
 Context:
+
 - For most of the past years (essentially since entering IT), the primary focus has been precise internal software architecture, domain-heavy backend logic, system robustness, and performance.
 - CLI development has been the main adjacent area.
 - The visual direction also draws on skills first shaped before entering IT through earlier art practice.
 
 Outcome:
+
 - Bringing these tracks together here was an exploratory and genuinely rewarding experience that broadened perspective across adjacent software disciplines.
 - Frontend is still not the intended primary specialization; the long-term center of gravity remains high-quality backend engineering for thoughtful, resilient systems.
 

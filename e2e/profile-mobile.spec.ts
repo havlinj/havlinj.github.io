@@ -47,6 +47,8 @@ test.describe('/profile mobile regressions @serial', () => {
             const line1 = reveal?.querySelector(
               '.tile-state-secondary .line-1',
             );
+            if (!(reveal instanceof HTMLElement))
+              throw new Error('missing .prof-tile__reveal');
             if (!(stanza instanceof HTMLElement))
               throw new Error('missing .tile-state-secondary');
             if (!(line1 instanceof HTMLElement))
@@ -56,6 +58,9 @@ test.describe('/profile mobile regressions @serial', () => {
             return {
               hFits: stanza.scrollHeight <= stanza.clientHeight + 1,
               rightGap: stanzaRect.right - lineRect.right,
+              leftMargin: lineRect.left - reveal.getBoundingClientRect().left,
+              rightMargin:
+                reveal.getBoundingClientRect().right - lineRect.right,
             };
           }),
         { timeout: 2500, intervals: [100, 180, 300] },
@@ -73,17 +78,53 @@ test.describe('/profile mobile regressions @serial', () => {
             const line1 = reveal?.querySelector(
               '.tile-state-secondary .line-1',
             );
+            if (!(reveal instanceof HTMLElement))
+              throw new Error('missing .prof-tile__reveal');
             if (!(stanza instanceof HTMLElement))
               throw new Error('missing .tile-state-secondary');
             if (!(line1 instanceof HTMLElement))
               throw new Error('missing .line-1');
             const stanzaRect = stanza.getBoundingClientRect();
             const lineRect = line1.getBoundingClientRect();
-            return stanzaRect.right - lineRect.right;
+            const revealRect = reveal.getBoundingClientRect();
+            return {
+              rightGap: stanzaRect.right - lineRect.right,
+              leftMargin: lineRect.left - revealRect.left,
+              rightMargin: revealRect.right - lineRect.right,
+            };
           }),
         { timeout: 2500, intervals: [100, 180, 300] },
       )
-      .toBeGreaterThanOrEqual(0);
+      .toMatchObject({
+        rightGap: expect.any(Number),
+        leftMargin: expect.any(Number),
+        rightMargin: expect.any(Number),
+      });
+
+    const marginCheck = await page.evaluate(() => {
+      const reveal = document.querySelector(
+        '.prof-tile--foundations .prof-tile__reveal',
+      );
+      const stanza = reveal?.querySelector('.tile-state-secondary');
+      const line1 = reveal?.querySelector('.tile-state-secondary .line-1');
+      if (!(reveal instanceof HTMLElement))
+        throw new Error('missing .prof-tile__reveal');
+      if (!(stanza instanceof HTMLElement))
+        throw new Error('missing .tile-state-secondary');
+      if (!(line1 instanceof HTMLElement)) throw new Error('missing .line-1');
+      const stanzaRect = stanza.getBoundingClientRect();
+      const lineRect = line1.getBoundingClientRect();
+      const revealRect = reveal.getBoundingClientRect();
+      return {
+        rightGap: stanzaRect.right - lineRect.right,
+        leftMargin: lineRect.left - revealRect.left,
+        rightMargin: revealRect.right - lineRect.right,
+      };
+    });
+    expect(marginCheck.rightGap).toBeGreaterThanOrEqual(0);
+    expect(marginCheck.rightMargin + 0.5).toBeGreaterThanOrEqual(
+      marginCheck.leftMargin * 1.3 + 2,
+    );
 
     // Visual guardrail for real clipping regressions.
     await expect(

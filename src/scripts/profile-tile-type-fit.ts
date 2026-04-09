@@ -3,7 +3,7 @@
  * - Shared tile label size from the longest of Why / What I do / Foundations → --profile-tile-label-font-size.
  * - Foundations reveal → --profile-reveal-font-size (often derived from tile size).
  * - Portrait column geometry → --profile-right-height-px, --profile-portrait-side-px.
- * Dispatches `profileTileTypeFit` when ready so Layout can drop the loading veil (with CSS clamp fallbacks if JS is off).
+ * Dispatches `profileTileTypeFit` when ready so Layout can drop the loading veil (reveal uses a fixed rem fallback in CSS if JS is off — no clamp).
  */
 
 import {
@@ -21,6 +21,18 @@ const PROFILE_PORTRAIT_SIDE_VAR = '--profile-portrait-side-px';
 const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
+const REVEAL_RIGHT_MARGIN_RATIO_MIN = 1.3;
+/** Extra slack so mobile raster + subpixels do not clip the last glyph. */
+const REVEAL_RIGHT_RENDER_PAD_PX = 5;
+/** Conservative padding vs `clientWidth` / `clientHeight` (overflow-based fit). */
+const REVEAL_OVERFLOW_H_PAD_PX = 10;
+const REVEAL_OVERFLOW_V_PAD_PX = 4;
+/**
+ * Last-glyph slack vs the stanza’s right padding edge. `scrollWidth` can match `clientWidth`
+ * on some WebKit builds even when `overflow:visible` ink still clips under `overflow:hidden`
+ * ancestors — so we also measure the `?` box directly.
+ */
+const REVEAL_INK_H_PAD_PX = 4;
 
 /** Layout.astro listens (once) before fading `.profile-section--loading` away. */
 const TYPE_FIT_EVENT = 'profileTileTypeFit';
@@ -36,6 +48,8 @@ const SELECTORS = {
   foundationsRevealInTile: '.prof-tile--foundations .prof-tile__reveal',
   foundationsRevealStateSecondary: '.tile-state-secondary',
   foundationsRevealLine1: '.tile-state-secondary .line-1',
+  foundationsRevealLine2: '.tile-state-secondary .line-2',
+  foundationsRevealCopyInner: '.tile-state-secondary__inner',
   foundationsRevealStanza:
     '.tile-state-secondary .line-1, .tile-state-secondary .line-2',
   profileRightColumn: '.profile-right-column',
@@ -49,10 +63,44 @@ const REVEAL_CLASSES = {
   typefitReady: 'is-reveal-typefit-ready',
 } as const;
 
-/** After this, show copy even if layout never stabilised (broken layout beats invisible). */
-const REVEAL_COPY_FALLBACK_MS = 1400;
+/**
+ * Last resort: show reveal copy if stable layout never converges (slow device / long motion).
+ * Must stay past tile state2 motion so we do not un-hide on CSS clamp + wrong box size.
+ */
+const REVEAL_COPY_FALLBACK_MS = 3200;
 /** Consecutive frames with identical stanza box + font var after fit (post-CSS-transition). */
 const REVEAL_LAYOUT_STABLE_FRAMES = 3;
+
+const FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR = '--foundations-reveal-uniform-scale';
+
+/** While Foundations is revealed, keep font size from first fit and only shrink via uniform scale. */
+const foundationsRevealFontLock = new WeakMap<HTMLElement, number>();
+
+function clearFoundationsRevealFontLock(tile: HTMLElement | null): void {
+  if (tile) foundationsRevealFontLock.delete(tile);
+}
+
+function setRevealCopyUniformScale(inner: HTMLElement | null, scale: number): void {
+  if (!inner) return;
+  inner.style.setProperty(FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR, String(scale));
+}
+
+function applyRevealCopyUniformScale(
+  stanza: HTMLElement,
+  inner: HTMLElement | null,
+): void {
+  if (!inner) return;
+  setRevealCopyUniformScale(inner, 1);
+  void stanza.offsetHeight;
+  const iw = inner.offsetWidth;
+  const ih = inner.offsetHeight;
+  if (iw < 2 || ih < 2) return;
+  const pad = 6;
+  const sw = Math.max(stanza.clientWidth - pad, 1);
+  const sh = Math.max(stanza.clientHeight - pad, 1);
+  const s = Math.min(1, sw / iw, sh / ih);
+  setRevealCopyUniformScale(inner, s);
+}
 
 function queryElement<T extends Element>(
   root: ParentNode,
@@ -65,6 +113,11 @@ function queryElement<T extends Element>(
 
 function rootRemPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+}
+
+/** Lower bound for reveal type fit; also used as immediate inline size so CSS clamp is never the first paint. */
+function minRevealFontPx(): number {
+  return Math.max(2, rootRemPx() * 0.32);
 }
 
 function setPxCustomProperty(
@@ -171,9 +224,7 @@ function fitTileLabels(section: HTMLElement): void {
 }
 
 function fitFoundationsReveal(reveal: HTMLElement): void {
-  const rem = rootRemPx();
-  // Allow deeper downscale under aggressive browser zoom to avoid right-edge clipping.
-  const minPx = Math.max(2, rem * 0.32);
+  const minPx = minRevealFontPx();
   let preferredPx = titleCapFontPx();
 
   const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
@@ -198,6 +249,23 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   // Grid animation can report 0× box for a frame; skip to avoid visible font flash.
   if (stanza.clientWidth < 4 || stanza.clientHeight < 4) return;
 
+  const tile =
+    (reveal.closest(SELECTORS.foundationsTile) as HTMLElement | null) ??
+    queryElement(document, SELECTORS.foundationsTile, HTMLElement);
+  const copyInner = queryElement(
+    stanza,
+    SELECTORS.foundationsRevealCopyInner,
+    HTMLElement,
+  );
+  const isRevealed = Boolean(
+    tile?.classList.contains(REVEAL_CLASSES.revealed),
+  );
+
+  if (!isRevealed) {
+    clearFoundationsRevealFontLock(tile);
+    setRevealCopyUniformScale(copyInner, 1);
+  }
+
   // Hard cap by current rendered box: never allow a font larger than the box can physically host.
   const boxCapPx = Math.max(
     minPx,
@@ -205,33 +273,89 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   );
   const maxPx = Math.max(minPx, Math.min(boxCapPx, preferredPx));
 
+  if (
+    isRevealed &&
+    copyInner &&
+    tile &&
+    foundationsRevealFontLock.has(tile)
+  ) {
+    setPxCustomProperty(reveal, REVEAL_VAR, foundationsRevealFontLock.get(tile)!);
+    applyRevealCopyUniformScale(stanza, copyInner);
+    return;
+  }
+
   const fits = (fontSizePx: number): boolean => {
     reveal.style.setProperty(REVEAL_VAR, `${roundPx(fontSizePx)}px`);
-    // Real rendered fit check (both axes) using measured line geometry.
-    const hSafetyPx = 2;
-    const vSafetyPx = 1;
+    setRevealCopyUniformScale(copyInner, 1);
+    void stanza.offsetHeight;
+
     const line1 = queryElement(
       reveal,
       SELECTORS.foundationsRevealLine1,
       HTMLElement,
     );
-    const maxH = Math.max(0, stanza.clientHeight - vSafetyPx);
-    const boxFitsH = stanza.scrollHeight <= maxH;
+    const line2 = queryElement(
+      reveal,
+      SELECTORS.foundationsRevealLine2,
+      HTMLElement,
+    );
 
-    if (!line1) return boxFitsH;
-    const lineRect = line1.getBoundingClientRect();
+    const wBudget = Math.max(0, stanza.clientWidth - REVEAL_OVERFLOW_H_PAD_PX);
+    const hBudget = Math.max(0, stanza.clientHeight - REVEAL_OVERFLOW_V_PAD_PX);
+
+    const l1w = line1?.scrollWidth ?? 0;
+    const l2w = line2?.scrollWidth ?? 0;
+    const linesFitW = l1w <= wBudget && l2w <= wBudget;
+
+    const stanzaFitsW =
+      stanza.scrollWidth <= stanza.clientWidth + REVEAL_OVERFLOW_H_PAD_PX;
+    const stanzaFitsH = stanza.scrollHeight <= hBudget;
+
+    if (!line1) return linesFitW && stanzaFitsW && stanzaFitsH;
+
     const stanzaRect = stanza.getBoundingClientRect();
-    // Tail buffer is part of .line-1 width via .question-mark::after, so this check is deterministic.
-    const lineFits = lineRect.width <= stanzaRect.width - hSafetyPx;
-    return boxFitsH && lineFits;
+    const questionInkFits = (() => {
+      const mark = line1.querySelector('.question-mark');
+      if (!(mark instanceof HTMLElement)) return true;
+      const mr = mark.getBoundingClientRect();
+      const mcs = getComputedStyle(mark);
+      const marginR = Number.parseFloat(mcs.marginRight || '0') || 0;
+      const inkRight = mr.right + marginR;
+      return inkRight <= stanzaRect.right - REVEAL_INK_H_PAD_PX;
+    })();
+
+    const lineRect = line1.getBoundingClientRect();
+    const revealRect = reveal.getBoundingClientRect();
+    const line1Style = getComputedStyle(line1);
+    const lineMarginLeft = Number.parseFloat(line1Style.marginLeft || '0') || 0;
+    const lineMarginRight = Number.parseFloat(line1Style.marginRight || '0') || 0;
+    const lineLeftPx = lineRect.left - lineMarginLeft;
+    const lineRightPx = lineRect.right + lineMarginRight;
+    const leftMarginPx = Math.max(0, lineLeftPx - revealRect.left);
+    const rightMarginPx = Math.max(0, revealRect.right - lineRightPx);
+    const rightMarginFits =
+      rightMarginPx + 0.5 >=
+      leftMarginPx * REVEAL_RIGHT_MARGIN_RATIO_MIN + REVEAL_RIGHT_RENDER_PAD_PX;
+
+    return (
+      linesFitW &&
+      stanzaFitsW &&
+      stanzaFitsH &&
+      questionInkFits &&
+      rightMarginFits
+    );
   };
 
   if (!fits(minPx)) {
     setPxCustomProperty(reveal, REVEAL_VAR, minPx);
+    if (isRevealed && tile) foundationsRevealFontLock.set(tile, minPx);
+    applyRevealCopyUniformScale(stanza, copyInner);
     return;
   }
   if (fits(maxPx)) {
     setPxCustomProperty(reveal, REVEAL_VAR, maxPx);
+    if (isRevealed && tile) foundationsRevealFontLock.set(tile, maxPx);
+    applyRevealCopyUniformScale(stanza, copyInner);
     return;
   }
 
@@ -244,6 +368,8 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   }
   const fontPx = lo;
   setPxCustomProperty(reveal, REVEAL_VAR, fontPx);
+  if (isRevealed && tile) foundationsRevealFontLock.set(tile, fontPx);
+  applyRevealCopyUniformScale(stanza, copyInner);
 }
 
 function fitAll(): void {
@@ -329,6 +455,7 @@ function wireFoundationsReveal(): void {
 
   const resetRevealToState1 = () => {
     clearRevealTimers();
+    clearFoundationsRevealFontLock(foundationsTile);
     foundationsTile.classList.remove(
       REVEAL_CLASSES.revealed,
       REVEAL_CLASSES.fadingOut,
@@ -376,7 +503,12 @@ function wireFoundationsReveal(): void {
     );
     foundationsTile.classList.add(REVEAL_CLASSES.revealed);
     clearRevealTimers();
+    clearFoundationsRevealFontLock(foundationsTile);
     if (reveal) {
+      // Avoid first paint using the CSS `clamp(...)` fallback: it can overshoot on narrow viewports
+      // while the stanza box is still mid-transition (looks “huge” and clips `?`).
+      setPxCustomProperty(reveal, REVEAL_VAR, minRevealFontPx());
+
       const showRevealCopy = () => {
         if (revealStableRafId) {
           window.cancelAnimationFrame(revealStableRafId);
@@ -386,7 +518,15 @@ function wireFoundationsReveal(): void {
           window.clearTimeout(revealCopyFallbackId);
           revealCopyFallbackId = 0;
         }
-        foundationsTile.classList.add(REVEAL_CLASSES.typefitReady);
+        fitFoundationsReveal(reveal);
+        revealStableRafId = window.requestAnimationFrame(() => {
+          fitFoundationsReveal(reveal);
+          revealStableRafId = window.requestAnimationFrame(() => {
+            fitFoundationsReveal(reveal);
+            revealStableRafId = 0;
+            foundationsTile.classList.add(REVEAL_CLASSES.typefitReady);
+          });
+        });
       };
       revealCopyFallbackId = window.setTimeout(() => {
         revealCopyFallbackId = 0;
