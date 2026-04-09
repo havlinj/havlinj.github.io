@@ -181,8 +181,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const revealCs = getComputedStyle(reveal);
       const copyCs = getComputedStyle(copy);
       const inner = copy.querySelector('.tile-state-secondary__inner');
-      const gapSource =
-        inner instanceof HTMLElement ? inner : copy;
+      const gapSource = inner instanceof HTMLElement ? inner : copy;
       const primaryCs = getComputedStyle(primary);
       const secondaryCs = getComputedStyle(secondary);
       const primaryPx = Number.parseFloat(primaryCs.fontSize);

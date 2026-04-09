@@ -73,7 +73,8 @@ const REVEAL_COPY_FALLBACK_MS = 3200;
 /** Consecutive frames with identical stanza box + font var after fit (post-CSS-transition). */
 const REVEAL_LAYOUT_STABLE_FRAMES = 3;
 
-const FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR = '--foundations-reveal-uniform-scale';
+const FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR =
+  '--foundations-reveal-uniform-scale';
 
 /** While Foundations is revealed, keep font size from first fit and only shrink via uniform scale. */
 const foundationsRevealFontLock = new WeakMap<HTMLElement, number>();
@@ -82,7 +83,10 @@ function clearFoundationsRevealFontLock(tile: HTMLElement | null): void {
   if (tile) foundationsRevealFontLock.delete(tile);
 }
 
-function setRevealCopyUniformScale(inner: HTMLElement | null, scale: number): void {
+function setRevealCopyUniformScale(
+  inner: HTMLElement | null,
+  scale: number,
+): void {
   if (!inner) return;
   inner.style.setProperty(FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR, String(scale));
 }
@@ -259,9 +263,7 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     SELECTORS.foundationsRevealCopyInner,
     HTMLElement,
   );
-  const isRevealed = Boolean(
-    tile?.classList.contains(REVEAL_CLASSES.revealed),
-  );
+  const isRevealed = Boolean(tile?.classList.contains(REVEAL_CLASSES.revealed));
 
   if (!isRevealed) {
     clearFoundationsRevealFontLock(tile);
@@ -275,13 +277,12 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
   );
   const maxPx = Math.max(minPx, Math.min(boxCapPx, preferredPx));
 
-  if (
-    isRevealed &&
-    copyInner &&
-    tile &&
-    foundationsRevealFontLock.has(tile)
-  ) {
-    setPxCustomProperty(reveal, REVEAL_VAR, foundationsRevealFontLock.get(tile)!);
+  if (isRevealed && copyInner && tile && foundationsRevealFontLock.has(tile)) {
+    setPxCustomProperty(
+      reveal,
+      REVEAL_VAR,
+      foundationsRevealFontLock.get(tile)!,
+    );
     applyRevealCopyUniformScale(stanza, copyInner);
     return;
   }
@@ -330,7 +331,8 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     const revealRect = reveal.getBoundingClientRect();
     const line1Style = getComputedStyle(line1);
     const lineMarginLeft = Number.parseFloat(line1Style.marginLeft || '0') || 0;
-    const lineMarginRight = Number.parseFloat(line1Style.marginRight || '0') || 0;
+    const lineMarginRight =
+      Number.parseFloat(line1Style.marginRight || '0') || 0;
     const lineLeftPx = lineRect.left - lineMarginLeft;
     const lineRightPx = lineRect.right + lineMarginRight;
     const leftMarginPx = Math.max(0, lineLeftPx - revealRect.left);
