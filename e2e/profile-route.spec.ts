@@ -1,5 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 import { RGB_INK } from '../src/constants/colors';
+import {
+  REVEAL_PADDING_RATIO_ASSERT_TOLERANCE_PX,
+  REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
+  REVEAL_RIGHT_MARGIN_RATIO_MIN,
+  REVEAL_RIGHT_RENDER_PAD_PX,
+} from '../src/utils/profile-reveal-constants';
 import { gotoProfileWhenReady, mustBox } from './helpers';
 
 type FoundationsGeometry = {
@@ -214,7 +220,8 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(layout.revealPadL).toBeGreaterThanOrEqual(28);
     expect(layout.revealPadL).toBeLessThanOrEqual(34);
     expect(layout.revealPadR).toBeGreaterThanOrEqual(
-      layout.revealPadL * 1.3 - 0.5,
+      layout.revealPadL * REVEAL_RIGHT_MARGIN_RATIO_MIN -
+        REVEAL_PADDING_RATIO_ASSERT_TOLERANCE_PX,
     );
     expect(layout.copyClass).toContain('tile-state-secondary');
     expect(layout.copyTextAlign).toBe('left');
@@ -229,8 +236,11 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(Math.abs(layout.primaryLeft - layout.secondaryLeft)).toBeLessThan(
       1.5,
     );
-    expect(layout.primaryRightMarginPx).toBeGreaterThanOrEqual(
-      layout.primaryLeftMarginPx * 1.3 + 1.5,
+    expect(
+      layout.primaryRightMarginPx + REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
+    ).toBeGreaterThanOrEqual(
+      layout.primaryLeftMarginPx * REVEAL_RIGHT_MARGIN_RATIO_MIN +
+        REVEAL_RIGHT_RENDER_PAD_PX,
     );
     expect(layout.revealIconCount).toBe(0);
     expect(layout.copyAnimName).toBe('none');

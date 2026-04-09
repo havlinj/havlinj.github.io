@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import { RGB_INK } from '../src/constants/colors';
+import {
+  REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
+  REVEAL_RIGHT_MARGIN_RATIO_MIN,
+  REVEAL_RIGHT_RENDER_PAD_PX,
+} from '../src/utils/profile-reveal-constants';
 import { gotoProfileWhenReady } from './helpers';
 
 async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
@@ -122,8 +127,11 @@ test.describe('/profile mobile regressions @serial', () => {
       };
     });
     expect(marginCheck.rightGap).toBeGreaterThanOrEqual(0);
-    expect(marginCheck.rightMargin + 0.5).toBeGreaterThanOrEqual(
-      marginCheck.leftMargin * 1.3 + 2,
+    expect(
+      marginCheck.rightMargin + REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
+    ).toBeGreaterThanOrEqual(
+      marginCheck.leftMargin * REVEAL_RIGHT_MARGIN_RATIO_MIN +
+        REVEAL_RIGHT_RENDER_PAD_PX,
     );
 
     // Visual guardrail for real clipping regressions.

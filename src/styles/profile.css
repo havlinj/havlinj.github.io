@@ -463,8 +463,9 @@ article .profile-section:last-child {
   justify-content: center;
   padding-block: 1.2rem;
   padding-inline-start: var(--profile-tile-text-inset-x);
+  /* Right inset factor: sync with REVEAL_RIGHT_MARGIN_RATIO_MIN in src/utils/profile-reveal-constants.ts */
   padding-inline-end: calc(
-    var(--profile-tile-text-inset-x) * 1.3 +
+    var(--profile-tile-text-inset-x) * 1.18 +
       var(--profile-reveal-clip-safe-right) +
       var(--profile-reveal-right-edge-comp)
   );

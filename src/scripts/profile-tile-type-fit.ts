@@ -12,6 +12,11 @@ import {
   normalizePositiveScale,
   roundPx,
 } from '../utils/profile-fit-math';
+import {
+  REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
+  REVEAL_RIGHT_MARGIN_RATIO_MIN,
+  REVEAL_RIGHT_RENDER_PAD_PX,
+} from '../utils/profile-reveal-constants';
 
 const LABEL_VAR = '--profile-tile-label-font-size';
 const REVEAL_VAR = '--profile-reveal-font-size';
@@ -21,9 +26,6 @@ const PROFILE_PORTRAIT_SIDE_VAR = '--profile-portrait-side-px';
 const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 const REVEAL_FADE_MS = 180;
 const REVEAL_PAUSE_MS = 50;
-const REVEAL_RIGHT_MARGIN_RATIO_MIN = 1.3;
-/** Extra slack so mobile raster + subpixels do not clip the last glyph. */
-const REVEAL_RIGHT_RENDER_PAD_PX = 5;
 /** Conservative padding vs `clientWidth` / `clientHeight` (overflow-based fit). */
 const REVEAL_OVERFLOW_H_PAD_PX = 10;
 const REVEAL_OVERFLOW_V_PAD_PX = 4;
@@ -334,7 +336,7 @@ function fitFoundationsReveal(reveal: HTMLElement): void {
     const leftMarginPx = Math.max(0, lineLeftPx - revealRect.left);
     const rightMarginPx = Math.max(0, revealRect.right - lineRightPx);
     const rightMarginFits =
-      rightMarginPx + 0.5 >=
+      rightMarginPx + REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX >=
       leftMarginPx * REVEAL_RIGHT_MARGIN_RATIO_MIN + REVEAL_RIGHT_RENDER_PAD_PX;
 
     return (
