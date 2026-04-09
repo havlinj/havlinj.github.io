@@ -82,6 +82,8 @@ jobs:
         env:
           # Runners are often 2 vCPU; local all.sh defaults to 12 workers without this.
           PW_WORKERS: '4'
+          # In CI we start from a fresh checkout, so skip all.sh pre-clean for speed.
+          ALL_SH_CLEAN: '0'
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \

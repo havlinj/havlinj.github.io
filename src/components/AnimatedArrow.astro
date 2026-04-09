@@ -206,26 +206,28 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     aria-hidden="true"
   >
     <defs>
-      {hasTexture && (
-        <pattern
-          id={texturePatternId}
-          patternUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width={VIEWBOX_W}
-          height={VIEWBOX_H}
-        >
-          <image
-            href={textureUrl}
-            x={textureX}
-            y={textureY}
-            width={textureW}
-            height={textureH}
-            preserveAspectRatio="xMidYMid slice"
-            style={`filter: brightness(${textureBrightness}) contrast(${textureContrast});`}
-          />
-        </pattern>
-      )}
+      {
+        hasTexture && (
+          <pattern
+            id={texturePatternId}
+            patternUnits="userSpaceOnUse"
+            x="0"
+            y="0"
+            width={VIEWBOX_W}
+            height={VIEWBOX_H}
+          >
+            <image
+              href={textureUrl}
+              x={textureX}
+              y={textureY}
+              width={textureW}
+              height={textureH}
+              preserveAspectRatio="xMidYMid slice"
+              style={`filter: brightness(${textureBrightness}) contrast(${textureContrast});`}
+            />
+          </pattern>
+        )
+      }
     </defs>
     <g class="arrow-grain-group">
       <polygon
@@ -256,8 +258,7 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
       <polygon
         class="seg s6"
         style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="99.282,28.564 120.718,28.564 110,10"
-      ></polygon>
+        points="99.282,28.564 120.718,28.564 110,10"></polygon>
     </g>
   </svg>
 </span>

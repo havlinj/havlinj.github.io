@@ -535,7 +535,9 @@ import {
     const firstLine = firstLineRectInElement(leadForCta);
     if (!firstLine) return;
     let anchor =
-      firstLine.left - m.boxOuterRect.left + WHY_CTA_LEAD_TRACK * firstLine.width;
+      firstLine.left -
+      m.boxOuterRect.left +
+      WHY_CTA_LEAD_TRACK * firstLine.width;
     const edge = Math.max(
       WHY_CTA_EDGE_MIN_PX,
       m.boxOuterRect.width * WHY_CTA_EDGE_WIDTH_FRAC,

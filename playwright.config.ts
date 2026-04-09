@@ -1,5 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const serverMode = process.env.PW_SERVER_MODE === 'preview' ? 'preview' : 'dev';
+const webServerCommand =
+  serverMode === 'preview'
+    ? 'npm run build && npm run preview -- --host 127.0.0.1 --port 4321'
+    : 'npm run dev';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -27,14 +33,17 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: webServerCommand,
     url: 'http://localhost:4321',
     // When Playwright starts dev (CI=1 / all.sh), hide its stdout — otherwise Vite/Astro floods the terminal.
     stdout: 'ignore',
-    // Local `npm test`: reuse an existing dev on :4321 (fast iteration).
-    // CI/all.sh default starts a clean server, but you can opt into reuse when needed:
+    // Local `npm test` in dev-mode can reuse existing server for faster iteration.
+    // CI/all.sh defaults to fresh server; preview mode always starts a clean server.
+    // You can still opt into reuse when needed:
     //   PW_REUSE_SERVER=1 ./scripts/all.sh
-    reuseExistingServer: !process.env.CI || process.env.PW_REUSE_SERVER === '1',
+    reuseExistingServer:
+      serverMode === 'dev' &&
+      (!process.env.CI || process.env.PW_REUSE_SERVER === '1'),
     timeout: 15_000,
   },
 });

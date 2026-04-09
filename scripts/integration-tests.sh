@@ -28,7 +28,7 @@ cd "$ROOT_DIR"
 # - keep worker count conservative to avoid dev-server contention on repeated runs
 # - optional CI-like mode can be enabled via PW_CI_MODE=1
 #
-# Auto mode (default):
+# Auto mode:
 # - if :4321 serves this site health token, reuse it
 # - if :4321 is occupied by something else, fail with clear guidance
 # - if :4321 is free, let Playwright start its own dev server
@@ -36,13 +36,15 @@ cd "$ROOT_DIR"
 # Manual override:
 #   PW_REUSE_SERVER=1 ./scripts/integration-tests.sh   # always reuse existing
 #   PW_REUSE_SERVER=0 ./scripts/integration-tests.sh   # never reuse
-REUSE_MODE="${PW_REUSE_SERVER:-auto}"
+# Default to fresh server per run for stability (cleaner runtime environment).
+REUSE_MODE="${PW_REUSE_SERVER:-0}"
 REUSE_FLAG="0"
 if [ "$REUSE_MODE" = "1" ]; then
   REUSE_FLAG="1"
   echo "Using existing dev server on :4321 (PW_REUSE_SERVER=1)."
 elif [ "$REUSE_MODE" = "0" ]; then
   REUSE_FLAG="0"
+  echo "Using fresh Playwright-managed dev server (PW_REUSE_SERVER=0)."
 else
   RESPONSE="$(curl -fsS --max-time 2 "http://localhost:4321/e2e-health" 2>/dev/null || true)"
   if [ -n "$RESPONSE" ]; then
@@ -60,18 +62,18 @@ else
   fi
 fi
 
-PW_WORKERS="${PW_WORKERS:-12}"
+PW_WORKERS="${PW_WORKERS:-8}"
 PW_CI_MODE="${PW_CI_MODE:-0}"
 echo "Playwright workers: $PW_WORKERS"
 echo "Playwright CI mode: $PW_CI_MODE"
 echo "Running parallel-safe tests (excluding @serial)..."
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial"
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial"
 echo ""
 echo "Running serial-sensitive why tests with one worker..."
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" npm run test -- e2e/why-route.spec.ts --workers=1
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-route.spec.ts --workers=1
 echo ""
 echo "Running serial-sensitive mobile profile tests with one worker..."
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" npm run test -- e2e/profile-mobile.spec.ts --workers=1
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/profile-mobile.spec.ts --workers=1
 
 echo ""
 echo "Integration tests passed."

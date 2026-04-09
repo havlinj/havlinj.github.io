@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import {
   MAX_CONTENT_WIDTH_CH,
@@ -6,15 +6,20 @@ import {
   MIN_CONTENT_WIDTH_PX,
 } from './constants';
 
+/** Home page: DOM + stylesheets are enough; default `load` waits on hero image + webfonts. */
+async function gotoHomeForGlobals(page: Page) {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+}
+
 test.describe('Global colors', () => {
   test('body has correct background color', async ({ page }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const body = page.locator('body');
     await expect(body).toHaveCSS('background-color', RGB_PAGE_BG);
   });
 
   test('body has correct text color', async ({ page }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const body = page.locator('body');
     await expect(body).toHaveCSS('color', RGB_INK);
   });
@@ -22,13 +27,13 @@ test.describe('Global colors', () => {
 
 test.describe('Global typography', () => {
   test('root font is Inter', async ({ page }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const html = page.locator('html');
     await expect(html).toHaveCSS('font-family', /Inter/);
   });
 
   test('root font-size is 16px (1rem)', async ({ page }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const html = page.locator('html');
     await expect(html).toHaveCSS('font-size', '16px');
   });
@@ -36,7 +41,7 @@ test.describe('Global typography', () => {
 
 test.describe('Content width limits', () => {
   test(':root defines --content-min-width (40ch)', async ({ page }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const value = await page.evaluate(() =>
       getComputedStyle(document.documentElement)
         .getPropertyValue('--content-min-width')
@@ -49,7 +54,7 @@ test.describe('Content width limits', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 300, height: 600 });
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const main = page.locator('main.content');
     await expect(main).toBeVisible();
     const [boxWidth, computedMin] = await main.evaluate((el) => {
@@ -64,7 +69,7 @@ test.describe('Content width limits', () => {
   test('main.content has max-width from --content-width (70ch)', async ({
     page,
   }) => {
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const [rootVar, mainMaxWidth] = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement)
         .getPropertyValue('--content-width')
@@ -81,7 +86,7 @@ test.describe('Content width limits', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 300, height: 600 });
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const main = page.locator('main.content');
     await expect(main).toBeVisible();
     const box = await main.boundingBox();
@@ -93,7 +98,7 @@ test.describe('Content width limits', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
-    await page.goto('/');
+    await gotoHomeForGlobals(page);
     const main = page.locator('main.content');
     await expect(main).toBeVisible();
     const [boxWidth, maxWidthPx] = await main.evaluate((el) => {

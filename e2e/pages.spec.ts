@@ -314,6 +314,13 @@ test.describe('Credits page (/credits)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Contact page (/contact)', () => {
+  test.beforeEach(async ({ page }) => {
+    // Turnstile loads from Cloudflare; waiting on it makes `goto` slow and flaky under load.
+    await page.route('**/challenges.cloudflare.com/**', (route) =>
+      route.abort(),
+    );
+  });
+
   test('shows navbar with active Contact', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.site-header')).toBeVisible();

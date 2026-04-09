@@ -13,7 +13,9 @@ import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
 
 async function setWhyScrollTop(page: Page, top: number): Promise<void> {
   await page.evaluate((value) => {
-    const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
+    const scroll = document.querySelector(
+      '.why-page .why-scroll',
+    ) as HTMLElement;
     scroll.scrollTop = value;
     scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
   }, top);
@@ -21,7 +23,9 @@ async function setWhyScrollTop(page: Page, top: number): Promise<void> {
 
 async function setWhyScrollBottom(page: Page): Promise<void> {
   await page.evaluate(() => {
-    const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
+    const scroll = document.querySelector(
+      '.why-page .why-scroll',
+    ) as HTMLElement;
     scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
     scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
   });
@@ -136,7 +140,7 @@ test.describe('/why page @serial', () => {
 
     expect(data).not.toBeNull();
     expect(data!.imageHref).toBe(
-      '/assets/pages/profile/why/leo-wieling-fNorkpLdc-Y-unsplash_dichrom_cropped.png',
+      '/assets/pages/profile/why/dichrom_background.png',
     );
     expect(data!.segCount).toBeGreaterThanOrEqual(6);
     expect(data!.texturedCount).toBe(data!.segCount);
@@ -274,7 +278,8 @@ test.describe('/why page @serial', () => {
             cs.getPropertyValue('--why-start-cover-opacity').trim() || '1',
           ),
           introBottomVeilOp: parseFloat(
-            cs.getPropertyValue('--why-intro-bottom-veil-opacity').trim() || '0',
+            cs.getPropertyValue('--why-intro-bottom-veil-opacity').trim() ||
+              '0',
           ),
           bottomVeilOp: parseFloat(
             cs.getPropertyValue('--why-bottom-veil-opacity').trim() || '0',
@@ -382,7 +387,9 @@ test.describe('/why page @serial', () => {
     await expect(cta).toHaveCSS('visibility', 'hidden');
 
     await page.evaluate(() => {
-      const scroll = document.querySelector('.why-page .why-scroll') as HTMLElement;
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement;
       scroll.scrollTop = 0;
     });
     await waitTwoFrames(page);
@@ -675,9 +682,7 @@ test.describe('/why page @serial', () => {
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.reload();
-    await page
-      .locator('.why-page .why-content.why-content--ready')
-      .waitFor({ state: 'visible', timeout: 10000 });
+    await gotoWhyWhenReady(page);
     const nativeRm = await whyWheelScrollDeltaPx(page, rawDelta);
 
     expect(damped, 'damped path should move').toBeGreaterThan(28);
