@@ -327,6 +327,16 @@ function wireFoundationsReveal(): void {
     revealCopyFallbackId = 0;
   };
 
+  const resetRevealToState1 = () => {
+    clearRevealTimers();
+    foundationsTile.classList.remove(
+      REVEAL_CLASSES.revealed,
+      REVEAL_CLASSES.fadingOut,
+      REVEAL_CLASSES.opening,
+      REVEAL_CLASSES.typefitReady,
+    );
+  };
+
   const isRevealed = (): boolean =>
     foundationsTile.classList.contains(REVEAL_CLASSES.revealed);
   const isFadingOut = (): boolean =>
@@ -448,6 +458,12 @@ function wireFoundationsReveal(): void {
     }
     event.preventDefault();
     openReveal();
+  });
+
+  // Mobile browsers can restore /profile from BFCache after visiting /foundations.
+  // In that case, old reveal classes/timers may stay stale; always restore state1.
+  window.addEventListener('pageshow', () => {
+    resetRevealToState1();
   });
 }
 

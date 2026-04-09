@@ -139,4 +139,35 @@ test.describe('/profile mobile regressions @serial', () => {
       })
       .toEqual(before);
   });
+
+  test('history back from /foundations restores Foundations tile to state1', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    await setRevealTimeoutMs(page, 5000);
+
+    const tile = page.getByRole('link', { name: 'Foundations' });
+    await tile.click();
+    await expect(tile).toHaveClass(/is-revealed/);
+
+    await tile.click();
+    await expect(page).toHaveURL(/\/foundations\/?$/);
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/profile\/?$/);
+
+    await expect
+      .poll(
+        async () => {
+          const cls = (await tile.getAttribute('class')) ?? '';
+          return {
+            revealed: cls.includes('is-revealed'),
+            fading: cls.includes('is-reveal-fading-out'),
+            opening: cls.includes('is-reveal-opening'),
+          };
+        },
+        { timeout: 2000, intervals: [100, 200, 350] },
+      )
+      .toEqual({ revealed: false, fading: false, opening: false });
+  });
 });
