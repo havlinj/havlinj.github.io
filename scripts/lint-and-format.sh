@@ -22,6 +22,16 @@ if ! npm run lint; then
   exit 1
 fi
 
+echo "Running Astro check..."
+ASTRO_CHECK_OUTPUT="$(npm run check:astro 2>&1)"
+echo "$ASTRO_CHECK_OUTPUT"
+
+# Keep all.sh strict: fail when Astro reports any non-zero warnings/hints.
+if echo "$ASTRO_CHECK_OUTPUT" | grep -Eq "(^warning[[:space:]])|(^- [1-9][0-9]* warnings?$)|(^- [1-9][0-9]* hints?$)"; then
+  echo "Astro check reported warnings/hints. Treating as failure."
+  exit 1
+fi
+
 echo "ESLint passed – running Prettier..."
 npm run format
 

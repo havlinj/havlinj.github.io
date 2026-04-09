@@ -3,9 +3,10 @@ import { getCollection } from 'astro:content';
 import { readdir } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import Layout from '../layouts/Layout.astro';
+import { splitAndSortWritingPosts } from '../utils/writing-posts';
 
 const posts = await getCollection('blog');
-posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
 const WRITING_POOL_DIR = join(
   process.cwd(),
@@ -67,24 +68,48 @@ const defaultWritingBg = writingPoolUrls[0]
     <h1 class="page-title">Writing</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
-        <ul class="post-list page-buttons" aria-label="Articles">
+        <div class="writing-groups">
           {
-            posts.map((post) => (
-              <li>
-                <a href={`/blog/${post.id}`} class="page-button">
-                  <span class="page-button__bg" aria-hidden="true" />
-                  <span class="page-button__overlay" aria-hidden="true" />
-                  <span class="page-button__inner">
-                    <span class="page-button__glow-wrap" aria-hidden="true">
-                      <span class="page-button__glow">{post.data.title}</span>
-                    </span>
-                    <span class="page-button__text">{post.data.title}</span>
-                  </span>
-                </a>
-              </li>
-            ))
+            featuredPosts.length > 0 && (
+              <ul class="post-list page-buttons" aria-label="Featured articles">
+                {featuredPosts.map((post) => (
+                  <li>
+                    <a href={`/blog/${post.id}`} class="page-button">
+                      <span class="page-button__bg" aria-hidden="true" />
+                      <span class="page-button__overlay" aria-hidden="true" />
+                      <span class="page-button__inner">
+                        <span class="page-button__glow-wrap" aria-hidden="true">
+                          <span class="page-button__glow">
+                            {post.data.title}
+                          </span>
+                        </span>
+                        <span class="page-button__text">{post.data.title}</span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )
           }
-        </ul>
+          <ul class="post-list page-buttons" aria-label="Articles">
+            {
+              regularPosts.map((post) => (
+                <li>
+                  <a href={`/blog/${post.id}`} class="page-button">
+                    <span class="page-button__bg" aria-hidden="true" />
+                    <span class="page-button__overlay" aria-hidden="true" />
+                    <span class="page-button__inner">
+                      <span class="page-button__glow-wrap" aria-hidden="true">
+                        <span class="page-button__glow">{post.data.title}</span>
+                      </span>
+                      <span class="page-button__text">{post.data.title}</span>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
     </div>
   </article>

@@ -47,7 +47,8 @@ test.describe('/why page @serial', () => {
       }
       const lines: string[] = [];
       scroll.querySelectorAll('.why-content p').forEach((p) => {
-        p.innerText.split('\n').forEach((raw) => {
+        const text = (p as HTMLElement).innerText;
+        text.split('\n').forEach((raw: string) => {
           const t = raw.replace(/\s+/g, ' ').trim();
           if (t.length > 0) lines.push(t);
         });
@@ -299,10 +300,8 @@ test.describe('/why page @serial', () => {
     await waitTwoFrames(page);
     const atTop = await read();
     expect(atTop).not.toBeNull();
-    expect(atTop!.maxScroll).toBeGreaterThanOrEqual(
-      100,
-      '/why needs scroll room for end-cover phase (try a shorter viewport height)',
-    );
+    // Needs enough scroll room for the end-cover phase.
+    expect(atTop!.maxScroll).toBeGreaterThanOrEqual(100);
     expect(atTop!.startOp, 'start-cover visible at scroll 0').toBeGreaterThan(
       0.85,
     );

@@ -519,8 +519,7 @@ import {
     }
   }
 
-  /** @returns {number} CTA opacity 0–1 */
-  function applyCtaFade() {
+  function applyCtaFade(): number {
     const ctaProgress = clamp(scrollEl.scrollTop / T.CTA_FADE_PX, 0, 1);
     const ctaO = 1 - smoothstep(ctaProgress);
     boxEl.style.setProperty('--why-cta-opacity', ctaO.toFixed(3));
@@ -574,8 +573,10 @@ import {
     boxEl.style.setProperty('--why-cta-top', `${topPx.toFixed(2)}px`);
   }
 
-  /** @returns {null | { left: number, right: number, top: number, bottom: number }} */
-  function buildCtaZone(m, ctaO) {
+  function buildCtaZone(
+    m,
+    ctaO,
+  ): null | { left: number; right: number; top: number; bottom: number } {
     if (
       !ctaEl ||
       ctaO <= T.CTA_ZONE_MIN_O ||
@@ -672,8 +673,7 @@ import {
     boxEl.style.setProperty('--why-end-top-veil-grow', growPhase.toFixed(3));
   }
 
-  /** @returns {number} intro blend 0–1 */
-  function applyIntroTopEdge() {
+  function applyIntroTopEdge(): number {
     const introRampPx = Math.max(
       T.INTRO_RAMP_MIN,
       scrollEl.clientHeight * T.INTRO_RAMP_FRAC,

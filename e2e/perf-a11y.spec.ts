@@ -14,16 +14,24 @@ const PERF_BUDGET = {
 } as const;
 
 test.describe('Homepage quality gates', () => {
-  test('performance budget stays within conservative limits', async ({ page }) => {
+  test('performance budget stays within conservative limits', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
-      (window as unknown as { __perfBudget?: { lcp: number; cls: number; tbt: number } }).__perfBudget = {
+      (
+        window as unknown as {
+          __perfBudget?: { lcp: number; cls: number; tbt: number };
+        }
+      ).__perfBudget = {
         lcp: 0,
         cls: 0,
         tbt: 0,
       };
 
       const state = (
-        window as unknown as { __perfBudget: { lcp: number; cls: number; tbt: number } }
+        window as unknown as {
+          __perfBudget: { lcp: number; cls: number; tbt: number };
+        }
       ).__perfBudget;
 
       let lcpObserver: PerformanceObserver | null = null;
@@ -33,7 +41,10 @@ test.describe('Homepage quality gates', () => {
             if (entry.startTime > state.lcp) state.lcp = entry.startTime;
           }
         });
-        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+        lcpObserver.observe({
+          type: 'largest-contentful-paint',
+          buffered: true,
+        });
       } catch {
         // Unsupported observer type in this runtime.
       }
@@ -41,7 +52,7 @@ test.describe('Homepage quality gates', () => {
       let clsObserver: PerformanceObserver | null = null;
       try {
         clsObserver = new PerformanceObserver((entryList) => {
-          for (const entry of entryList.getEntries() as Array<{
+          for (const entry of entryList.getEntries() as unknown as Array<{
             value: number;
             hadRecentInput?: boolean;
           }>) {
@@ -85,9 +96,8 @@ test.describe('Homepage quality gates', () => {
     await page.waitForTimeout(1200);
 
     const metrics = await page.evaluate<PerfBudgetResult>(() => {
-      const state = (
-        window as unknown as { __perfBudget: PerfBudgetResult }
-      ).__perfBudget;
+      const state = (window as unknown as { __perfBudget: PerfBudgetResult })
+        .__perfBudget;
       return {
         lcp: state?.lcp ?? 0,
         cls: state?.cls ?? 0,

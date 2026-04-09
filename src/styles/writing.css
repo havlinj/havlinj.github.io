@@ -16,6 +16,16 @@ ul.post-list > li::before {
   display: none;
 }
 
+.writing-groups {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Gap between featured and regular groups: 3x the normal button gap (0.4rem). */
+.writing-groups > .post-list + .post-list {
+  margin-top: 1.2rem;
+}
+
 /* Writing: make the whole panel square, so the background fills it */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;

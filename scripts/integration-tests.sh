@@ -2,8 +2,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$SCRIPT_DIR/.."
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOCK_DIR="/tmp/documents-web-integration-tests.lock"
+PORT=4321
 
 # Prevent concurrent integration runs (common source of Playwright/dev conflicts).
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
@@ -19,6 +20,39 @@ cleanup() {
   rm -rf "$LOCK_DIR"
 }
 trap cleanup EXIT INT TERM
+
+pid_listening_on_port() {
+  lsof -tiTCP:"$PORT" -sTCP:LISTEN 2>/dev/null | head -n1 || true
+}
+
+is_project_preview_process() {
+  local pid="$1"
+  local cmd
+  cmd="$(ps -p "$pid" -o args= 2>/dev/null || true)"
+  [[ "$cmd" == *"$ROOT_DIR/node_modules/.bin/astro preview"* ]] &&
+    [[ "$cmd" == *"--port $PORT"* ]]
+}
+
+ensure_port_ready_for_fresh_server() {
+  local pid
+  pid="$(pid_listening_on_port)"
+  if [[ -z "$pid" ]]; then
+    return
+  fi
+
+  if is_project_preview_process "$pid"; then
+    echo "Port $PORT has stale project preview process (pid $pid), terminating it..."
+    kill "$pid" 2>/dev/null || true
+    sleep 0.2
+    if kill -0 "$pid" 2>/dev/null; then
+      kill -9 "$pid" 2>/dev/null || true
+    fi
+  else
+    echo "Port $PORT is already in use by another process (pid $pid)."
+    echo "Stop that process or rerun with PW_REUSE_SERVER=1 if you intentionally want reuse."
+    exit 1
+  fi
+}
 
 echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"
@@ -67,12 +101,15 @@ PW_CI_MODE="${PW_CI_MODE:-0}"
 echo "Playwright workers: $PW_WORKERS"
 echo "Playwright CI mode: $PW_CI_MODE"
 echo "Running parallel-safe tests (excluding @serial)..."
+if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial"
 echo ""
 echo "Running serial-sensitive why tests with one worker..."
+if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-route.spec.ts --workers=1
 echo ""
 echo "Running serial-sensitive mobile profile tests with one worker..."
+if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/profile-mobile.spec.ts --workers=1
 
 echo ""
