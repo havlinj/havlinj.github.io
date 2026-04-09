@@ -84,6 +84,12 @@ jobs:
           PW_WORKERS: '4'
           # In CI we start from a fresh checkout, so skip all.sh pre-clean for speed.
           ALL_SH_CLEAN: '0'
+      - name: Lighthouse budget (homepage)
+        run: bash ./scripts/lighthouse.sh
+        working-directory: ${{ env.BUILD_PATH }}
+        env:
+          # all.sh already built and tested; Lighthouse script can reuse that build.
+          LIGHTHOUSE_SKIP_BUILD: '1'
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \

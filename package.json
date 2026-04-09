@@ -16,6 +16,7 @@
     "test:update-snapshots": "bash ./scripts/update-playwright-snapshots.sh",
     "test:update-snapshots:all": "PLAYWRIGHT_FORCE_TTY=1 playwright test --update-snapshots",
     "test:ui": "playwright test --ui",
+    "test:lighthouse": "bash ./scripts/lighthouse.sh",
     "clean": "rm -rf dist .astro test-results playwright-report node_modules/.vite",
     "clean:deep": "rm -rf node_modules dist .astro test-results playwright-report && npm install",
     "format": "prettier . --write \"**/*.{js,ts,astro,md,json,css,scss,html}\"",
@@ -35,6 +36,7 @@
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^9.39.3",
     "eslint-plugin-astro": "^1.6.0",
+    "lighthouse": "^13.1.0",
     "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
     "vitest": "^4.1.3"
