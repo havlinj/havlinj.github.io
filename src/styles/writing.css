@@ -40,14 +40,14 @@ ul.post-list > li::before {
   }
 }
 
-/* Writing index only: micro extra space between article rows (default .page-buttons gap is 0.4rem). */
+/* Writing index only: extra space between article rows (default .page-buttons gap is 0.4rem). */
 .writing-page .page-buttons {
-  gap: 0.5rem;
+  gap: 0.7rem;
 }
 
-/* Featured vs rest: keep ~3× the writing row gap, nudged up slightly with the new gap. */
+/* Featured vs rest: ~3× the writing row gap */
 .writing-page .writing-groups > .post-list + .post-list {
-  margin-top: 1.5rem;
+  margin-top: 2.1rem;
 }
 
 /* Writing: make the whole panel square, so the background fills it */
@@ -57,15 +57,61 @@ ul.post-list > li::before {
 
 /* Writing index: a bit taller rows than default page-button (1.75–2rem) for long titles */
 .writing-page .page-button {
-  min-height: 2rem;
-  max-height: 2.35rem;
+  min-height: 2.2rem;
+  max-height: 2.55rem;
+}
+
+/* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).
+   Small vertical padding + no subpixel nudge avoids blurry/clipped glyph edges with overflow:hidden on .page-button. */
+.writing-page .page-button__inner {
+  justify-content: space-between;
+  gap: 0.65em;
+  padding-block: 2px;
 }
 
 /* Writing index: slightly airier labels on article links (scoped; hover/focus invert unchanged) */
 .writing-page .page-button__text {
-  line-height: 1.32;
-  letter-spacing: 0.012em;
-  color: rgba(17, 17, 17, 0.92);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  letter-spacing: 0.016em;
+  color: rgba(17, 17, 17, 0.95);
+  padding: 0.07em;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.writing-page .page-button__date {
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: rgba(17, 17, 17, 0.65);
+  padding: 0.07em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+  position: relative;
+  z-index: 3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.writing-page .page-button:focus-visible .page-button__date {
+  color: var(--color-page-bg);
+}
+
+@media (hover: hover) {
+  .writing-page .page-button:hover .page-button__date {
+    color: var(--color-page-bg);
+  }
 }
 
 .blog-post .article-meta {

@@ -10,9 +10,9 @@ title: 'Profile'
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;
-    --portrait-brightness: 1;
+    --portrait-brightness: 1.08;
     --portrait-contrast: 1;
-    --portrait-opacity: 0.85;
+    --portrait-opacity: 1;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;
@@ -21,24 +21,24 @@ title: 'Profile'
     --profile-tile-1-zoom: 1;
     --profile-tile-1-brightness: 1;
     --profile-tile-1-contrast: 1.2;
-    --profile-tile-1-opacity: 0.7;
+    --profile-tile-1-opacity: 0.8;
     --profile-tile-3-pos-x: 50%;
     --profile-tile-3-pos-y: 50%;
     --profile-tile-3-pan-x: 10%;
     --profile-tile-3-pan-y: 5%;
     --profile-tile-3-zoom: 1.39;
-    --profile-tile-3-brightness: 1.2;
+    --profile-tile-3-brightness: 1;
     --profile-tile-3-contrast: 1;
-    --profile-tile-3-opacity: 0.7;
+    --profile-tile-3-opacity: 0.8;
     --profile-tile-4-bg: url('/assets/pages/profile/evgeniy-sholokh-5Xf2hLm6yj8-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 60%;
     --profile-tile-4-pan-x: 0%;
     --profile-tile-4-pan-y: 0%;
     --profile-tile-4-zoom: 1;
-    --profile-tile-4-brightness: 0.9;
-    --profile-tile-4-contrast: 1.2;
-    --profile-tile-4-opacity: 0.8;
+    --profile-tile-4-brightness: 1.15;
+    --profile-tile-4-contrast: 1;
+    --profile-tile-4-opacity: 0.97;
     --profile-reveal-text-scale: 1.35;
   "
 >

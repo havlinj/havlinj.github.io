@@ -164,7 +164,7 @@ test.describe('Writing page (/writing)', () => {
       page.getByRole('heading', { name: 'Writing', level: 1 }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'System Thinking, Applied' }),
+      page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
   });
 
@@ -192,15 +192,19 @@ test.describe('Writing page (/writing)', () => {
     await expect(page.locator('article.writing-page')).toBeVisible();
     await expect(page.locator('.page-buttons-zone')).toBeVisible();
     await expect(page.locator('.page-buttons-panel')).toBeVisible();
-    const list = page.getByRole('list', { name: 'Articles', exact: true });
-    await expect(list).toBeVisible();
-    const buttons = list.locator('a.page-button');
-    await expect(buttons).toHaveCount(2);
+    const featuredList = page.getByRole('list', {
+      name: 'Featured articles',
+    });
+    const articlesList = page.getByRole('list', { name: 'Articles', exact: true });
+    await expect(featuredList).toBeVisible();
+    await expect(articlesList).toBeVisible();
+    await expect(featuredList.locator('a.page-button')).toHaveCount(2);
+    await expect(articlesList.locator('a.page-button')).toHaveCount(1);
     await expect(
-      page.getByRole('link', { name: 'System Thinking, Applied' }),
+      page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Example Article' }),
+      page.getByRole('link', { name: /Example Article/ }),
     ).toBeVisible();
   });
 
@@ -213,18 +217,56 @@ test.describe('Writing page (/writing)', () => {
     }
   });
 
+  test('each writing row shows a date on the same line as the title', async ({
+    page,
+  }) => {
+    const links = page.locator('.writing-groups .post-list a.page-button');
+    const n = await links.count();
+    expect(n).toBeGreaterThanOrEqual(1);
+    for (let i = 0; i < n; i++) {
+      const link = links.nth(i);
+      const dateEl = link.locator('time.page-button__date');
+      await expect(dateEl).toHaveCount(1);
+      await expect(dateEl).toHaveAttribute(
+        'datetime',
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      );
+      await expect(dateEl).toHaveText(/\S/);
+    }
+  });
+
+  test('writing rows keep crisp label rendering (padding, no subpixel translate)', async ({
+    page,
+  }) => {
+    const links = page.locator('.writing-groups .post-list a.page-button');
+    const n = await links.count();
+    expect(n).toBeGreaterThanOrEqual(1);
+    for (let i = 0; i < n; i++) {
+      const link = links.nth(i);
+      const inner = link.locator('.page-button__inner');
+      const title = link.locator('.page-button__text');
+      const dateEl = link.locator('.page-button__date');
+      await expect(inner).toHaveCSS('padding-top', '2px');
+      await expect(inner).toHaveCSS('padding-bottom', '2px');
+      await expect(title).toHaveCSS('transform', 'none');
+      await expect(dateEl).toHaveCSS('transform', 'none');
+      await expect(title).toHaveCSS('-webkit-font-smoothing', 'antialiased');
+      await expect(dateEl).toHaveCSS('-webkit-font-smoothing', 'antialiased');
+    }
+  });
+
   test('writing buttons invert colors on hover', async ({ page }) => {
     const button = page
-      .getByRole('link', { name: 'System Thinking, Applied' })
+      .getByRole('link', { name: /System Thinking, Applied/ })
       .first();
     const text = button.locator('.page-button__text');
     const bg = button.locator('.page-button__bg');
 
     await expect(button).toBeVisible();
-    /* Writing index uses slightly soft ink: rgba(17, 17, 17, 0.92) */
+    /* Writing index title uses near-black ink with slight transparency */
     await expect(text).toHaveCSS(
       'color',
-      /rgba\(17,\s*17,\s*17,\s*0\.92\)|rgb\(17,\s*17,\s*17\)/,
+      /rgba\(17,\s*17,\s*17,\s*0\.(?:8[0-9]*|9[0-9]*)\)|rgb\(17,\s*17,\s*17\)/,
     );
     await expect(bg).toHaveCSS('background-color', RGB_PAGE_BG);
 

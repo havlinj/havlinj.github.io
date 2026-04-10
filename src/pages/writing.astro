@@ -46,6 +46,14 @@ try {
 const defaultWritingBg = writingPoolUrls[0]
   ? `url('${writingPoolUrls[0]}')`
   : 'none';
+
+function formatWritingListDate(d: Date): string {
+  return d.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: '2-digit',
+  });
+}
 ---
 
 <Layout title="Writing" activeSection="writing">
@@ -87,6 +95,12 @@ const defaultWritingBg = writingPoolUrls[0]
                           </span>
                         </span>
                         <span class="page-button__text">{post.data.title}</span>
+                        <time
+                          class="page-button__date"
+                          datetime={post.data.date.toISOString()}
+                        >
+                          {formatWritingListDate(post.data.date)}
+                        </time>
                       </span>
                     </a>
                   </li>
@@ -106,6 +120,12 @@ const defaultWritingBg = writingPoolUrls[0]
                         <span class="page-button__glow">{post.data.title}</span>
                       </span>
                       <span class="page-button__text">{post.data.title}</span>
+                      <time
+                        class="page-button__date"
+                        datetime={post.data.date.toISOString()}
+                      >
+                        {formatWritingListDate(post.data.date)}
+                      </time>
                     </span>
                   </a>
                 </li>
