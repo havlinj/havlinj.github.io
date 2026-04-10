@@ -19,16 +19,53 @@ ul.post-list > li::before {
 .writing-groups {
   display: flex;
   flex-direction: column;
+  text-wrap: pretty;
 }
 
-/* Gap between featured and regular groups: 3x the normal button gap (0.4rem). */
-.writing-groups > .post-list + .post-list {
-  margin-top: 1.2rem;
+/* Panel + background stay visible; only the link stack fades in after fonts/layout settle */
+.writing-page .writing-groups.writing-groups--pending {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.writing-page .writing-groups.writing-groups--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-page .writing-groups.writing-groups--visible {
+    transition: none;
+  }
+}
+
+/* Writing index only: micro extra space between article rows (default .page-buttons gap is 0.4rem). */
+.writing-page .page-buttons {
+  gap: 0.5rem;
+}
+
+/* Featured vs rest: keep ~3× the writing row gap, nudged up slightly with the new gap. */
+.writing-page .writing-groups > .post-list + .post-list {
+  margin-top: 1.5rem;
 }
 
 /* Writing: make the whole panel square, so the background fills it */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
+}
+
+/* Writing index: a bit taller rows than default page-button (1.75–2rem) for long titles */
+.writing-page .page-button {
+  min-height: 2rem;
+  max-height: 2.35rem;
+}
+
+/* Writing index: slightly airier labels on article links (scoped; hover/focus invert unchanged) */
+.writing-page .page-button__text {
+  line-height: 1.32;
+  letter-spacing: 0.012em;
+  color: rgba(17, 17, 17, 0.92);
 }
 
 .blog-post .article-meta {
@@ -41,11 +78,38 @@ ul.post-list > li::before {
   margin-top: 0;
 }
 
-.blog-post .article-body p:first-of-type {
+.blog-post .article-body h2 {
+  font-size: clamp(1.35rem, 1.95vw, 1.75rem);
+  margin:2.1rem 0 1.7rem 0;
+  letter-spacing: -0.005em;
+}
+
+.blog-post .article-body h3 {
+  font-size: clamp(1.12rem, 1.45vw, 1.32rem);
+  margin: 1.5rem 0 1.05rem 0;
+  letter-spacing: -0.003em;
+}
+
+.blog-post .article-body {
+  text-wrap: pretty;
+}
+
+.blog-post .article-body .statement {
+  margin-top: 1.8rem;
+  margin-bottom: 1.2rem;
+
+}
+
+.blog-post .article-body .statement-tight {
+  margin-top: 1.4rem;
+  margin-bottom: 1.2rem;
+}
+
+.blog-post .article-body > p:first-of-type {
   text-indent: 0;
 }
 
-.blog-post .article-body p:first-of-type::first-letter {
+.blog-post .article-body > p:first-of-type::first-letter {
   float: left;
   font-size: 2.7em;
   line-height: 0.8;

@@ -66,4 +66,17 @@ describe('writing-posts', () => {
     expect(featuredPosts).toEqual([]);
     expect(regularPosts.map((p) => p.id)).toEqual(['y', 'x']);
   });
+
+  it('dedupes same title and date (e.g. renamed slug + leftover file)', () => {
+    const items = [
+      post('reflection-on-building-systems', 'Same Title', '2025-06-01'),
+      post('system-thinking-applied', 'Same Title', '2025-06-01'),
+      post('other', 'Other', '2025-06-01'),
+    ];
+    const { regularPosts } = splitAndSortWritingPosts(items);
+    expect(regularPosts.map((p) => p.id)).toEqual([
+      'other',
+      'reflection-on-building-systems',
+    ]);
+  });
 });

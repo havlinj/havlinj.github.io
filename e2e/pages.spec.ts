@@ -150,6 +150,9 @@ test.describe('Profile page (/profile, /why)', () => {
 test.describe('Writing page (/writing)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/writing');
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('shows navbar with active Writing and article list', async ({
@@ -161,14 +164,14 @@ test.describe('Writing page (/writing)', () => {
       page.getByRole('heading', { name: 'Writing', level: 1 }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Reflection on Building Systems' }),
+      page.getByRole('link', { name: 'System Thinking, Applied' }),
     ).toBeVisible();
   });
 
   test('gaps between navbar, title, content', async ({ page }) => {
     const nav = page.locator('.site-header');
     const title = page.getByRole('heading', { name: 'Writing', level: 1 });
-    const list = page.locator('.post-list');
+    const list = page.locator('.writing-groups .post-list').first();
     await expect(nav).toBeVisible();
     await expect(title).toBeVisible();
     await expect(list).toBeVisible();
@@ -189,12 +192,12 @@ test.describe('Writing page (/writing)', () => {
     await expect(page.locator('article.writing-page')).toBeVisible();
     await expect(page.locator('.page-buttons-zone')).toBeVisible();
     await expect(page.locator('.page-buttons-panel')).toBeVisible();
-    const list = page.getByRole('list', { name: 'Articles' });
+    const list = page.getByRole('list', { name: 'Articles', exact: true });
     await expect(list).toBeVisible();
     const buttons = list.locator('a.page-button');
     await expect(buttons).toHaveCount(2);
     await expect(
-      page.getByRole('link', { name: 'Reflection on Building Systems' }),
+      page.getByRole('link', { name: 'System Thinking, Applied' }),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Example Article' }),
@@ -212,13 +215,17 @@ test.describe('Writing page (/writing)', () => {
 
   test('writing buttons invert colors on hover', async ({ page }) => {
     const button = page
-      .getByRole('link', { name: 'Reflection on Building Systems' })
+      .getByRole('link', { name: 'System Thinking, Applied' })
       .first();
     const text = button.locator('.page-button__text');
     const bg = button.locator('.page-button__bg');
 
     await expect(button).toBeVisible();
-    await expect(text).toHaveCSS('color', RGB_INK);
+    /* Writing index uses slightly soft ink: rgba(17, 17, 17, 0.92) */
+    await expect(text).toHaveCSS(
+      'color',
+      /rgba\(17,\s*17,\s*17,\s*0\.92\)|rgb\(17,\s*17,\s*17\)/,
+    );
     await expect(bg).toHaveCSS('background-color', RGB_PAGE_BG);
 
     await button.hover();

@@ -22,7 +22,7 @@
   overflow: hidden;
   background-color: var(--why-box-bg);
   color: var(--why-box-fg);
-  /* Horní ::before; spodní clona je o kousek vyšší + intenzivnější gradient (viz .why-box-bottom-veil). */
+  /* Top ::before; bottom veil is slightly taller with a denser gradient (see .why-box-bottom-veil). */
   --why-edge-veil-height: clamp(130px, 22vh, 230px);
   --why-bottom-veil-height: clamp(152px, 27vh, 268px);
   /* End phase (set from JS): 0 = normal, 1 = final scroll band near bottom. */
@@ -118,8 +118,8 @@
 }
 
 /*
- * Post-intro spodní clona: zrcadlí tvar horního pásu, o něco vyšší a s mírně silnějšími alphy
- * (pořád plynulé). Síla vrstvy: --why-bottom-veil-opacity.
+ * Post-intro bottom veil: mirrors the top band shape, a bit taller and with slightly stronger alpha steps
+ * (still smooth). Layer strength: --why-bottom-veil-opacity.
  */
 .why-page .why-box > .why-box-bottom-veil {
   position: absolute;

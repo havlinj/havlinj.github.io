@@ -8,13 +8,13 @@ _Note: Some may find that I hold strong opinions. That would be a problem if I d
 
 Born in 1993, in the early post-socialist era shortly after the fall of the communist regime in Czechoslovakia (1989). It was a time of emerging democracy and early capitalism, when the country, separated from Slovakia in 1993, began its difficult path toward catching up with the developed Western world.
 
-Historically, without the communist period, there likely would not have been much to catch up to. Up until World War II, we were among the more advanced nations relative to our size. The following decades under Soviet influence caused lasting damage. The post-revolution privatization of state assets, often poorly executed, did not help either.
+Historically, without the communist period, would not have been much to catch up to. Up until World War II, we were among the more advanced nations relative to our size. The following decades under Soviet influence caused lasting damage. The post-revolution privatization of state assets, often poorly executed, only reinforced that trajectory.
 
-Even today, I find it encouraging to see signs that the Czech Republic is gradually re-emerging and proving again that it has capable and intelligent people. I believe the country is slowly shifting from being the “assembly line of Europe” toward a stronger R&D-oriented economy, including a solid IT sector. In a slightly exaggerated sense, I see my own work as contributing to that direction.
+Even today, it is encouraging to see signs that the Czech Republic is gradually re-emerging and proving again that it has capable and intelligent people. I believe the country is slowly shifting from being the “assembly line of Europe” toward a stronger R&D-oriented economy, including a solid IT sector. In a slightly exaggerated sense, I see my own work as contributing to that direction.
 
 ---
 
-**Since childhood, I have tried to maintain a broad and structured view of the world.** I have always cared about understanding what is true and being cautious about sources of information. This trait seems more relevant today than ever.
+**Since childhood, I have tried to maintain a broad and structured view of the world.** I have always cared about understanding what is true and being cautious about sources of information. This trait is more relevant today than ever.
 
 I have always been interested in what happens beyond my own country. I never wanted to go through life without seeing other parts of the world. This naturally leads to comparisons. **In the end, however, it is less about comparison and more about understanding scale and learning to see people across different cultures.**
 
@@ -26,7 +26,7 @@ I tend to see myself as a global citizen.
 
 ---
 
-_Note: Just as I approach the world in a broader way, I try to approach software in a similar manner. Both operate under changing conditions and multiple variables, whether cultural, economic, or technical._
+_Note: Just as I approach the world in a broader way, I approach software in the same way — as a system shaped by changing conditions and multiple variables, whether cultural, economic, or technical._
 
 ---
 
@@ -64,9 +64,7 @@ Despite that, ambition has not disappeared and likely never will. **I have alway
 
 I am not interested in spending life purely chasing entertainment. While balance is necessary, including relationships, rest, and mental well-being, what drives me is finding ways to make meaningful use of the fact that I have a life to work with.
 
-**Life itself is undervalued.** We could be more grateful just to be here. The human mind is often used far below what it is capable of.
-
-Many people are not fully aware of what their mind can do, and they do not make a real effort to use it to its full potential. Yet it is precisely there where their real wealth lies, even if it is not fully discovered, and perhaps never will be.
+**Life itself is undervalued.** We could be more grateful just to be here. The human mind is often used far below what it is capable of. Many people never fully realize what their mind can do, nor do they seriously attempt to use it to its full potential. Yet that is where their real wealth lies — even if it remains undiscovered.
 
 Our greatest value is not in material things or numbers, but within us, in the mind and in the heart. We should be aware of that and, at the very least, not take it for granted.
 

@@ -54,7 +54,7 @@ import {
     START_COVER_BELOW_WIDE_REM: 0.5,
     /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
     START_COVER_HEIGHT_MAX: 300,
-    /** After intro band: 1 = stejná „plná“ intenzita vrstvy jako horní ::before (jen násobí gradient). */
+    /** After intro band: 1 = same "full" layer intensity as the top ::before (it only scales the gradient). */
     BOTTOM_VEIL_MAX_O: 1,
     /**
      * At scrollTop ≈ 0, intro-only narrow bottom veil opacity (separate layer).
@@ -94,7 +94,7 @@ import {
     /**
      * Top of `.why-lead` sits at LEAD_TOP_FRAC × .why-box height from the box top (scroll panel).
      * padTop + topSpacer + introGifPad = H * LEAD_TOP_FRAC − padTop. (Older “from bottom” baseline
-     * wording differed; this matches “horní okraj leadu na polovině výšky”.)
+     * wording differed; this matches "lead top edge at half height".)
      */
     LEAD_TOP_FRAC: 0.5,
     GIF_NARROW_REF_PX: 520,

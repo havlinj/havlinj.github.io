@@ -68,7 +68,10 @@ const defaultWritingBg = writingPoolUrls[0]
     <h1 class="page-title">Writing</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
-        <div class="writing-groups">
+        <div
+          class="writing-groups writing-groups--pending"
+          aria-busy="true"
+        >
           {
             featuredPosts.length > 0 && (
               <ul class="post-list page-buttons" aria-label="Featured articles">
@@ -113,8 +116,39 @@ const defaultWritingBg = writingPoolUrls[0]
       </div>
     </div>
   </article>
+  <noscript>
+    <style>
+      .writing-page .writing-groups.writing-groups--pending {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+    </style>
+  </noscript>
   <script is:inline define:vars={{ writingPoolUrls }}>
     (() => {
+      const writingArticle = document.querySelector('article.writing-page');
+      const writingGroups = document.querySelector(
+        '.writing-page .writing-groups',
+      );
+
+      let buttonsRevealed = false;
+      function revealWritingButtons() {
+        if (buttonsRevealed || !writingGroups) return;
+        buttonsRevealed = true;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            writingGroups.classList.remove('writing-groups--pending');
+            writingGroups.classList.add('writing-groups--visible');
+            writingGroups.removeAttribute('aria-busy');
+          });
+        });
+      }
+
+      const fontsReady = document.fonts?.ready ?? Promise.resolve();
+      fontsReady.finally(() => revealWritingButtons());
+      window.setTimeout(revealWritingButtons, 2500);
+
+      if (!writingArticle) return;
       if (!Array.isArray(writingPoolUrls) || writingPoolUrls.length === 0)
         return;
 
@@ -127,9 +161,6 @@ const defaultWritingBg = writingPoolUrls[0]
       const nextIndex = (currentIndex + 1) % writingPoolUrls.length;
 
       window.localStorage.setItem(storageKey, String(nextIndex));
-
-      const writingArticle = document.querySelector('article.writing-page');
-      if (!writingArticle) return;
       writingArticle.style.setProperty('--panel-bg', `url('${selectedUrl}')`);
 
       function readNonNegativeInt(rawValue) {

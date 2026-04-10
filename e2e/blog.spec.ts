@@ -4,10 +4,10 @@ test.describe('Blog post pages (/blog/...)', () => {
   test('blog post page shows title and navbar with active Writing', async ({
     page,
   }) => {
-    await page.goto('/blog/reflection-on-building-systems');
+    await page.goto('/blog/system-thinking-applied');
     await expect(
       page.getByRole('heading', {
-        name: 'Reflection on Building Systems',
+        name: 'System Thinking, Applied',
         level: 1,
       }),
     ).toBeVisible();
@@ -19,16 +19,20 @@ test.describe('Blog post pages (/blog/...)', () => {
 
   test('navigating from Writing to blog post works', async ({ page }) => {
     await page.goto('/writing');
-    const link = page.getByRole('link', {
-      name: 'Reflection on Building Systems',
-    });
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10000 });
+    const link = page
+      .locator('a.page-button')
+      .filter({ hasText: 'System Thinking, Applied' })
+      .first();
     await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', /\/blog\//);
+    await expect(link).toHaveAttribute('href', /\/blog\/system-thinking-applied\/?$/);
     await link.click();
-    await expect(page).toHaveURL(/\/blog\/reflection-on-building-systems/);
+    await expect(page).toHaveURL(/\/blog\/system-thinking-applied/);
     await expect(
       page.getByRole('heading', {
-        name: 'Reflection on Building Systems',
+        name: 'System Thinking, Applied',
         level: 1,
       }),
     ).toBeVisible();
