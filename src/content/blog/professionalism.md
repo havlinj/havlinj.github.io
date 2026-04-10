@@ -16,9 +16,9 @@ There is, however, a higher level.
 
 At that point, it is no longer just about enjoying the work — responsibility enters the picture. Responsibility is a powerful concept, but its meaning varies greatly from person to person. It is not entirely intuitive. One arrives at it through other traits — primarily empathy and purpose — and through applying them in a meaningful way.
 
-A responsible person begins to care deeply about the quality of their work. They think about it. Not out of anxiety or fear of consequences if the work is done poorly. That is not true responsibility — *it is closer to what I would call false responsibility*.
+A responsible person begins to care deeply about the quality of their work. They think about it. Not out of anxiety or fear of consequences if the work is done poorly. That is not true responsibility — _it is closer to what I would call false responsibility_.
 
-<fz size="lg">They feel a need for their work to serve others.</fz> 
+<fz size="lg">They feel a need for their work to serve others.</fz>
 
 Put simply: that people receive something of real value in exchange for what they pay. They care about those who depend on their work — those who receive it. This extends beyond end users to colleagues, partners, and suppliers alike.
 
@@ -38,7 +38,6 @@ They take satisfaction in work done well. They care about continuity — about w
         </lh>
     </fw> 
 </p>
-
 
 This shift is reflected in the whole person, especially in their character. Unfortunately, this is not something that can be easily taught. Not everyone will adopt it. Not everyone will understand why it is worth prioritizing others over a purely self-centered approach to work.
 
@@ -85,7 +84,7 @@ At different stages of my life, various experiences contributed to it. Today, I 
 
 I have often thought about others. Work that lacks any form of impact or broader meaning has never truly fulfilled me. I have always been drawn to the idea of a calling, or to higher ideals in general.
 
-Over time, this mix of views gradually formed a kind of direction — one that kept leading me to further thinking and reflection. 
+Over time, this mix of views gradually formed a kind of direction — one that kept leading me to further thinking and reflection.
 
 <sp space="lg" side="top">Until I realized that professionalism offers the form of expression that fits me best.</sp>
 

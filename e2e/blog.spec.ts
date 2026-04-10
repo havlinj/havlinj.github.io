@@ -27,7 +27,10 @@ test.describe('Blog post pages (/blog/...)', () => {
       .filter({ hasText: 'System Thinking, Applied' })
       .first();
     await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', /\/blog\/system-thinking-applied\/?$/);
+    await expect(link).toHaveAttribute(
+      'href',
+      /\/blog\/system-thinking-applied\/?$/,
+    );
     await link.click();
     await expect(page).toHaveURL(/\/blog\/system-thinking-applied/);
     await expect(

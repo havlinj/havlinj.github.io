@@ -195,7 +195,10 @@ test.describe('Writing page (/writing)', () => {
     const featuredList = page.getByRole('list', {
       name: 'Featured articles',
     });
-    const articlesList = page.getByRole('list', { name: 'Articles', exact: true });
+    const articlesList = page.getByRole('list', {
+      name: 'Articles',
+      exact: true,
+    });
     await expect(featuredList).toBeVisible();
     await expect(articlesList).toBeVisible();
     await expect(featuredList.locator('a.page-button')).toHaveCount(2);
