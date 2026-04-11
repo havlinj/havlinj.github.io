@@ -78,12 +78,12 @@ ul.post-list > li::before {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.01em;
+  font-size: 0.98em;
   line-height: 1.4;
-  letter-spacing: 0.016em;
-  color: rgba(17, 17, 17, 0.95);
-  padding: 0.07em;
-  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(17, 17, 17, 0.82);
+  padding: 0.2em;
+  font-weight: 600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -95,8 +95,8 @@ ul.post-list > li::before {
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0.02em;
-  color: rgba(17, 17, 17, 0.65);
-  padding: 0.07em;
+  color: rgba(17, 17, 17, 0.6);
+  padding: 0.15em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   transition: color 0.18s ease;
@@ -106,14 +106,14 @@ ul.post-list > li::before {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Narrow content column: slightly tighter tracking so a bit more title fits; weight stays 700 above. */
+/* Narrow content column: tighter title tracking; date slightly looser than wide for balance. */
 @container (max-width: 34rem) {
   .writing-page .page-button__text {
-    letter-spacing: 0.012em;
+    letter-spacing: 0.02em;
   }
 
   .writing-page .page-button__date {
-    letter-spacing: 0.017em;
+    letter-spacing: 0.027em;
   }
 }
 
