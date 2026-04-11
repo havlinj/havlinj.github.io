@@ -510,6 +510,68 @@ test.describe('Contact page (/contact)', () => {
     await expect(page.getByLabel('Message')).toHaveValue('');
   });
 
+  test('after success, contact fields are replaced with new empty nodes', async ({
+    page,
+  }) => {
+    await page.route('**/api/contact', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await page.goto('/contact');
+    await fillContactFormWithValidData(page);
+
+    const nameBefore = await page
+      .locator('#contact-form input[name="name"]')
+      .elementHandle();
+    const emailBefore = await page
+      .locator('#contact-form input[name="email"]')
+      .elementHandle();
+    const messageBefore = await page
+      .locator('#contact-form textarea[name="message"]')
+      .elementHandle();
+
+    expect(nameBefore).toBeTruthy();
+    expect(emailBefore).toBeTruthy();
+    expect(messageBefore).toBeTruthy();
+
+    await page.getByRole('button', { name: 'Send' }).click();
+    await expect(page.locator('#status')).toHaveText(
+      'Thanks! Your message has been sent.',
+    );
+
+    const replaced = await page.evaluate(
+      ([nameEl, emailEl, msgEl]) => {
+        const nameNow = document.querySelector(
+          '#contact-form input[name="name"]',
+        );
+        const emailNow = document.querySelector(
+          '#contact-form input[name="email"]',
+        );
+        const msgNow = document.querySelector(
+          '#contact-form textarea[name="message"]',
+        );
+        return (
+          nameNow !== nameEl &&
+          emailNow !== emailEl &&
+          msgNow !== msgEl &&
+          nameNow instanceof HTMLInputElement &&
+          emailNow instanceof HTMLInputElement &&
+          msgNow instanceof HTMLTextAreaElement &&
+          nameNow.value === '' &&
+          emailNow.value === '' &&
+          msgNow.value === ''
+        );
+      },
+      [nameBefore, emailBefore, messageBefore],
+    );
+
+    expect(replaced).toBe(true);
+  });
+
   test('shows API error and resets turnstile only when requested', async ({
     page,
   }) => {

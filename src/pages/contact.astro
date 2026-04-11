@@ -136,6 +136,23 @@ const title = 'Contact — Jan Havlín';
         sendButton.insertAdjacentElement('afterend', wrapper);
       }
 
+      /** New DOM nodes so the browser does not re-apply autofill to the same elements. */
+      function replaceContactFieldsWithFreshElements() {
+        const names = ['name', 'email', 'message', 'company'];
+        for (const fieldName of names) {
+          const oldEl = form.querySelector('[name="' + fieldName + '"]');
+          if (!oldEl) continue;
+          const tag = oldEl.tagName.toLowerCase();
+          if (tag !== 'input' && tag !== 'textarea') continue;
+          const fresh = document.createElement(tag);
+          for (let i = 0; i < oldEl.attributes.length; i++) {
+            const a = oldEl.attributes[i];
+            fresh.setAttribute(a.name, a.value);
+          }
+          oldEl.replaceWith(fresh);
+        }
+      }
+
       let isSubmitting = false;
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -156,12 +173,11 @@ const title = 'Contact — Jan Havlín';
           const data = await response.json();
 
           if (data.ok) {
-            form.reset();
             status.textContent = 'Thanks! Your message has been sent.';
-
             if (window.turnstile) {
               window.turnstile.reset();
             }
+            replaceContactFieldsWithFreshElements();
           } else {
             status.textContent = data.error || 'Something went wrong.';
 
