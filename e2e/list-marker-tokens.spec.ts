@@ -14,6 +14,13 @@ async function readListMarkerTokens(page: import('@playwright/test').Page) {
   });
 }
 
+/** Engines may serialize custom props as `.48rem` instead of `0.48rem`; compare numerically. */
+function expectRemVar(value: string, expectedRem: number) {
+  const v = value.trim();
+  expect(v.endsWith('rem')).toBe(true);
+  expect(parseFloat(v)).toBeCloseTo(expectedRem, 8);
+}
+
 test.describe('List marker spacing (:root tokens)', () => {
   test('just above breakpoint: default gap (0.48rem) and inset (0.15rem)', async ({
     page,
@@ -24,8 +31,8 @@ test.describe('List marker spacing (:root tokens)', () => {
     });
     await page.goto('/credits', { waitUntil: 'domcontentloaded' });
     const t = await readListMarkerTokens(page);
-    expect(t.afterGap).toBe('0.48rem');
-    expect(t.markerLeft).toBe('0.15rem');
+    expectRemVar(t.afterGap, 0.48);
+    expectRemVar(t.markerLeft, 0.15);
   });
 
   test('at breakpoint: larger gap and inset (max-width applies)', async ({
@@ -37,7 +44,7 @@ test.describe('List marker spacing (:root tokens)', () => {
     });
     await page.goto('/credits', { waitUntil: 'domcontentloaded' });
     const t = await readListMarkerTokens(page);
-    expect(t.afterGap).toBe('0.85rem');
-    expect(t.markerLeft).toBe('0.22rem');
+    expectRemVar(t.afterGap, 0.85);
+    expectRemVar(t.markerLeft, 0.22);
   });
 });
