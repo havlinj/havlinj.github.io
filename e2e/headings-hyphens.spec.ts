@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
  * Body uses hyphens: auto; all h1–h6 must use hyphens: none (computed).
  * Scope to main.content so Astro dev toolbar headings (e.g. “Featured integrations”)
  * are not matched — they are outside the app shell and use initial hyphens: manual.
- * @see src/styles/global.css
+ * @see src/styles/special-typography.css
  */
 const ROUTES_WITH_HEADINGS = [
   '/',

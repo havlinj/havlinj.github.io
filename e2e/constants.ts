@@ -5,7 +5,7 @@ export const LAYOUT_TOLERANCE = 8;
 export const MIN_GAP = 8;
 export const MAX_GAP = 80;
 
-/** Content container width limits (must match global.css :root). */
+/** Content container width limits (must match special-typography.css :root). */
 export const MIN_CONTENT_WIDTH_CH = 40; /* --content-min-width */
 export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
 /** Approx min width in px for assertions (40ch ≈ 320px at Inter 16px). */

@@ -12,31 +12,43 @@ Some are more fortunate — they genuinely enjoy their work. Yet even then, many
 
 Their relationship to work tends to be narrowly defined. They do it for themselves. Positive feedback pleases them, of course. But beyond that, they rarely think about the impact of their work — not beyond what they directly experience. There is little sense of connection to those who ultimately receive the value they create.
 
-There is, however, a higher level.
+<p class="statement">
+    <lh rel="snug">
+        There is, however, a higher level.
+    </lh>
+</p>
 
 At that point, it is no longer just about enjoying the work — responsibility enters the picture. Responsibility is a powerful concept, but its meaning varies greatly from person to person. It is not entirely intuitive. One arrives at it through other traits — primarily empathy and purpose — and through applying them in a meaningful way.
 
 A responsible person begins to care deeply about the quality of their work. They think about it. Not out of anxiety or fear of consequences if the work is done poorly. That is not true responsibility — _it is closer to what I would call false responsibility_.
 
-<fz size="lg">They feel a need for their work to serve others.</fz>
+<p class="statement">
+    <lh rel="snug">
+        They feel a need for their work to serve others.
+    </lh>
+</p>
 
 Put simply: that people receive something of real value in exchange for what they pay. They care about those who depend on their work — those who receive it. This extends beyond end users to colleagues, partners, and suppliers alike.
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
 
-<p class="statement-tight">
-    Reputation matters.<br>
-    A reputation built on quality is hard to destroy.
+<p class="statement" style="margin:3em 0 2.1em 0">
+    <lh rel="snug">
+        <fz size="lg" style="opacity: 0.97">
+            Reputation matters.<br>
+            A reputation built on quality is hard to destroy.
+        </fz>
+    </lh>
 </p>
 
-<p class="statement">
-    <fw weight="medium" style="hyphens: none">
+<p class="statement" style="margin:2.8em 0 3.2em 0">
+    <fw weight="medium" style="opacity: 0.85">
         <lh rel="snug">
-            <fz size="lg">
-                Professionalism, then, begins with replacing the selfish "I" with a more responsible "we".
+            <fz size="xl">
+                Professionalism cannot be achieved without replacing the selfish "I" with a more responsible and considerate "we".
             </fz>
         </lh>
-    </fw> 
+    </fw>
 </p>
 
 This shift is reflected in the whole person, especially in their character. Unfortunately, this is not something that can be easily taught. Not everyone will adopt it. Not everyone will understand why it is worth prioritizing others over a purely self-centered approach to work.

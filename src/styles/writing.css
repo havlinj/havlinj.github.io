@@ -137,6 +137,86 @@ ul.post-list > li::before {
   margin-top: 0;
 }
 
+.blog-post .article-body {
+  text-wrap: pretty;
+}
+
+/* --- Blog posts: emphasis blocks + <sp> / <fz> rhythm (all .md articles share this) --- */
+.blog-post .article-body .statement {
+  margin-top: 1.6rem;
+  margin-bottom: 1.1rem;
+  hyphens: none;
+}
+
+/*
+ * Adjacent sibling combinator (+): only the *second* block is targeted. We lower its margin-top
+ * so two emphasis blocks in a row don’t stack full 1.6rem gaps; a hair more when both are .statement.
+ */
+.blog-post .article-body .statement + .statement {
+  margin-top: 1.3rem;
+}
+
+/* <sp> in articles: between global presets and “flat”; keeps bands visible on phones */
+.blog-post .article-body sp[space='xs'] {
+  --sp-y: 0.45rem;
+}
+.blog-post .article-body sp[space='sm'] {
+  --sp-y: 0.75rem;
+}
+.blog-post .article-body sp[space='md'] {
+  --sp-y: 1.35rem;
+}
+.blog-post .article-body sp[space='lg'] {
+  --sp-y: 1.85rem;
+}
+.blog-post .article-body sp[space='xl'] {
+  --sp-y: 2.25rem;
+}
+
+/* Consecutive <sp>: shared gap, still visible */
+.blog-post .article-body sp + sp {
+  margin-top: 1.2rem;
+}
+
+/* After statement blocks: <sp> stays linked but not stacked like double lg */
+.blog-post .article-body .statement + sp {
+  margin-top: 1.35rem;
+}
+
+/* Article fz: lg = mid bump; xl ≈ former global lg (1.1em) */
+.blog-post .article-body fz[size='lg'] {
+  font-size: 1.04em;
+}
+.blog-post .article-body fz[size='xl'] {
+  font-size: 1.09em;
+}
+
+/* Statement: optional inner fz / fw; lh-only uses same margins */
+.blog-post .article-body .statement fz[size='lg'] {
+  font-size: 1.03em;
+}
+
+/* Narrow column: full statement a touch calmer than wide */
+@container (max-width: 34rem) {
+  .blog-post .article-body .statement {
+    margin-top: 1.35rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .blog-post .article-body .statement fz[size='lg'] {
+    font-size: 1.04em;
+  }
+
+  .blog-post .article-body .statement fw[weight='medium'] {
+    font-weight: 500;
+    color: rgba(17, 17, 17, 0.96);
+  }
+
+  .blog-post .article-body .statement lh[rel='snug'] {
+    --lh: 1.52;
+  }
+}
+
 .blog-post .article-body h2 {
   font-size: clamp(1.35rem, 1.95vw, 1.75rem);
   margin: 2.1rem 0 1.7rem 0;
@@ -147,20 +227,6 @@ ul.post-list > li::before {
   font-size: clamp(1.12rem, 1.45vw, 1.32rem);
   margin: 1.5rem 0 1.05rem 0;
   letter-spacing: -0.003em;
-}
-
-.blog-post .article-body {
-  text-wrap: pretty;
-}
-
-.blog-post .article-body .statement {
-  margin-top: 1.8rem;
-  margin-bottom: 1.2rem;
-}
-
-.blog-post .article-body .statement-tight {
-  margin-top: 1.4rem;
-  margin-bottom: 1.2rem;
 }
 
 .blog-post .article-body > p:first-of-type {

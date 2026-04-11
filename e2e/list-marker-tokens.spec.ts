@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-/** Must match `global.css` @media (max-width: 640px) for list marker tokens */
+/** Must match `special-typography.css` @media (max-width: 640px) for list marker tokens */
 const LIST_MARKER_BREAKPOINT_PX = 640;
 
-/** @see src/styles/global.css — ul/ol marker column tokens */
+/** @see src/styles/special-typography.css — ul/ol marker column tokens */
 async function readListMarkerTokens(page: import('@playwright/test').Page) {
   return page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
