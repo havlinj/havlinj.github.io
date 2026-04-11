@@ -47,6 +47,15 @@
   --page-title-rule-gap: 1.35rem;
 }
 
+/* Phones: extra space after marker (iOS etc.). Wide layouts keep :root values above — do not use
+ * viewport-based clamp here: content stays ~70ch while vw is large, which mis-sized the ramp. */
+@media (max-width: 640px) {
+  :root {
+    --list-marker-left: 0.22rem;
+    --list-after-marker-gap: 0.85rem;
+  }
+}
+
 /* ===============================
    BASE TYPOGRAPHY
 ================================ */
