@@ -62,11 +62,13 @@ ul.post-list > li::before {
 }
 
 /* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).
-   Small vertical padding + no subpixel nudge avoids blurry/clipped glyph edges with overflow:hidden on .page-button. */
+   Small vertical padding + no subpixel nudge avoids blurry/clipped glyph edges with overflow:hidden on .page-button.
+   Fluid type: font-size on inner (main.content supplies cqi); title 1em, date 8/11 em — same ratio at any size. */
 .writing-page .page-button__inner {
   justify-content: space-between;
   gap: 0.65em;
   padding-block: 2px;
+  font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
 }
 
 /* Writing index: slightly airier labels on article links (scoped; hover/focus invert unchanged) */
@@ -76,7 +78,7 @@ ul.post-list > li::before {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.1rem;
+  font-size: 1.01em;
   line-height: 1.4;
   letter-spacing: 0.016em;
   color: rgba(17, 17, 17, 0.95);
@@ -89,7 +91,7 @@ ul.post-list > li::before {
 .writing-page .page-button__date {
   flex-shrink: 0;
   text-align: right;
-  font-size: 0.8rem;
+  font-size: 0.78em;
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0.02em;
@@ -102,6 +104,17 @@ ul.post-list > li::before {
   z-index: 3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Narrow content column: slightly tighter tracking so a bit more title fits; weight stays 700 above. */
+@container (max-width: 34rem) {
+  .writing-page .page-button__text {
+    letter-spacing: 0.012em;
+  }
+
+  .writing-page .page-button__date {
+    letter-spacing: 0.017em;
+  }
 }
 
 .writing-page .page-button:focus-visible .page-button__date {
