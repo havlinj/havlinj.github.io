@@ -429,6 +429,11 @@ function wireFoundationsReveal(): void {
     HTMLAnchorElement,
   );
   if (!foundationsTile) return;
+  const rightColumn = queryElement(
+    document,
+    SELECTORS.profileRightColumn,
+    HTMLElement,
+  );
 
   let revealTimeoutId = 0;
   let revealCloseStepId = 0;
@@ -662,17 +667,26 @@ async function start(): Promise<void> {
     /* ignore */
   }
 
+  /*
+   * ResizeObserver on `.profile-section` must attach only after the first-fit burst + signal.
+   * If RO is registered earlier, its first delivery often lands on the frame after
+   * `profileTileTypeFit` — then a late `fitAll()` nudges label size / cqi while the grid
+   * is already visible (seams at Why/What I do and What I do/Foundations).
+   */
+  wireFoundationsReveal();
+
   requestAnimationFrame(() => {
     fitAll();
     requestAnimationFrame(() => {
       fitAll();
-      signalTypeFitReady();
+      requestAnimationFrame(() => {
+        fitAll();
+        signalTypeFitReady();
+        wireResize();
+        wireFoundationsRevealResize();
+      });
     });
   });
-
-  wireResize();
-  wireFoundationsRevealResize();
-  wireFoundationsReveal();
 }
 
 if (document.readyState === 'loading') {

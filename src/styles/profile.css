@@ -29,6 +29,10 @@ article.has-buttons-panel {
   height: 100cqw;
   --profile-tile-text-inset-x: 2rem;
   --profile-photo-frame-size: 6px;
+  --profile-shared-edge-thickness: calc(var(--profile-photo-frame-size) * 1.25);
+  --profile-stitched-seam-thickness: calc(
+    2 * var(--profile-shared-edge-thickness) - var(--profile-photo-frame-size)
+  );
   /* Temporary: disable image grain/overlay effects on profile tiles */
   --profile-grain-opacity: 0.5;
 }
@@ -49,8 +53,7 @@ article.has-buttons-panel {
  * - a: default Foundations height (state 1) = A/2 = 50%.
  * - c: portrait wrapper side length (measured in JS into `--profile-portrait-side-px`).
  *
- * State 1: Foundations = a, portrait stands on top edge (bottom = 50%).
- *          This stays pure CSS (50%) to avoid visible settling during extreme zoom/resize.
+ * State 1: Foundations = a (50% height), portrait bottom = 50%.
  * State 2: Foundations = h_max = A - c, portrait lifts and still touches
  *          the top edge (bottom = FoundationsHeight).
  *
@@ -75,11 +78,22 @@ article.has-buttons-panel {
     var(--profile-portrait-side-px) * var(--portrait-effective-scale)
   );
 
-  /* state1 (a = A/2) stays CSS-native for immediate stability on resize/zoom */
+  /* state1 (a = A/2): same model as left-column tiles — exact half height */
   --profile-foundations-height: 50%;
   --portrait-stand-bottom: 50%;
   --profile-motion-duration: 0.45s;
   --profile-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --profile-photo-gutter-x: var(
+    --profile-inner-gutter-x,
+    var(
+      --profile-inner-gutter,
+      var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
+    )
+  );
+  --profile-portrait-content-side: calc(100% - (2 * var(--profile-photo-gutter-x)));
+  --profile-portrait-shell-width: calc(
+    var(--profile-portrait-content-side) + (2 * var(--profile-photo-frame-size))
+  );
 }
 
 .profile-right-column .profile-photo-frame {
@@ -98,6 +112,7 @@ article.has-buttons-panel {
 
   height: var(--profile-foundations-height);
   transition: height var(--profile-motion-duration) var(--profile-motion-ease);
+  border-left-width: var(--profile-stitched-seam-thickness);
 }
 
 /* state2: after click (is-revealed), Foundations smoothly expands to h_max */
@@ -256,7 +271,8 @@ article .profile-section:last-child {
 
 .profile-photo-box {
   position: absolute;
-  inset: var(--profile-photo-frame-size);
+  inset: var(--profile-photo-frame-size) var(--profile-photo-frame-size)
+    var(--profile-stitched-seam-thickness) var(--profile-photo-frame-size);
   overflow: hidden;
   background: var(--color-page-bg);
 }
@@ -277,6 +293,10 @@ article .profile-section:last-child {
   /* cqi/cqw for font caps = this tile’s width (grid cell) */
   container-type: inline-size;
   container-name: profile-tile;
+}
+
+.profile-section > a[href='/why'].prof-tile {
+  border-bottom-width: var(--profile-stitched-seam-thickness);
 }
 
 .prof-tile .page-button__inner {

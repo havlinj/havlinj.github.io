@@ -285,9 +285,18 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const frameVar = Number.parseFloat(
         sectionCs.getPropertyValue('--profile-photo-frame-size').trim(),
       );
+      const whyTile = document.querySelector(
+        'a.prof-tile[href="/why"]',
+      ) as HTMLElement | null;
+      const stitchedVar = whyTile
+        ? Number.parseFloat(getComputedStyle(whyTile).borderBottomWidth) || 0
+        : 0;
       const tileData = tiles.map((tile) => {
         const cs = getComputedStyle(tile);
+        const href = tile.getAttribute('href') ?? '';
         return {
+          href,
+          isFoundations: tile.classList.contains('prof-tile--foundations'),
           boxSizing: cs.boxSizing,
           borderTop: Number.parseFloat(cs.borderTopWidth) || 0,
           borderRight: Number.parseFloat(cs.borderRightWidth) || 0,
@@ -296,16 +305,22 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
           borderColor: cs.borderTopColor,
         };
       });
-      return { frameVar, tileData };
+      return { frameVar, stitchedVar, tileData };
     });
 
     expect(info.frameVar).toBeGreaterThan(0);
+    expect(info.stitchedVar).toBeGreaterThan(0);
     for (const tile of info.tileData) {
       expect(tile.boxSizing).toBe('border-box');
       expect(tile.borderTop).toBeCloseTo(info.frameVar, 1);
       expect(tile.borderRight).toBeCloseTo(info.frameVar, 1);
-      expect(tile.borderBottom).toBeCloseTo(info.frameVar, 1);
-      expect(tile.borderLeft).toBeCloseTo(info.frameVar, 1);
+      const bottomExpect =
+        tile.href === '/why' ? info.stitchedVar : info.frameVar;
+      const leftExpect = tile.isFoundations
+        ? info.stitchedVar
+        : info.frameVar;
+      expect(tile.borderBottom).toBeCloseTo(bottomExpect, 1);
+      expect(tile.borderLeft).toBeCloseTo(leftExpect, 1);
       expect(tile.borderColor).toBe(RGB_INK);
     }
   });
