@@ -8,8 +8,6 @@ export const MAX_GAP = 80;
 /** Content container width limits (must match special-typography.css :root). */
 export const MIN_CONTENT_WIDTH_CH = 40; /* --content-min-width */
 export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
-/** Approx min width in px for assertions (40ch ≈ 320px at Inter 16px). */
-export const MIN_CONTENT_WIDTH_PX = 320;
 
 /** /why layout — single source: `src/constants/why-layout.ts` */
 export {
