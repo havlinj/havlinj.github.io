@@ -41,19 +41,25 @@ ol > li::before {
   pointer-events: none;
 }
 
-/* Unordered: ▪ vs ▫ — both “small square” code points; U+25A1 (□) is oversized in Inter */
+/* Unordered markers: geometric square for consistent size across OS/browser/font rendering. */
 ul > li::before {
-  content: '\25AA'; /* ▪ BLACK SMALL SQUARE */
+  content: '';
+  top: calc(0.5em - (var(--list-marker-box-size) / 2));
+  width: var(--list-marker-box-size);
+  height: var(--list-marker-box-size);
+  background-color: currentColor;
+  box-sizing: border-box;
 }
 
 ul ul > li::before,
 ul ul ul ul > li::before {
-  content: '\25AB'; /* ▫ WHITE SMALL SQUARE — matches ▪ size; avoid U+25A1 (□) */
-  font-size: calc(1em * var(--list-marker-hollow-scale));
+  background-color: transparent;
+  border: 1px solid currentColor;
 }
 
 ul ul ul > li::before {
-  content: '\25AA';
+  background-color: currentColor;
+  border: 0;
 }
 
 /* Ordered: decimal counter (restarts per nested ol) */

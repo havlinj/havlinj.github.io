@@ -14,6 +14,21 @@ async function readListMarkerTokens(page: import('@playwright/test').Page) {
   });
 }
 
+async function readFirstUnorderedMarkerMetrics(
+  page: import('@playwright/test').Page,
+) {
+  return page.evaluate(() => {
+    const li = document.querySelector('ul li');
+    if (!(li instanceof HTMLElement)) return null;
+    const marker = getComputedStyle(li, '::before');
+    return {
+      widthPx: parseFloat(marker.width),
+      heightPx: parseFloat(marker.height),
+      left: marker.left,
+    };
+  });
+}
+
 /** Engines may serialize custom props as `.48rem` instead of `0.48rem`; compare numerically. */
 function expectRemVar(value: string, expectedRem: number) {
   const v = value.trim();
@@ -46,5 +61,14 @@ test.describe('List marker spacing (:root tokens)', () => {
     const t = await readListMarkerTokens(page);
     expectRemVar(t.afterGap, 0.85);
     expectRemVar(t.markerLeft, 0.22);
+  });
+
+  test('unordered marker uses stable geometric square size', async ({ page }) => {
+    await page.goto('/credits', { waitUntil: 'domcontentloaded' });
+    const metrics = await readFirstUnorderedMarkerMetrics(page);
+    expect(metrics).toBeTruthy();
+    expect(metrics!.widthPx).toBeGreaterThan(6);
+    expect(metrics!.heightPx).toBeGreaterThan(6);
+    expect(Math.abs(metrics!.widthPx - metrics!.heightPx)).toBeLessThanOrEqual(0.5);
   });
 });

@@ -31,18 +31,19 @@
   --color-list-marker: rgba(17, 17, 17, 0.55);
   /* Optical vertical align: negative = nudge bullet/number up (via ::before, not ::marker - Firefox) */
   --list-marker-nudge-y: -0.1em;
-  /* Marker column: offset from li edge + glyph width + gap before line (approx old 0.5rem after bullet) */
+  /* Unordered marker uses a geometric square (not font glyph) for cross-device consistency. */
+  --list-marker-box-size: 0.56em;
+  /* Marker column: offset from li edge + marker box width + gap before line */
   --list-marker-left: 0.15rem;
   --list-after-marker-gap: 0.48rem;
   --list-ul-indent: calc(
-    var(--list-marker-left) + 0.65em + var(--list-after-marker-gap)
+    var(--list-marker-left) + var(--list-marker-box-size) +
+      var(--list-after-marker-gap)
   );
   /* Match ol > li::before min-width (room for 2-3 digits) + same gap as ul */
   --list-ol-indent: calc(
     var(--list-marker-left) + 2em + var(--list-after-marker-gap)
   );
-  /* Hollow = ▫ (U+25AB), same "small square" size class as ▪; scale down only if you switch to □ (U+25A1) */
-  --list-marker-hollow-scale: 1;
   /* 1px rule under main H1 on selected pages (gap above/below line) */
   --page-title-rule-gap: 1.35rem;
 }
