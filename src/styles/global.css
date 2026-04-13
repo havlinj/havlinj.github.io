@@ -265,6 +265,11 @@ a:hover {
   margin-top: 0.1rem;
 }
 
+/* Local popup tweak: small note text needs a calmer marker nudge than global lists. */
+.display-mode-prompt__note li::before {
+  transform: translateY(0.04em);
+}
+
 /* ===============================
    SMALL PHONES: keep content centered
 ================================ */
