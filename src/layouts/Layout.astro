@@ -5,8 +5,9 @@ import '../styles/writing.css';
 import '../styles/site-header.css';
 import '../styles/footer.css';
 import '../styles/page-buttons.css';
+import '../styles/settings.css';
 
-const { title, activeSection } = Astro.props;
+const { title, activeSection, showHeader = false } = Astro.props;
 const pageTitle = title || 'Astro Basics';
 const navItems = [
   { href: '/profile', label: 'Profile', section: 'profile' },
@@ -25,12 +26,60 @@ const navItems = [
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <script is:inline>
+      (function () {
+        'use strict';
+
+        var DISPLAY_MODE_KEY = 'display-mode';
+        function clearDisplayModeClasses() {
+          document.documentElement.classList.remove('display-legacy');
+          document.documentElement.classList.remove('display-legacy-strong');
+        }
+
+        function likelyLegacyDisplayEnvironment() {
+          var hasMatchMedia = typeof window.matchMedia === 'function';
+          var isStandardRange = hasMatchMedia
+            ? window.matchMedia('(dynamic-range: standard)').matches
+            : true;
+          var isSrgb = hasMatchMedia
+            ? window.matchMedia('(color-gamut: srgb)').matches
+            : true;
+          var isWideGamut = hasMatchMedia
+            ? window.matchMedia('(color-gamut: p3)').matches
+            : false;
+          var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
+          var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
+          var maxDim = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+          var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
+
+          return (
+            isStandardRange &&
+            isSrgb &&
+            !isWideGamut &&
+            lowDpi &&
+            lowColorDepth &&
+            isClassicDesktopPanel
+          );
+        }
+
+        var mode = window.localStorage.getItem(DISPLAY_MODE_KEY) || 'standard';
+        if (mode === 'auto') {
+          mode = likelyLegacyDisplayEnvironment() ? 'legacy' : 'standard';
+        }
+        clearDisplayModeClasses();
+        if (mode === 'legacy') {
+          document.documentElement.classList.add('display-legacy');
+        } else if (mode === 'legacy-strong') {
+          document.documentElement.classList.add('display-legacy-strong');
+        }
+      })();
+    </script>
     <slot name="head" />
   </head>
   <body>
     <main class="content">
       {
-        activeSection && (
+        (activeSection || showHeader) && (
           <header class="site-header">
             {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
             <div class="site-header__inner">
@@ -55,6 +104,9 @@ const navItems = [
       <footer class="site-footer">
         <div class="site-footer__inner">
           <a href="/" class="site-footer__link site-footer__home">Home</a>
+          <a href="/settings" class="site-footer__link site-footer__settings">
+            Settings
+          </a>
           <a href="/credits" class="site-footer__link site-footer__credits">
             Credits
           </a>
@@ -62,6 +114,143 @@ const navItems = [
         </div>
       </footer>
     </main>
+    <script is:inline>
+      (function () {
+        'use strict';
+
+        var DISPLAY_MODE_KEY = 'display-mode';
+        var PROMPT_SEEN_KEY = 'display-mode-prompt-seen';
+        function clearDisplayModeClasses() {
+          document.documentElement.classList.remove('display-legacy');
+          document.documentElement.classList.remove('display-legacy-strong');
+        }
+
+        function likelyLegacyDisplayEnvironment() {
+          var hasMatchMedia = typeof window.matchMedia === 'function';
+          var isStandardRange = hasMatchMedia
+            ? window.matchMedia('(dynamic-range: standard)').matches
+            : true;
+          var isSrgb = hasMatchMedia
+            ? window.matchMedia('(color-gamut: srgb)').matches
+            : true;
+          var isWideGamut = hasMatchMedia
+            ? window.matchMedia('(color-gamut: p3)').matches
+            : false;
+          var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
+          var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
+          var maxDim = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+          var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
+
+          return (
+            isStandardRange &&
+            isSrgb &&
+            !isWideGamut &&
+            lowDpi &&
+            lowColorDepth &&
+            isClassicDesktopPanel
+          );
+        }
+
+        function setMode(mode) {
+          window.localStorage.setItem(DISPLAY_MODE_KEY, mode);
+          clearDisplayModeClasses();
+          if (mode === 'legacy') {
+            document.documentElement.classList.add('display-legacy');
+          } else if (mode === 'legacy-strong') {
+            document.documentElement.classList.add('display-legacy-strong');
+          } else if (mode === 'standard') {
+            clearDisplayModeClasses();
+          } else if (mode === 'auto') {
+            if (likelyLegacyDisplayEnvironment()) {
+              document.documentElement.classList.add('display-legacy');
+            }
+          }
+        }
+
+        function buildPrompt() {
+          var host = document.createElement('div');
+          host.className = 'display-mode-prompt';
+          host.innerHTML =
+            '<div class="display-mode-prompt__backdrop" aria-hidden="true"></div>' +
+            '<div class="display-mode-prompt__dialog" role="dialog" aria-modal="true" aria-labelledby="display-mode-title">' +
+            '<h2 id="display-mode-title">Display compatibility</h2>' +
+            '<p class="display-mode-prompt__lead">' +
+            '<span class="display-mode-prompt__lead-line">Your display may use an older color pipeline.</span>' +
+            '<span class="display-mode-prompt__lead-line">Enable a compatibility style for this site?</span>' +
+            '</p>' +
+            '<div class="display-mode-prompt__actions">' +
+            '<button type="button" data-display-mode="legacy">Yes, enable</button>' +
+            '<button type="button" data-display-mode="standard">No, keep current</button>' +
+            '</div>' +
+            '<ul class="display-mode-prompt__note">' +
+            '<li>this only changes this site in this browser</li>' +
+            '<li>you can change this anytime in Settings</li>' +
+            '<li>for older displays, try legacy compatibility (strong)</li>' +
+            '</ul>' +
+            '</div>';
+
+          function fitLeadLines() {
+            var lead = host.querySelector('.display-mode-prompt__lead');
+            var lines = host.querySelectorAll('.display-mode-prompt__lead-line');
+            if (!(lead instanceof HTMLElement) || lines.length === 0) return;
+
+            var min = 10;
+            var max = 20;
+            var best = min;
+            while (max - min > 0.2) {
+              var mid = (min + max) / 2;
+              lead.style.fontSize = mid + 'px';
+              var fits = Array.prototype.every.call(lines, function (line) {
+                return line.scrollWidth <= lead.clientWidth;
+              });
+              if (fits) {
+                best = mid;
+                min = mid;
+              } else {
+                max = mid;
+              }
+            }
+            lead.style.fontSize = best + 'px';
+          }
+
+          host.addEventListener('click', function (event) {
+            var target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            var nextMode = target.getAttribute('data-display-mode');
+            if (!nextMode) return;
+            setMode(nextMode);
+            window.localStorage.setItem(PROMPT_SEEN_KEY, '1');
+            host.remove();
+          });
+
+          document.body.appendChild(host);
+          fitLeadLines();
+          document.fonts?.ready?.then(fitLeadLines);
+          window.addEventListener('resize', fitLeadLines, { passive: true });
+        }
+
+        var forceDisplayPrompt =
+          new URLSearchParams(window.location.search).get('showDisplayPrompt') ===
+          '1';
+        var isAutomatedBrowser =
+          typeof navigator !== 'undefined' && navigator.webdriver === true;
+        var hasExplicitChoice = window.localStorage.getItem(DISPLAY_MODE_KEY);
+        var seenPrompt = window.localStorage.getItem(PROMPT_SEEN_KEY) === '1';
+        if (
+          forceDisplayPrompt ||
+          (!isAutomatedBrowser &&
+            !hasExplicitChoice &&
+            !seenPrompt &&
+            likelyLegacyDisplayEnvironment())
+        ) {
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', buildPrompt, { once: true });
+          } else {
+            buildPrompt();
+          }
+        }
+      })();
+    </script>
     <script is:inline>
       (function () {
         'use strict';

@@ -1,0 +1,169 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Settings — Jan Havlín" showHeader={true}>
+  <article class="has-page-title-rule">
+    <h1 class="page-title">Settings</h1>
+    <p>
+      If the site doesn't look right on your display,<br />
+      try a different mode:
+    </p>
+    <p>
+      This only affects how this site is rendered in this browser.
+    </p>
+    <form id="display-settings-form" class="display-settings-form">
+      <label class="display-settings-option">
+        <input type="radio" name="display-mode" value="standard" />
+        <span class="display-settings-option__marker" aria-hidden="true"></span>
+        <span>Standard (default)</span>
+      </label>
+      <label class="display-settings-option">
+        <input type="radio" name="display-mode" value="legacy" />
+        <span class="display-settings-option__marker" aria-hidden="true"></span>
+        <span>Legacy compatibility</span>
+      </label>
+      <label class="display-settings-option">
+        <input type="radio" name="display-mode" value="legacy-strong" />
+        <span class="display-settings-option__marker" aria-hidden="true"></span>
+        <span>Legacy compatibility (strong)</span>
+      </label>
+      <label class="display-settings-option">
+        <input type="radio" name="display-mode" value="auto" />
+        <span class="display-settings-option__marker" aria-hidden="true"></span>
+        <span>Auto detect</span>
+      </label>
+    </form>
+  </article>
+
+  <style>
+    .display-settings-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .display-settings-option {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.48rem;
+      cursor: pointer;
+      color: #111;
+    }
+
+    .display-settings-option input {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      clip: rect(0 0 0 0);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .display-settings-option__marker {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 1em;
+      height: 1em;
+      line-height: 1;
+    }
+
+    .display-settings-option__marker::before {
+      content: '\25AB';
+      display: block;
+      color: var(--color-list-marker);
+      line-height: 1;
+    }
+
+    .display-settings-option input:checked + .display-settings-option__marker::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      /* Optical center inside ▫ glyph box (slight upward correction). */
+      transform: translate(-53%, 5%);
+      width: 20%;
+      height: 20%;
+      background: var(--color-list-marker);
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      'use strict';
+
+      var DISPLAY_MODE_KEY = 'display-mode';
+      var PROMPT_SEEN_KEY = 'display-mode-prompt-seen';
+      var form = document.getElementById('display-settings-form');
+      if (!(form instanceof HTMLFormElement)) return;
+
+      function likelyLegacyDisplayEnvironment() {
+        var hasMatchMedia = typeof window.matchMedia === 'function';
+        var isStandardRange = hasMatchMedia
+          ? window.matchMedia('(dynamic-range: standard)').matches
+          : true;
+        var isSrgb = hasMatchMedia
+          ? window.matchMedia('(color-gamut: srgb)').matches
+          : true;
+        var isWideGamut = hasMatchMedia
+          ? window.matchMedia('(color-gamut: p3)').matches
+          : false;
+        var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
+        var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
+        var maxDim = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+        var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
+
+        return (
+          isStandardRange &&
+          isSrgb &&
+          !isWideGamut &&
+          lowDpi &&
+          lowColorDepth &&
+          isClassicDesktopPanel
+        );
+      }
+
+      function applyMode(mode) {
+        if (mode === 'legacy') {
+          document.documentElement.classList.remove('display-legacy-strong');
+          document.documentElement.classList.add('display-legacy');
+          return;
+        }
+        if (mode === 'legacy-strong') {
+          document.documentElement.classList.remove('display-legacy');
+          document.documentElement.classList.add('display-legacy-strong');
+          return;
+        }
+        if (mode === 'auto') {
+          document.documentElement.classList.remove('display-legacy-strong');
+          if (likelyLegacyDisplayEnvironment()) {
+            document.documentElement.classList.add('display-legacy');
+          } else {
+            document.documentElement.classList.remove('display-legacy');
+          }
+          return;
+        }
+        document.documentElement.classList.remove('display-legacy');
+        document.documentElement.classList.remove('display-legacy-strong');
+      }
+
+      var initialMode = window.localStorage.getItem(DISPLAY_MODE_KEY) || 'standard';
+      var input = form.querySelector('input[value="' + initialMode + '"]');
+      if (input instanceof HTMLInputElement) input.checked = true;
+      applyMode(initialMode);
+
+      form.addEventListener('change', function () {
+        var selected = form.querySelector('input[name="display-mode"]:checked');
+        if (!(selected instanceof HTMLInputElement)) return;
+        var mode = selected.value;
+        window.localStorage.setItem(DISPLAY_MODE_KEY, mode);
+        window.localStorage.setItem(PROMPT_SEEN_KEY, '1');
+        applyMode(mode);
+      });
+    })();
+  </script>
+</Layout>

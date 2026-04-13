@@ -181,6 +181,89 @@ a:hover {
   text-decoration: underline;
 }
 
+.display-mode-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.display-mode-prompt__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.42);
+}
+
+.display-mode-prompt__dialog {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(24rem, calc(100vw - 2rem));
+  padding: 1rem 1rem 1.3rem;
+  background: var(--color-page-bg);
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+}
+
+.display-mode-prompt__dialog h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.45rem;
+}
+
+.display-mode-prompt__dialog p {
+  margin: 0;
+}
+
+.display-mode-prompt__lead {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.display-mode-prompt__lead-line {
+  display: block;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.display-mode-prompt__lead-line + .display-mode-prompt__lead-line {
+  margin-top: 0.2rem;
+}
+
+.display-mode-prompt__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+.display-mode-prompt__actions button {
+  border: 1px solid #111;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.display-mode-prompt__actions button:hover {
+  background: #111;
+  color: var(--color-page-bg);
+}
+
+.display-mode-prompt__note {
+  margin-top: 0.95rem !important;
+  opacity: 0.58;
+  font-size: clamp(0.65rem, 0.55rem + 0.5vw, 0.8rem);
+  line-height: 1.2;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.display-mode-prompt__note li + li {
+  margin-top: 0.1rem;
+}
+
 /* ===============================
    SMALL PHONES: keep content centered
 ================================ */

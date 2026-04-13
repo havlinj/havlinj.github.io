@@ -1,0 +1,34 @@
+/* Legacy display mode.
+ * Active only when <html> has class="display-legacy". */
+
+html.display-legacy {
+  --panel-bg-saturation: 0.92;
+  --panel-bg-brightness: 0.99;
+  --panel-bg-contrast: 0.96;
+
+  --tile-brightness: 0.985;
+  --tile-contrast: 0.955;
+  --tile-image-opacity: 0.985;
+
+  --portrait-brightness: 0.99;
+  --portrait-contrast: 0.955;
+  --portrait-opacity: 0.99;
+
+  --profile-grain-opacity: 0.08;
+}
+
+html.display-legacy-strong {
+  --panel-bg-saturation: 0.82;
+  --panel-bg-brightness: 0.97;
+  --panel-bg-contrast: 0.9;
+
+  --tile-brightness: 0.97;
+  --tile-contrast: 0.9;
+  --tile-image-opacity: 0.975;
+
+  --portrait-brightness: 0.975;
+  --portrait-contrast: 0.9;
+  --portrait-opacity: 0.98;
+
+  --profile-grain-opacity: 0.04;
+}
