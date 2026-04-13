@@ -7,6 +7,24 @@ import {
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../src/utils/profile-reveal-constants';
 import { gotoProfileWhenReady, mustBox } from './helpers';
+import {
+  PROFILE_SEAM_VIEWPORT_WIDTHS,
+  PROFILE_SHARED_EDGE_RATIO_BY_STEP,
+  activeProfileSeamRatio,
+  expectedProfileStitchedBorderPx,
+} from './profile-seam-ratios';
+
+/** Chromium often reports whole CSS px for used border widths while calc() is fractional. */
+function expectUsedBorderWidthInComputedRange(
+  received: number,
+  expectedFromCalc: number,
+  msg: string,
+) {
+  const low = Math.floor(expectedFromCalc + 1e-6);
+  const high = Math.ceil(expectedFromCalc - 1e-6);
+  expect(received, msg).toBeGreaterThanOrEqual(low);
+  expect(received, msg).toBeLessThanOrEqual(high);
+}
 
 type FoundationsGeometry = {
   columnHeight: number;
@@ -267,6 +285,79 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     const outer = await mustBox(frame);
     expect(inner.width).toBeLessThan(outer.width - 2);
     expect(inner.height).toBeLessThan(outer.height - 2);
+  });
+
+  test('profile section seam ratio custom props match e2e/profile-seam-ratios.ts', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await gotoProfileWhenReady(page);
+    const fromDom = await page.evaluate(() => {
+      const s = document.querySelector('.profile-section');
+      if (!(s instanceof HTMLElement)) throw new Error('missing .profile-section');
+      const cs = getComputedStyle(s);
+      return {
+        base: Number.parseFloat(
+          cs.getPropertyValue('--profile-shared-edge-ratio-base').trim(),
+        ),
+        at360: Number.parseFloat(
+          cs.getPropertyValue('--profile-shared-edge-ratio-360').trim(),
+        ),
+        at480: Number.parseFloat(
+          cs.getPropertyValue('--profile-shared-edge-ratio-480').trim(),
+        ),
+        at720: Number.parseFloat(
+          cs.getPropertyValue('--profile-shared-edge-ratio-720').trim(),
+        ),
+        at960: Number.parseFloat(
+          cs.getPropertyValue('--profile-shared-edge-ratio-960').trim(),
+        ),
+      };
+    });
+    const e = PROFILE_SHARED_EDGE_RATIO_BY_STEP;
+    expect(fromDom.base).toBeCloseTo(e.base, 5);
+    expect(fromDom.at360).toBeCloseTo(e.at360, 5);
+    expect(fromDom.at480).toBeCloseTo(e.at480, 5);
+    expect(fromDom.at720).toBeCloseTo(e.at720, 5);
+    expect(fromDom.at960).toBeCloseTo(e.at960, 5);
+  });
+
+  test('profile stitched seam width follows ratio steps by viewport', async ({
+    page,
+  }) => {
+    for (const width of PROFILE_SEAM_VIEWPORT_WIDTHS) {
+      await page.setViewportSize({ width, height: 900 });
+      await gotoProfileWhenReady(page);
+      const { framePx, stitchedPx, innerW } = await page.evaluate(() => {
+        const section = document.querySelector('.profile-section');
+        const why = document.querySelector(
+          'a.prof-tile[href="/why"]',
+        ) as HTMLElement | null;
+        if (!(section instanceof HTMLElement) || !why) {
+          throw new Error('missing profile Why tile or section');
+        }
+        const frame = Number.parseFloat(
+          getComputedStyle(section)
+            .getPropertyValue('--profile-photo-frame-size')
+            .trim(),
+        );
+        const stitched = Number.parseFloat(
+          getComputedStyle(why).borderBottomWidth,
+        );
+        return {
+          framePx: frame,
+          stitchedPx: stitched,
+          innerW: window.innerWidth,
+        };
+      });
+      const ratio = activeProfileSeamRatio(innerW);
+      const expected = expectedProfileStitchedBorderPx(framePx, ratio);
+      expectUsedBorderWidthInComputedRange(
+        stitchedPx,
+        expected,
+        `innerWidth ${innerW}px (set ${width}px), ratio ${ratio}`,
+      );
+    }
   });
 
   test('profile tile borders use portrait frame thickness with border-box sizing', async ({

@@ -14,6 +14,8 @@ article.has-buttons-panel {
  *   --profile-inner-gutter-y    -> reserved
  *   --profile-photo-inset-bottom -> portrait square bottom edge (0 = touches tile below)
  *   --profile-photo-inset-right  -> portrait square right offset (0 = fully right)
+ *   Shared seam ratio (tune --profile-shared-edge-ratio-* together). Breakpoints use layout viewport
+ *   CSS px — phones are often 360–430px wide, so the first step is min-width: 360px (not 480px).
  * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (single value for both axes).
  * --profile-tile-label-font-size is set by profile-tile-type-fit.ts
  */
@@ -29,12 +31,47 @@ article.has-buttons-panel {
   height: 100cqw;
   --profile-tile-text-inset-x: 2rem;
   --profile-photo-frame-size: 6px;
-  --profile-shared-edge-thickness: calc(var(--profile-photo-frame-size) * 1.25);
+  /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
+   * Keep in sync: e2e/profile-seam-ratios.ts (no --_ prefix: avoids var/inherit quirks in some engines). */
+  --profile-shared-edge-ratio-base: 0.77;
+  --profile-shared-edge-ratio-360: 0.85;
+  --profile-shared-edge-ratio-480: 1.05;
+  --profile-shared-edge-ratio-720: 1.14;
+  --profile-shared-edge-ratio-960: 1.25;
+  --profile-shared-edge-frame-ratio: var(--profile-shared-edge-ratio-base);
+  --profile-shared-edge-thickness: calc(
+    var(--profile-photo-frame-size) * var(--profile-shared-edge-frame-ratio)
+  );
   --profile-stitched-seam-thickness: calc(
     2 * var(--profile-shared-edge-thickness) - var(--profile-photo-frame-size)
   );
   /* Temporary: disable image grain/overlay effects on profile tiles */
   --profile-grain-opacity: 0.5;
+}
+
+/* Breakpoint px values: keep aligned with e2e/profile-seam-ratios.ts PROFILE_SEAM_MEDIA_MIN_WIDTHS */
+@media (min-width: 360px) {
+  .profile-section {
+    --profile-shared-edge-frame-ratio: var(--profile-shared-edge-ratio-360);
+  }
+}
+
+@media (min-width: 480px) {
+  .profile-section {
+    --profile-shared-edge-frame-ratio: var(--profile-shared-edge-ratio-480);
+  }
+}
+
+@media (min-width: 720px) {
+  .profile-section {
+    --profile-shared-edge-frame-ratio: var(--profile-shared-edge-ratio-720);
+  }
+}
+
+@media (min-width: 960px) {
+  .profile-section {
+    --profile-shared-edge-frame-ratio: var(--profile-shared-edge-ratio-960);
+  }
 }
 
 .profile-section > a[href='/why'] {
