@@ -180,3 +180,18 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* ===============================
+   SMALL PHONES: keep content centered
+================================ */
+@media (max-width: 430px) {
+  main,
+  .content {
+    /* On tiny screens, fixed 2rem insets + 40ch min-width can push layout off-axis. */
+    min-width: 0;
+    padding-top: 1.5rem;
+    /* Keep near-desktop width; shrink side insets only as needed on very small viewports. */
+    padding-right: max(env(safe-area-inset-right), clamp(1.15rem, 6vw, 2rem));
+    padding-left: max(env(safe-area-inset-left), clamp(1.15rem, 6vw, 2rem));
+  }
+}
