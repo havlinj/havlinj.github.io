@@ -48,7 +48,10 @@ const navItems = [
             : false;
           var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
           var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
-          var maxDim = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+          var maxDim = Math.max(
+            window.screen?.width || 0,
+            window.screen?.height || 0,
+          );
           var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
 
           return (
@@ -137,7 +140,10 @@ const navItems = [
             : false;
           var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
           var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
-          var maxDim = Math.max(window.screen?.width || 0, window.screen?.height || 0);
+          var maxDim = Math.max(
+            window.screen?.width || 0,
+            window.screen?.height || 0,
+          );
           var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
 
           return (
@@ -190,7 +196,9 @@ const navItems = [
 
           function fitLeadLines() {
             var lead = host.querySelector('.display-mode-prompt__lead');
-            var lines = host.querySelectorAll('.display-mode-prompt__lead-line');
+            var lines = host.querySelectorAll(
+              '.display-mode-prompt__lead-line',
+            );
             if (!(lead instanceof HTMLElement) || lines.length === 0) return;
 
             var min = 10;
@@ -229,8 +237,9 @@ const navItems = [
         }
 
         var forceDisplayPrompt =
-          new URLSearchParams(window.location.search).get('showDisplayPrompt') ===
-          '1';
+          new URLSearchParams(window.location.search).get(
+            'showDisplayPrompt',
+          ) === '1';
         var isAutomatedBrowser =
           typeof navigator !== 'undefined' && navigator.webdriver === true;
         var hasExplicitChoice = window.localStorage.getItem(DISPLAY_MODE_KEY);
@@ -243,7 +252,9 @@ const navItems = [
             likelyLegacyDisplayEnvironment())
         ) {
           if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', buildPrompt, { once: true });
+            document.addEventListener('DOMContentLoaded', buildPrompt, {
+              once: true,
+            });
           } else {
             buildPrompt();
           }

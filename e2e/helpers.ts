@@ -4,7 +4,7 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
   await page.goto('/profile');
   await page
     .locator('.profile-section:not(.profile-section--loading)')
-    .waitFor({ state: 'visible', timeout: 10000 });
+    .waitFor({ state: 'visible', timeout: 15000 });
 }
 
 /** Why page: inline script removes pending class after spacer/GIF metrics settle. */

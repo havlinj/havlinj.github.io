@@ -20,7 +20,9 @@ test.describe('List marker geometry on mobile', () => {
     expect(metrics).toBeTruthy();
     expect(metrics!.widthPx).toBeGreaterThan(5);
     expect(metrics!.heightPx).toBeGreaterThan(5);
-    expect(Math.abs(metrics!.widthPx - metrics!.heightPx)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(metrics!.widthPx - metrics!.heightPx)).toBeLessThanOrEqual(
+      0.5,
+    );
     expect(metrics!.color).toMatch(/^rgb/);
   });
 });

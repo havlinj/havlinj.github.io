@@ -63,12 +63,16 @@ test.describe('List marker spacing (:root tokens)', () => {
     expectRemVar(t.markerLeft, 0.22);
   });
 
-  test('unordered marker uses stable geometric square size', async ({ page }) => {
+  test('unordered marker uses stable geometric square size', async ({
+    page,
+  }) => {
     await page.goto('/credits', { waitUntil: 'domcontentloaded' });
     const metrics = await readFirstUnorderedMarkerMetrics(page);
     expect(metrics).toBeTruthy();
     expect(metrics!.widthPx).toBeGreaterThan(6);
     expect(metrics!.heightPx).toBeGreaterThan(6);
-    expect(Math.abs(metrics!.widthPx - metrics!.heightPx)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(metrics!.widthPx - metrics!.heightPx)).toBeLessThanOrEqual(
+      0.5,
+    );
   });
 });

@@ -429,11 +429,6 @@ function wireFoundationsReveal(): void {
     HTMLAnchorElement,
   );
   if (!foundationsTile) return;
-  const rightColumn = queryElement(
-    document,
-    SELECTORS.profileRightColumn,
-    HTMLElement,
-  );
 
   let revealTimeoutId = 0;
   let revealCloseStepId = 0;

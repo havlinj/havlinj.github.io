@@ -17,7 +17,7 @@ export const PROFILE_SEAM_MEDIA_MIN_WIDTHS = [360, 480, 720, 960] as const;
 /** Same cascade as CSS: which ratio applies for this layout viewport width (CSS px). */
 export function activeProfileSeamRatio(layoutWidthPx: number): number {
   const r = PROFILE_SHARED_EDGE_RATIO_BY_STEP;
-  let ratio = r.base;
+  let ratio: number = r.base;
   if (layoutWidthPx >= PROFILE_SEAM_MEDIA_MIN_WIDTHS[0]) ratio = r.at360;
   if (layoutWidthPx >= PROFILE_SEAM_MEDIA_MIN_WIDTHS[1]) ratio = r.at480;
   if (layoutWidthPx >= PROFILE_SEAM_MEDIA_MIN_WIDTHS[2]) ratio = r.at720;
@@ -38,6 +38,4 @@ export function expectedProfileStitchedBorderPx(
  * Skip below ~360px width: Chromium can round border-bottom-width away from raw calc() px
  * on very narrow layout viewports, so we start at 380 (still the 360px media step).
  */
-export const PROFILE_SEAM_VIEWPORT_WIDTHS = [
-  380, 500, 800, 1280,
-] as const;
+export const PROFILE_SEAM_VIEWPORT_WIDTHS = [380, 500, 800, 1280] as const;

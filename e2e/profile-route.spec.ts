@@ -294,7 +294,8 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await gotoProfileWhenReady(page);
     const fromDom = await page.evaluate(() => {
       const s = document.querySelector('.profile-section');
-      if (!(s instanceof HTMLElement)) throw new Error('missing .profile-section');
+      if (!(s instanceof HTMLElement))
+        throw new Error('missing .profile-section');
       const cs = getComputedStyle(s);
       return {
         base: Number.parseFloat(
@@ -407,9 +408,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       expect(tile.borderRight).toBeCloseTo(info.frameVar, 1);
       const bottomExpect =
         tile.href === '/why' ? info.stitchedVar : info.frameVar;
-      const leftExpect = tile.isFoundations
-        ? info.stitchedVar
-        : info.frameVar;
+      const leftExpect = tile.isFoundations ? info.stitchedVar : info.frameVar;
       expect(tile.borderBottom).toBeCloseTo(bottomExpect, 1);
       expect(tile.borderLeft).toBeCloseTo(leftExpect, 1);
       expect(tile.borderColor).toBe(RGB_INK);

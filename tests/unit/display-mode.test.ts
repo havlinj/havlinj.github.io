@@ -37,7 +37,9 @@ describe('isLikelyLegacyDisplayEnvironment', () => {
 
   it('returns false for large modern panels', () => {
     expect(
-      isLikelyLegacyDisplayEnvironment(makeSignals({ maxScreenDimension: 2560 })),
+      isLikelyLegacyDisplayEnvironment(
+        makeSignals({ maxScreenDimension: 2560 }),
+      ),
     ).toBe(false);
   });
 });

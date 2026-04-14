@@ -127,7 +127,9 @@ article.has-buttons-panel {
       var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
     )
   );
-  --profile-portrait-content-side: calc(100% - (2 * var(--profile-photo-gutter-x)));
+  --profile-portrait-content-side: calc(
+    100% - (2 * var(--profile-photo-gutter-x))
+  );
   --profile-portrait-shell-width: calc(
     var(--profile-portrait-content-side) + (2 * var(--profile-photo-frame-size))
   );
