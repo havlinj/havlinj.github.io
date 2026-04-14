@@ -57,18 +57,49 @@ ul.post-list > li::before {
 
 /* Writing index: a bit taller rows than default page-button (1.75–2rem) for long titles */
 .writing-page .page-button {
-  min-height: 2.2rem;
-  max-height: 2.55rem;
+  min-height: var(--writing-row-min-h, 2.2rem);
+  max-height: var(--writing-row-max-h, 2.55rem);
 }
 
 /* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).
    Small vertical padding + no subpixel nudge avoids blurry/clipped glyph edges with overflow:hidden on .page-button.
    Fluid type: font-size on inner (main.content supplies cqi); title 1em, date 8/11 em — same ratio at any size. */
 .writing-page .page-button__inner {
+  /*
+   * Display-scaled title rhythm:
+   * smaller panels keep tighter lines, wider panels get a touch more breathing room.
+   */
+  --writing-title-lh: clamp(1.18, 1.14 + 0.24cqi, 1.34);
   justify-content: space-between;
   gap: 0.65em;
-  padding-block: 2px;
+  padding-block: var(--writing-row-pad-block, 2px);
   font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
+}
+
+/* Mobile / narrow panels: force tighter title rows (cqi alone can be too subtle). */
+@container (max-width: 34rem) {
+  .writing-page .page-button {
+    --writing-row-min-h: 2.05rem;
+    --writing-row-max-h: 2.35rem;
+    --writing-row-pad-block: 1px;
+  }
+
+  .writing-page .page-button__inner {
+    --writing-title-lh: 1.12;
+  }
+}
+
+/* Wide panels: slightly more air in rows and title line rhythm. */
+@container (min-width: 52rem) {
+  .writing-page .page-button {
+    --writing-row-min-h: 2.3rem;
+    --writing-row-max-h: 2.75rem;
+    --writing-row-pad-block: 3px;
+  }
+
+  .writing-page .page-button__inner {
+    --writing-title-lh: 1.3;
+  }
 }
 
 /* Writing index: slightly airier labels on article links (scoped; hover/focus invert unchanged) */
@@ -79,7 +110,7 @@ ul.post-list > li::before {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.98em;
-  line-height: 1.4;
+  line-height: var(--writing-title-lh);
   letter-spacing: 0.08em;
   color: rgba(17, 17, 17, 0.82);
   padding: 0.2em;
