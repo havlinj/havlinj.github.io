@@ -424,7 +424,9 @@ test.describe('Contact page (/contact)', () => {
     );
   });
 
-  test('send status is rendered inline next to Send button', async ({ page }) => {
+  test('send status is rendered inline next to Send button', async ({
+    page,
+  }) => {
     await page.goto('/contact');
     const actions = page.locator('#contact-form .contact-form__actions');
     const send = actions.getByRole('button', { name: 'Send' });
@@ -471,7 +473,10 @@ test.describe('Contact page (/contact)', () => {
     page,
   }) => {
     await page.goto('/contact');
-    await expect(page.getByLabel('Name')).toHaveAttribute('autocomplete', 'name');
+    await expect(page.getByLabel('Name')).toHaveAttribute(
+      'autocomplete',
+      'name',
+    );
     await expect(page.getByLabel('Email')).toHaveAttribute(
       'autocomplete',
       'email',
