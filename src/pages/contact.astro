@@ -20,27 +20,44 @@ const title = 'Contact — Jan Havlín';
       Feel free to reach out about engineering, architecture, or opportunities.
     </p>
 
-    <form id="contact-form" class="contact-form" novalidate>
+    <form id="contact-form" class="contact-form" novalidate autocomplete="off">
       <label>
         Name
-        <input type="text" name="name" maxlength="100" required />
+        <input
+          type="text"
+          name="name"
+          maxlength="100"
+          required
+          autocomplete="name"
+        />
       </label>
 
       <label>
         Email
-        <input type="email" name="email" required />
+        <input type="email" name="email" required autocomplete="email" />
       </label>
 
       <label>
         Message
-        <textarea name="message" minlength="10" maxlength="5000" required
+        <textarea
+          name="message"
+          minlength="10"
+          maxlength="5000"
+          required
+          autocomplete="off"
         ></textarea>
       </label>
 
       <div class="hidden" aria-hidden="true">
         <label>
           Company
-          <input type="text" name="company" tabindex="-1" autocomplete="off" />
+          <input
+            type="text"
+            name="company"
+            tabindex="-1"
+            autocomplete="off"
+            inputmode="none"
+          />
         </label>
       </div>
 
@@ -184,6 +201,7 @@ const title = 'Contact — Jan Havlín';
             if (window.turnstile) {
               window.turnstile.reset();
             }
+            form.reset();
             replaceContactFieldsWithFreshElements();
           } else {
             status.textContent = data.error || 'Something went wrong.';

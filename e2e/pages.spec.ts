@@ -418,6 +418,23 @@ test.describe('Contact page (/contact)', () => {
       'novalidate',
       '',
     );
+    await expect(page.locator('#contact-form')).toHaveAttribute(
+      'autocomplete',
+      'off',
+    );
+  });
+
+  test('send status is rendered inline next to Send button', async ({ page }) => {
+    await page.goto('/contact');
+    const actions = page.locator('#contact-form .contact-form__actions');
+    const send = actions.getByRole('button', { name: 'Send' });
+    const status = actions.locator('#status');
+    await expect(actions).toBeVisible();
+    await expect(send).toBeVisible();
+    await expect(status).toBeAttached();
+    await expect(status).toHaveAttribute('role', 'status');
+    await expect(status).toHaveAttribute('aria-live', 'polite');
+    await expect(status).toHaveText('');
   });
 
   test('honeypot company field is hidden from a11y tree', async ({ page }) => {
@@ -430,6 +447,8 @@ test.describe('Contact page (/contact)', () => {
     // (offscreen position + 1x1 sizing). `input` itself can still report a
     // larger box due to its own intrinsic layout, so we validate the wrapper.
     await expect(company).toHaveAttribute('tabindex', '-1');
+    await expect(company).toHaveAttribute('autocomplete', 'off');
+    await expect(company).toHaveAttribute('inputmode', 'none');
     await expect(hiddenWrapper).toBeVisible(); // attached; wrapper exists in DOM
 
     const wrapperBox = await hiddenWrapper.evaluate((el) => {
@@ -444,8 +463,23 @@ test.describe('Contact page (/contact)', () => {
   test('status region is present and empty before submit', async ({ page }) => {
     await page.goto('/contact');
     const status = page.locator('#status');
-    await expect(status).toBeVisible();
+    await expect(status).toBeAttached();
     await expect(status).toHaveText('');
+  });
+
+  test('contact field autocomplete policy is set as intended', async ({
+    page,
+  }) => {
+    await page.goto('/contact');
+    await expect(page.getByLabel('Name')).toHaveAttribute('autocomplete', 'name');
+    await expect(page.getByLabel('Email')).toHaveAttribute(
+      'autocomplete',
+      'email',
+    );
+    await expect(page.getByLabel('Message')).toHaveAttribute(
+      'autocomplete',
+      'off',
+    );
   });
 
   test('after load: org links and intro text below Send', async ({ page }) => {
