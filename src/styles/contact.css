@@ -72,7 +72,6 @@
 }
 
 .contact-form button {
-  justify-self: flex-start;
   min-height: 1.75rem;
   max-height: 2rem;
   padding: 0 1.4rem;
@@ -100,7 +99,19 @@
 
 .contact-status {
   min-height: 1.5em;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  opacity: 0.82;
+  margin: 0;
+}
+
+.contact-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contact-form__actions .contact-status {
+  min-height: 1em;
 }
 
 /* Additional links shown after the Send button (created by JS) */

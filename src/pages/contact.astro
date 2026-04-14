@@ -46,9 +46,11 @@ const title = 'Contact — Jan Havlín';
 
       <div class="cf-turnstile" data-sitekey="0x4AAAAAACpJlpuMEv-nLyuB"></div>
 
-      <button type="submit">Send</button>
-      <p id="status" class="contact-status" role="status" aria-live="polite">
-      </p>
+      <div class="contact-form__actions">
+        <button type="submit">Send</button>
+        <p id="status" class="contact-status" role="status" aria-live="polite">
+        </p>
+      </div>
     </form>
   </article>
 
@@ -82,7 +84,12 @@ const title = 'Contact — Jan Havlín';
 
       // Insert 2 additional organization links right after the Send button.
       const sendButton = form.querySelector('button[type="submit"]');
-      if (sendButton && !form.querySelector('.contact-extra-links-wrapper')) {
+      const actionsRow = form.querySelector('.contact-form__actions');
+      if (
+        sendButton &&
+        actionsRow instanceof HTMLElement &&
+        !form.querySelector('.contact-extra-links-wrapper')
+      ) {
         const extraLinks = [
           {
             href: githubUrl,
@@ -133,7 +140,7 @@ const title = 'Contact — Jan Havlín';
 
         wrapper.appendChild(intro);
         wrapper.appendChild(container);
-        sendButton.insertAdjacentElement('afterend', wrapper);
+        actionsRow.insertAdjacentElement('afterend', wrapper);
       }
 
       /** New DOM nodes so the browser does not re-apply autofill to the same elements. */
