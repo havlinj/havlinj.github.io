@@ -38,19 +38,9 @@ const isWhy = slug === 'why';
 const hasPageTitleRule =
   slug === 'credits' || slug === 'what-i-do' || slug === 'foundations';
 
-const PROFILE_PRELOADS = [
-  '/assets/hero/dichromatic_portrait_bayer_noise.png',
-  '/assets/pages/profile/tai-bui-yKX7wC_VioM-unsplash_dichrom.png',
-];
 ---
 
 <Layout title={page.data.title} activeSection={activeSection}>
-  {
-    isProfile &&
-      PROFILE_PRELOADS.map((href) => (
-        <link slot="head" rel="preload" as="image" href={href} />
-      ))
-  }
   <article
     class={[
       isProfile && 'has-buttons-panel',
