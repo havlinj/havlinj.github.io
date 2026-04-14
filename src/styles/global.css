@@ -29,8 +29,8 @@
   --color-divider: rgba(17, 17, 17, 0.22);
   /* List bullets / numbers: visible but slightly softer than body text */
   --color-list-marker: rgba(17, 17, 17, 0.55);
-  /* Optical vertical align: negative = nudge bullet/number up (via ::before, not ::marker - Firefox) */
-  --list-marker-nudge-y: -0.1em;
+  /* Optical vertical align for bullets/numbers across the site (slightly above center looks best). */
+  --list-marker-nudge-y: -0.025em;
   /* Unordered marker uses a geometric square (not font glyph) for cross-device consistency. */
   --list-marker-box-size: 0.56em;
   /* Marker column: offset from li edge + marker box width + gap before line */
@@ -270,11 +270,6 @@ a:hover {
 
 .display-mode-prompt__note li + li {
   margin-top: 0.1rem;
-}
-
-/* Local popup tweak: small note text needs a calmer marker nudge than global lists. */
-.display-mode-prompt__note li::before {
-  transform: translateY(0.04em);
 }
 
 /* ===============================

@@ -4,7 +4,7 @@
 #
 # Usage:
 #   ./scripts/update-playwright-snapshots.sh
-#       → default screenshot set: hero section, profile section, and mobile Foundations reveal
+#       → default screenshot set: hero, profile, Credits main, and mobile Foundations reveal
 #   ./scripts/update-playwright-snapshots.sh e2e/foo.spec.ts
 #   ./scripts/update-playwright-snapshots.sh --update-snapshots e2e/
 #       → any extra args are passed to: playwright test --update-snapshots <args...>
@@ -24,6 +24,9 @@ else
   npx playwright test e2e/pages.spec.ts e2e/hero.spec.ts \
     --project=desktop-chromium \
     --grep 'last screenshot matches' \
+    --update-snapshots
+  npx playwright test e2e/credits.spec.ts \
+    --project=desktop-chromium \
     --update-snapshots
   exec npx playwright test e2e/profile-mobile.spec.ts \
     --project=mobile-chromium \

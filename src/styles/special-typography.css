@@ -41,10 +41,13 @@ ol > li::before {
   pointer-events: none;
 }
 
-/* Unordered markers: geometric square for consistent size across OS/browser/font rendering. */
+/* Unordered markers: square is CSS (not an Inter bullet glyph); em/lh/transform are still resolved
+   on the li’s font metrics so the marker lines up with the first text line. */
 ul > li::before {
   content: '';
+  /* 0.5em fallback; 0.5lh aligns to the first line box (body uses numeric line-height). */
   top: calc(0.5em - (var(--list-marker-box-size) / 2));
+  top: calc(0.5lh - (var(--list-marker-box-size) / 2));
   width: var(--list-marker-box-size);
   height: var(--list-marker-box-size);
   background-color: currentColor;

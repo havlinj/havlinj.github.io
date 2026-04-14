@@ -1,4 +1,5 @@
 ---
+import interLatin400Woff2 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
 import '../styles/global.css';
 import '../styles/special-typography.css';
 import '../styles/writing.css';
@@ -25,6 +26,13 @@ const navItems = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <link
+      rel="preload"
+      href={interLatin400Woff2}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
     <script is:inline>
       (function () {
         'use strict';
