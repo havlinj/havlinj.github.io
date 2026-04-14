@@ -79,13 +79,13 @@ ul.post-list > li::before {
 /* Mobile / narrow panels: force tighter title rows (cqi alone can be too subtle). */
 @container (max-width: 34rem) {
   .writing-page .page-button {
-    --writing-row-min-h: 2.05rem;
-    --writing-row-max-h: 2.35rem;
-    --writing-row-pad-block: 1px;
+    --writing-row-min-h: 1.8rem;
+    --writing-row-max-h: 2.2rem;
+    --writing-row-pad-block: 0px;
   }
 
   .writing-page .page-button__inner {
-    --writing-title-lh: 1.12;
+    --writing-title-lh: 1.06;
   }
 }
 
