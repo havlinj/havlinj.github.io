@@ -32,7 +32,7 @@ Put simply: that people receive something of real value in exchange for what the
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
 
-<p class="statement" style="margin:3em 0 2.1em 0">
+<p class="statement" style="margin:2em 0 0 0">
     <lh rel="snug">
         <fz size="lg" style="opacity: 0.97">
             Reputation matters.<br>
@@ -41,11 +41,11 @@ They take satisfaction in work done well. They care about continuity — about w
     </lh>
 </p>
 
-<p class="statement" style="margin:2.8em 0 3.2em 0">
-    <fw weight="medium" style="opacity: 0.85">
+<p class="statement" style="margin:2.05em 0 2.15em 0">
+    <fw weight="medium" style="opacity: 0.8">
         <lh rel="snug">
             <fz size="xl">
-                Professionalism cannot be achieved without replacing the selfish "I" with a more responsible and considerate "we".
+                Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
             </fz>
         </lh>
     </fw>
@@ -90,15 +90,47 @@ This effect can be observed everywhere — if only more people who are capable o
 
 ## Rooted in Me
 
-This sense of responsibility has been forming in me since childhood. In many ways, it reflects my entire life.
+<lh rel="relaxed">This sense of responsibility has been forming in me since childhood. In many ways, it reflects my entire life.</lh>
 
-At different stages of my life, various experiences contributed to it. Today, I have perspective — even though I am still relatively young.
+<lh rel="relaxed">At different stages of my life, various experiences contributed to it. Today, I can rely on a well-formed perspective — despite my age.</lh>
 
-I have often thought about others. Work that lacks any form of impact or broader meaning has never truly fulfilled me. I have always been drawn to the idea of a calling, or to higher ideals in general.
+<lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh> 
 
-Over time, this mix of views gradually formed a kind of direction — one that kept leading me to further thinking and reflection.
+<p class="statement" style="margin:2.05em 0 2.15em 0">
+    <fw weight="medium" style="opacity: 0.8">
+        <lh rel="snug">
+            <fz size="xl">
+                Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
+            </fz>
+        </lh>
+    </fw>
+</p>
 
-<sp space="lg" side="top">Until I realized that professionalism offers the form of expression that fits me best.</sp>
+I have always been drawn to the idea of a calling, or to higher ideals in general. Not in a naive sense — but as something that can be lived out in a grounded and fulfilling way.
+
+Over time, this mix of views gradually formed a direction — one that kept leading me toward further reflection.
+
+Until I realized that professionalism provides a way to unify these inclinations into something concrete.
+
+<sp space="lg" side="top">I still remember a television commercial from around 2001, when I was about eight years old. It was from a Czech coffee producer. The message was, of course, deliberately emotional.</sp>
+
+There was a shot of a baker speaking about his relationship to his work. At one point, he said: *“Of course, you have to keep moving, but I believe that if you do things properly, people will appreciate it.”*
+
+<sp space="lg">For some reason, it felt natural to me then, and still does.</sp>
+
+At the time, I also spent a lot of time watching documentary programs. They often presented the world with a kind of directness and clarity, laying the foundations of my values — perhaps more than school ever did — and helping shape the perspective I carry to this day.
+
+I grew up hearing stories about successful Czech individuals and their businesses. My father often spoke of them as something worth admiring, but somewhat distant from our own reality — perhaps understandably so. I never truly saw it that way.
+
+<p class="statement">
+    I often felt that nothing already achieved by others was inherently out of reach.</br> 
+    I didn’t feel the need to reinvent things.</br>
+    Instead, I found myself thinking about what a person is capable of, given what others had already done, and was drawn to applying that same energy to my own creative pursuits.
+</p>
+
+As with anyone, this was a time when my sense of reality was still forming. Since then, a certain idealism has stayed with me — but it has been tempered by realism.
+
+<sp space="lg" side="top">I believe that without idealism, there is no real drive. Realism comes later, to keep it in balance when necessary.</sp>
 
 ## A Defining Turning Point
 

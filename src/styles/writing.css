@@ -216,10 +216,10 @@ ul.post-list > li::before {
 
 /* Article fz: lg = mid bump; xl ≈ former global lg (1.1em) */
 .blog-post .article-body fz[size='lg'] {
-  font-size: 1.04em;
+  font-size: 1.035em;
 }
 .blog-post .article-body fz[size='xl'] {
-  font-size: 1.09em;
+  font-size: 1.055em;
 }
 
 /* Statement: optional inner fz / fw; lh-only uses same margins */
