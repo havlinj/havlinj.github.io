@@ -32,9 +32,9 @@ Put simply: that people receive something of real value in exchange for what the
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
 
-<p class="statement" style="margin:2em 0 0 0">
+<p class="statement" style="margin:1.9em 0 0 0">
     <lh rel="snug">
-        <fz size="lg" style="opacity: 0.97">
+        <fz size="lg" style="opacity: 0.85">
             Reputation matters.<br>
             A reputation built on quality is hard to destroy.
         </fz>
@@ -42,7 +42,7 @@ They take satisfaction in work done well. They care about continuity — about w
 </p>
 
 <p class="statement" style="margin:2.05em 0 2.15em 0">
-    <fw weight="medium" style="opacity: 0.8">
+    <fw weight="medium" style="opacity: 0.7">
         <lh rel="snug">
             <fz size="xl">
                 Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
@@ -96,8 +96,8 @@ This effect can be observed everywhere — if only more people who are capable o
 
 <lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh> 
 
-<p class="statement" style="margin:2.05em 0 2.15em 0">
-    <fw weight="medium" style="opacity: 0.8">
+<p class="statement" style="margin:1.9em 0 2em 0">
+    <fw weight="medium" style="opacity: 0.7">
         <lh rel="snug">
             <fz size="xl">
                 Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
@@ -116,7 +116,15 @@ Until I realized that professionalism provides a way to unify these inclinations
 
 There was a shot of a baker speaking about his relationship to his work. At one point, he said: *“Of course, you have to keep moving, but I believe that if you do things properly, people will appreciate it.”*
 
-<sp space="lg">For some reason, it felt natural to me then, and still does.</sp>
+<p class="statement" style="margin:1.9em 0 2em 0">
+    <fw weight="medium" style="opacity: 0.7">
+        <lh rel="snug">
+            <fz size="xl">
+                For some reason, it felt natural to me then, and still does.
+            </fz>
+        </lh>
+    </fw>
+</p>
 
 At the time, I also spent a lot of time watching documentary programs. They often presented the world with a kind of directness and clarity, laying the foundations of my values — perhaps more than school ever did — and helping shape the perspective I carry to this day.
 
