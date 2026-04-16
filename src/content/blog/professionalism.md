@@ -12,7 +12,7 @@ Some are more fortunate — they genuinely enjoy their work. Yet even then, many
 
 Their relationship to work tends to be narrowly defined. They do it for themselves. Positive feedback pleases them, of course. But beyond that, they rarely think about the impact of their work — not beyond what they directly experience. There is little sense of connection to those who ultimately receive the value they create.
 
-<p class="statement">
+<p class="statement-plain">
     <lh rel="snug">
         There is, however, a higher level.
     </lh>
@@ -22,33 +22,19 @@ At that point, it is no longer just about enjoying the work — responsibility e
 
 A responsible person begins to care deeply about the quality of their work. They think about it. Not out of anxiety or fear of consequences if the work is done poorly. That is not true responsibility — _it is closer to what I would call false responsibility_.
 
-<p class="statement">
-    <lh rel="snug">
-        They feel a need for their work to serve others.
-    </lh>
-</p>
+<p class="statement-soft">They feel a need for their work to serve others.</p>
 
 Put simply: that people receive something of real value in exchange for what they pay. They care about those who depend on their work — those who receive it. This extends beyond end users to colleagues, partners, and suppliers alike.
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
-
-<p class="statement" style="margin:1.9em 0 0 0">
-    <lh rel="snug">
-        <fz size="lg" style="opacity: 0.85">
-            Reputation matters.<br>
-            A reputation built on quality is hard to destroy.
-        </fz>
-    </lh>
+  
+<p class="statement-emphasis" style="margin: 1.95em 3em 0em 0.3em">
+    Reputation matters.<br>
+    A reputation built on quality is hard to destroy.
 </p>
 
-<p class="statement" style="margin:2.05em 0 2.15em 0">
-    <fw weight="medium" style="opacity: 0.7">
-        <lh rel="snug">
-            <fz size="xl">
-                Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
-            </fz>
-        </lh>
-    </fw>
+<p class="statement-hero" style="margin: 2.05em 3em 2.15em 0.3em">
+    Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
 </p>
 
 This shift is reflected in the whole person, especially in their character. Unfortunately, this is not something that can be easily taught. Not everyone will adopt it. Not everyone will understand why it is worth prioritizing others over a purely self-centered approach to work.
@@ -59,9 +45,9 @@ Professionalism is a desirable trait. It should be supported. People who are cap
 
 At times, it feels as if there is less and less space for this today.
 
-<sp space="md" side="top">Everything is measured in money and time.</sp>
+<sp space="lg">Everything is measured in money and time.</sp>
 
-<sp space="lg">Professionalism, as a value, is almost being redefined as a luxury — something most people cannot afford.</sp>
+<p class="statement-soft">Professionalism, as a value, is almost being redefined as a luxury — something most people cannot afford.</p>
 
 As if it were something extra. Something that needs to be paid for. Something society cannot sustain. Really?
 
@@ -79,7 +65,7 @@ Professionalism runs against excessive selectivity. A professional must actively
 
 When done well, these two worlds remain separate. Exceptions will always exist — we are only human. But this is precisely why self-reflection, composure, and a healthy sense of ego must be part of a professional’s toolkit.
 
-<p class="statement">
+<p class="statement-plain">
     Ego should never speak for them.<br>
     Their work should.
 </p>
@@ -96,14 +82,8 @@ This effect can be observed everywhere — if only more people who are capable o
 
 <lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh> 
 
-<p class="statement" style="margin:1.9em 0 2em 0">
-    <fw weight="medium" style="opacity: 0.7">
-        <lh rel="snug">
-            <fz size="xl">
-                Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
-            </fz>
-        </lh>
-    </fw>
+<p class="statement-hero">
+    Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
 </p>
 
 I have always been drawn to the idea of a calling, or to higher ideals in general. Not in a naive sense — but as something that can be lived out in a grounded and fulfilling way.
@@ -116,23 +96,17 @@ Until I realized that professionalism provides a way to unify these inclinations
 
 There was a shot of a baker speaking about his relationship to his work. At one point, he said: *“Of course, you have to keep moving, but I believe that if you do things properly, people will appreciate it.”*
 
-<p class="statement" style="margin:1.9em 0 2em 0">
-    <fw weight="medium" style="opacity: 0.7">
-        <lh rel="snug">
-            <fz size="xl">
-                For some reason, it felt natural to me then, and still does.
-            </fz>
-        </lh>
-    </fw>
+<p class="statement-soft">
+    For some reason, it felt natural to me then, and still does.
 </p>
 
 At the time, I also spent a lot of time watching documentary programs. They often presented the world with a kind of directness and clarity, laying the foundations of my values — perhaps more than school ever did — and helping shape the perspective I carry to this day.
 
 I grew up hearing stories about successful Czech individuals and their businesses. My father often spoke of them as something worth admiring, but somewhat distant from our own reality — perhaps understandably so. I never truly saw it that way.
 
-<p class="statement">
-    I often felt that nothing already achieved by others was inherently out of reach.</br> 
-    I didn’t feel the need to reinvent things.</br>
+<p class="statement-plain">
+    I often felt that nothing already achieved by others was inherently out of reach.<br> 
+    I didn’t feel the need to reinvent things.<br>
     Instead, I found myself thinking about what a person is capable of, given what others had already done, and was drawn to applying that same energy to my own creative pursuits.
 </p>
 

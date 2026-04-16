@@ -72,4 +72,4 @@ As technology continues to surround us more and more, I believe it becomes incre
 
 ---
 
-Among the influences that shaped me, some of the strongest are artistic disciplines rooted in creativity and perception, in part through my time at an economics faculty, since economic forces shape much of today’s world, a general awareness of history and the evolution of ethics, respect for exact sciences and research, both contemporary and historical, engineering, including studies in mechanical engineering, and at times, writing as a form of expression.
+Among other influences that have shaped me, some of the strongest include artistic disciplines rooted in creativity and perception, my time at an economics faculty, as economic forces shape much of today’s world, and a broader awareness of history and the evolution of ethics. I also value the exact sciences and research, both contemporary and historical, engineering, including my studies in mechanical engineering, and, at times, writing as a form of expression.
