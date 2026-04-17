@@ -189,7 +189,6 @@
   );
 }
 
-
 /*
  * Intro-only bottom veil: narrower band used only at scroll start so first two intro
  * paragraphs remain fully bright while we still soften incoming body lines at the edge.
@@ -240,7 +239,8 @@
         var(--why-bottom-veil-height) -
           (var(--why-bottom-veil-height) - var(--why-bottom-veil-end-height)) *
           var(--why-end-phase, 0)
-      ) * 0.72
+      ) *
+      0.72
   );
   z-index: 2;
   pointer-events: none;

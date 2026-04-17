@@ -17,7 +17,6 @@ const ROUTES_WITH_HEADINGS = [
   '/credits',
   '/blog/professionalism',
   '/blog/system-thinking-applied',
-  '/blog/example',
 ] as const;
 
 test.describe('Heading hyphenation', () => {

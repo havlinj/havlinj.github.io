@@ -204,14 +204,14 @@ test.describe('Writing page (/writing)', () => {
       exact: true,
     });
     await expect(featuredList).toBeVisible();
-    await expect(articlesList).toBeVisible();
     await expect(featuredList.locator('a.page-button')).toHaveCount(2);
-    await expect(articlesList.locator('a.page-button')).toHaveCount(1);
+    // Regular list can be hidden when there are zero non-featured posts.
+    await expect(articlesList.locator('a.page-button')).toHaveCount(0);
     await expect(
       page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /Example Article/ }),
+      page.getByRole('link', { name: /Professionalism/ }),
     ).toBeVisible();
   });
 

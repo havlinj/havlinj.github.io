@@ -544,7 +544,10 @@ import {
     );
     const step3Opacity =
       smoothstep(step3InT) * (1 - smoothstep(step3OutT)) * T.STEP3_VEIL_MAX_O;
-    boxEl.style.setProperty('--why-step3-veil-opacity', step3Opacity.toFixed(3));
+    boxEl.style.setProperty(
+      '--why-step3-veil-opacity',
+      step3Opacity.toFixed(3),
+    );
 
     // Separate intro-only narrow veil: strong at scrollTop 0, gone quickly.
     const introFadeBandPx = Math.max(
@@ -691,7 +694,11 @@ import {
   }
 
   function applyCtaAttachedVeil(ctaO) {
-    if (!ctaEl || !(leadForCta instanceof HTMLElement) || ctaO <= T.CTA_O_HIDDEN) {
+    if (
+      !ctaEl ||
+      !(leadForCta instanceof HTMLElement) ||
+      ctaO <= T.CTA_O_HIDDEN
+    ) {
       boxEl.style.setProperty('--why-cta-veil-top', '100%');
       boxEl.style.setProperty('--why-cta-veil-opacity', '0');
       return;
@@ -724,7 +731,10 @@ import {
     const ctaTopLocal = ctaRect.top - boxRect.top;
     const desiredTop = ctaTopLocal - T.CTA_VEIL_ABOVE_ARROW_PX;
     const topEdge = clamp(
-      Math.max(desiredTop, guardBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX),
+      Math.max(
+        desiredTop,
+        guardBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
+      ),
       0,
       boxRect.height,
     );
@@ -985,7 +995,8 @@ import {
     const strictStart = isStrictStartLock();
     const strictEnd = isStrictEndLock(m);
     if (ctaTextDimActive) {
-      if (scrollEl.scrollTop <= T.CTA_TEXT_DIM_EXIT_PX) ctaTextDimActive = false;
+      if (scrollEl.scrollTop <= T.CTA_TEXT_DIM_EXIT_PX)
+        ctaTextDimActive = false;
     } else if (scrollEl.scrollTop >= T.CTA_TEXT_DIM_ENTER_PX) {
       ctaTextDimActive = true;
     }

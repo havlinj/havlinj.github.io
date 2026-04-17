@@ -27,7 +27,7 @@ A responsible person begins to care deeply about the quality of their work. They
 Put simply: that people receive something of real value in exchange for what they pay. They care about those who depend on their work — those who receive it. This extends beyond end users to colleagues, partners, and suppliers alike.
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
-  
+
 <p class="statement-emphasis" style="margin: 1.95em 3em 0em 0.3em">
     Reputation matters.<br>
     A reputation built on quality is hard to destroy.
@@ -80,7 +80,7 @@ This effect can be observed everywhere — if only more people who are capable o
 
 <lh rel="relaxed">At different stages of my life, various experiences contributed to it. Today, I can rely on a well-formed perspective — despite my age.</lh>
 
-<lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh> 
+<lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh>
 
 <p class="statement-hero">
     Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
@@ -94,7 +94,7 @@ Until I realized that professionalism provides a way to unify these inclinations
 
 <sp space="lg" side="top">I still remember a television commercial from around 2001, when I was about eight years old. It was from a Czech coffee producer. The message was, of course, deliberately emotional.</sp>
 
-There was a shot of a baker speaking about his relationship to his work. At one point, he said: *“Of course, you have to keep moving, but I believe that if you do things properly, people will appreciate it.”*
+There was a shot of a baker speaking about his relationship to his work. At one point, he said: _“Of course, you have to keep moving, but I believe that if you do things properly, people will appreciate it.”_
 
 <p class="statement-soft">
     For some reason, it felt natural to me then, and still does.
