@@ -96,9 +96,15 @@ import Layout from '../layouts/Layout.astro';
     (function () {
       'use strict';
 
-      var DISPLAY_MODE_KEY = 'display-mode';
-      var PROMPT_SEEN_KEY = 'display-mode-prompt-seen';
-      var form = document.getElementById('display-settings-form');
+      var KEYS = {
+        displayMode: 'display-mode',
+        promptSeen: 'display-mode-prompt-seen',
+      };
+      var SELECTORS = {
+        form: '#display-settings-form',
+        checkedMode: 'input[name="display-mode"]:checked',
+      };
+      var form = document.querySelector(SELECTORS.form);
       if (!(form instanceof HTMLFormElement)) return;
 
       function likelyLegacyDisplayEnvironment() {
@@ -155,17 +161,17 @@ import Layout from '../layouts/Layout.astro';
       }
 
       var initialMode =
-        window.localStorage.getItem(DISPLAY_MODE_KEY) || 'standard';
+        window.localStorage.getItem(KEYS.displayMode) || 'standard';
       var input = form.querySelector('input[value="' + initialMode + '"]');
       if (input instanceof HTMLInputElement) input.checked = true;
       applyMode(initialMode);
 
       form.addEventListener('change', function () {
-        var selected = form.querySelector('input[name="display-mode"]:checked');
+        var selected = form.querySelector(SELECTORS.checkedMode);
         if (!(selected instanceof HTMLInputElement)) return;
         var mode = selected.value;
-        window.localStorage.setItem(DISPLAY_MODE_KEY, mode);
-        window.localStorage.setItem(PROMPT_SEEN_KEY, '1');
+        window.localStorage.setItem(KEYS.displayMode, mode);
+        window.localStorage.setItem(KEYS.promptSeen, '1');
         applyMode(mode);
       });
     })();

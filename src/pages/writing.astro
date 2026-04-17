@@ -143,10 +143,13 @@ function formatWritingListDate(d: Date): string {
   </noscript>
   <script is:inline define:vars={{ writingPoolUrls }}>
     (() => {
-      const writingArticle = document.querySelector('article.writing-page');
-      const writingGroups = document.querySelector(
-        '.writing-page .writing-groups',
-      );
+      const SELECTORS = {
+        writingArticle: 'article.writing-page',
+        writingGroups: '.writing-page .writing-groups',
+      };
+      const STORAGE_KEY = 'writing-bg-index';
+      const writingArticle = document.querySelector(SELECTORS.writingArticle);
+      const writingGroups = document.querySelector(SELECTORS.writingGroups);
 
       let buttonsRevealed = false;
       function revealWritingButtons() {
@@ -169,15 +172,14 @@ function formatWritingListDate(d: Date): string {
       if (!Array.isArray(writingPoolUrls) || writingPoolUrls.length === 0)
         return;
 
-      const storageKey = 'writing-bg-index';
       const currentIndex = readNonNegativeInt(
-        window.localStorage.getItem(storageKey),
+        window.localStorage.getItem(STORAGE_KEY),
       );
       const selectedUrl =
         writingPoolUrls[currentIndex % writingPoolUrls.length];
       const nextIndex = (currentIndex + 1) % writingPoolUrls.length;
 
-      window.localStorage.setItem(storageKey, String(nextIndex));
+      window.localStorage.setItem(STORAGE_KEY, String(nextIndex));
       writingArticle.style.setProperty('--panel-bg', `url('${selectedUrl}')`);
 
       function readNonNegativeInt(rawValue) {

@@ -71,8 +71,17 @@ const title = 'Contact — Jan Havlín';
   </article>
 
   <script is:inline>
-    const form = document.getElementById('contact-form');
-    const status = document.getElementById('status');
+    const SELECTORS = {
+      form: '#contact-form',
+      status: '#status',
+      submitButton: 'button[type="submit"]',
+      actionsRow: '.contact-form__actions',
+      extraLinksWrapper: '.contact-extra-links-wrapper',
+    };
+    const FIELD_NAMES = ['name', 'email', 'message', 'company'];
+
+    const form = document.querySelector(SELECTORS.form);
+    const status = document.querySelector(SELECTORS.status);
 
     if (form && status) {
       // Build profile URLs from segmented parts to avoid plain static href strings.
@@ -99,12 +108,12 @@ const title = 'Contact — Jan Havlín';
       ]);
 
       // Insert 2 additional organization links right after the Send button.
-      const sendButton = form.querySelector('button[type="submit"]');
-      const actionsRow = form.querySelector('.contact-form__actions');
+      const sendButton = form.querySelector(SELECTORS.submitButton);
+      const actionsRow = form.querySelector(SELECTORS.actionsRow);
       if (
         sendButton &&
         actionsRow instanceof HTMLElement &&
-        !form.querySelector('.contact-extra-links-wrapper')
+        !form.querySelector(SELECTORS.extraLinksWrapper)
       ) {
         const extraLinks = [
           {
@@ -161,8 +170,7 @@ const title = 'Contact — Jan Havlín';
 
       /** New DOM nodes so the browser does not re-apply autofill to the same elements. */
       function replaceContactFieldsWithFreshElements() {
-        const names = ['name', 'email', 'message', 'company'];
-        for (const fieldName of names) {
+        for (const fieldName of FIELD_NAMES) {
           const oldEl = form.querySelector('[name="' + fieldName + '"]');
           if (!oldEl) continue;
           const tag = oldEl.tagName.toLowerCase();
