@@ -83,6 +83,16 @@ export function createWhyScrollVeils(config: {
   }
 
   function applyStartCoverBandSizing(): void {
+    const boxOuterH = boxEl.getBoundingClientRect().height;
+    if (boxOuterH > 1) {
+      boxEl.style.setProperty(
+        '--why-box-outer-height-px',
+        `${Math.round(boxOuterH * 4) / 4}px`,
+      );
+    } else {
+      boxEl.style.removeProperty('--why-box-outer-height-px');
+    }
+
     const rootRem = readRootRemPx();
     const marginPx = T.START_COVER_BELOW_WIDE_REM * rootRem;
     let lineBottom = lastLineBottomInElement(wideP);
@@ -98,22 +108,44 @@ export function createWhyScrollVeils(config: {
     const borderBottom = Number.parseFloat(cs.borderBottomWidth) || 0;
     const innerBottom = scrollB.bottom - borderBottom;
 
+    const boxFloorPx = boxOuterH * T.START_COVER_FRAC_OF_BOX;
+    const boxOnlyPx = Math.min(
+      T.START_COVER_HEIGHT_MAX,
+      Math.max(8, boxOuterH * T.START_COVER_BOX_ONLY_FRAC),
+    );
+
+    function commitHeights(hPx: number): void {
+      const capped = Math.min(T.START_COVER_HEIGHT_MAX, Math.max(8, hPx));
+      const hStr = `${Math.round(capped * 4) / 4}px`;
+      const introVeilHeight = clamp(
+        capped * T.INTRO_BOTTOM_VEIL_HEIGHT_FRAC,
+        T.INTRO_BOTTOM_VEIL_HEIGHT_MIN,
+        T.INTRO_BOTTOM_VEIL_HEIGHT_MAX,
+      );
+      boxEl.style.setProperty(
+        '--why-intro-bottom-veil-height',
+        `${Math.round(introVeilHeight)}px`,
+      );
+      if (hStr !== lastStartCoverHeightStr) {
+        lastStartCoverHeightStr = hStr;
+        boxEl.style.setProperty('--why-start-cover-height', hStr);
+      }
+    }
+
     let hStr: string | null = null;
     if (lineBottom != null && Number.isFinite(lineBottom)) {
       const raw = innerBottom - lineBottom - marginPx;
       if (raw >= 8) {
-        const hPx = Math.min(T.START_COVER_HEIGHT_MAX, raw);
+        const blended = Math.max(raw, boxFloorPx);
+        const hPx = Math.min(T.START_COVER_HEIGHT_MAX, blended);
         hStr = `${Math.round(hPx * 4) / 4}px`;
-        const introVeilHeight = clamp(
-          hPx * T.INTRO_BOTTOM_VEIL_HEIGHT_FRAC,
-          T.INTRO_BOTTOM_VEIL_HEIGHT_MIN,
-          T.INTRO_BOTTOM_VEIL_HEIGHT_MAX,
-        );
-        boxEl.style.setProperty(
-          '--why-intro-bottom-veil-height',
-          `${Math.round(introVeilHeight)}px`,
-        );
+        commitHeights(hPx);
       }
+    }
+
+    if (hStr == null && boxOuterH > 1) {
+      commitHeights(boxOnlyPx);
+      hStr = 'committed';
     }
 
     if (hStr == null) {
@@ -123,10 +155,6 @@ export function createWhyScrollVeils(config: {
       }
       boxEl.style.removeProperty('--why-intro-bottom-veil-height');
       return;
-    }
-    if (hStr !== lastStartCoverHeightStr) {
-      lastStartCoverHeightStr = hStr;
-      boxEl.style.setProperty('--why-start-cover-height', hStr);
     }
   }
 

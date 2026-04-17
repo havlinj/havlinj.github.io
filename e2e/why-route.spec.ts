@@ -4,6 +4,8 @@ import {
   WHY_CTA_ARROW_FLOOR_OPACITY,
   WHY_CTA_ARROW_PEAK_OPACITY,
   WHY_CTA_BOX_WIDTH_FRAC,
+  WHY_CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
+  WHY_CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX,
   WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH,
   WHY_GIF_TOP_INSET,
   WHY_SCROLL_CTA_CONTAINER_CQW,
@@ -1050,6 +1052,86 @@ test.describe('/why page @serial', () => {
       narrowDelta!,
       'CTA top should keep 3/5 anchor at narrow viewport (no progressive pull)',
     ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+  });
+
+  test('CTA veil top: below lead/wide+clearance and above arrow+min gap when feasible', async ({
+    page,
+  }) => {
+    const tol = LAYOUT_TOLERANCE;
+
+    const readVeilLayout = () =>
+      page.evaluate(
+        ([clearancePx, minGapPx]) => {
+          const box = document.querySelector('.why-page .why-box');
+          const lead = document.querySelector('.why-page p.why-lead');
+          const wide = document.querySelector('.why-page p.why-p--wide');
+          const cta = document.querySelector('.why-page .why-scroll-cta');
+          if (!box || !cta) return null;
+          const boxRect = box.getBoundingClientRect();
+          const leadBot =
+            lead instanceof HTMLElement
+              ? lead.getBoundingClientRect().bottom
+              : Number.NEGATIVE_INFINITY;
+          const wideBot =
+            wide instanceof HTMLElement
+              ? wide.getBoundingClientRect().bottom
+              : Number.NEGATIVE_INFINITY;
+          const guardBottom = Math.max(leadBot, wideBot);
+          if (!Number.isFinite(guardBottom)) return null;
+          const guardBottomLocal = guardBottom - boxRect.top;
+          const ctaTopLocal = cta.getBoundingClientRect().top - boxRect.top;
+          const cs = getComputedStyle(box);
+          const veilTopStr = cs.getPropertyValue('--why-cta-veil-top').trim();
+          const veilOp = parseFloat(
+            cs.getPropertyValue('--why-cta-veil-opacity').trim() || '0',
+          );
+          const veilTopPx = Number.parseFloat(veilTopStr);
+          if (!Number.isFinite(veilTopPx)) return null;
+          const textFloor = guardBottomLocal + clearancePx;
+          const arrowCeiling = ctaTopLocal - minGapPx;
+          const infeasible = textFloor > arrowCeiling;
+          return {
+            veilTopPx,
+            veilOp,
+            guardBottomLocal,
+            ctaTopLocal,
+            textFloor,
+            arrowCeiling,
+            infeasible,
+          };
+        },
+        [
+          WHY_CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
+          WHY_CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX,
+        ] as const,
+      );
+
+    for (const [width, height] of [
+      [900, 520],
+      [760, 520],
+      [400, 560],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await gotoWhyWhenReady(page);
+      await waitTwoFrames(page);
+      await waitTwoFrames(page);
+
+      const m = await readVeilLayout();
+      expect(m, `layout snapshot at ${width}×${height}`).not.toBeNull();
+      if (m!.veilOp <= 0.05) continue;
+
+      expect(
+        m!.veilTopPx,
+        `veil top ≥ text floor (viewport ${width}×${height})`,
+      ).toBeGreaterThanOrEqual(m!.textFloor - tol);
+
+      if (!m!.infeasible) {
+        expect(
+          m!.veilTopPx,
+          `veil top ≤ arrow ceiling (viewport ${width}×${height})`,
+        ).toBeLessThanOrEqual(m!.arrowCeiling + tol);
+      }
+    }
   });
 
   test('CTA arrow scales inversely as Why box narrows', async ({ page }) => {

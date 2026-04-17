@@ -103,9 +103,10 @@ export function applyCtaAttachedVeil(params: {
   wideP: Element | null;
   ctaOpacity: number;
   ctaHiddenOpacity: number;
-  veilProximityBandPx: number;
   veilAboveArrowPx: number;
   veilClearanceBelowLeadPx: number;
+  /** Max `top` for veil (px): `ctaTopLocal - this` so black stays clearly above the arrow. */
+  veilMinGapAboveArrowPx: number;
 }): void {
   if (
     !(params.ctaEl instanceof HTMLElement) ||
@@ -130,11 +131,8 @@ export function applyCtaAttachedVeil(params: {
     params.boxEl.style.setProperty('--why-cta-veil-opacity', '0');
     return;
   }
-  const distance = ctaRect.top - leadBottom;
-  const band = Math.max(params.veilProximityBandPx, ctaRect.height * 2.6);
-  const proximity = clamp(1 - distance / band, 0, 1);
-  const localStrength = clamp(0.86 + 0.14 * smoothstep(proximity), 0, 1);
-  const o = localStrength * params.ctaOpacity;
+  /* Solid ink: opacity tracks CTA fade only (no proximity ramp — avoids letters showing through). */
+  const o = params.ctaOpacity;
   const wideBottomPx =
     wideBottom != null && Number.isFinite(wideBottom)
       ? wideBottom
@@ -142,12 +140,17 @@ export function applyCtaAttachedVeil(params: {
   const guardBottom = Math.max(leadBottom, wideBottomPx);
   const guardBottomLocal = guardBottom - boxRect.top;
   const ctaTopLocal = ctaRect.top - boxRect.top;
+  const textFloor = guardBottomLocal + params.veilClearanceBelowLeadPx;
+  const arrowCeiling = ctaTopLocal - params.veilMinGapAboveArrowPx;
   const desiredTop = ctaTopLocal - params.veilAboveArrowPx;
-  const topEdge = clamp(
-    Math.max(desiredTop, guardBottomLocal + params.veilClearanceBelowLeadPx),
-    0,
-    boxRect.height,
-  );
+  let topEdge: number;
+  if (textFloor > arrowCeiling) {
+    /* Rare: wide copy sits high vs arrow — keep text safe; arrow gap may shrink slightly. */
+    topEdge = textFloor;
+  } else {
+    topEdge = Math.min(Math.max(desiredTop, textFloor), arrowCeiling);
+  }
+  topEdge = clamp(topEdge, 0, boxRect.height);
   params.boxEl.style.setProperty(
     '--why-cta-veil-top',
     `${Math.round(topEdge)}px`,

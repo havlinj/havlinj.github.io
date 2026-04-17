@@ -141,6 +141,15 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     START_COVER_BELOW_WIDE_REM: 0.9,
     /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
     START_COVER_HEIGHT_MAX: 300,
+    /**
+     * Floor for start-cover / intro-veil band height vs `.why-box` outer height so veils track
+     * the black panel when the viewport or box grows (not only the text gap below `.why-p--wide`).
+     */
+    START_COVER_FRAC_OF_BOX: 0.165,
+    /**
+     * When the text gap cannot be measured (`raw < 8`), derive height only from box height.
+     */
+    START_COVER_BOX_ONLY_FRAC: 0.155,
     /** After intro band: 1 = same "full" layer intensity as the top ::before (it only scales the gradient). */
     BOTTOM_VEIL_MAX_O: 1,
     /** Step-3-only veil window (short, mild helper veil after step-2). */
@@ -172,12 +181,15 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     CTA_SCALE_MAX_BOOST: 0.28,
     /** CTA center is this fraction from lead-bottom toward box-bottom. */
     CTA_FROM_LEAD_TO_BOTTOM_FRAC: 0.6,
-    /** CTA-attached veil ramps when arrow gets close to lead line. */
-    CTA_VEIL_PROXIMITY_BAND_PX: 130,
-    /** Keep CTA veil top safely below the lead line. */
-    CTA_VEIL_CLEARANCE_BELOW_LEAD_PX: 8,
-    /** Start full-black CTA veil slightly above arrow top edge. */
+    /** Min px below bottom of `.why-lead` / `.why-p--wide` before veil may start (zoom-stable air gap). */
+    CTA_VEIL_CLEARANCE_BELOW_LEAD_PX: 28,
+    /** Preferred offset: veil top this many px above arrow top (soft target). */
     CTA_VEIL_ABOVE_ARROW_PX: 6,
+    /**
+     * Hard cap: veil top must stay at least this many px above arrow top at all zooms
+     * (smaller topEdge in px = higher on box). Tighten if black creeps toward the chevron.
+     */
+    CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX: 16,
     /** Hysteresis for CTA overlap dimming to avoid early dim/bright flicker. */
     CTA_TEXT_DIM_ENTER_PX: 116,
     CTA_TEXT_DIM_EXIT_PX: 92,
@@ -541,9 +553,9 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       wideP,
       ctaOpacity: ctaO,
       ctaHiddenOpacity: T.CTA_O_HIDDEN,
-      veilProximityBandPx: T.CTA_VEIL_PROXIMITY_BAND_PX,
       veilAboveArrowPx: T.CTA_VEIL_ABOVE_ARROW_PX,
       veilClearanceBelowLeadPx: T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
+      veilMinGapAboveArrowPx: T.CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX,
     });
     const ctaZone = buildCtaZone({
       ctaEl,

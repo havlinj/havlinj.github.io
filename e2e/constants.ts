@@ -16,6 +16,11 @@ export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
  */
 export const WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH = 400;
 
+/** Sync: `CTA_VEIL_CLEARANCE_BELOW_LEAD_PX` in `src/scripts/why-box-scroll.ts`. */
+export const WHY_CTA_VEIL_CLEARANCE_BELOW_LEAD_PX = 28;
+/** Sync: `CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX` in `src/scripts/why-box-scroll.ts`. */
+export const WHY_CTA_VEIL_MIN_GAP_ABOVE_ARROW_PX = 16;
+
 /** /why layout — single source: `src/constants/why-layout.ts` */
 export {
   WHY_CTA_ARROW_FLOOR_OPACITY,

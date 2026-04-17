@@ -6,11 +6,12 @@
    1) Shell     — .why-wrapper / .why-box: panel colors, container-type, default veil heights,
                   --why-end-phase, --why-end-top-veil-grow, --why-top-edge-opacity,
                   .why-intro-top-band: --why-intro-top-band-height, --why-intro-top-band-opacity (why-box-scroll.ts)
-   2) CTA stack — .why-scroll-cta (--why-cta-horizontal on .why-box), .why-cta-veil: --why-cta-top/scale/opacity,
-                  --why-cta-veil-top/opacity (why-scroll-cta.ts)
+   2) CTA stack — .why-scroll-cta (--why-cta-horizontal on .why-box), .why-cta-veil + ::after solid strip,
+                  --why-cta-top/scale/opacity, --why-cta-veil-top/opacity (why-scroll-cta.ts)
    3) Phase veils — .why-end-cover, .why-start-cover, .why-box-bottom-veil,
-                  .why-box-intro-bottom-veil, .why-box-step3-veil, ::before/::after:
-                  --why-start-cover-*, --why-bottom-veil-*, --why-intro-bottom-veil-*,
+                  .why-box-step2-veil (scroll step 2), .why-box-step3-veil, ::before/::after:
+                  --why-start-cover-*, --why-bottom-veil-*, --why-intro-bottom-veil-* (step 2),
+                  --why-box-outer-height-px (box height; veils scale with it in JS),
                   --why-step3-veil-*, --why-end-cover-opacity, --why-top-veil-current-height-px
                   (why-scroll-veils.ts + start-cover sizing in layout pass)
    4) Scrollport — .why-scroll / .why-content: --why-font-scale, --why-copy-font-size,
@@ -104,7 +105,8 @@
    */
   top: var(--why-cta-top, 72%);
   bottom: auto;
-  z-index: 9;
+  /* Above .why-scroll (1) + in-scroll copy (p z-index 6); strip on .why-cta-veil must sit under arrow only. */
+  z-index: 13;
   transform: translate(-50%, -50%) scale(var(--why-cta-scale, 1));
   transform-origin: center center;
   pointer-events: none;
@@ -130,9 +132,25 @@
   right: 0;
   top: var(--why-cta-veil-top, 100%);
   bottom: 0;
-  z-index: 8;
+  /* Must paint above .why-scroll stacking context so the strip + fill cover intro copy. */
+  z-index: 12;
+  isolation: isolate;
   pointer-events: none;
   opacity: var(--why-cta-veil-opacity, 0);
+  background: var(--why-box-bg);
+}
+
+/* Short strip above solid veil; ::after opacity 1 (no second multiply vs --why-cta-opacity). */
+.why-page .why-box > .why-cta-veil::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -12px;
+  height: 12px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
   background: var(--why-box-bg);
 }
 
@@ -236,10 +254,10 @@
 }
 
 /*
- * Intro-only bottom veil: narrower band used only at scroll start so first two intro
- * paragraphs remain fully bright while we still soften incoming body lines at the edge.
+ * Scroll step 2 — bottom intro veil (was .why-box-intro-bottom-veil): narrow band at
+ * scroll start; first intro lines stay bright while body lines soften at the edge.
  */
-.why-page .why-box > .why-box-intro-bottom-veil {
+.why-page .why-box > .why-box-step2-veil {
   position: absolute;
   left: 0;
   right: 0;
@@ -257,17 +275,19 @@
   z-index: 2;
   pointer-events: none;
   opacity: var(--why-intro-bottom-veil-opacity, 0);
+  /*
+   * Soft top feather: `--why-intro-bottom-veil-hard` deepens the mid band only; 100% stays
+   * transparent so the upper edge never reads as a solid cap against intro copy.
+   */
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    var(--why-box-bg) calc(38% + 24% * var(--why-intro-bottom-veil-hard, 0)),
-    rgba(17, 17, 17, calc(0.92 + 0.08 * var(--why-intro-bottom-veil-hard, 0)))
-      56%,
-    rgba(17, 17, 17, calc(0.56 + 0.34 * var(--why-intro-bottom-veil-hard, 0)))
-      78%,
-    rgba(17, 17, 17, calc(0.08 + 0.92 * var(--why-intro-bottom-veil-hard, 0)))
-      calc(88% + 7% * var(--why-intro-bottom-veil-hard, 0)),
-    rgba(17, 17, 17, calc(0 + 1 * var(--why-intro-bottom-veil-hard, 0))) 100%
+    var(--why-box-bg) calc(28% + 16% * var(--why-intro-bottom-veil-hard, 0)),
+    rgba(17, 17, 17, calc(0.42 + 0.38 * var(--why-intro-bottom-veil-hard, 0))) 40%,
+    rgba(17, 17, 17, calc(0.22 + 0.28 * var(--why-intro-bottom-veil-hard, 0))) 54%,
+    rgba(17, 17, 17, calc(0.1 + 0.14 * var(--why-intro-bottom-veil-hard, 0))) 68%,
+    rgba(17, 17, 17, calc(0.03 + 0.06 * var(--why-intro-bottom-veil-hard, 0))) 82%,
+    rgba(17, 17, 17, 0) 100%
   );
 }
 
@@ -291,12 +311,15 @@
   z-index: 2;
   pointer-events: none;
   opacity: var(--why-step3-veil-opacity, 0);
+  /* Softer, more transparent top feather than the intro bottom veil. */
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    rgba(17, 17, 17, 0.9) 24%,
-    rgba(17, 17, 17, 0.58) 52%,
-    rgba(17, 17, 17, 0.24) 78%,
+    rgba(17, 17, 17, 0.72) 16%,
+    rgba(17, 17, 17, 0.42) 34%,
+    rgba(17, 17, 17, 0.2) 52%,
+    rgba(17, 17, 17, 0.08) 72%,
+    rgba(17, 17, 17, 0.02) 88%,
     rgba(17, 17, 17, 0) 100%
   );
 }
