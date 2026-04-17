@@ -50,6 +50,14 @@ import {
     FIT_SAFETY_PX: 3,
     START_COVER_BAND_MIN: 85,
     START_COVER_BAND_FRAC: 0.26,
+    /** Keep the start bottom cover fully visible for the first tiny scroll move(s). */
+    START_COVER_HOLD_PX: 52,
+    /** Fade span after hold; starts later so cover removal happens around the third notch. */
+    START_COVER_FADE_PX: 58,
+    /** Keep intro veil in "hard" state through the second notch. */
+    INTRO_BOTTOM_VEIL_HARD_HOLD_PX: 112,
+    /** Then release hard state smoothly during the next notch. */
+    INTRO_BOTTOM_VEIL_HARD_FADE_PX: 52,
     /** Keep bottom fade band below `.why-p--wide` last line (+ this gap); drives --why-start-cover-height. */
     START_COVER_BELOW_WIDE_REM: 0.5,
     /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
@@ -60,7 +68,7 @@ import {
      * At scrollTop ≈ 0, intro-only narrow bottom veil opacity (separate layer).
      * Keeps incoming body lines softened at the viewport edge without dimming the second intro line.
      */
-    INTRO_BOTTOM_VEIL_BASE: 0.96,
+    INTRO_BOTTOM_VEIL_BASE: 1,
     /** Intro-only veil fades out faster than start-cover so only the opening moment is affected. */
     INTRO_BOTTOM_VEIL_FADE_BAND_FRAC: 0.48,
     /** Narrower intro-only veil height relative to measured start-cover height. */
@@ -438,11 +446,24 @@ import {
       T.START_COVER_BAND_MIN,
       scrollEl.clientHeight * T.START_COVER_BAND_FRAC,
     );
-    const startProgress = clamp(scrollEl.scrollTop / startBandPx, 0, 1);
+    const holdPx = Math.min(T.START_COVER_HOLD_PX, startBandPx * 0.6);
+    const fadePx = Math.max(1, Math.min(T.START_COVER_FADE_PX, startBandPx));
+    const startProgress = clamp((scrollEl.scrollTop - holdPx) / fadePx, 0, 1);
     const startOpacity = 1 - smoothstep(startProgress);
     boxEl.style.setProperty(
       '--why-start-cover-opacity',
       startOpacity.toFixed(3),
+    );
+    const introHardProgress = clamp(
+      (scrollEl.scrollTop - T.INTRO_BOTTOM_VEIL_HARD_HOLD_PX) /
+        T.INTRO_BOTTOM_VEIL_HARD_FADE_PX,
+      0,
+      1,
+    );
+    const introHardPhase = 1 - smoothstep(introHardProgress);
+    boxEl.style.setProperty(
+      '--why-intro-bottom-veil-hard',
+      introHardPhase.toFixed(3),
     );
     const sm = smoothstep(startProgress);
     const outwardRamp = sm * T.BOTTOM_VEIL_MAX_O;
@@ -457,9 +478,17 @@ import {
       1,
       startBandPx * T.INTRO_BOTTOM_VEIL_FADE_BAND_FRAC,
     );
-    const introProgress = clamp(scrollEl.scrollTop / introFadeBandPx, 0, 1);
-    const introOpacity =
+    const introHoldPx = Math.min(holdPx * 0.8, introFadeBandPx * 0.45);
+    const introProgress = clamp(
+      (scrollEl.scrollTop - introHoldPx) / introFadeBandPx,
+      0,
+      1,
+    );
+    const introOpacityBase =
       (1 - smoothstep(introProgress)) * T.INTRO_BOTTOM_VEIL_BASE;
+    // While hard phase is active, force intro veil opacity to max so early wheel notches
+    // fully hide revolver motion at the bottom edge.
+    const introOpacity = Math.max(introOpacityBase, introHardPhase);
     boxEl.style.setProperty(
       '--why-intro-bottom-veil-opacity',
       introOpacity.toFixed(3),

@@ -158,17 +158,24 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px));
+  height: calc(
+    var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px)) *
+      (1 + 0.34 * var(--why-intro-bottom-veil-hard, 0))
+  );
   z-index: 2;
   pointer-events: none;
   opacity: var(--why-intro-bottom-veil-opacity, 0);
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    var(--why-box-bg) 22%,
-    rgba(17, 17, 17, 0.68) 52%,
-    rgba(17, 17, 17, 0.22) 76%,
-    rgba(17, 17, 17, 0) 100%
+    var(--why-box-bg) calc(30% + 18% * var(--why-intro-bottom-veil-hard, 0)),
+    rgba(17, 17, 17, calc(0.88 + 0.12 * var(--why-intro-bottom-veil-hard, 0)))
+      56%,
+    rgba(17, 17, 17, calc(0.44 + 0.28 * var(--why-intro-bottom-veil-hard, 0)))
+      78%,
+    rgba(17, 17, 17, calc(0.08 + 0.92 * var(--why-intro-bottom-veil-hard, 0)))
+      calc(88% + 7% * var(--why-intro-bottom-veil-hard, 0)),
+    rgba(17, 17, 17, calc(0 + 1 * var(--why-intro-bottom-veil-hard, 0))) 100%
   );
 }
 

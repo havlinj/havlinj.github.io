@@ -717,6 +717,71 @@ test.describe('/why page @serial', () => {
     ).toBeLessThan(rawDelta * 0.92);
   });
 
+  test('intro bottom veil stays hard for first two wheel steps, then releases on third', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const scroll = page.locator('.why-page .why-scroll');
+    const box = page.locator('.why-page .why-box');
+    const rect = await scroll.boundingBox();
+    expect(rect).toBeTruthy();
+    await page.mouse.move(
+      rect!.x + rect!.width / 2,
+      rect!.y + rect!.height / 2,
+    );
+
+    const readVeil = async () =>
+      box.evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return {
+          hard: parseFloat(
+            cs.getPropertyValue('--why-intro-bottom-veil-hard').trim() || '0',
+          ),
+          introOpacity: parseFloat(
+            cs
+              .getPropertyValue('--why-intro-bottom-veil-opacity')
+              .trim() || '0',
+          ),
+        };
+      });
+
+    await setWhyScrollTop(page, 0);
+    await waitTwoFrames(page);
+
+    const wheelStep = 120;
+    await page.mouse.wheel(0, wheelStep);
+    await waitTwoFrames(page);
+    const afterFirst = await readVeil();
+
+    await page.mouse.wheel(0, wheelStep);
+    await waitTwoFrames(page);
+    const afterSecond = await readVeil();
+
+    await page.mouse.wheel(0, wheelStep);
+    await waitTwoFrames(page);
+    const afterThird = await readVeil();
+
+    expect(afterFirst.hard, '1st step should keep hard veil near max').toBe(
+      1,
+    );
+    expect(
+      afterSecond.hard,
+      `2nd step should still keep hard veil, got ${afterSecond.hard}`,
+    ).toBeGreaterThanOrEqual(0.95);
+    expect(
+      afterSecond.introOpacity,
+      `2nd step intro opacity should still be near full, got ${afterSecond.introOpacity}`,
+    ).toBeGreaterThanOrEqual(0.95);
+    expect(
+      afterThird.hard,
+      `3rd step should start releasing hard veil, got ${afterThird.hard}`,
+    ).toBeLessThan(0.95);
+    expect(afterThird.hard).toBeLessThan(afterSecond.hard);
+  });
+
   test('prefers-reduced-motion: wheel bypasses damped handler (reload for media)', async ({
     page,
   }) => {
