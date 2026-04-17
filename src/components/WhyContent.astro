@@ -39,13 +39,20 @@ import '../styles/why.css';
 
         <div class="why-gif-holder" aria-hidden="true">
           <div class="why-gif-frame">
-            <img
+            <video
               class="why-gif"
-              src="/assets/pages/profile/why/nicola_narracci_14570518_1920_1080_30fps_pexels_dichrom.gif"
-              alt=""
-              loading="eager"
-              decoding="async"
-            />
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-hidden="true"
+            >
+              <source
+                src="/assets/pages/profile/why/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom.mp4"
+                type="video/mp4"
+              />
+            </video>
           </div>
         </div>
 

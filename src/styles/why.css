@@ -630,6 +630,7 @@
   height: 100%;
   display: block;
   object-fit: cover;
+  pointer-events: none;
 
   /* Dissolve corners: top-right + bottom-left.
      This version uses diagonal fades along the two diagonals. */

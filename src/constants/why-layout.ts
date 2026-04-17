@@ -25,6 +25,23 @@ export const WHY_GIF_TOP_INSET = '2.11em';
  */
 export const WHY_GIF_BASE_OPACITY = 0.7;
 
+/**
+ * Background clip `playbackRate` oscillates in time only (not tied to scroll / wheel).
+ * Tuning (if the effect feels invisible): (1) shorten `SINE_PERIOD_MS` — long periods mean
+ * glacial change; (2) widen `SINE_HIGH − SINE_LOW` — e.g. 0.35→1.15 reads clearly on motion;
+ * (3) try `WAVE: 'triangle'` — linear sweep through speeds vs smooth sine dwell near extrema.
+ * Phase: `phase = 2π * tSec / (SINE_PERIOD_MS/1000) + SINE_PHASE_RAD`, `tSec = performance.now()/1000`.
+ */
+export const WHY_CLIP_PLAYBACK_SINE_LOW = 0.32;
+export const WHY_CLIP_PLAYBACK_SINE_HIGH = 1.12;
+/** Duration of one full wave cycle (milliseconds). */
+export const WHY_CLIP_PLAYBACK_SINE_PERIOD_MS = 5200;
+/** Added to wave phase (radians). */
+export const WHY_CLIP_PLAYBACK_SINE_PHASE_RAD = 0;
+
+/** `sine` — smooth; `triangle` — constant rate of change through LOW↔HIGH (often easier to notice). */
+export const WHY_CLIP_PLAYBACK_WAVE: 'sine' | 'triangle' = 'triangle';
+
 /** Scroll-hint arrow: `AnimatedArrow` `containerCqw` (width vs `.why-box`). */
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
 

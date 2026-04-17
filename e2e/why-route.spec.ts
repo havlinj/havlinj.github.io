@@ -117,18 +117,22 @@ test.describe('/why page @serial', () => {
     expect(longest).toBe(WHY_FIT_REFERENCE_LINE);
   });
 
-  test('shows Why title, lead copy, and GIF asset', async ({ page }) => {
+  test('shows Why title, lead copy, and loop video asset', async ({ page }) => {
     await expect(
       page.getByRole('heading', { name: 'Why', level: 1 }),
     ).toBeVisible();
     await expect(page.locator('.why-page p.why-lead')).toHaveText(
       "I'm a software engineer.",
     );
-    const gif = page.locator('.why-page .why-gif');
-    await expect(gif).toBeVisible();
-    await expect(gif).toHaveAttribute(
+    const clip = page.locator('.why-page video.why-gif');
+    await expect(clip).toBeVisible();
+    await expect(clip).toHaveJSProperty('loop', true);
+    const mp4 = page.locator(
+      '.why-page video.why-gif source[type="video/mp4"]',
+    );
+    await expect(mp4).toHaveAttribute(
       'src',
-      /\/assets\/pages\/profile\/why\/.+\.gif/,
+      /\/assets\/pages\/profile\/why\/.+\.mp4/,
     );
   });
 
