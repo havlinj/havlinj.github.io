@@ -83,6 +83,9 @@ import {
     CTA_ZONE_PAD_H_FRAC: 0.35,
     CTA_ZONE_PAD_TOP: 16,
     CTA_ZONE_PAD_BOTTOM: 28,
+    /** Hysteresis for CTA overlap dimming to avoid early dim/bright flicker. */
+    CTA_TEXT_DIM_ENTER_PX: 116,
+    CTA_TEXT_DIM_EXIT_PX: 92,
     /** 0.5 = halfway between ref line bottom and box bottom; higher = closer to box bottom. */
     CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM: 0.55,
     /** Keep CTA vertical center inside the box if geometry goes odd while scrolling. */
@@ -99,6 +102,9 @@ import {
     INTRO_LINE_COUNT: 2,
     INTRO_RAMP_MIN: 100,
     INTRO_RAMP_FRAC: 0.22,
+    /** Hysteresis around strict-start lock threshold to prevent on/off flicker at handoff. */
+    INTRO_STRICT_LOCK_ENTER_FRAC: 0.33,
+    INTRO_STRICT_LOCK_EXIT_FRAC: 0.39,
     /**
      * Top of `.why-lead` sits at LEAD_TOP_FRAC × .why-box height from the box top (scroll panel).
      * padTop + topSpacer + introGifPad = H * LEAD_TOP_FRAC − padTop. (Older “from bottom” baseline
@@ -159,6 +165,10 @@ import {
     FONT_SCALE_QUANT: 0.005,
     /** <1 = mouse wheel moves the panel slower (only when we handle wheel below). */
     WHEEL_SCROLL_FACTOR: 0.78,
+    /** Per-frame catch-up toward wheel target scrollTop (higher = quicker, lower = smoother). */
+    WHEEL_TARGET_EASE: 0.42,
+    /** Snap to wheel target when close to avoid endless tiny increments. */
+    WHEEL_TARGET_SNAP_PX: 0.45,
     /**
      * ~1 keeps revolver catching up while lines move through the band (too low = they never
      * read as smaller + inset). Wheel damping already slows scroll; lerp stays fairly snappy.
@@ -176,6 +186,8 @@ import {
   let lastMaxScrollForRevolverFreeze = -1;
   let hasAppliedRevolverOnce = false;
   let revolverIdleStreak = 0;
+  let strictStartLockActive = true;
+  let ctaTextDimActive = false;
   /** When true, skip font fit this frame — breaks measure↔scale feedback while revolver is frozen. */
   let prevFrameRevolverIdle = false;
   const lineLastRevolverStyles = new WeakMap();
@@ -274,7 +286,15 @@ import {
       scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
     );
     // Near scroll top: opening scene fixed — applied only to first INTRO_LINE_COUNT lines in revolver.
-    return scrollEl.scrollTop <= introRampPx * 0.35;
+    // Use small hysteresis so boundary noise does not rapidly toggle lock on/off (visible blink).
+    const enterPx = introRampPx * T.INTRO_STRICT_LOCK_ENTER_FRAC;
+    const exitPx = introRampPx * T.INTRO_STRICT_LOCK_EXIT_FRAC;
+    if (strictStartLockActive) {
+      if (scrollEl.scrollTop > exitPx) strictStartLockActive = false;
+    } else if (scrollEl.scrollTop < enterPx) {
+      strictStartLockActive = true;
+    }
+    return strictStartLockActive;
   }
 
   function isStrictEndLock(m) {
@@ -854,6 +874,12 @@ import {
     const lerp = revolverLerpForDelta(scrollDeltaPx);
     const strictStart = isStrictStartLock();
     const strictEnd = isStrictEndLock(m);
+    if (ctaTextDimActive) {
+      if (scrollEl.scrollTop <= T.CTA_TEXT_DIM_EXIT_PX) ctaTextDimActive = false;
+    } else if (scrollEl.scrollTop >= T.CTA_TEXT_DIM_ENTER_PX) {
+      ctaTextDimActive = true;
+    }
+    const effectiveCtaZone = ctaTextDimActive ? ctaZone : null;
     const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
     const viewportCenterContentY = viewportCenterContentYStable();
     lines.forEach((line, lineIndex) => {
@@ -880,10 +906,10 @@ import {
       if (phaseGate <= 0.001 || strictStartThisLine || strictEnd) {
         lineBlendState[lineIndex] = 0;
         let lineOp = 1;
-        if (ctaZone && !line.classList.contains('why-lead')) {
+        if (effectiveCtaZone && !line.classList.contains('why-lead')) {
           lineOp = ctaOverlapMultiplier(
             line.getBoundingClientRect(),
-            ctaZone,
+            effectiveCtaZone,
             T.LINE_OVERLAP_Y,
             T.LINE_OVERLAP_X,
           );
@@ -910,10 +936,10 @@ import {
       const inset = maxInset * blendedEased;
 
       let lineOp = 1;
-      if (ctaZone && !isLead) {
+      if (effectiveCtaZone && !isLead) {
         lineOp = ctaOverlapMultiplier(
           line.getBoundingClientRect(),
-          ctaZone,
+          effectiveCtaZone,
           T.LINE_OVERLAP_Y,
           T.LINE_OVERLAP_X,
         );
@@ -1057,6 +1083,7 @@ import {
   let lastIntroGifPadStr = '';
   let lastStartCoverHeightStr = '';
   let resizeQuietTimer = 0;
+  let wheelTargetTop = Number.NaN;
 
   const requestZoomSettle = (frames = 4) => {
     settleFrames = Math.max(settleFrames, frames);
@@ -1084,6 +1111,18 @@ import {
 
   function update() {
     rafId = 0;
+
+    if (Number.isFinite(wheelTargetTop)) {
+      const cur = scrollEl.scrollTop;
+      const target = wheelTargetTop;
+      const dist = target - cur;
+      if (Math.abs(dist) <= T.WHEEL_TARGET_SNAP_PX) {
+        scrollEl.scrollTop = target;
+        wheelTargetTop = Number.NaN;
+      } else {
+        scrollEl.scrollTop = cur + dist * T.WHEEL_TARGET_EASE;
+      }
+    }
 
     if (!prevFrameRevolverIdle) {
       applyFontScaleStep();
@@ -1157,6 +1196,9 @@ import {
       settleFrames -= 1;
       schedule();
     }
+    if (Number.isFinite(wheelTargetTop)) {
+      schedule();
+    }
   }
 
   function afterTwoFrames(fn) {
@@ -1190,7 +1232,10 @@ import {
         scrollEl.scrollHeight - scrollEl.clientHeight,
       );
       const dy = wheelDeltaToPixels(event) * T.WHEEL_SCROLL_FACTOR;
-      scrollEl.scrollTop = clamp(scrollEl.scrollTop + dy, 0, maxScroll);
+      const base = Number.isFinite(wheelTargetTop)
+        ? wheelTargetTop
+        : scrollEl.scrollTop;
+      wheelTargetTop = clamp(base + dy, 0, maxScroll);
       schedule();
     },
     { passive: false },
