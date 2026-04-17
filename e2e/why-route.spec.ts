@@ -913,6 +913,233 @@ test.describe('/why page @serial', () => {
     expect(Math.abs(start!.i0 - start!.i1)).toBeLessThan(0.08);
   });
 
+  test('wide intro line remains fully opaque and untransformed near scroll start', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const checks = await page.evaluate(async () => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      const wide = document.querySelector(
+        '.why-page p.why-p--wide',
+      ) as HTMLElement | null;
+      if (!scroll || !wide) return null;
+
+      const waitFrames = (n = 3) =>
+        new Promise<void>((resolve) => {
+          const run = (left: number) => {
+            if (left <= 0) return resolve();
+            requestAnimationFrame(() => run(left - 1));
+          };
+          run(n);
+        });
+
+      const sampleAt = async (top: number) => {
+        scroll.scrollTop = top;
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+        await waitFrames();
+        const cs = getComputedStyle(wide);
+        return {
+          top,
+          op: parseFloat(cs.getPropertyValue('--why-line-opacity') || cs.opacity),
+          s: parseFloat(cs.getPropertyValue('--why-line-scale') || '1'),
+          i: parseFloat(cs.getPropertyValue('--why-line-inset') || '0'),
+        };
+      };
+
+      return [
+        await sampleAt(0),
+        await sampleAt(24),
+        await sampleAt(64),
+      ];
+    });
+
+    expect(checks).not.toBeNull();
+    for (const c of checks!) {
+      expect(c.op, `wide intro opacity at scrollTop=${c.top}`).toBeGreaterThan(0.99);
+      expect(c.s, `wide intro scale at scrollTop=${c.top}`).toBeCloseTo(1, 2);
+      expect(Math.abs(c.i), `wide intro inset at scrollTop=${c.top}`).toBeLessThan(0.02);
+    }
+  });
+
+  test('step-3 veil appears in window and fades out afterward', async ({ page }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const readStep3Op = async (top: number) =>
+      page.evaluate(async (scrollTop) => {
+        const scroll = document.querySelector(
+          '.why-page .why-scroll',
+        ) as HTMLElement | null;
+        const box = document.querySelector('.why-page .why-box');
+        if (!scroll || !box) return null;
+        const waitFrames = (n = 3) =>
+          new Promise<void>((resolve) => {
+            const run = (left: number) => {
+              if (left <= 0) return resolve();
+              requestAnimationFrame(() => run(left - 1));
+            };
+            run(n);
+          });
+        scroll.scrollTop = scrollTop;
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+        await waitFrames();
+        const cs = getComputedStyle(box);
+        return parseFloat(cs.getPropertyValue('--why-step3-veil-opacity') || '0');
+      }, top);
+
+    const before = await readStep3Op(90);
+    const peak = await readStep3Op(150);
+    const after = await readStep3Op(250);
+
+    expect(before).not.toBeNull();
+    expect(peak).not.toBeNull();
+    expect(after).not.toBeNull();
+    expect(before!, 'step-3 veil should be low before its window').toBeLessThan(0.2);
+    expect(peak!, 'step-3 veil should peak in its window').toBeGreaterThan(0.35);
+    expect(after!, 'step-3 veil should fade after its window').toBeLessThan(0.2);
+  });
+
+  test('CTA vertical anchor keeps fixed 3/5 fraction from lead toward box bottom', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 900, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const readDelta = async () =>
+      page.evaluate(() => {
+        const box = document.querySelector('.why-page .why-box');
+        const lead = document.querySelector('.why-page p.why-lead');
+        if (!box || !lead) return null;
+        const boxRect = box.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(lead);
+        const rects = range.getClientRects();
+        if (!rects.length) return null;
+        const leadBottom = rects[rects.length - 1]!.bottom;
+        const setTop = parseFloat(
+          getComputedStyle(box).getPropertyValue('--why-cta-top') || '0',
+        );
+        const expected =
+          leadBottom -
+          boxRect.top +
+          0.6 * Math.max(0, boxRect.bottom - leadBottom);
+        return Math.abs(setTop - expected);
+      });
+
+    const wideDelta = await readDelta();
+    expect(wideDelta).not.toBeNull();
+    expect(wideDelta!, 'CTA top should match 3/5 anchor at wide viewport').toBeLessThanOrEqual(
+      LAYOUT_TOLERANCE,
+    );
+
+    await page.setViewportSize({ width: 760, height: 520 });
+    await gotoWhyWhenReady(page);
+    const narrowDelta = await readDelta();
+    expect(narrowDelta).not.toBeNull();
+    expect(
+      narrowDelta!,
+      'CTA top should keep 3/5 anchor at narrow viewport (no progressive pull)',
+    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+  });
+
+  test('CTA arrow scales inversely as Why box narrows', async ({ page }) => {
+    const readArrowWidth = async () =>
+      page.evaluate(() => {
+        const box = document.querySelector('.why-page .why-box');
+        const arrow = document.querySelector(
+          '.why-page .why-scroll-cta svg.animated-arrow',
+        ) as SVGElement | null;
+        if (!box || !arrow) return null;
+        return {
+          boxW: box.getBoundingClientRect().width,
+          arrowW: arrow.getBoundingClientRect().width,
+        };
+      });
+
+    await page.setViewportSize({ width: 980, height: 520 });
+    await gotoWhyWhenReady(page);
+    const wide = await readArrowWidth();
+    expect(wide).not.toBeNull();
+
+    await page.setViewportSize({ width: 740, height: 520 });
+    await gotoWhyWhenReady(page);
+    const narrow = await readArrowWidth();
+    expect(narrow).not.toBeNull();
+
+    expect(narrow!.boxW).toBeLessThan(wide!.boxW);
+    expect(
+      narrow!.arrowW,
+      `arrow width should increase as box narrows (wide=${wide!.arrowW}, narrow=${narrow!.arrowW})`,
+    ).toBeGreaterThan(wide!.arrowW + 2);
+  });
+
+  test('lead left optical correction remains applied', async ({ page }) => {
+    await page.setViewportSize({ width: 920, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    const leadStyle = await page.evaluate(() => {
+      const lead = document.querySelector(
+        '.why-page .why-scroll p.why-lead',
+      ) as HTMLElement | null;
+      if (!lead) return null;
+      const cs = getComputedStyle(lead);
+      return {
+        marginLeft: cs.marginLeft,
+        textIndent: cs.textIndent,
+      };
+    });
+
+    expect(leadStyle).not.toBeNull();
+    expect(leadStyle!.marginLeft).toBe('-1px');
+    expect(leadStyle!.textIndent).toBe('0px');
+  });
+
+  test('extreme fit failure applies page-level runtime min-width lock', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 560, height: 520 });
+    await gotoWhyWhenReady(page);
+
+    await page.evaluate(async () => {
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      if (!scroll) return;
+      const waitFrames = (n = 2) =>
+        new Promise<void>((resolve) => {
+          const run = (left: number) => {
+            if (left <= 0) return resolve();
+            requestAnimationFrame(() => run(left - 1));
+          };
+          run(n);
+        });
+      // Force multiple update passes near top to let fit-failure streak settle.
+      for (let i = 0; i < 18; i += 1) {
+        scroll.scrollTop = i % 2 === 0 ? 0 : 2;
+        scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
+        await waitFrames();
+      }
+    });
+
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(() => {
+            const main = document.querySelector('main.content') as HTMLElement | null;
+            return main?.style.minWidth || '';
+          }),
+        {
+          timeout: 4000,
+          message: 'main.content should receive runtime min-width lock at extreme fit failure',
+        },
+      )
+      .toMatch(/px$/);
+  });
+
   test('edge veils: top extends at scroll end, bottom shrinks versus middle', async ({
     page,
   }) => {

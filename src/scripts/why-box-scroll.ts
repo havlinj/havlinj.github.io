@@ -21,7 +21,6 @@ import {
   if (!scrollEl) return;
   const boxEl = scrollEl.closest('.why-box');
   if (!boxEl) return;
-  const wrapperEl = boxEl.closest('.why-wrapper');
   const pageMainEl = document.querySelector('main.content');
   const ctaEl = boxEl.querySelector('.why-scroll-cta');
   const contentEl = scrollEl.querySelector('.why-content');
@@ -61,7 +60,7 @@ import {
     /** Then release hard state smoothly during the next notch. */
     INTRO_BOTTOM_VEIL_HARD_FADE_PX: 52,
     /** Keep bottom fade band below `.why-p--wide` last line (+ this gap); drives --why-start-cover-height. */
-    START_COVER_BELOW_WIDE_REM: 0.5,
+    START_COVER_BELOW_WIDE_REM: 0.9,
     /** Cap JS-computed start-cover height (px); fallback CSS clamp when measurement skipped. */
     START_COVER_HEIGHT_MAX: 300,
     /** After intro band: 1 = same "full" layer intensity as the top ::before (it only scales the gradient). */
@@ -139,7 +138,7 @@ import {
     GIF_MIN_BOX_FRAC: 0.065,
     GIF_MIN_ABS_PX: 24,
     /** Extra intro padding below the GIF band, as a fraction of lead line height (proportional air). */
-    GIF_TO_LEAD_CLEARANCE_MULT: 0.26,
+    GIF_TO_LEAD_CLEARANCE_MULT: 0.08,
     /** Cap intro GIF pad vs scroll height so tiny boxes don’t collapse. */
     GIF_INTRO_PAD_MAX_FRAC: 0.48,
     GIF_BASE_SCALE_MIN: 0.5,
@@ -698,6 +697,7 @@ import {
       return;
     }
     const leadBottom = lastLineBottomInElement(leadForCta);
+    const wideBottom = lastLineBottomInElement(wideP);
     const boxRect = boxEl.getBoundingClientRect();
     const ctaRect = ctaEl.getBoundingClientRect();
     if (
@@ -716,11 +716,15 @@ import {
     // Fully opaque cover while CTA exists; remove together when CTA is hidden.
     const localStrength = clamp(0.86 + 0.14 * smoothstep(proximity), 0, 1);
     const o = localStrength * ctaO;
-    const leadBottomLocal = leadBottom - boxRect.top;
+    const guardBottom = Math.max(
+      leadBottom,
+      Number.isFinite(wideBottom) ? wideBottom : Number.NEGATIVE_INFINITY,
+    );
+    const guardBottomLocal = guardBottom - boxRect.top;
     const ctaTopLocal = ctaRect.top - boxRect.top;
     const desiredTop = ctaTopLocal - T.CTA_VEIL_ABOVE_ARROW_PX;
     const topEdge = clamp(
-      Math.max(desiredTop, leadBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX),
+      Math.max(desiredTop, guardBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX),
       0,
       boxRect.height,
     );
@@ -989,6 +993,7 @@ import {
     const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
     const viewportCenterContentY = viewportCenterContentYStable();
     lines.forEach((line, lineIndex) => {
+      const isWideIntroLine = line.classList.contains('why-p--wide');
       const lineCY = elementCenterYInScrollContent(line);
       let normalized;
       if (Number.isFinite(lineCY) && halfContent > 1) {
@@ -1009,10 +1014,17 @@ import {
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
       const targetBlend = eased * gate * phaseGate;
       const strictStartThisLine = strictStart && lineIndex < T.INTRO_LINE_COUNT;
+      // Keep the wide intro sentence fully stable to prevent startup "glint"/flicker.
+      if (isWideIntroLine) {
+        lineBlendState[lineIndex] = 0;
+        applyLineRevolverStylesIfChanged(line, '1.00', '0.00rem', '1.000');
+        return;
+      }
       if (phaseGate <= 0.001 || strictStartThisLine || strictEnd) {
         lineBlendState[lineIndex] = 0;
         let lineOp = 1;
-        if (effectiveCtaZone && !line.classList.contains('why-lead')) {
+        const isLeadLine = line.classList.contains('why-lead');
+        if (effectiveCtaZone && !isLeadLine && !isWideIntroLine) {
           lineOp = ctaOverlapMultiplier(
             line.getBoundingClientRect(),
             effectiveCtaZone,
@@ -1042,7 +1054,7 @@ import {
       const inset = maxInset * blendedEased;
 
       let lineOp = 1;
-      if (effectiveCtaZone && !isLead) {
+      if (effectiveCtaZone && !isLead && !isWideIntroLine) {
         lineOp = ctaOverlapMultiplier(
           line.getBoundingClientRect(),
           effectiveCtaZone,
@@ -1250,8 +1262,6 @@ import {
       runtimeLockedMinBoxWidth =
         Math.ceil(m.boxRect.width) + T.FIT_FAIL_LOCK_PADDING_PX;
       const lockWidth = `${runtimeLockedMinBoxWidth}px`;
-      boxEl.style.setProperty('--why-runtime-min-width', lockWidth);
-      if (wrapperEl) wrapperEl.style.setProperty('--why-runtime-min-width', lockWidth);
       if (pageMainEl instanceof HTMLElement) {
         pageMainEl.style.minWidth = lockWidth;
       }

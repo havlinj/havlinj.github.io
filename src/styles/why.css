@@ -444,6 +444,16 @@
   letter-spacing: -0.015em;
 }
 
+/* Keep the wide intro sentence on a static paint path (no transform compositing flicker). */
+.why-page .why-scroll p.why-p--wide {
+  position: relative;
+  z-index: 6;
+  transform: none !important;
+  opacity: 1 !important;
+  backface-visibility: visible;
+  will-change: auto;
+}
+
 /* Gentler than full Inter italic for <em> (e.g. LinkedIn / GitHub). Tune deg if needed. */
 .why-page .why-scroll em {
   font-style: oblique 6deg;
