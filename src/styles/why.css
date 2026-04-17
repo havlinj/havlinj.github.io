@@ -136,27 +136,6 @@
   background: var(--why-box-bg);
 }
 
-/* Soft top feather for CTA veil while preserving full-black body. */
-.why-page .why-box > .why-cta-veil::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -16px;
-  height: 16px;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(17, 17, 17, 1) 0%,
-    rgba(17, 17, 17, 0.94) 34%,
-    rgba(17, 17, 17, 0.76) 58%,
-    rgba(17, 17, 17, 0.5) 76%,
-    rgba(17, 17, 17, 0.26) 89%,
-    rgba(17, 17, 17, 0.09) 96%,
-    rgba(17, 17, 17, 0) 100%
-  );
-}
-
 .why-page .why-scroll-cta .animated-arrow-root {
   position: relative;
   z-index: 1;
@@ -268,10 +247,10 @@
   height: min(
     calc(
       var(--why-start-cover-height, clamp(140px, 20.8vh, 218px)) *
-        (0.48 + 0.26 * var(--why-intro-bottom-veil-hard, 0))
+        (0.72 + 0.26 * var(--why-intro-bottom-veil-hard, 0))
     ),
     calc(
-      var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px)) *
+      var(--why-intro-bottom-veil-height, clamp(64px, 13vh, 140px)) *
         (1 + 0.26 * var(--why-intro-bottom-veil-hard, 0))
     )
   );

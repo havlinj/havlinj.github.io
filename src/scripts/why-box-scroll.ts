@@ -122,7 +122,8 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     /** Slower = less hunt with browser zoom / fractional layout. */
     FONT_LERP: 0.12,
     FONT_SNAP: 0.012,
-    FIT_SAFETY_PX: 3,
+    /** Tightens column budget so the width guard engages before obvious clipping. */
+    FIT_SAFETY_PX: 6,
     START_COVER_BAND_MIN: 85,
     START_COVER_BAND_FRAC: 0.26,
     /** Intro top band on `.why-box`: full opacity until this scroll distance, then fades. */
@@ -154,10 +155,10 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     INTRO_BOTTOM_VEIL_BASE: 1,
     /** Intro-only veil fades out faster than start-cover so only the opening moment is affected. */
     INTRO_BOTTOM_VEIL_FADE_BAND_FRAC: 0.48,
-    /** Narrower intro-only veil height relative to measured start-cover height. */
-    INTRO_BOTTOM_VEIL_HEIGHT_FRAC: 0.46,
-    INTRO_BOTTOM_VEIL_HEIGHT_MIN: 52,
-    INTRO_BOTTOM_VEIL_HEIGHT_MAX: 92,
+    /** Intro-only bottom veil height vs measured start-cover height (cap INTRO_BOTTOM_VEIL_HEIGHT_MAX). */
+    INTRO_BOTTOM_VEIL_HEIGHT_FRAC: 0.68,
+    INTRO_BOTTOM_VEIL_HEIGHT_MIN: 64,
+    INTRO_BOTTOM_VEIL_HEIGHT_MAX: 145,
     CTA_FADE_PX: 56,
     CTA_O_HIDDEN: 0.002,
     CTA_ZONE_MIN_O: 0.04,
@@ -257,9 +258,8 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     REVOLVER_LERP_INSTANT_BELOW_PX: 2.5,
     /** Quantize --why-font-scale steps to reduce wrap-width ping-pong at odd zoom. */
     FONT_SCALE_QUANT: 0.005,
-    /** Detect sustained fit failure at extreme zoom before applying runtime width guard. */
-    FIT_FAIL_TARGET_EPS: 0.004,
-    FIT_FAIL_FRAMES: 8,
+    /** Consecutive rAF passes with probe overflow before `main` min-width lock (no FONT_MIN gate — lerp can lag). */
+    FIT_FAIL_FRAMES: 4,
     FIT_FAIL_LOCK_PADDING_PX: 6,
     /** Safety reserve so widest line still fits with a tiny buffer. */
     FIT_LOCK_SAFETY_PX: 1,
@@ -485,10 +485,8 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       applyFontScaleStep();
     }
     applyIntroTopBand(m);
-    const fitTargetNow = computeWhyFontTarget();
     const overflowPx = measureFitOverflowPx();
-    const fitAtLimit =
-      fitTargetNow <= T.FONT_MIN + T.FIT_FAIL_TARGET_EPS && overflowPx > 0;
+    const fitAtLimit = overflowPx > 0;
     if (fitAtLimit) fitFailStreak++;
     else fitFailStreak = 0;
     if (
