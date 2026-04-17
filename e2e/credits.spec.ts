@@ -19,6 +19,9 @@ test.describe('/credits page', () => {
     await expect(main).toBeVisible();
     await expect(main).toHaveScreenshot('credits-content.png', {
       animations: 'disabled',
+      // Baseline matches `PW_SERVER_MODE=preview` (integration-tests.sh / CI). Dev
+      // (Vite) output differs slightly (~1% pixels) from production build for the same page.
+      maxDiffPixelRatio: 0.012,
     });
   });
 });
