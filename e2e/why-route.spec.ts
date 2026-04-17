@@ -3,9 +3,7 @@ import {
   LAYOUT_TOLERANCE,
   WHY_CTA_ARROW_FLOOR_OPACITY,
   WHY_CTA_ARROW_PEAK_OPACITY,
-  WHY_CTA_EDGE_MIN_PX,
-  WHY_CTA_EDGE_WIDTH_FRAC,
-  WHY_CTA_LEAD_TRACK,
+  WHY_CTA_BOX_WIDTH_FRAC,
   WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH,
   WHY_GIF_TOP_INSET,
   WHY_SCROLL_CTA_CONTAINER_CQW,
@@ -214,63 +212,34 @@ test.describe('/why page @serial', () => {
     );
   });
 
-  test('--why-cta-left tracks lead first line (inset + WHY_CTA_LEAD_TRACK × line width)', async ({
+  test('scroll CTA horizontal anchor matches WHY_CTA_BOX_WIDTH_FRAC of .why-box', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 900, height: 520 });
     await gotoWhyWhenReady(page);
 
-    const check = await page.evaluate(
-      ([leadTrack, edgeMinPx, edgeWidthFrac]) => {
-        const box = document.querySelector('.why-page .why-box');
-        const lead = document.querySelector('.why-page p.why-lead');
-        if (!box || !lead)
-          return { ok: false as const, reason: 'missing nodes' };
+    const data = await page.evaluate((frac) => {
+      const box = document.querySelector('.why-page .why-box');
+      const arrow = document.querySelector(
+        '.why-page .why-scroll-cta svg.animated-arrow',
+      ) as SVGSVGElement | null;
+      if (!box || !arrow) return null;
+      const boxR = box.getBoundingClientRect();
+      const arrowR = arrow.getBoundingClientRect();
+      const expectedMid = boxR.left + frac * boxR.width;
+      const arrowMid = arrowR.left + arrowR.width / 2;
+      const varPct = getComputedStyle(box)
+        .getPropertyValue('--why-cta-horizontal')
+        .trim();
+      return {
+        delta: Math.abs(arrowMid - expectedMid),
+        varPct,
+      };
+    }, WHY_CTA_BOX_WIDTH_FRAC);
 
-        const leftVar = getComputedStyle(box)
-          .getPropertyValue('--why-cta-left')
-          .trim();
-        if (!/^\d+(\.\d+)?px$/.test(leftVar)) {
-          return {
-            ok: false as const,
-            reason: `bad --why-cta-left: "${leftVar}"`,
-          };
-        }
-        const setPx = parseFloat(leftVar);
-
-        const range = document.createRange();
-        range.selectNodeContents(lead);
-        const fr = range.getClientRects();
-        if (!fr.length) {
-          return { ok: false as const, reason: 'lead has no client rects' };
-        }
-        const r0 = fr[0];
-        const br = box.getBoundingClientRect();
-        const edge = Math.max(edgeMinPx, br.width * edgeWidthFrac);
-        let expected = r0.left - br.left + leadTrack * r0.width;
-        expected = Math.min(Math.max(expected, edge), br.width - edge);
-
-        return {
-          ok: true as const,
-          setPx,
-          expected,
-          delta: Math.abs(setPx - expected),
-        };
-      },
-      [
-        WHY_CTA_LEAD_TRACK,
-        WHY_CTA_EDGE_MIN_PX,
-        WHY_CTA_EDGE_WIDTH_FRAC,
-      ] as const,
-    );
-
-    expect(check.ok, !check.ok ? check.reason : '').toBe(true);
-    if (check.ok) {
-      expect(
-        check.delta,
-        `setPx=${check.setPx} expected≈${check.expected}`,
-      ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
-    }
+    expect(data).not.toBeNull();
+    expect(data!.varPct).toBe(`${WHY_CTA_BOX_WIDTH_FRAC * 100}%`);
+    expect(data!.delta).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
   test('GIF holder is out of flow; JS sets scroll pad and intro GIF band', async ({

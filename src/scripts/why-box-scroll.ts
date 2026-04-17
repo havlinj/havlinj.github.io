@@ -14,7 +14,6 @@ import { clamp } from '../utils/why-scroll-math';
 import {
   applyCtaAttachedVeil,
   applyCtaFade,
-  applyCtaHorizontalAnchor,
   applyCtaScale,
   applyCtaVerticalMidpoint,
   buildCtaZone,
@@ -520,7 +519,6 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       boxEl,
       ctaEl,
     });
-    applyCtaHorizontalAnchor({ boxEl, ctaEl, leadForCta, metrics: m });
     applyCtaVerticalMidpoint({
       boxEl,
       ctaEl,

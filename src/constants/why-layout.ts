@@ -3,14 +3,8 @@
  * CSS that cannot read TS should duplicate with a “sync:” comment to this file.
  */
 
-/** Horizontal CTA anchor: fraction of `.why-lead` first-line width from line start. */
-export const WHY_CTA_LEAD_TRACK = 0.42;
-
-/** Min px from `.why-box` edge when clamping CTA `left`. */
-export const WHY_CTA_EDGE_MIN_PX = 8;
-
-/** `.why-box` width fraction for CTA horizontal edge clamp. */
-export const WHY_CTA_EDGE_WIDTH_FRAC = 0.02;
+/** Horizontal CTA anchor: fraction of `.why-box` width from the left (arrow center; CSS uses translateX(-50%)). */
+export const WHY_CTA_BOX_WIDTH_FRAC = 0.488;
 
 /**
  * GIF band from scroll inner edge (custom property on `.why-wrapper`).

@@ -6,7 +6,7 @@
    1) Shell     — .why-wrapper / .why-box: panel colors, container-type, default veil heights,
                   --why-end-phase, --why-end-top-veil-grow, --why-top-edge-opacity,
                   .why-intro-top-band: --why-intro-top-band-height, --why-intro-top-band-opacity (why-box-scroll.ts)
-   2) CTA stack — .why-scroll-cta, .why-cta-veil: --why-cta-left/top/scale/opacity,
+   2) CTA stack — .why-scroll-cta (--why-cta-horizontal on .why-box), .why-cta-veil: --why-cta-top/scale/opacity,
                   --why-cta-veil-top/opacity (why-scroll-cta.ts)
    3) Phase veils — .why-end-cover, .why-start-cover, .why-box-bottom-veil,
                   .why-box-intro-bottom-veil, .why-box-step3-veil, ::before/::after:
@@ -95,8 +95,9 @@
 /* Downward scroll CTA (page-bg color); fades via --why-cta-opacity from WhyContent script */
 .why-page .why-scroll-cta {
   position: absolute;
-  /* Horizontal: --why-cta-left from JS (see src/constants/why-layout.ts WHY_CTA_LEAD_TRACK); fallback ~old % */
-  left: var(--why-cta-left, 20%);
+  /* sync: WHY_CTA_BOX_WIDTH_FRAC — set as % on `.why-box` in WhyContent.astro */
+  /* Fallback unused when WhyContent sets --why-cta-horizontal from WHY_CTA_BOX_WIDTH_FRAC. */
+  left: var(--why-cta-horizontal, 50%);
   /*
    * Vertical: --why-cta-top from why-box-scroll.ts — from .why-box bottom, 55% of the gap up to
    * the last line of .why-p--wide (px from box top). Center via translate(-50%, -50%).
@@ -108,6 +109,18 @@
   transform-origin: center center;
   pointer-events: none;
   opacity: var(--why-cta-opacity, 1);
+}
+
+/*
+ * Same reveal gate as `.why-content--pending-layout`: keep CTA (and its veil) off
+ * until `revealAfterStableLayout` adds `.why-content--ready`, so JS-set --why-cta-top / scale
+ * never flash at CSS fallbacks (72% / 1).
+ */
+.why-page .why-box:not(:has(.why-content--ready)) > .why-scroll-cta,
+.why-page .why-box:not(:has(.why-content--ready)) > .why-cta-veil {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Full-width CTA cover on the black box: from arrow top edge downward. */

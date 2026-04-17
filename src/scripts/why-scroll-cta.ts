@@ -1,13 +1,5 @@
-import {
-  WHY_CTA_EDGE_MIN_PX,
-  WHY_CTA_EDGE_WIDTH_FRAC,
-  WHY_CTA_LEAD_TRACK,
-} from '../constants/why-layout';
 import { clamp, smoothstep } from '../utils/why-scroll-math';
-import {
-  firstLineRectInElement,
-  lastLineBottomInElement,
-} from './why-scroll-dom';
+import { lastLineBottomInElement } from './why-scroll-dom';
 
 export type CtaZone = {
   left: number;
@@ -48,32 +40,6 @@ export function applyCtaFade(params: {
       ctaO < params.ctaHiddenOpacity ? 'hidden' : 'visible';
   }
   return ctaO;
-}
-
-export function applyCtaHorizontalAnchor(params: {
-  boxEl: HTMLElement;
-  ctaEl: Element | null;
-  leadForCta: Element | null;
-  metrics: CtaLayoutMetrics;
-}): void {
-  if (
-    !(params.ctaEl instanceof HTMLElement) ||
-    !(params.leadForCta instanceof HTMLElement)
-  ) {
-    return;
-  }
-  const firstLine = firstLineRectInElement(params.leadForCta);
-  if (!firstLine) return;
-  let anchor =
-    firstLine.left -
-    params.metrics.boxOuterRect.left +
-    WHY_CTA_LEAD_TRACK * firstLine.width;
-  const edge = Math.max(
-    WHY_CTA_EDGE_MIN_PX,
-    params.metrics.boxOuterRect.width * WHY_CTA_EDGE_WIDTH_FRAC,
-  );
-  anchor = clamp(anchor, edge, params.metrics.boxOuterRect.width - edge);
-  params.boxEl.style.setProperty('--why-cta-left', `${anchor.toFixed(2)}px`);
 }
 
 export function applyCtaVerticalMidpoint(params: {

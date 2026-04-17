@@ -3,6 +3,7 @@ import AnimatedArrow from './AnimatedArrow.astro';
 import {
   WHY_CTA_ARROW_FLOOR_OPACITY,
   WHY_CTA_ARROW_PEAK_OPACITY,
+  WHY_CTA_BOX_WIDTH_FRAC,
   WHY_GIF_BASE_OPACITY,
   WHY_GIF_TOP_INSET,
   WHY_SCROLL_CTA_CONTAINER_CQW,
@@ -17,7 +18,12 @@ import '../styles/why.css';
     '--why-gif-base-opacity': String(WHY_GIF_BASE_OPACITY),
   }}
 >
-  <div class="why-box">
+  <div
+    class="why-box"
+    style={{
+      '--why-cta-horizontal': `${WHY_CTA_BOX_WIDTH_FRAC * 100}%`,
+    }}
+  >
     <div class="why-end-cover" aria-hidden="true"></div>
     <div class="why-cta-veil" aria-hidden="true"></div>
     <div class="why-scroll-cta" aria-hidden="true">
