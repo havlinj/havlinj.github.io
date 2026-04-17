@@ -66,7 +66,12 @@ test.describe('Profile page (/profile, /why)', () => {
         }
       });
     });
-    await expect(page).toHaveScreenshot('profile-section.png');
+    await page.evaluate(async () => {
+      await document.fonts?.ready;
+    });
+    await expect(page).toHaveScreenshot('profile-section.png', {
+      animations: 'disabled',
+    });
   });
 
   test('What I do page has heading and profile-active navbar', async ({

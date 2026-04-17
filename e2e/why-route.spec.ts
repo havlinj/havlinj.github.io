@@ -44,8 +44,8 @@ test.describe('/why page @serial', () => {
       pageErrors.push(error.message);
     });
 
-    await page.goto('/why', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
+    // beforeEach already navigated here; avoid an immediate second /why load in dev —
+    // Vite can race on dynamic dep chunks (e.g. audit-*.js) and surface a spurious pageerror.
 
     await expect(
       page.locator('.why-page .why-content.why-content--ready'),
