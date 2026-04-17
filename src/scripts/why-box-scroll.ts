@@ -3,18 +3,27 @@
 import { WHY_FIT_REFERENCE_LINE } from '../constants/why-fit-reference';
 import {
   WHY_BODY_MAX_INSET_REM,
-  WHY_CTA_EDGE_MIN_PX,
-  WHY_CTA_EDGE_WIDTH_FRAC,
-  WHY_CTA_LEAD_TRACK,
   WHY_TEXT_RIGHT_GUTTER_REM,
 } from '../constants/why-layout';
+import { clamp } from '../utils/why-scroll-math';
 import {
-  clamp,
-  middlePhaseRevolverGate as computeMiddlePhaseRevolverGate,
-  revolverLerpForDelta as computeRevolverLerpForDelta,
-  smoothstep,
-  wheelDeltaToPixels as toWheelPixels,
-} from '../utils/why-scroll-math';
+  applyCtaAttachedVeil,
+  applyCtaFade,
+  applyCtaHorizontalAnchor,
+  applyCtaScale,
+  applyCtaVerticalMidpoint,
+  buildCtaZone,
+} from './why-scroll-cta';
+import {
+  computeEndPhase,
+  middlePhaseRevolverGate,
+  wheelDeltaToPixels,
+  whyScrollPrefersReducedMotion,
+} from './why-scroll-helpers';
+import { readRootRemPx } from './why-scroll-dom';
+import { createWhyScrollLayout } from './why-scroll-layout';
+import { createWhyScrollRevolver } from './why-scroll-revolver';
+import { createWhyScrollVeils } from './why-scroll-veils';
 
 (function () {
   const scrollEl = document.querySelector('.why-page .why-scroll');
@@ -199,137 +208,55 @@ import {
     REVOLVER_LERP_SPEED: 0.94,
   };
 
+  const revolver = createWhyScrollRevolver({
+    scrollEl,
+    lines,
+    gifEl,
+    leadForCta,
+    T,
+  });
+
   let whyFontScale = 1;
   let fontScaleSettled = false;
   let fitFailStreak = 0;
   let runtimeLockedMinBoxWidth = 0;
-  const lineBlendState = lines.map(() => 0);
-  let gifBlendState = 0;
   let lastScrollTopSnapped = Math.round(
     scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX,
   );
   let lastMaxScrollForRevolverFreeze = -1;
   let hasAppliedRevolverOnce = false;
   let revolverIdleStreak = 0;
-  let strictStartLockActive = true;
-  let ctaTextDimActive = false;
   /** When true, skip font fit this frame — breaks measure↔scale feedback while revolver is frozen. */
   let prevFrameRevolverIdle = false;
-  const lineLastRevolverStyles = new WeakMap();
-  let gifLastRevolverKey = '';
 
-  function revolverLerpForDelta(scrollDeltaPx) {
-    return computeRevolverLerpForDelta(
-      scrollDeltaPx,
-      T.REVOLVER_LERP_INSTANT_BELOW_PX,
-      T.REVOLVER_LERP_SPEED,
-    );
-  }
+  let rafId = 0;
+  let settleFrames = 0;
+  let resizeQuietTimer = 0;
+  let wheelTargetTop = Number.NaN;
+  let layoutObserver: ResizeObserver | null = null;
+  let ctaScaleBaselineBoxWidth = 0;
 
-  function wheelDeltaToPixels(ev) {
-    return toWheelPixels(
-      ev.deltaY,
-      ev.deltaZ || 0,
-      ev.deltaMode,
-      scrollEl.clientHeight || 1,
-    );
-  }
+  const layout = createWhyScrollLayout({
+    scrollEl,
+    boxEl,
+    contentEl,
+    topSpacer,
+    bottomSpacer,
+    lines,
+    gifEl,
+    leadForCta,
+    T,
+    bumpSettleFrames: (n) => {
+      settleFrames = Math.max(settleFrames, n);
+    },
+  });
 
-  function whyScrollPrefersReducedMotion() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
-
-  /** Coarsen normalized distance so edgeProgress does not flutter at fractional zoom. */
-  function quantizeRevolverNormalized(n) {
-    if (!Number.isFinite(n)) return n;
-    return Math.round(n * 40) / 40;
-  }
-
-  /** Integer-safe center of the scrollport in content Y (avoids subpixel scrollTop noise). */
-  function viewportCenterContentYStable() {
-    const st = Math.round(scrollEl.scrollTop);
-    const ch = Math.round(scrollEl.clientHeight);
-    return st + ch * 0.5;
-  }
-
-  function applyLineRevolverStylesIfChanged(line, scaleStr, insetStr, opStr) {
-    const prev = lineLastRevolverStyles.get(line);
-    if (
-      prev &&
-      prev.s === scaleStr &&
-      prev.i === insetStr &&
-      prev.o === opStr
-    ) {
-      return;
-    }
-    line.style.setProperty('--why-line-scale', scaleStr);
-    line.style.setProperty('--why-line-inset', insetStr);
-    line.style.setProperty('--why-line-opacity', opStr);
-    lineLastRevolverStyles.set(line, {
-      s: scaleStr,
-      i: insetStr,
-      o: opStr,
-    });
-  }
-
-  function readRootRemPx() {
-    return (
-      Number.parseFloat(getComputedStyle(document.documentElement).fontSize) ||
-      16
-    );
-  }
-
-  function firstLineRectInElement(el) {
-    if (!(el instanceof HTMLElement)) return null;
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      const rects = range.getClientRects();
-      if (rects.length > 0) return rects[0];
-    } catch {
-      /* ignore Range errors */
-    }
-    return null;
-  }
-
-  function lastLineBottomInElement(el) {
-    if (!(el instanceof HTMLElement)) return null;
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      const rects = range.getClientRects();
-      if (rects.length > 0) return rects[rects.length - 1].bottom;
-    } catch {
-      /* ignore Range errors */
-    }
-    return null;
-  }
-
-  function isStrictStartLock() {
-    const introRampPx = Math.max(
-      T.INTRO_RAMP_MIN,
-      scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
-    );
-    // Near scroll top: opening scene fixed — applied only to first INTRO_LINE_COUNT lines in revolver.
-    // Use small hysteresis so boundary noise does not rapidly toggle lock on/off (visible blink).
-    const enterPx = introRampPx * T.INTRO_STRICT_LOCK_ENTER_FRAC;
-    const exitPx = introRampPx * T.INTRO_STRICT_LOCK_EXIT_FRAC;
-    if (strictStartLockActive) {
-      if (scrollEl.scrollTop > exitPx) strictStartLockActive = false;
-    } else if (scrollEl.scrollTop < enterPx) {
-      strictStartLockActive = true;
-    }
-    return strictStartLockActive;
-  }
-
-  function isStrictEndLock(m) {
-    if (m.maxScroll <= 1) return false;
-    const endBandPx = Math.max(
-      T.END_COVER_BAND_MIN,
-      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
-    );
-    return m.maxScroll - scrollEl.scrollTop <= endBandPx * 0.45;
-  }
+  const veils = createWhyScrollVeils({
+    scrollEl,
+    boxEl,
+    wideP,
+    T,
+  });
 
   /**
    * Revolver should be strongest in the middle scroll phase only.
@@ -337,8 +264,8 @@ import {
    * - end edge: keep final paragraphs fully stable (no revolver transform)
    * Smooth ramps preserve continuity into/out of the effect.
    */
-  function middlePhaseRevolverGate(m) {
-    return computeMiddlePhaseRevolverGate(
+  function middlePhaseRevolverGateForFrame(m) {
+    return middlePhaseRevolverGate(
       scrollEl.scrollTop,
       m.maxScroll,
       scrollEl.clientHeight,
@@ -347,25 +274,6 @@ import {
       T.END_COVER_BAND_MIN,
       T.END_COVER_BAND_FRAC,
     );
-  }
-
-  /**
-   * Pre-transform layout height of the GIF column (16:9 frame). Do not use
-   * getBoundingClientRect() on `.why-gif-holder` — scale() is applied there and
-   * would feed back into footprint math (flicker / stuck mid-zoom).
-   */
-  function gifLayoutHeightPx() {
-    if (!gifEl) return 0;
-    let h = gifEl.offsetHeight;
-    if (h <= 0) {
-      const frame = gifEl.querySelector('.why-gif-frame');
-      if (frame) h = frame.offsetHeight;
-    }
-    if (h <= 0) {
-      const w = gifEl.offsetWidth;
-      if (w > 0) h = (w * 9) / 16;
-    }
-    return h;
   }
 
   function wideColumnContentWidthPx() {
@@ -420,817 +328,21 @@ import {
     }
   }
 
-  /**
-   * Vertical center of `el` in .why-scroll **content** coordinates (ignores CSS transform on lines),
-   * so revolver targets do not feedback from getBoundingClientRect + scale/translate jitter at zoom.
-   */
-  function elementCenterYInScrollContent(el) {
-    if (!(el instanceof Element)) return Number.NaN;
-    let top = 0;
-    let n = el;
-    while (n && n !== scrollEl) {
-      top += n.offsetTop;
-      n = n.offsetParent;
-    }
-    if (n !== scrollEl) return Number.NaN;
-    return Math.round((top + el.offsetHeight * 0.5) * 4) / 4;
-  }
-
-  function readLayoutMetrics() {
-    const maxScroll = Math.max(
-      0,
-      scrollEl.scrollHeight - scrollEl.clientHeight,
-    );
-    const boxRect = scrollEl.getBoundingClientRect();
-    const contentRect = contentEl.getBoundingClientRect();
-    const boxOuterRect = boxEl.getBoundingClientRect();
-    const half = boxRect.height / 2;
-    const center = boxRect.top + half;
-    const leadEl = leadForCta ?? lines[0];
-    const leadRect = leadEl.getBoundingClientRect();
-    const leadHeight = leadRect.height || 0;
-    const gifLayoutHeight = gifLayoutHeightPx();
-    const scrollStyle = window.getComputedStyle(scrollEl);
-    const padTop = Number.parseFloat(scrollStyle.paddingTop) || 0;
-    const padBottom = Number.parseFloat(scrollStyle.paddingBottom) || 0;
-
-    return {
-      maxScroll,
-      boxRect,
-      contentRect,
-      boxOuterRect,
-      half,
-      center,
-      leadEl,
-      leadRect,
-      leadHeight,
-      gifLayoutHeight,
-      padTop,
-      padBottom,
-    };
-  }
-
-  function lineTextStartLeftPx(lineEl) {
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(lineEl);
-      const rects = range.getClientRects();
-      if (rects.length > 0) return rects[0].left;
-    } catch {
-      /* ignore Range errors and use fallback */
-    }
-    const rr = lineEl.getBoundingClientRect();
-    const cs = getComputedStyle(lineEl);
-    const padL = Number.parseFloat(cs.paddingLeft) || 0;
-    return rr.left + padL;
-  }
-
-  function ctaOverlapMultiplier(rect, zone, yWeight, xWeight) {
-    const oy =
-      Math.min(rect.bottom, zone.bottom) - Math.max(rect.top, zone.top);
-    if (oy <= 0) return 1;
-    const ox =
-      Math.min(rect.right, zone.right) - Math.max(rect.left, zone.left);
-    if (ox <= 0) return 1;
-    const fracY = oy / Math.max(rect.height, 1);
-    const fracX = ox / Math.max(rect.width, 1);
-    return 1 - smoothstep(Math.min(1, fracY * yWeight + fracX * xWeight));
-  }
-
-  function applyStartCover() {
-    const startBandPx = Math.max(
-      T.START_COVER_BAND_MIN,
-      scrollEl.clientHeight * T.START_COVER_BAND_FRAC,
-    );
-    const holdPx = Math.min(T.START_COVER_HOLD_PX, startBandPx * 0.6);
-    const fadePx = Math.max(1, Math.min(T.START_COVER_FADE_PX, startBandPx));
-    const startProgress = clamp((scrollEl.scrollTop - holdPx) / fadePx, 0, 1);
-    const startOpacity = 1 - smoothstep(startProgress);
-    boxEl.style.setProperty(
-      '--why-start-cover-opacity',
-      startOpacity.toFixed(3),
-    );
-    const introHardProgress = clamp(
-      (scrollEl.scrollTop - T.INTRO_BOTTOM_VEIL_HARD_HOLD_PX) /
-        T.INTRO_BOTTOM_VEIL_HARD_FADE_PX,
-      0,
-      1,
-    );
-    const introHardPhase = 1 - smoothstep(introHardProgress);
-    boxEl.style.setProperty(
-      '--why-intro-bottom-veil-hard',
-      introHardPhase.toFixed(3),
-    );
-    const sm = smoothstep(startProgress);
-    const outwardRamp = sm * T.BOTTOM_VEIL_MAX_O;
-    const veilOpacity = Math.min(1, outwardRamp);
-    boxEl.style.setProperty(
-      '--why-bottom-veil-opacity',
-      veilOpacity.toFixed(3),
-    );
-
-    const st = scrollEl.scrollTop;
-    const step3InT = clamp(
-      (st - T.STEP3_VEIL_IN_PX) /
-        Math.max(1, T.STEP3_VEIL_PEAK_PX - T.STEP3_VEIL_IN_PX),
-      0,
-      1,
-    );
-    const step3OutT = clamp(
-      (st - T.STEP3_VEIL_PEAK_PX) /
-        Math.max(1, T.STEP3_VEIL_OUT_PX - T.STEP3_VEIL_PEAK_PX),
-      0,
-      1,
-    );
-    const step3Opacity =
-      smoothstep(step3InT) * (1 - smoothstep(step3OutT)) * T.STEP3_VEIL_MAX_O;
-    boxEl.style.setProperty(
-      '--why-step3-veil-opacity',
-      step3Opacity.toFixed(3),
-    );
-
-    // Separate intro-only narrow veil: strong at scrollTop 0, gone quickly.
-    const introFadeBandPx = Math.max(
-      1,
-      startBandPx * T.INTRO_BOTTOM_VEIL_FADE_BAND_FRAC,
-    );
-    const introHoldPx = Math.min(holdPx * 0.8, introFadeBandPx * 0.45);
-    const introProgress = clamp(
-      (scrollEl.scrollTop - introHoldPx) / introFadeBandPx,
-      0,
-      1,
-    );
-    const introOpacityBase =
-      (1 - smoothstep(introProgress)) * T.INTRO_BOTTOM_VEIL_BASE;
-    // While hard phase is active, force intro veil opacity to max so early wheel notches
-    // fully hide revolver motion at the bottom edge.
-    const introOpacity = Math.max(introOpacityBase, introHardPhase);
-    boxEl.style.setProperty(
-      '--why-intro-bottom-veil-opacity',
-      introOpacity.toFixed(3),
-    );
-  }
-
-  /**
-   * Size the bottom start-cover (and matching .why-box::after) so its top sits at
-   * last line of `.why-p--wide` + START_COVER_BELOW_WIDE_REM. Stops the gradient
-   * from washing out that line at odd zoom/viewport heights (fixed vh clamp was too tall).
-   */
-  function applyStartCoverBandSizing() {
-    const rootRem = readRootRemPx();
-    const marginPx = T.START_COVER_BELOW_WIDE_REM * rootRem;
-    let lineBottom = lastLineBottomInElement(wideP);
-    if (
-      (lineBottom == null || !Number.isFinite(lineBottom)) &&
-      wideP instanceof HTMLElement
-    ) {
-      lineBottom = wideP.getBoundingClientRect().bottom;
-    }
-
-    const scrollB = scrollEl.getBoundingClientRect();
-    const cs = window.getComputedStyle(scrollEl);
-    const borderBottom = Number.parseFloat(cs.borderBottomWidth) || 0;
-    const innerBottom = scrollB.bottom - borderBottom;
-
-    let hStr = null;
-    if (lineBottom != null && Number.isFinite(lineBottom)) {
-      const raw = innerBottom - lineBottom - marginPx;
-      if (raw >= 8) {
-        const hPx = Math.min(T.START_COVER_HEIGHT_MAX, raw);
-        hStr = `${Math.round(hPx * 4) / 4}px`;
-        const introVeilHeight = clamp(
-          hPx * T.INTRO_BOTTOM_VEIL_HEIGHT_FRAC,
-          T.INTRO_BOTTOM_VEIL_HEIGHT_MIN,
-          T.INTRO_BOTTOM_VEIL_HEIGHT_MAX,
-        );
-        boxEl.style.setProperty(
-          '--why-intro-bottom-veil-height',
-          `${Math.round(introVeilHeight)}px`,
-        );
-      }
-    }
-
-    if (hStr == null) {
-      if (lastStartCoverHeightStr !== '') {
-        lastStartCoverHeightStr = '';
-        boxEl.style.removeProperty('--why-start-cover-height');
-      }
-      boxEl.style.removeProperty('--why-intro-bottom-veil-height');
-      return;
-    }
-    if (hStr !== lastStartCoverHeightStr) {
-      lastStartCoverHeightStr = hStr;
-      boxEl.style.setProperty('--why-start-cover-height', hStr);
-    }
-  }
-
-  function applyCtaFade(): number {
-    const ctaProgress = clamp(scrollEl.scrollTop / T.CTA_FADE_PX, 0, 1);
-    const ctaO = 1 - smoothstep(ctaProgress);
-    boxEl.style.setProperty('--why-cta-opacity', ctaO.toFixed(3));
-    if (ctaEl) {
-      ctaEl.style.visibility = ctaO < T.CTA_O_HIDDEN ? 'hidden' : 'visible';
-    }
-    return ctaO;
-  }
-
-  function applyCtaHorizontalAnchor(m) {
-    if (!ctaEl || !(leadForCta instanceof HTMLElement)) return;
-    const firstLine = firstLineRectInElement(leadForCta);
-    if (!firstLine) return;
-    let anchor =
-      firstLine.left -
-      m.boxOuterRect.left +
-      WHY_CTA_LEAD_TRACK * firstLine.width;
-    const edge = Math.max(
-      WHY_CTA_EDGE_MIN_PX,
-      m.boxOuterRect.width * WHY_CTA_EDGE_WIDTH_FRAC,
-    );
-    anchor = clamp(anchor, edge, m.boxOuterRect.width - edge);
-    boxEl.style.setProperty('--why-cta-left', `${anchor.toFixed(2)}px`);
-  }
-
-  /**
-   * Vertical center of the CTA: from `.why-box` bottom, go up by
-   * CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM × (distance from that bottom to the bottom of the last
-   * line of `.why-p--wide`). `top` + translate(-50%, -50%) places the arrow’s center there.
-   */
-  function applyCtaVerticalMidpoint(m) {
-    if (!ctaEl) return;
-    const boxTop = m.boxOuterRect.top;
-    const boxBottom = m.boxOuterRect.bottom;
-    const boxH = m.boxOuterRect.height;
-    const f = T.CTA_FROM_LEAD_TO_BOTTOM_FRAC;
-    const leadBottom = lastLineBottomInElement(leadForCta);
-    let targetY;
-    if (leadBottom == null || !Number.isFinite(leadBottom)) {
-      targetY = boxBottom - T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM * boxH;
-    } else {
-      const gap = Math.max(0, boxBottom - leadBottom);
-      targetY = leadBottom + f * gap;
-    }
-    let topPx = targetY - boxTop;
-    topPx = clamp(
-      topPx,
-      T.CTA_TOP_CLAMP_MARGIN,
-      Math.max(T.CTA_TOP_CLAMP_MARGIN, boxH - T.CTA_TOP_CLAMP_MARGIN),
-    );
-    boxEl.style.setProperty('--why-cta-top', `${topPx.toFixed(2)}px`);
-  }
-
-  function applyCtaScale(m) {
-    if (!ctaEl) return;
-    if (ctaScaleBaselineBoxWidth <= 0 && m.boxOuterRect.width > 0) {
-      ctaScaleBaselineBoxWidth = m.boxOuterRect.width;
-    }
-    const baseline = ctaScaleBaselineBoxWidth || m.boxOuterRect.width;
-    const narrowness = clamp(
-      (baseline - m.boxOuterRect.width) / T.CTA_SCALE_NARROW_RANGE_PX,
-      0,
-      1,
-    );
-    const scale = 1 + T.CTA_SCALE_MAX_BOOST * smoothstep(narrowness);
-    boxEl.style.setProperty('--why-cta-scale', scale.toFixed(3));
-  }
-
-  function applyCtaAttachedVeil(ctaO) {
-    if (
-      !ctaEl ||
-      !(leadForCta instanceof HTMLElement) ||
-      ctaO <= T.CTA_O_HIDDEN
-    ) {
-      boxEl.style.setProperty('--why-cta-veil-top', '100%');
-      boxEl.style.setProperty('--why-cta-veil-opacity', '0');
-      return;
-    }
-    const leadBottom = lastLineBottomInElement(leadForCta);
-    const wideBottom = lastLineBottomInElement(wideP);
-    const boxRect = boxEl.getBoundingClientRect();
-    const ctaRect = ctaEl.getBoundingClientRect();
-    if (
-      leadBottom == null ||
-      !Number.isFinite(leadBottom) ||
-      ctaRect.height <= 0 ||
-      boxRect.height <= 0
-    ) {
-      boxEl.style.setProperty('--why-cta-veil-top', '100%');
-      boxEl.style.setProperty('--why-cta-veil-opacity', '0');
-      return;
-    }
-    const distance = ctaRect.top - leadBottom;
-    const band = Math.max(T.CTA_VEIL_PROXIMITY_BAND_PX, ctaRect.height * 2.6);
-    const proximity = clamp(1 - distance / band, 0, 1);
-    // Fully opaque cover while CTA exists; remove together when CTA is hidden.
-    const localStrength = clamp(0.86 + 0.14 * smoothstep(proximity), 0, 1);
-    const o = localStrength * ctaO;
-    const guardBottom = Math.max(
-      leadBottom,
-      Number.isFinite(wideBottom) ? wideBottom : Number.NEGATIVE_INFINITY,
-    );
-    const guardBottomLocal = guardBottom - boxRect.top;
-    const ctaTopLocal = ctaRect.top - boxRect.top;
-    const desiredTop = ctaTopLocal - T.CTA_VEIL_ABOVE_ARROW_PX;
-    const topEdge = clamp(
-      Math.max(
-        desiredTop,
-        guardBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
-      ),
-      0,
-      boxRect.height,
-    );
-    boxEl.style.setProperty('--why-cta-veil-top', `${Math.round(topEdge)}px`);
-    boxEl.style.setProperty('--why-cta-veil-opacity', o.toFixed(3));
-  }
-
-  function buildCtaZone(
-    m,
-    ctaO,
-  ): null | { left: number; right: number; top: number; bottom: number } {
-    if (
-      !ctaEl ||
-      ctaO <= T.CTA_ZONE_MIN_O ||
-      ctaEl.style.visibility === 'hidden'
-    ) {
-      return null;
-    }
-    const cr = ctaEl.getBoundingClientRect();
-    if (cr.width <= T.CTA_RECT_MIN || cr.height <= T.CTA_RECT_MIN) return null;
-    const padH = Math.max(
-      T.CTA_ZONE_PAD_H_MIN,
-      cr.width * T.CTA_ZONE_PAD_H_FRAC,
-    );
-    return {
-      left: cr.left - padH,
-      right: cr.right + padH,
-      top: cr.top - T.CTA_ZONE_PAD_TOP,
-      bottom: cr.bottom + T.CTA_ZONE_PAD_BOTTOM,
-    };
-  }
-
-  /** Matches why.css clamp(130px, 22vh, 230px) / clamp(42px, 8vh, 86px). */
-  function edgeVeilHeightPx() {
-    const vh = window.innerHeight;
-    return clamp(130, vh * 0.22, 230);
-  }
-
-  function edgeVeilEndHeightPx() {
-    const vh = window.innerHeight;
-    return clamp(42, vh * 0.08, 86);
-  }
-
-  function computeEndPhase(maxScroll) {
-    const coverBandPx = Math.max(
-      T.END_COVER_BAND_MIN,
-      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
-    );
-    const coverProgress = maxScroll
-      ? clamp(
-          (scrollEl.scrollTop - (maxScroll - coverBandPx)) / coverBandPx,
-          0,
-          1,
-        )
-      : 0;
-    return smoothstep(coverProgress);
-  }
-
-  function applyEndPhaseCss(endPhase) {
-    boxEl.style.setProperty('--why-end-phase', endPhase.toFixed(3));
-    boxEl.style.setProperty('--why-end-cover-opacity', endPhase.toFixed(3));
-  }
-
-  /**
-   * Near maxScroll, extend the top ::before veil downward toward the close-block lead
-   * (“There are no project showcases…”) so coverage ramps smoothly at the real stop.
-   */
-  function applyTopVeilHeight(maxScroll, endPhase) {
-    const baseVeil = edgeVeilHeightPx();
-    const endVeil = edgeVeilEndHeightPx();
-    const hShrunk = baseVeil - (baseVeil - endVeil) * endPhase;
-
-    const growBandPx = Math.max(
-      T.END_TOP_VEIL_GROW_BAND_MIN,
-      scrollEl.clientHeight * T.END_TOP_VEIL_GROW_BAND_FRAC,
-    );
-    const distFromEnd = Math.max(0, maxScroll - scrollEl.scrollTop);
-    const growT =
-      maxScroll > 1 && growBandPx > 0
-        ? 1 - clamp(distFromEnd / growBandPx, 0, 1)
-        : 0;
-    const growPhase = smoothstep(growT);
-
-    const showcaseP = scrollEl.querySelector(
-      '.why-block--close > p:not(.why-close)',
-    );
-    const boxRect = boxEl.getBoundingClientRect();
-    const maxH = boxRect.height * T.END_TOP_VEIL_MAX_FRAC_OF_BOX;
-
-    let targetH = hShrunk;
-    if (showcaseP instanceof HTMLElement && maxScroll > 1) {
-      const pRect = showcaseP.getBoundingClientRect();
-      const rootRem =
-        Number.parseFloat(
-          getComputedStyle(document.documentElement).fontSize,
-        ) || 16;
-      const margin = T.END_TOP_VEIL_MARGIN_ABOVE_SHOWCASE_REM * rootRem;
-      const rawTarget = pRect.top - boxRect.top - margin;
-      targetH = clamp(Math.max(rawTarget, hShrunk), hShrunk, maxH);
-    }
-
-    const hFinal = hShrunk + (targetH - hShrunk) * growPhase;
-    const hStr = `${Math.round(hFinal * 4) / 4}px`;
-    boxEl.style.setProperty('--why-top-veil-current-height-px', hStr);
-    boxEl.style.setProperty('--why-end-top-veil-grow', growPhase.toFixed(3));
-  }
-
-  function applyIntroTopEdge(): number {
-    const introRampPx = Math.max(
-      T.INTRO_RAMP_MIN,
-      scrollEl.clientHeight * T.INTRO_RAMP_FRAC,
-    );
-    const introBlend = smoothstep(
-      clamp(scrollEl.scrollTop / introRampPx, 0, 1),
-    );
-    boxEl.style.setProperty('--why-top-edge-opacity', introBlend.toFixed(3));
-    return introBlend;
-  }
-
-  /**
-   * Vertical budget for the intro band:
-   * - `baseDisplayPx`: how tall the GIF is drawn (uniform scale, 16:9 frame unchanged).
-   * - `gifFootprintPx` (returned): padding-top for intro = display height + clearance vs lead
-   *   so the gap scales with lead size without stretching the asset.
-   * - `footprintMaxPx` caps intro pad so lead anchor (padTop + topSpacer + pad) stays fixed.
-   */
-  function computeGifFootprintPx(m, footprintMaxPx) {
-    const layoutH = m.gifLayoutHeight;
-    let gifFootprintPx = layoutH;
-    if (layoutH > 0 && gifEl) {
-      const narrowness = clamp(
-        (T.GIF_NARROW_REF_PX - m.boxRect.width) / T.GIF_NARROW_RANGE,
-        0,
-        1,
-      );
-      const narrowFactor = clamp(
-        1 - T.GIF_BOX_NARROW_SHAVE * narrowness,
-        0.65,
-        1,
-      );
-      const boxH = m.boxOuterRect.height;
-      const maxByBox = boxH * T.GIF_MAX_BOX_FRAC * narrowFactor;
-      const minByLead = Math.max(
-        m.leadHeight * T.GIF_MIN_LEAD_MULT,
-        boxH * T.GIF_MIN_BOX_FRAC,
-        T.GIF_MIN_ABS_PX,
-      );
-      let baseDisplayPx = clamp(
-        Math.min(layoutH, maxByBox),
-        minByLead,
-        layoutH,
-      );
-      const clearancePx = m.leadHeight * T.GIF_TO_LEAD_CLEARANCE_MULT;
-      const padMax = boxH * T.GIF_INTRO_PAD_MAX_FRAC;
-      const desiredPad = baseDisplayPx + clearancePx;
-      gifFootprintPx = Math.max(baseDisplayPx, Math.min(desiredPad, padMax));
-      gifFootprintPx = Math.min(gifFootprintPx, footprintMaxPx);
-
-      const maxBaseForFootprint = Math.max(0, gifFootprintPx - clearancePx);
-      if (baseDisplayPx > maxBaseForFootprint) {
-        baseDisplayPx = clamp(
-          maxBaseForFootprint,
-          T.GIF_MIN_ABS_PX,
-          Math.min(layoutH, maxByBox),
-        );
-      }
-      baseDisplayPx = Math.min(baseDisplayPx, gifFootprintPx);
-
-      const gifBaseScale = clamp(
-        baseDisplayPx / layoutH,
-        T.GIF_BASE_SCALE_MIN,
-        1,
-      );
-      const scaleStr = gifBaseScale.toFixed(3);
-      if (scaleStr !== lastGifBaseScaleStr) {
-        lastGifBaseScaleStr = scaleStr;
-        gifEl.style.setProperty('--why-gif-base-scale', scaleStr);
-      }
-    } else if (gifEl && lastGifBaseScaleStr !== '1.000') {
-      lastGifBaseScaleStr = '1.000';
-      gifEl.style.setProperty('--why-gif-base-scale', '1.000');
-    }
-    return gifFootprintPx;
-  }
-
-  /** Sum (topSpacer + introGifPad) so lead top = LEAD_TOP_FRAC × why-box height from box top. */
-  function leadAnchorCombinedScrollPx(m) {
-    const H = m.boxOuterRect.height;
-    return Math.max(0, H * T.LEAD_TOP_FRAC - m.padTop);
-  }
-
-  function applySpacersAndIntroVars(m, gifFootprintPx, combinedForLeadPx) {
-    const padQuantized = Math.round(gifFootprintPx * 4) / 4;
-    const topSpacerPx = Math.max(0, combinedForLeadPx - padQuantized);
-    const endScrollExtraPx = m.half * T.END_SCROLL_EXTRA_FRAC;
-    const legacyFloor = m.half - m.padBottom - padQuantized + endScrollExtraPx;
-    const endBandPx = Math.max(
-      T.END_COVER_BAND_MIN,
-      scrollEl.clientHeight * T.END_COVER_BAND_FRAC,
-    );
-    const nearEndLockZone =
-      scrollEl.scrollTop >= Math.max(0, m.maxScroll - endBandPx * 2);
-
-    // Keep the end stop stable: at max scroll, midpoint of the last 2 paragraphs
-    // should sit on the viewport center regardless of zoom/font scaling.
-    // Use layout-space metrics (offsetTop/offsetHeight), not transformed rects,
-    // to avoid feedback jitter from active scale/translate transforms.
-    const lastTwo = lines.slice(-2);
-    let bottomSpacerPx = Math.max(0, legacyFloor);
-    if (nearEndLockZone && lastTwo.length === 2) {
-      const c0 = lastTwo[0].offsetTop + lastTwo[0].offsetHeight / 2;
-      const c1 = lastTwo[1].offsetTop + lastTwo[1].offsetHeight / 2;
-      const targetCenterContentY = contentEl.offsetTop + (c0 + c1) / 2;
-      const requiredMaxScroll = Math.max(0, targetCenterContentY - m.half);
-      const currentBottomSpacerPx = bottomSpacer.offsetHeight || 0;
-      const contentWithoutBottomSpacer =
-        scrollEl.scrollHeight - currentBottomSpacerPx;
-      const neededBottomSpacerPx =
-        requiredMaxScroll + scrollEl.clientHeight - contentWithoutBottomSpacer;
-      bottomSpacerPx = Math.max(0, neededBottomSpacerPx, legacyFloor);
-      // Quantize stronger to suppress sub-pixel spacer ping-pong near end lock.
-      bottomSpacerPx = Math.round(bottomSpacerPx * 2) / 2;
-    }
-    const topStr = `${topSpacerPx.toFixed(2)}px`;
-    const botStr = `${bottomSpacerPx.toFixed(2)}px`;
-    let spacerChanged = false;
-    if (topStr !== lastTopSpacerStr) {
-      lastTopSpacerStr = topStr;
-      topSpacer.style.height = topStr;
-      spacerChanged = true;
-    }
-    if (botStr !== lastBottomSpacerStr) {
-      lastBottomSpacerStr = botStr;
-      bottomSpacer.style.height = botStr;
-      spacerChanged = true;
-    }
-
-    const padTopStr = `${m.padTop.toFixed(2)}px`;
-    const introPadStr = `${padQuantized.toFixed(2)}px`;
-    if (padTopStr !== lastScrollPadTopStr) {
-      lastScrollPadTopStr = padTopStr;
-      contentEl.style.setProperty('--why-scroll-pad-top', padTopStr);
-    }
-    if (introPadStr !== lastIntroGifPadStr) {
-      lastIntroGifPadStr = introPadStr;
-      contentEl.style.setProperty('--why-intro-gif-pad', introPadStr);
-    }
-    contentEl.style.setProperty('--why-gif-nudge-y', '0px');
-    if (spacerChanged && nearEndLockZone) {
-      // Spacer changes alter scrollHeight/maxScroll; force a couple of follow-up frames
-      // so edge-phase gating settles correctly even after fast wheel/touch bursts.
-      settleFrames = Math.max(settleFrames, 2);
-    }
-  }
-
-  function applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate) {
-    const lerp = revolverLerpForDelta(scrollDeltaPx);
-    const strictStart = isStrictStartLock();
-    const strictEnd = isStrictEndLock(m);
-    if (ctaTextDimActive) {
-      if (scrollEl.scrollTop <= T.CTA_TEXT_DIM_EXIT_PX)
-        ctaTextDimActive = false;
-    } else if (scrollEl.scrollTop >= T.CTA_TEXT_DIM_ENTER_PX) {
-      ctaTextDimActive = true;
-    }
-    const effectiveCtaZone = ctaTextDimActive ? ctaZone : null;
-    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
-    const viewportCenterContentY = viewportCenterContentYStable();
-    lines.forEach((line, lineIndex) => {
-      const isWideIntroLine = line.classList.contains('why-p--wide');
-      const lineCY = elementCenterYInScrollContent(line);
-      let normalized;
-      if (Number.isFinite(lineCY) && halfContent > 1) {
-        normalized = Math.abs(lineCY - viewportCenterContentY) / halfContent;
-      } else {
-        const r = line.getBoundingClientRect();
-        const mid = (r.top + r.bottom) / 2;
-        normalized = Math.abs(mid - m.center) / m.half;
-      }
-      normalized = quantizeRevolverNormalized(normalized);
-
-      const edgeProgress = clamp(
-        (normalized - T.REVOLVER_CENTER_BAND) / T.REVOLVER_TRANSITION_BAND,
-        0,
-        1,
-      );
-      const eased = smoothstep(edgeProgress);
-      const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
-      const targetBlend = eased * gate * phaseGate;
-      const strictStartThisLine = strictStart && lineIndex < T.INTRO_LINE_COUNT;
-      // Keep the wide intro sentence fully stable to prevent startup "glint"/flicker.
-      if (isWideIntroLine) {
-        lineBlendState[lineIndex] = 0;
-        applyLineRevolverStylesIfChanged(line, '1.00', '0.00rem', '1.000');
-        return;
-      }
-      if (phaseGate <= 0.001 || strictStartThisLine || strictEnd) {
-        lineBlendState[lineIndex] = 0;
-        let lineOp = 1;
-        const isLeadLine = line.classList.contains('why-lead');
-        if (effectiveCtaZone && !isLeadLine && !isWideIntroLine) {
-          lineOp = ctaOverlapMultiplier(
-            line.getBoundingClientRect(),
-            effectiveCtaZone,
-            T.LINE_OVERLAP_Y,
-            T.LINE_OVERLAP_X,
-          );
-        }
-        applyLineRevolverStylesIfChanged(
-          line,
-          '1.00',
-          '0.00rem',
-          lineOp.toFixed(3),
-        );
-        return;
-      }
-      const prevBlend = lineBlendState[lineIndex] ?? 0;
-      let blendedEased = prevBlend + (targetBlend - prevBlend) * lerp;
-      if (Math.abs(targetBlend - blendedEased) < T.REVOLVER_BLEND_SNAP) {
-        blendedEased = targetBlend;
-      }
-      lineBlendState[lineIndex] = blendedEased;
-
-      const isLead = line.classList.contains('why-lead');
-      const scaleDrop = isLead ? T.LEAD_SCALE_DROP : T.BODY_SCALE_DROP;
-      const maxInset = isLead ? T.LEAD_MAX_INSET_REM : T.BODY_MAX_INSET_REM;
-      const scale = 1 - scaleDrop * blendedEased;
-      const inset = maxInset * blendedEased;
-
-      let lineOp = 1;
-      if (effectiveCtaZone && !isLead && !isWideIntroLine) {
-        lineOp = ctaOverlapMultiplier(
-          line.getBoundingClientRect(),
-          effectiveCtaZone,
-          T.LINE_OVERLAP_Y,
-          T.LINE_OVERLAP_X,
-        );
-      }
-      applyLineRevolverStylesIfChanged(
-        line,
-        scale.toFixed(2),
-        `${inset.toFixed(2)}rem`,
-        lineOp.toFixed(3),
-      );
-    });
-  }
-
-  function pickActiveLineForGif(m) {
-    let activeLineInset = 0;
-    let activeLineDist = Number.POSITIVE_INFINITY;
-    let activeLineLeftPx = Number.NaN;
-    const viewportCenterContentY = viewportCenterContentYStable();
-    lines.forEach((line) => {
-      const lineCY = elementCenterYInScrollContent(line);
-      const rr = line.getBoundingClientRect();
-      const dist = Number.isFinite(lineCY)
-        ? Math.abs(lineCY - viewportCenterContentY)
-        : Math.abs((rr.top + rr.bottom) / 2 - m.center);
-      if (dist < activeLineDist) {
-        activeLineDist = dist;
-        activeLineLeftPx = lineTextStartLeftPx(line) - m.contentRect.left;
-        const insetRaw = line.style.getPropertyValue('--why-line-inset').trim();
-        const insetRem = Number.parseFloat(insetRaw);
-        activeLineInset = Number.isFinite(insetRem) ? insetRem : 0;
-      }
-    });
-    return { activeLineInset, activeLineLeftPx };
-  }
-
-  function applyGifRevolver(
-    m,
-    introBlend,
-    ctaZone,
-    active,
-    scrollDeltaPx,
-    phaseGate,
-  ) {
-    if (!gifEl) return;
-    const lerp = revolverLerpForDelta(scrollDeltaPx);
-    const strictStart = isStrictStartLock();
-    const strictEnd = isStrictEndLock(m);
-    const halfContent = Math.max(1, Math.round(scrollEl.clientHeight) * 0.5);
-    const viewportCenterContentY = viewportCenterContentYStable();
-    const gifCY = elementCenterYInScrollContent(gifEl);
-    let normalized =
-      Number.isFinite(gifCY) && halfContent > 1
-        ? Math.abs(gifCY - viewportCenterContentY) / halfContent
-        : (() => {
-            const r = gifEl.getBoundingClientRect();
-            const mid = (r.top + r.bottom) / 2;
-            return Math.abs(mid - m.center) / m.half;
-          })();
-    normalized = quantizeRevolverNormalized(normalized);
-
-    const edgeProgress = clamp(
-      (normalized - T.REVOLVER_CENTER_BAND) / T.REVOLVER_TRANSITION_BAND,
-      0,
-      1,
-    );
-    const eased = smoothstep(edgeProgress);
-    const gifTarget = eased * introBlend * phaseGate;
-    if (phaseGate <= 0.001 || strictStart || strictEnd) {
-      gifBlendState = 0;
-      let opacity = 1;
-      if (ctaZone) {
-        opacity *= ctaOverlapMultiplier(
-          gifEl.getBoundingClientRect(),
-          ctaZone,
-          T.GIF_OVERLAP_Y,
-          T.GIF_OVERLAP_X,
-        );
-      }
-      const key = `z|1.00|0.00rem||${opacity.toFixed(3)}`;
-      if (key !== gifLastRevolverKey) {
-        gifLastRevolverKey = key;
-        gifEl.style.setProperty('--why-line-scale', '1.00');
-        gifEl.style.setProperty('--why-line-inset', '0.00rem');
-        gifEl.style.removeProperty('--why-gif-align-x');
-        gifEl.style.setProperty('--why-gif-opacity', opacity.toFixed(3));
-      }
-      return;
-    }
-    let gifEased = gifBlendState + (gifTarget - gifBlendState) * lerp;
-    if (Math.abs(gifTarget - gifEased) < T.REVOLVER_BLEND_SNAP) {
-      gifEased = gifTarget;
-    }
-    gifBlendState = gifEased;
-
-    const leadHStable =
-      leadForCta && leadForCta.offsetHeight > 0
-        ? leadForCta.offsetHeight
-        : m.leadHeight;
-    const liftPx = leadHStable * T.GIF_LIFT_LEAD_MULT;
-    const liftStr = `${(-liftPx).toFixed(1)}px`;
-
-    const scale = 1 - T.GIF_SCALE_DROP * gifEased;
-    const scaleStr = scale.toFixed(2);
-    const insetStr = `${active.activeLineInset.toFixed(2)}rem`;
-    const alignStr = Number.isFinite(active.activeLineLeftPx)
-      ? `${active.activeLineLeftPx.toFixed(2)}px`
-      : '';
-
-    let opacity = clamp(1 - T.GIF_OPACITY_DROP * gifEased, 0, 1);
-    if (ctaZone) {
-      opacity *= ctaOverlapMultiplier(
-        gifEl.getBoundingClientRect(),
-        ctaZone,
-        T.GIF_OVERLAP_Y,
-        T.GIF_OVERLAP_X,
-      );
-    }
-    const opStr = opacity.toFixed(3);
-    const key = `${liftStr}|${scaleStr}|${insetStr}|${alignStr}|${opStr}`;
-    if (key !== gifLastRevolverKey) {
-      gifLastRevolverKey = key;
-      gifEl.style.setProperty('--why-gif-y', liftStr);
-      gifEl.style.setProperty('--why-line-scale', scaleStr);
-      gifEl.style.setProperty('--why-line-inset', insetStr);
-      if (alignStr) {
-        gifEl.style.setProperty('--why-gif-align-x', alignStr);
-      } else {
-        gifEl.style.removeProperty('--why-gif-align-x');
-      }
-      gifEl.style.setProperty('--why-gif-opacity', opStr);
-    }
-  }
-
-  let rafId = 0;
-  let settleFrames = 0;
-  /** Dedupe style writes to cut layout thrash during zoom. */
-  let lastGifBaseScaleStr = '';
-  let lastTopSpacerStr = '';
-  let lastBottomSpacerStr = '';
-  let lastScrollPadTopStr = '';
-  let lastIntroGifPadStr = '';
-  let lastStartCoverHeightStr = '';
-  let resizeQuietTimer = 0;
-  let wheelTargetTop = Number.NaN;
-  let layoutObserver: ResizeObserver | null = null;
-  let ctaScaleBaselineBoxWidth = 0;
+  const schedule = () => {
+    if (rafId) return;
+    rafId = requestAnimationFrame(update);
+  };
 
   const requestZoomSettle = (frames = 4) => {
     settleFrames = Math.max(settleFrames, frames);
     schedule();
   };
 
-  const schedule = () => {
-    if (rafId) return;
-    rafId = requestAnimationFrame(update);
-  };
-
   /** One rAF per burst while resizing; extra passes only after zoom/resize is quiet. */
   function onViewportResize() {
     prevFrameRevolverIdle = false;
     revolverIdleStreak = 0;
-    gifLastRevolverKey = '';
+    revolver.resetGifRevolverStyleKey();
     schedule();
     if (resizeQuietTimer) window.clearTimeout(resizeQuietTimer);
     resizeQuietTimer = window.setTimeout(() => {
@@ -1255,7 +367,7 @@ import {
       }
     }
 
-    const m = readLayoutMetrics();
+    const m = layout.readLayoutMetrics();
     if (!prevFrameRevolverIdle) {
       applyFontScaleStep();
     }
@@ -1285,21 +397,61 @@ import {
       T.REVOLVER_SCROLL_SNAP_PX;
     lastScrollTopSnapped = scrollSnapStep;
 
-    applyStartCover();
-    const ctaO = applyCtaFade();
-    applyCtaHorizontalAnchor(m);
-    applyCtaVerticalMidpoint(m);
-    applyCtaScale(m);
-    applyCtaAttachedVeil(ctaO);
-    const ctaZone = buildCtaZone(m, ctaO);
+    veils.applyStartCover();
+    const ctaO = applyCtaFade({
+      scrollTop: scrollEl.scrollTop,
+      ctaFadePx: T.CTA_FADE_PX,
+      ctaHiddenOpacity: T.CTA_O_HIDDEN,
+      boxEl,
+      ctaEl,
+    });
+    applyCtaHorizontalAnchor({ boxEl, ctaEl, leadForCta, metrics: m });
+    applyCtaVerticalMidpoint({
+      boxEl,
+      ctaEl,
+      leadForCta,
+      metrics: m,
+      ctaFromLeadToBottomFrac: T.CTA_FROM_LEAD_TO_BOTTOM_FRAC,
+      ctaVerticalFracFromBoxBottom: T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM,
+      ctaTopClampMargin: T.CTA_TOP_CLAMP_MARGIN,
+    });
+    ctaScaleBaselineBoxWidth = applyCtaScale({
+      boxEl,
+      ctaEl,
+      metrics: m,
+      baselineBoxWidth: ctaScaleBaselineBoxWidth,
+      scaleNarrowRangePx: T.CTA_SCALE_NARROW_RANGE_PX,
+      scaleMaxBoost: T.CTA_SCALE_MAX_BOOST,
+    });
+    applyCtaAttachedVeil({
+      boxEl,
+      ctaEl,
+      leadForCta,
+      wideP,
+      ctaOpacity: ctaO,
+      ctaHiddenOpacity: T.CTA_O_HIDDEN,
+      veilProximityBandPx: T.CTA_VEIL_PROXIMITY_BAND_PX,
+      veilAboveArrowPx: T.CTA_VEIL_ABOVE_ARROW_PX,
+      veilClearanceBelowLeadPx: T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX,
+    });
+    const ctaZone = buildCtaZone({
+      ctaEl,
+      ctaOpacity: ctaO,
+      ctaZoneMinOpacity: T.CTA_ZONE_MIN_O,
+      ctaRectMin: T.CTA_RECT_MIN,
+      ctaZonePadHMin: T.CTA_ZONE_PAD_H_MIN,
+      ctaZonePadHFrac: T.CTA_ZONE_PAD_H_FRAC,
+      ctaZonePadTop: T.CTA_ZONE_PAD_TOP,
+      ctaZonePadBottom: T.CTA_ZONE_PAD_BOTTOM,
+    });
 
-    const introBlend = applyIntroTopEdge();
-    const phaseGate = middlePhaseRevolverGate(m);
+    const introBlend = veils.applyIntroTopEdge();
+    const phaseGate = middlePhaseRevolverGateForFrame(m);
 
-    const combinedForLead = leadAnchorCombinedScrollPx(m);
-    const gifFootprintPx = computeGifFootprintPx(m, combinedForLead);
-    applySpacersAndIntroVars(m, gifFootprintPx, combinedForLead);
-    applyStartCoverBandSizing();
+    const combinedForLead = layout.leadAnchorCombinedScrollPx(m);
+    const gifFootprintPx = layout.computeGifFootprintPx(m, combinedForLead);
+    layout.applySpacersAndIntroVars(m, gifFootprintPx, combinedForLead);
+    veils.applyStartCoverBandSizing();
 
     const maxScrollNow = Math.max(
       0,
@@ -1311,9 +463,15 @@ import {
         T.REVOLVER_MAX_SCROLL_JITTER_EPS;
     lastMaxScrollForRevolverFreeze = maxScrollNow;
 
-    const endPhaseNow = computeEndPhase(maxScrollNow);
-    applyEndPhaseCss(endPhaseNow);
-    applyTopVeilHeight(maxScrollNow, endPhaseNow);
+    const endPhaseNow = computeEndPhase(
+      scrollEl.scrollTop,
+      scrollEl.clientHeight,
+      maxScrollNow,
+      T.END_COVER_BAND_MIN,
+      T.END_COVER_BAND_FRAC,
+    );
+    veils.applyEndPhaseCss(endPhaseNow);
+    veils.applyTopVeilHeight(maxScrollNow, endPhaseNow);
 
     const rawRevolverIdle =
       scrollDeltaPx < T.REVOLVER_SCROLL_IDLE_EPS &&
@@ -1327,9 +485,9 @@ import {
       hasAppliedRevolverOnce && revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
 
     if (!revolverIdle) {
-      applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
-      const active = pickActiveLineForGif(m);
-      applyGifRevolver(
+      revolver.applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
+      const active = revolver.pickActiveLineForGif(m);
+      revolver.applyGifRevolver(
         m,
         introBlend,
         ctaZone,
@@ -1390,7 +548,13 @@ import {
         0,
         scrollEl.scrollHeight - scrollEl.clientHeight,
       );
-      const dy = wheelDeltaToPixels(event) * T.WHEEL_SCROLL_FACTOR;
+      const dy =
+        wheelDeltaToPixels(
+          event.deltaY,
+          event.deltaZ || 0,
+          event.deltaMode,
+          scrollEl.clientHeight || 1,
+        ) * T.WHEEL_SCROLL_FACTOR;
       const base = Number.isFinite(wheelTargetTop)
         ? wheelTargetTop
         : scrollEl.scrollTop;
