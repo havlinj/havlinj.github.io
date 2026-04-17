@@ -184,6 +184,8 @@ import {
     FIT_FAIL_TARGET_EPS: 0.004,
     FIT_FAIL_FRAMES: 8,
     FIT_FAIL_LOCK_PADDING_PX: 6,
+    /** Safety reserve so widest line still fits with a tiny buffer. */
+    FIT_LOCK_SAFETY_PX: 1,
     /** <1 = mouse wheel moves the panel slower (only when we handle wheel below). */
     WHEEL_SCROLL_FACTOR: 0.78,
     /** Per-frame catch-up toward wheel target scrollTop (higher = quicker, lower = smoother). */
@@ -389,6 +391,17 @@ import {
     if (w < 2) return 1;
     const wPerUnit = w / Math.max(1e-4, whyFontScale);
     return clamp(contentW / wPerUnit, T.FONT_MIN, 1);
+  }
+
+  function measureFitOverflowPx() {
+    if (!(wideP instanceof HTMLElement) || !(fitProbe instanceof HTMLElement))
+      return 0;
+    const contentW = wideColumnContentWidthPx();
+    scrollEl.style.setProperty('--why-font-scale', whyFontScale.toFixed(4));
+    void scrollEl.offsetWidth;
+    const probeW = fitProbe.getBoundingClientRect().width;
+    // Positive value means widest sentence is already clipping in available column width.
+    return probeW - (contentW + T.FIT_LOCK_SAFETY_PX);
   }
 
   function applyFontScaleStep() {
@@ -1217,7 +1230,9 @@ import {
       applyFontScaleStep();
     }
     const fitTargetNow = computeWhyFontTarget();
-    const fitAtLimit = fitTargetNow <= T.FONT_MIN + T.FIT_FAIL_TARGET_EPS;
+    const overflowPx = measureFitOverflowPx();
+    const fitAtLimit =
+      fitTargetNow <= T.FONT_MIN + T.FIT_FAIL_TARGET_EPS && overflowPx > 0;
     if (fitAtLimit) fitFailStreak++;
     else fitFailStreak = 0;
     if (
