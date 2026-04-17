@@ -2,6 +2,16 @@
    PROFILE PAGE – photo left (square), panel right extends 1/4 width down
 ================================ */
 
+/*
+ * CONTRACT OVERVIEW (sync with profile-tile-type-fit.ts + e2e/profile-seam-ratios.ts)
+ * - Grid + seams: --profile-shared-edge-ratio-*, --profile-shared-edge-frame-ratio,
+ *   --profile-stitched-seam-thickness (breakpoints below must match TS constants).
+ * - Type fit (JS): --profile-tile-label-font-size, --profile-reveal-font-size,
+ *   --foundations-reveal-uniform-scale (Foundations reveal stanza).
+ * - Right column geometry (JS): --profile-right-height-px, --profile-portrait-side-px,
+ *   --portrait-effective-scale; state2 uses :has(.is-revealed) overrides on .profile-right-column.
+ */
+
 /* Clip panel by content-body when it extends (soft edges stay inside) */
 article.has-buttons-panel {
   overflow: hidden;
@@ -84,6 +94,7 @@ article.has-buttons-panel {
   grid-row: 2;
 }
 
+/* --- Right column (A / a / c model; vars from JS) --- */
 /*
  * Right column geometry (A/a/c model):
  * - A: "big square" height (= full right region height, 100%).

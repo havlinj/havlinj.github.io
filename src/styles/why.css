@@ -1,3 +1,26 @@
+/* ===============================
+   /why — CSS CONTRACT (no visual edits here without matching TS)
+   Read together with: WhyContent.astro, why-box-scroll.ts, src/constants/why-layout.ts
+
+   Rough token buckets (names are API for JS):
+   1) Shell     — .why-wrapper / .why-box: panel colors, container-type, default veil heights,
+                  --why-end-phase, --why-end-top-veil-grow, --why-top-edge-opacity
+   2) CTA stack — .why-scroll-cta, .why-cta-veil: --why-cta-left/top/scale/opacity,
+                  --why-cta-veil-top/opacity (why-scroll-cta.ts)
+   3) Phase veils — .why-end-cover, .why-start-cover, .why-box-bottom-veil,
+                  .why-box-intro-bottom-veil, .why-box-step3-veil, ::before/::after:
+                  --why-start-cover-*, --why-bottom-veil-*, --why-intro-bottom-veil-*,
+                  --why-step3-veil-*, --why-end-cover-opacity, --why-top-veil-current-height-px
+                  (why-scroll-veils.ts + start-cover sizing in layout pass)
+   4) Scrollport — .why-scroll / .why-content: --why-font-scale, --why-copy-font-size,
+                  --why-text-right-gutter, --why-scroll-pad-top, --why-intro-gif-pad,
+                  --why-gif-nudge-y (why-scroll-layout.ts)
+   5) Revolver  — paragraphs + .why-gif-holder: --why-line-scale/inset/opacity,
+                  --why-gif-y, --why-gif-align-x, --why-gif-base-scale, --why-gif-opacity
+                  (why-scroll-revolver.ts)
+================================ */
+
+/* --- 1) Shell: wrapper + panel box --- */
 .why-page .why-wrapper {
   --why-box-bg: #111;
   --why-box-fg: var(--color-page-bg);
@@ -39,6 +62,7 @@
   container-name: why-box;
 }
 
+/* --- 2) CTA + full-width CTA veil --- */
 /* Downward scroll CTA (page-bg color); fades via --why-cta-opacity from WhyContent script */
 .why-page .why-scroll-cta {
   position: absolute;
@@ -107,6 +131,7 @@
   }
 }
 
+/* --- 3) End cover, in-scroll start cover, stacked bottom veils, box ink pseudos --- */
 .why-page .why-end-cover {
   position: absolute;
   top: 0;
@@ -255,6 +280,7 @@
   );
 }
 
+/* ::before top veil + ::after bottom mirror (stacking vs .why-scroll z-index 1) */
 .why-page .why-box::before,
 .why-page .why-box::after {
   content: '';
@@ -336,6 +362,7 @@
   );
 }
 
+/* --- 4) Scrollport, content readiness, blocks, typography + revolver vars --- */
 .why-page .why-scroll {
   /* sync: WHY_TEXT_RIGHT_GUTTER_REM (JS px fallback) — ~3rem at ~1.09rem body (3/1.09) */
   --why-text-right-gutter: 2.75em;
@@ -406,6 +433,7 @@
   margin-top: calc(clamp(4.5rem, 8vh, 6.5rem) * var(--why-font-scale, 1));
 }
 
+/* Paragraph revolver: --why-line-scale, --why-line-inset, --why-line-opacity */
 .why-page .why-scroll p {
   margin: 0;
   font-size: inherit;
@@ -494,6 +522,7 @@
   letter-spacing: -0.01em;
 }
 
+/* --- 5) GIF column (shares --why-line-* / --why-gif-* with revolver) --- */
 .why-page .why-gif-holder {
   position: absolute;
   left: 0;
