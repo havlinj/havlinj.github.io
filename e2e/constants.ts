@@ -9,6 +9,13 @@ export const MAX_GAP = 80;
 export const MIN_CONTENT_WIDTH_CH = 40; /* --content-min-width */
 export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
 
+/**
+ * Viewport width for e2e that forces Why wide-line fit past `FONT_MIN` so the
+ * runtime `main.content` min-width lock engages (guards extreme zoom / narrow layout).
+ * Sync intent with `FIT_FAIL_*` in `src/scripts/why-box-scroll.ts`.
+ */
+export const WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH = 400;
+
 /** /why layout — single source: `src/constants/why-layout.ts` */
 export {
   WHY_CTA_ARROW_FLOOR_OPACITY,

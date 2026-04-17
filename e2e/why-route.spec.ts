@@ -6,6 +6,7 @@ import {
   WHY_CTA_EDGE_MIN_PX,
   WHY_CTA_EDGE_WIDTH_FRAC,
   WHY_CTA_LEAD_TRACK,
+  WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH,
   WHY_GIF_TOP_INSET,
   WHY_SCROLL_CTA_CONTAINER_CQW,
 } from './constants';
@@ -1137,10 +1138,13 @@ test.describe('/why page @serial', () => {
     expect(leadStyle!.textIndent).toBe('0px');
   });
 
-  test('extreme fit failure lock path stays valid when triggered', async ({
+  test('Why runtime min-width lock engages at extreme narrow width (fit-fail guard)', async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 560, height: 520 });
+    await page.setViewportSize({
+      width: WHY_FIT_FAIL_LOCK_VIEWPORT_WIDTH,
+      height: 520,
+    });
     await gotoWhyWhenReady(page);
 
     await page.evaluate(async () => {
@@ -1148,7 +1152,7 @@ test.describe('/why page @serial', () => {
         '.why-page .why-scroll',
       ) as HTMLElement | null;
       if (!scroll) return;
-      const waitFrames = (n = 2) =>
+      const waitFrames = (n = 3) =>
         new Promise<void>((resolve) => {
           const run = (left: number) => {
             if (left <= 0) return resolve();
@@ -1156,23 +1160,47 @@ test.describe('/why page @serial', () => {
           };
           run(n);
         });
-      // Force multiple update passes near top to let fit-failure streak settle.
-      for (let i = 0; i < 18; i += 1) {
-        scroll.scrollTop = i % 2 === 0 ? 0 : 2;
+      for (let i = 0; i < 36; i += 1) {
+        scroll.scrollTop = i % 2 === 0 ? 0 : 3;
         scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
         await waitFrames();
       }
+      window.dispatchEvent(new Event('resize'));
+      window.visualViewport?.dispatchEvent(new Event('resize'));
     });
 
-    await page.waitForTimeout(250);
-    const lockValue = await page.evaluate(() => {
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(() => {
+            const main = document.querySelector(
+              'main.content',
+            ) as HTMLElement | null;
+            return main?.style.minWidth?.trim() ?? '';
+          }),
+        {
+          message:
+            'Why script should set main.content inline minWidth after sustained fit failure (zoom / narrow guard)',
+          timeout: 12_000,
+        },
+      )
+      .toMatch(/^\d+(\.\d+)?px$/);
+
+    const { lockPx, scrollW } = await page.evaluate(() => {
       const main = document.querySelector('main.content') as HTMLElement | null;
-      return main?.style.minWidth || '';
+      const scroll = document.querySelector(
+        '.why-page .why-scroll',
+      ) as HTMLElement | null;
+      const lock = main?.style.minWidth?.trim() ?? '';
+      const lockPx = Number.parseFloat(lock) || 0;
+      const scrollW = scroll?.getBoundingClientRect().width ?? 0;
+      return { lockPx, scrollW };
     });
-
-    if (typeof lockValue === 'string' && lockValue.length > 0) {
-      expect(lockValue).toMatch(/px$/);
-    }
+    expect(lockPx).toBeGreaterThan(0);
+    expect(scrollW).toBeGreaterThan(0);
+    /* Lock is ceil(.why-scroll width) + FIT_FAIL_LOCK_PADDING_PX in why-box-scroll.ts */
+    expect(lockPx).toBeGreaterThanOrEqual(scrollW - 2);
+    expect(lockPx).toBeLessThanOrEqual(scrollW + 24);
   });
 
   test('edge veils: top extends at scroll end, bottom shrinks versus middle', async ({

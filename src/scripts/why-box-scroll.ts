@@ -482,10 +482,10 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     }
 
     const m = layout.readLayoutMetrics();
-    applyIntroTopBand(m);
     if (!prevFrameRevolverIdle) {
       applyFontScaleStep();
     }
+    applyIntroTopBand(m);
     const fitTargetNow = computeWhyFontTarget();
     const overflowPx = measureFitOverflowPx();
     const fitAtLimit =
