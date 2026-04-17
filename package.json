@@ -26,6 +26,7 @@
     "all": "bash ./scripts/all.sh"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.2",
     "@fontsource/inter": "^5.2.8",
     "astro": "^6.1.3"
   },
