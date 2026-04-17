@@ -165,7 +165,9 @@ test.describe('/why page @serial', () => {
     );
   });
 
-  test('scroll CTA arrow is solid fill with blink animation', async ({ page }) => {
+  test('scroll CTA arrow is solid fill with blink animation', async ({
+    page,
+  }) => {
     const data = await page.evaluate(() => {
       const root = document.querySelector(
         '.why-page .why-scroll-cta .animated-arrow-root',
@@ -207,7 +209,10 @@ test.describe('/why page @serial', () => {
       'animated-arrow-blink',
     );
     expect(data!.fill).toMatch(/rgb\(\s*224\s*,\s*247\s*,\s*250\s*\)/i);
-    expect(parseFloat(data!.peakVar)).toBeCloseTo(WHY_CTA_ARROW_PEAK_OPACITY, 5);
+    expect(parseFloat(data!.peakVar)).toBeCloseTo(
+      WHY_CTA_ARROW_PEAK_OPACITY,
+      5,
+    );
     expect(parseFloat(data!.floorVar)).toBeCloseTo(
       WHY_CTA_ARROW_FLOOR_OPACITY,
       5,

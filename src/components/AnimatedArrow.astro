@@ -124,13 +124,17 @@ const responsiveClampMaxPx = (() => {
 })();
 
 const variant =
-  props.variant === 'solid-blink' ? ('solid-blink' as const) : ('segmented' as const);
+  props.variant === 'solid-blink'
+    ? ('solid-blink' as const)
+    : ('segmented' as const);
 
 const color = props.color ?? '#111';
 const durationSec = Number(props.duration);
 const durationDefault = variant === 'solid-blink' ? 1.45 : 2.6;
 const duration =
-  Number.isFinite(durationSec) && durationSec > 0 ? durationSec : durationDefault;
+  Number.isFinite(durationSec) && durationSec > 0
+    ? durationSec
+    : durationDefault;
 const className = props.class ?? '';
 const direction = props.direction === 'down' ? 'down' : 'up';
 

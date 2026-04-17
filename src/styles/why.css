@@ -283,10 +283,14 @@
     to top,
     var(--why-box-bg) 0%,
     var(--why-box-bg) calc(28% + 16% * var(--why-intro-bottom-veil-hard, 0)),
-    rgba(17, 17, 17, calc(0.42 + 0.38 * var(--why-intro-bottom-veil-hard, 0))) 40%,
-    rgba(17, 17, 17, calc(0.22 + 0.28 * var(--why-intro-bottom-veil-hard, 0))) 54%,
-    rgba(17, 17, 17, calc(0.1 + 0.14 * var(--why-intro-bottom-veil-hard, 0))) 68%,
-    rgba(17, 17, 17, calc(0.03 + 0.06 * var(--why-intro-bottom-veil-hard, 0))) 82%,
+    rgba(17, 17, 17, calc(0.42 + 0.38 * var(--why-intro-bottom-veil-hard, 0)))
+      40%,
+    rgba(17, 17, 17, calc(0.22 + 0.28 * var(--why-intro-bottom-veil-hard, 0)))
+      54%,
+    rgba(17, 17, 17, calc(0.1 + 0.14 * var(--why-intro-bottom-veil-hard, 0)))
+      68%,
+    rgba(17, 17, 17, calc(0.03 + 0.06 * var(--why-intro-bottom-veil-hard, 0)))
+      82%,
     rgba(17, 17, 17, 0) 100%
   );
 }

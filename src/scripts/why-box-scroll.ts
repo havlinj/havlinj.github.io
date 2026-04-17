@@ -70,7 +70,8 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     }
     const periodSec = Math.max(1e-3, WHY_CLIP_PLAYBACK_SINE_PERIOD_MS / 1000);
     const tSec = performance.now() * 0.001;
-    const phase = (tSec * (Math.PI * 2)) / periodSec + WHY_CLIP_PLAYBACK_SINE_PHASE_RAD;
+    const phase =
+      (tSec * (Math.PI * 2)) / periodSec + WHY_CLIP_PLAYBACK_SINE_PHASE_RAD;
     let wave;
     if (WHY_CLIP_PLAYBACK_WAVE === 'triangle') {
       const twoPi = Math.PI * 2;
@@ -474,7 +475,10 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       '--why-intro-top-band-height',
       op <= 0 ? '0px' : `${heightPx}px`,
     );
-    introTopBandEl.style.setProperty('--why-intro-top-band-opacity', String(op));
+    introTopBandEl.style.setProperty(
+      '--why-intro-top-band-opacity',
+      String(op),
+    );
   }
 
   function update() {
