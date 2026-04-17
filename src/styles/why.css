@@ -50,10 +50,29 @@
    */
   top: var(--why-cta-top, 72%);
   bottom: auto;
-  z-index: 5;
-  transform: translate(-50%, -50%);
+  z-index: 9;
+  transform: translate(-50%, -50%) scale(var(--why-cta-scale, 1));
+  transform-origin: center center;
   pointer-events: none;
   opacity: var(--why-cta-opacity, 1);
+}
+
+/* Full-width CTA cover on the black box: from arrow top edge downward. */
+.why-page .why-box > .why-cta-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--why-cta-veil-top, 100%);
+  bottom: 0;
+  z-index: 8;
+  pointer-events: none;
+  opacity: var(--why-cta-veil-opacity, 0);
+  background: var(--why-box-bg);
+}
+
+.why-page .why-scroll-cta .animated-arrow-root {
+  position: relative;
+  z-index: 1;
 }
 
 .why-page .why-scroll-cta .animated-arrow-root {
@@ -158,9 +177,15 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(
-    var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px)) *
-      (1 + 0.34 * var(--why-intro-bottom-veil-hard, 0))
+  height: min(
+    calc(
+      var(--why-start-cover-height, clamp(140px, 20.8vh, 218px)) *
+        (0.44 + 0.24 * var(--why-intro-bottom-veil-hard, 0))
+    ),
+    calc(
+      var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px)) *
+        (1 + 0.26 * var(--why-intro-bottom-veil-hard, 0))
+    )
   );
   z-index: 2;
   pointer-events: none;
@@ -168,10 +193,10 @@
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    var(--why-box-bg) calc(30% + 18% * var(--why-intro-bottom-veil-hard, 0)),
-    rgba(17, 17, 17, calc(0.88 + 0.12 * var(--why-intro-bottom-veil-hard, 0)))
+    var(--why-box-bg) calc(38% + 24% * var(--why-intro-bottom-veil-hard, 0)),
+    rgba(17, 17, 17, calc(0.92 + 0.08 * var(--why-intro-bottom-veil-hard, 0)))
       56%,
-    rgba(17, 17, 17, calc(0.44 + 0.28 * var(--why-intro-bottom-veil-hard, 0)))
+    rgba(17, 17, 17, calc(0.56 + 0.34 * var(--why-intro-bottom-veil-hard, 0)))
       78%,
     rgba(17, 17, 17, calc(0.08 + 0.92 * var(--why-intro-bottom-veil-hard, 0)))
       calc(88% + 7% * var(--why-intro-bottom-veil-hard, 0)),
@@ -280,6 +305,7 @@
   padding-left: 0;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  hyphens: none;
 }
 
 .why-page .why-content {
@@ -344,6 +370,9 @@
   transition: none;
   backface-visibility: hidden;
   will-change: transform, opacity;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
 }
 
 .why-page .why-scroll p + p {
@@ -353,6 +382,9 @@
 .why-page .why-scroll p.why-lead {
   position: relative;
   z-index: 6;
+  /* Keep optical left edge stable across zoom/font-fit changes. */
+  text-indent: 0;
+  margin-left: -1px;
   font-size: calc(
     clamp(1.02rem, 0.95rem + 0.74vw, 1.22rem) * var(--why-font-scale, 1)
   );

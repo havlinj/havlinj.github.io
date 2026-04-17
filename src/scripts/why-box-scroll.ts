@@ -83,6 +83,21 @@ import {
     CTA_ZONE_PAD_H_FRAC: 0.35,
     CTA_ZONE_PAD_TOP: 16,
     CTA_ZONE_PAD_BOTTOM: 28,
+    /** CTA grows as the box gets narrower than baseline captured at init. */
+    CTA_SCALE_NARROW_RANGE_PX: 520,
+    CTA_SCALE_MAX_BOOST: 0.28,
+    /** CTA center is this fraction from lead-bottom toward box-bottom. */
+    CTA_FROM_LEAD_TO_BOTTOM_FRAC: 0.6,
+    /** Progressive tightening: minimum fraction as box narrows. */
+    CTA_FROM_LEAD_TO_BOTTOM_MIN_FRAC: 0.42,
+    CTA_FROM_LEAD_TO_BOTTOM_NARROW_RANGE_PX: 520,
+    CTA_FROM_LEAD_TO_BOTTOM_PROGRESSIVE_POWER: 1.6,
+    /** CTA-attached veil ramps when arrow gets close to lead line. */
+    CTA_VEIL_PROXIMITY_BAND_PX: 130,
+    /** Keep CTA veil top safely below the lead line. */
+    CTA_VEIL_CLEARANCE_BELOW_LEAD_PX: 8,
+    /** Start full-black CTA veil a bit above arrow top edge. */
+    CTA_VEIL_ABOVE_ARROW_PX: 12,
     /** Hysteresis for CTA overlap dimming to avoid early dim/bright flicker. */
     CTA_TEXT_DIM_ENTER_PX: 116,
     CTA_TEXT_DIM_EXIT_PX: 92,
@@ -604,14 +619,28 @@ import {
     const boxTop = m.boxOuterRect.top;
     const boxBottom = m.boxOuterRect.bottom;
     const boxH = m.boxOuterRect.height;
-    const f = T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM;
-    const refLineBottom = lastLineBottomInElement(wideP);
+    if (ctaScaleBaselineBoxWidth <= 0 && m.boxOuterRect.width > 0) {
+      ctaScaleBaselineBoxWidth = m.boxOuterRect.width;
+    }
+    const baseline = ctaScaleBaselineBoxWidth || m.boxOuterRect.width;
+    const narrowness = clamp(
+      (baseline - m.boxOuterRect.width) /
+        T.CTA_FROM_LEAD_TO_BOTTOM_NARROW_RANGE_PX,
+      0,
+      1,
+    );
+    const progressive = Math.pow(smoothstep(narrowness), T.CTA_FROM_LEAD_TO_BOTTOM_PROGRESSIVE_POWER);
+    const f =
+      T.CTA_FROM_LEAD_TO_BOTTOM_FRAC -
+      (T.CTA_FROM_LEAD_TO_BOTTOM_FRAC - T.CTA_FROM_LEAD_TO_BOTTOM_MIN_FRAC) *
+        progressive;
+    const leadBottom = lastLineBottomInElement(leadForCta);
     let targetY;
-    if (refLineBottom == null || !Number.isFinite(refLineBottom)) {
-      targetY = boxBottom - f * boxH;
+    if (leadBottom == null || !Number.isFinite(leadBottom)) {
+      targetY = boxBottom - T.CTA_VERTICAL_FRAC_FROM_BOX_BOTTOM * boxH;
     } else {
-      const gap = boxBottom - refLineBottom;
-      targetY = boxBottom - f * gap;
+      const gap = Math.max(0, boxBottom - leadBottom);
+      targetY = leadBottom + f * gap;
     }
     let topPx = targetY - boxTop;
     topPx = clamp(
@@ -620,6 +649,55 @@ import {
       Math.max(T.CTA_TOP_CLAMP_MARGIN, boxH - T.CTA_TOP_CLAMP_MARGIN),
     );
     boxEl.style.setProperty('--why-cta-top', `${topPx.toFixed(2)}px`);
+  }
+
+  function applyCtaScale(m) {
+    if (!ctaEl) return;
+    if (ctaScaleBaselineBoxWidth <= 0 && m.boxOuterRect.width > 0) {
+      ctaScaleBaselineBoxWidth = m.boxOuterRect.width;
+    }
+    const baseline = ctaScaleBaselineBoxWidth || m.boxOuterRect.width;
+    const narrowness = clamp(
+      (baseline - m.boxOuterRect.width) / T.CTA_SCALE_NARROW_RANGE_PX,
+      0,
+      1,
+    );
+    const scale = 1 + T.CTA_SCALE_MAX_BOOST * smoothstep(narrowness);
+    boxEl.style.setProperty('--why-cta-scale', scale.toFixed(3));
+  }
+
+  function applyCtaAttachedVeil(ctaO) {
+    if (!ctaEl || !(leadForCta instanceof HTMLElement) || ctaO <= T.CTA_O_HIDDEN) {
+      boxEl.style.setProperty('--why-cta-veil-top', '100%');
+      boxEl.style.setProperty('--why-cta-veil-opacity', '0');
+      return;
+    }
+    const leadBottom = lastLineBottomInElement(leadForCta);
+    const boxRect = boxEl.getBoundingClientRect();
+    const ctaRect = ctaEl.getBoundingClientRect();
+    if (
+      leadBottom == null ||
+      !Number.isFinite(leadBottom) ||
+      ctaRect.height <= 0 ||
+      boxRect.height <= 0
+    ) {
+      boxEl.style.setProperty('--why-cta-veil-top', '100%');
+      boxEl.style.setProperty('--why-cta-veil-opacity', '0');
+      return;
+    }
+    // Fully opaque cover while CTA exists; remove together when CTA is hidden.
+    const o = ctaO > T.CTA_O_HIDDEN ? 1 : 0;
+    const leadBottomLocal = leadBottom - boxRect.top;
+    const ctaTopLocal = ctaRect.top - boxRect.top;
+    // Hard requirement: full-black veil starts slightly above arrow top edge, but never reaches lead line.
+    const desiredTop = ctaTopLocal - T.CTA_VEIL_ABOVE_ARROW_PX;
+    const topEdge = clamp(
+      Math.max(desiredTop, leadBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX),
+      0,
+      boxRect.height,
+    );
+    boxEl.style.setProperty('--why-cta-veil-top', `${Math.round(topEdge)}px`);
+    boxEl.style.setProperty('--why-cta-veil-opacity', o.toFixed(3));
   }
 
   function buildCtaZone(
@@ -1084,6 +1162,8 @@ import {
   let lastStartCoverHeightStr = '';
   let resizeQuietTimer = 0;
   let wheelTargetTop = Number.NaN;
+  let layoutObserver: ResizeObserver | null = null;
+  let ctaScaleBaselineBoxWidth = 0;
 
   const requestZoomSettle = (frames = 4) => {
     settleFrames = Math.max(settleFrames, frames);
@@ -1141,6 +1221,8 @@ import {
     const ctaO = applyCtaFade();
     applyCtaHorizontalAnchor(m);
     applyCtaVerticalMidpoint(m);
+    applyCtaScale(m);
+    applyCtaAttachedVeil(ctaO);
     const ctaZone = buildCtaZone(m, ctaO);
 
     const introBlend = applyIntroTopEdge();
@@ -1215,6 +1297,15 @@ import {
   function init() {
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
     fontsReady.finally(() => afterTwoFrames(revealAfterStableLayout));
+    if ('ResizeObserver' in window) {
+      layoutObserver = new ResizeObserver(() => {
+        requestZoomSettle(6);
+      });
+      layoutObserver.observe(boxEl);
+      if (leadForCta instanceof HTMLElement) layoutObserver.observe(leadForCta);
+      if (ctaEl instanceof HTMLElement) layoutObserver.observe(ctaEl);
+      layoutObserver.observe(scrollEl);
+    }
   }
 
   scrollEl.addEventListener('scroll', schedule, { passive: true });
