@@ -17,6 +17,15 @@ import {
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../utils/profile-reveal-constants';
+import {
+  contentWidthWithoutHorizontalPadding,
+  maxLineWidth,
+  minRevealFontPx,
+  queryElement,
+  rootRemPx,
+  setPxCustomProperty,
+  titleCapFontPx,
+} from './profile-fit-dom';
 
 const LABEL_VAR = '--profile-tile-label-font-size';
 const REVEAL_VAR = '--profile-reveal-font-size';
@@ -108,80 +117,6 @@ function applyRevealCopyUniformScale(
   setRevealCopyUniformScale(inner, s);
 }
 
-function queryElement<T extends Element>(
-  root: ParentNode,
-  selector: string,
-  ctor: { new (): T },
-): T | null {
-  const el = root.querySelector(selector);
-  return el instanceof ctor ? el : null;
-}
-
-function rootRemPx(): number {
-  return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-}
-
-/** Lower bound for reveal type fit; also used as immediate inline size so CSS clamp is never the first paint. */
-function minRevealFontPx(): number {
-  return Math.max(2, rootRemPx() * 0.32);
-}
-
-function setPxCustomProperty(
-  el: HTMLElement,
-  propertyName: string,
-  valuePx: number,
-): void {
-  el.style.setProperty(propertyName, `${roundPx(valuePx)}px`);
-}
-
-function titleCapFontPx(): number {
-  const h1 = document.querySelector(SELECTORS.pageTitle);
-  if (!(h1 instanceof HTMLElement)) return Math.min(40, rootRemPx() * 2.5);
-  return parseFloat(getComputedStyle(h1).fontSize) || 40;
-}
-
-function measureLineWidth(
-  line: string,
-  fontSizePx: number,
-  style: CSSStyleDeclaration,
-): number {
-  const s = document.createElement('span');
-  s.setAttribute('aria-hidden', 'true');
-  s.style.cssText =
-    'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;pointer-events:none;contain:content';
-  s.style.fontFamily = style.fontFamily;
-  s.style.fontWeight = style.fontWeight;
-  s.style.fontStyle = style.fontStyle;
-  s.style.letterSpacing = style.letterSpacing;
-  s.style.textTransform = style.textTransform;
-  s.style.lineHeight = style.lineHeight;
-  s.style.fontSize = `${fontSizePx}px`;
-  s.textContent = line;
-  document.body.appendChild(s);
-  const w = s.offsetWidth;
-  s.remove();
-  return w;
-}
-
-function maxLineWidth(
-  lines: string[],
-  fontSizePx: number,
-  style: CSSStyleDeclaration,
-): number {
-  let m = 0;
-  for (const line of lines) {
-    m = Math.max(m, measureLineWidth(line, fontSizePx, style));
-  }
-  return m;
-}
-
-function contentWidthWithoutHorizontalPadding(el: HTMLElement): number {
-  const cs = getComputedStyle(el);
-  const padL = parseFloat(cs.paddingLeft) || 0;
-  const padR = parseFloat(cs.paddingRight) || 0;
-  return el.clientWidth - padL - padR;
-}
-
 function fitTileLabels(section: HTMLElement): void {
   const foundations = queryElement(
     section,
@@ -231,7 +166,7 @@ function fitTileLabels(section: HTMLElement): void {
 
 function fitFoundationsReveal(reveal: HTMLElement): void {
   const minPx = minRevealFontPx();
-  let preferredPx = titleCapFontPx();
+  let preferredPx = titleCapFontPx(SELECTORS.pageTitle);
 
   const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
   if (section) {
