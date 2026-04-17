@@ -88,6 +88,6 @@ All Pexels media listed below are used according to the
   - Edits: converted to GIF, dichromatic treatment
 
 - **Why section background video**
-  - Author: [Nicola Narracci](https://www.pexels.com/@nicola-narracci/)
-  - Source: [Pexels](https://www.pexels.com/video/14570518/)
-  - Edits: dichromatic treatment (MP4 loop)
+  - Author: [Nicola Narraci](https://www.pexels.com/@nicola-narraci/)
+  - Source: [Pexels](https://www.pexels.com/video/15717076/)
+  - Edits: reverse loop, dichromatic treatment

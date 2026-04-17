@@ -356,7 +356,7 @@ test.describe('Credits page (/credits)', () => {
     await expect(page.getByText('Evgeniy Sholokh')).toBeVisible();
     await expect(page.getByText('Joschka Silzle')).toBeVisible();
     await expect(page.getByText('Raddy')).toBeVisible();
-    await expect(page.getByText('Nicola Narracci')).toBeVisible();
+    await expect(page.getByText('Nicola Narraci')).toBeVisible();
   });
 
   test('footer credits link navigates to /credits', async ({ page }) => {
