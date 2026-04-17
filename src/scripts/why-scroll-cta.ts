@@ -32,7 +32,7 @@ export function applyCtaFade(params: {
   scrollTop: number;
   ctaFadePx: number;
   ctaHiddenOpacity: number;
-  boxEl: Element;
+  boxEl: HTMLElement;
   ctaEl: Element | null;
 }): number {
   const ctaProgress = clamp(params.scrollTop / params.ctaFadePx, 0, 1);
@@ -45,7 +45,7 @@ export function applyCtaFade(params: {
 }
 
 export function applyCtaHorizontalAnchor(params: {
-  boxEl: Element;
+  boxEl: HTMLElement;
   ctaEl: Element | null;
   leadForCta: Element | null;
   metrics: CtaLayoutMetrics;
@@ -68,7 +68,7 @@ export function applyCtaHorizontalAnchor(params: {
 }
 
 export function applyCtaVerticalMidpoint(params: {
-  boxEl: Element;
+  boxEl: HTMLElement;
   ctaEl: Element | null;
   leadForCta: Element | null;
   metrics: CtaLayoutMetrics;
@@ -98,7 +98,7 @@ export function applyCtaVerticalMidpoint(params: {
 }
 
 export function applyCtaScale(params: {
-  boxEl: Element;
+  boxEl: HTMLElement;
   ctaEl: Element | null;
   metrics: CtaLayoutMetrics;
   baselineBoxWidth: number;
@@ -122,7 +122,7 @@ export function applyCtaScale(params: {
 }
 
 export function applyCtaAttachedVeil(params: {
-  boxEl: Element;
+  boxEl: HTMLElement;
   ctaEl: Element | null;
   leadForCta: Element | null;
   wideP: Element | null;
@@ -160,10 +160,11 @@ export function applyCtaAttachedVeil(params: {
   const proximity = clamp(1 - distance / band, 0, 1);
   const localStrength = clamp(0.86 + 0.14 * smoothstep(proximity), 0, 1);
   const o = localStrength * params.ctaOpacity;
-  const guardBottom = Math.max(
-    leadBottom,
-    Number.isFinite(wideBottom) ? wideBottom : Number.NEGATIVE_INFINITY,
-  );
+  const wideBottomPx =
+    wideBottom != null && Number.isFinite(wideBottom)
+      ? wideBottom
+      : Number.NEGATIVE_INFINITY;
+  const guardBottom = Math.max(leadBottom, wideBottomPx);
   const guardBottomLocal = guardBottom - boxRect.top;
   const ctaTopLocal = ctaRect.top - boxRect.top;
   const desiredTop = ctaTopLocal - params.veilAboveArrowPx;

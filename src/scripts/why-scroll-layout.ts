@@ -18,11 +18,11 @@ export type WhyScrollLayoutMetrics = {
 /* eslint-disable no-unused-vars -- type-only callback signature */
 export type WhyScrollLayoutConfig = {
   scrollEl: HTMLElement;
-  boxEl: Element;
+  boxEl: HTMLElement;
   contentEl: HTMLElement;
   topSpacer: HTMLElement;
   bottomSpacer: HTMLElement;
-  lines: Element[];
+  lines: HTMLElement[];
   gifEl: Element | null;
   leadForCta: Element | null;
   T: Record<string, number>;

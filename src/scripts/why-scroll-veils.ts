@@ -4,7 +4,7 @@ import { lastLineBottomInElement, readRootRemPx } from './why-scroll-dom';
 
 export function createWhyScrollVeils(config: {
   scrollEl: HTMLElement;
-  boxEl: Element;
+  boxEl: HTMLElement;
   wideP: Element | null;
   T: Record<string, number>;
 }) {
