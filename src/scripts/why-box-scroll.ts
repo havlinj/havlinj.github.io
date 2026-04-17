@@ -66,6 +66,11 @@ import {
     START_COVER_HEIGHT_MAX: 300,
     /** After intro band: 1 = same "full" layer intensity as the top ::before (it only scales the gradient). */
     BOTTOM_VEIL_MAX_O: 1,
+    /** Step-3-only veil window (short, mild helper veil after step-2). */
+    STEP3_VEIL_IN_PX: 118,
+    STEP3_VEIL_PEAK_PX: 150,
+    STEP3_VEIL_OUT_PX: 214,
+    STEP3_VEIL_MAX_O: 0.58,
     /**
      * At scrollTop ≈ 0, intro-only narrow bottom veil opacity (separate layer).
      * Keeps incoming body lines softened at the viewport edge without dimming the second intro line.
@@ -90,16 +95,12 @@ import {
     CTA_SCALE_MAX_BOOST: 0.28,
     /** CTA center is this fraction from lead-bottom toward box-bottom. */
     CTA_FROM_LEAD_TO_BOTTOM_FRAC: 0.6,
-    /** Progressive tightening: minimum fraction as box narrows. */
-    CTA_FROM_LEAD_TO_BOTTOM_MIN_FRAC: 0.42,
-    CTA_FROM_LEAD_TO_BOTTOM_NARROW_RANGE_PX: 520,
-    CTA_FROM_LEAD_TO_BOTTOM_PROGRESSIVE_POWER: 1.6,
     /** CTA-attached veil ramps when arrow gets close to lead line. */
     CTA_VEIL_PROXIMITY_BAND_PX: 130,
     /** Keep CTA veil top safely below the lead line. */
     CTA_VEIL_CLEARANCE_BELOW_LEAD_PX: 8,
-    /** Start full-black CTA veil a bit above arrow top edge. */
-    CTA_VEIL_ABOVE_ARROW_PX: 12,
+    /** Start full-black CTA veil slightly above arrow top edge. */
+    CTA_VEIL_ABOVE_ARROW_PX: 6,
     /** Hysteresis for CTA overlap dimming to avoid early dim/bright flicker. */
     CTA_TEXT_DIM_ENTER_PX: 116,
     CTA_TEXT_DIM_EXIT_PX: 92,
@@ -529,6 +530,23 @@ import {
       veilOpacity.toFixed(3),
     );
 
+    const st = scrollEl.scrollTop;
+    const step3InT = clamp(
+      (st - T.STEP3_VEIL_IN_PX) /
+        Math.max(1, T.STEP3_VEIL_PEAK_PX - T.STEP3_VEIL_IN_PX),
+      0,
+      1,
+    );
+    const step3OutT = clamp(
+      (st - T.STEP3_VEIL_PEAK_PX) /
+        Math.max(1, T.STEP3_VEIL_OUT_PX - T.STEP3_VEIL_PEAK_PX),
+      0,
+      1,
+    );
+    const step3Opacity =
+      smoothstep(step3InT) * (1 - smoothstep(step3OutT)) * T.STEP3_VEIL_MAX_O;
+    boxEl.style.setProperty('--why-step3-veil-opacity', step3Opacity.toFixed(3));
+
     // Separate intro-only narrow veil: strong at scrollTop 0, gone quickly.
     const introFadeBandPx = Math.max(
       1,
@@ -640,21 +658,7 @@ import {
     const boxTop = m.boxOuterRect.top;
     const boxBottom = m.boxOuterRect.bottom;
     const boxH = m.boxOuterRect.height;
-    if (ctaScaleBaselineBoxWidth <= 0 && m.boxOuterRect.width > 0) {
-      ctaScaleBaselineBoxWidth = m.boxOuterRect.width;
-    }
-    const baseline = ctaScaleBaselineBoxWidth || m.boxOuterRect.width;
-    const narrowness = clamp(
-      (baseline - m.boxOuterRect.width) /
-        T.CTA_FROM_LEAD_TO_BOTTOM_NARROW_RANGE_PX,
-      0,
-      1,
-    );
-    const progressive = Math.pow(smoothstep(narrowness), T.CTA_FROM_LEAD_TO_BOTTOM_PROGRESSIVE_POWER);
-    const f =
-      T.CTA_FROM_LEAD_TO_BOTTOM_FRAC -
-      (T.CTA_FROM_LEAD_TO_BOTTOM_FRAC - T.CTA_FROM_LEAD_TO_BOTTOM_MIN_FRAC) *
-        progressive;
+    const f = T.CTA_FROM_LEAD_TO_BOTTOM_FRAC;
     const leadBottom = lastLineBottomInElement(leadForCta);
     let targetY;
     if (leadBottom == null || !Number.isFinite(leadBottom)) {
@@ -706,11 +710,14 @@ import {
       boxEl.style.setProperty('--why-cta-veil-opacity', '0');
       return;
     }
+    const distance = ctaRect.top - leadBottom;
+    const band = Math.max(T.CTA_VEIL_PROXIMITY_BAND_PX, ctaRect.height * 2.6);
+    const proximity = clamp(1 - distance / band, 0, 1);
     // Fully opaque cover while CTA exists; remove together when CTA is hidden.
-    const o = ctaO > T.CTA_O_HIDDEN ? 1 : 0;
+    const localStrength = clamp(0.86 + 0.14 * smoothstep(proximity), 0, 1);
+    const o = localStrength * ctaO;
     const leadBottomLocal = leadBottom - boxRect.top;
     const ctaTopLocal = ctaRect.top - boxRect.top;
-    // Hard requirement: full-black veil starts slightly above arrow top edge, but never reaches lead line.
     const desiredTop = ctaTopLocal - T.CTA_VEIL_ABOVE_ARROW_PX;
     const topEdge = clamp(
       Math.max(desiredTop, leadBottomLocal + T.CTA_VEIL_CLEARANCE_BELOW_LEAD_PX),

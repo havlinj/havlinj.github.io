@@ -70,7 +70,7 @@
   background: var(--why-box-bg);
 }
 
-/* Extend only the top edge into a smoother fade; keep main area fully black. */
+/* Soft top feather for CTA veil while preserving full-black body. */
 .why-page .why-box > .why-cta-veil::after {
   content: '';
   position: absolute;
@@ -189,6 +189,7 @@
   );
 }
 
+
 /*
  * Intro-only bottom veil: narrower band used only at scroll start so first two intro
  * paragraphs remain fully bright while we still soften incoming body lines at the edge.
@@ -201,7 +202,7 @@
   height: min(
     calc(
       var(--why-start-cover-height, clamp(140px, 20.8vh, 218px)) *
-        (0.44 + 0.24 * var(--why-intro-bottom-veil-hard, 0))
+        (0.48 + 0.26 * var(--why-intro-bottom-veil-hard, 0))
     ),
     calc(
       var(--why-intro-bottom-veil-height, clamp(56px, 11vh, 88px)) *
@@ -222,6 +223,35 @@
     rgba(17, 17, 17, calc(0.08 + 0.92 * var(--why-intro-bottom-veil-hard, 0)))
       calc(88% + 7% * var(--why-intro-bottom-veil-hard, 0)),
     rgba(17, 17, 17, calc(0 + 1 * var(--why-intro-bottom-veil-hard, 0))) 100%
+  );
+}
+
+/*
+ * Step-3 helper veil: shorter and milder than the main post-intro veil.
+ * Used only in the third scroll step window (opacity driven by JS).
+ */
+.why-page .why-box > .why-box-step3-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(
+    (
+        var(--why-bottom-veil-height) -
+          (var(--why-bottom-veil-height) - var(--why-bottom-veil-end-height)) *
+          var(--why-end-phase, 0)
+      ) * 0.72
+  );
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--why-step3-veil-opacity, 0);
+  background: linear-gradient(
+    to top,
+    var(--why-box-bg) 0%,
+    rgba(17, 17, 17, 0.9) 24%,
+    rgba(17, 17, 17, 0.58) 52%,
+    rgba(17, 17, 17, 0.24) 78%,
+    rgba(17, 17, 17, 0) 100%
   );
 }
 
