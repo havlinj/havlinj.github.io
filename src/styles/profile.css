@@ -3,7 +3,7 @@
 ================================ */
 
 /*
- * CONTRACT OVERVIEW (sync with profile-tile-type-fit.ts + e2e/profile-seam-ratios.ts)
+ * CONTRACT OVERVIEW (sync with profile-tile-type-fit.ts entry + profile-tile-type-fit-*.ts + e2e/profile-seam-ratios.ts)
  * - Grid + seams: --profile-shared-edge-ratio-*, --profile-shared-edge-frame-ratio,
  *   --profile-stitched-seam-thickness (breakpoints below must match TS constants).
  * - Type fit (JS): --profile-tile-label-font-size, --profile-reveal-font-size,
