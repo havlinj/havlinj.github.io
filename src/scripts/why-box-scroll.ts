@@ -21,6 +21,8 @@ import {
   if (!scrollEl) return;
   const boxEl = scrollEl.closest('.why-box');
   if (!boxEl) return;
+  const wrapperEl = boxEl.closest('.why-wrapper');
+  const pageMainEl = document.querySelector('main.content');
   const ctaEl = boxEl.querySelector('.why-scroll-cta');
   const contentEl = scrollEl.querySelector('.why-content');
   if (!contentEl) return;
@@ -178,6 +180,10 @@ import {
     REVOLVER_LERP_INSTANT_BELOW_PX: 2.5,
     /** Quantize --why-font-scale steps to reduce wrap-width ping-pong at odd zoom. */
     FONT_SCALE_QUANT: 0.005,
+    /** Detect sustained fit failure at extreme zoom before applying runtime width guard. */
+    FIT_FAIL_TARGET_EPS: 0.004,
+    FIT_FAIL_FRAMES: 8,
+    FIT_FAIL_LOCK_PADDING_PX: 6,
     /** <1 = mouse wheel moves the panel slower (only when we handle wheel below). */
     WHEEL_SCROLL_FACTOR: 0.78,
     /** Per-frame catch-up toward wheel target scrollTop (higher = quicker, lower = smoother). */
@@ -193,6 +199,8 @@ import {
 
   let whyFontScale = 1;
   let fontScaleSettled = false;
+  let fitFailStreak = 0;
+  let runtimeLockedMinBoxWidth = 0;
   const lineBlendState = lines.map(() => 0);
   let gifBlendState = 0;
   let lastScrollTopSnapped = Math.round(
@@ -1204,11 +1212,28 @@ import {
       }
     }
 
+    const m = readLayoutMetrics();
     if (!prevFrameRevolverIdle) {
       applyFontScaleStep();
     }
-
-    const m = readLayoutMetrics();
+    const fitTargetNow = computeWhyFontTarget();
+    const fitAtLimit = fitTargetNow <= T.FONT_MIN + T.FIT_FAIL_TARGET_EPS;
+    if (fitAtLimit) fitFailStreak++;
+    else fitFailStreak = 0;
+    if (
+      runtimeLockedMinBoxWidth <= 0 &&
+      fitFailStreak >= T.FIT_FAIL_FRAMES &&
+      m.boxRect.width > 0
+    ) {
+      runtimeLockedMinBoxWidth =
+        Math.ceil(m.boxRect.width) + T.FIT_FAIL_LOCK_PADDING_PX;
+      const lockWidth = `${runtimeLockedMinBoxWidth}px`;
+      boxEl.style.setProperty('--why-runtime-min-width', lockWidth);
+      if (wrapperEl) wrapperEl.style.setProperty('--why-runtime-min-width', lockWidth);
+      if (pageMainEl instanceof HTMLElement) {
+        pageMainEl.style.minWidth = lockWidth;
+      }
+    }
     const scrollSnapStep = Math.round(
       scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX,
     );
