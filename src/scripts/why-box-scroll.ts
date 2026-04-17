@@ -485,7 +485,13 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       hasAppliedRevolverOnce && revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
 
     if (!revolverIdle) {
-      revolver.applyLineRevolver(m, introBlend, ctaZone, scrollDeltaPx, phaseGate);
+      revolver.applyLineRevolver(
+        m,
+        introBlend,
+        ctaZone,
+        scrollDeltaPx,
+        phaseGate,
+      );
       const active = revolver.pickActiveLineForGif(m);
       revolver.applyGifRevolver(
         m,

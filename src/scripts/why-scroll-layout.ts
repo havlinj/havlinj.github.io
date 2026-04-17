@@ -153,7 +153,10 @@ export function createWhyScrollLayout(config: WhyScrollLayoutConfig) {
         lastGifBaseScaleStr = scaleStr;
         gifEl.style.setProperty('--why-gif-base-scale', scaleStr);
       }
-    } else if (gifEl instanceof HTMLElement && lastGifBaseScaleStr !== '1.000') {
+    } else if (
+      gifEl instanceof HTMLElement &&
+      lastGifBaseScaleStr !== '1.000'
+    ) {
       lastGifBaseScaleStr = '1.000';
       gifEl.style.setProperty('--why-gif-base-scale', '1.000');
     }

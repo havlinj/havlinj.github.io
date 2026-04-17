@@ -77,7 +77,10 @@ export function computeEndPhase(
   endCoverBandMin: number,
   endCoverBandFrac: number,
 ): number {
-  const coverBandPx = Math.max(endCoverBandMin, clientHeight * endCoverBandFrac);
+  const coverBandPx = Math.max(
+    endCoverBandMin,
+    clientHeight * endCoverBandFrac,
+  );
   const coverProgress = maxScroll
     ? Math.min(
         1,

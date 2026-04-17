@@ -1,4 +1,8 @@
-import { minRevealFontPx, queryElement, setPxCustomProperty } from './profile-fit-dom';
+import {
+  minRevealFontPx,
+  queryElement,
+  setPxCustomProperty,
+} from './profile-fit-dom';
 import {
   DEFAULT_REVEAL_TIMEOUT_MS,
   REVEAL_CLASSES,

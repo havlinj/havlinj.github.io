@@ -131,8 +131,7 @@ export function createWhyScrollRevolver(config: {
       const eased = smoothstep(edgeProgress);
       const gate = lineIndex < T.INTRO_LINE_COUNT ? introBlend : 1;
       const targetBlend = eased * gate * phaseGate;
-      const strictStartThisLine =
-        strictStart && lineIndex < T.INTRO_LINE_COUNT;
+      const strictStartThisLine = strictStart && lineIndex < T.INTRO_LINE_COUNT;
       if (isWideIntroLine) {
         lineBlendState[lineIndex] = 0;
         applyLineRevolverStylesIfChanged(line, '1.00', '0.00rem', '1.000');
@@ -281,8 +280,7 @@ export function createWhyScrollRevolver(config: {
     gifBlendState = gifEased;
 
     const leadHStable =
-      leadForCta &&
-      (leadForCta as HTMLElement).offsetHeight > 0
+      leadForCta && (leadForCta as HTMLElement).offsetHeight > 0
         ? (leadForCta as HTMLElement).offsetHeight
         : m.leadHeight;
     const liftPx = leadHStable * T.GIF_LIFT_LEAD_MULT;

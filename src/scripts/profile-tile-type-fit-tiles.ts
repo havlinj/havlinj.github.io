@@ -1,7 +1,4 @@
-import {
-  fitFontSize,
-  roundPx,
-} from '../utils/profile-fit-math';
+import { fitFontSize, roundPx } from '../utils/profile-fit-math';
 import {
   contentWidthWithoutHorizontalPadding,
   maxLineWidth,

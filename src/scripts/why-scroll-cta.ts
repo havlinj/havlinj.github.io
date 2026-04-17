@@ -9,7 +9,12 @@ import {
   lastLineBottomInElement,
 } from './why-scroll-dom';
 
-export type CtaZone = { left: number; right: number; top: number; bottom: number };
+export type CtaZone = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
 
 type CtaLayoutMetrics = { boxOuterRect: DOMRect };
 
@@ -39,7 +44,8 @@ export function applyCtaFade(params: {
   const ctaO = 1 - smoothstep(ctaProgress);
   params.boxEl.style.setProperty('--why-cta-opacity', ctaO.toFixed(3));
   if (params.ctaEl instanceof HTMLElement) {
-    params.ctaEl.style.visibility = ctaO < params.ctaHiddenOpacity ? 'hidden' : 'visible';
+    params.ctaEl.style.visibility =
+      ctaO < params.ctaHiddenOpacity ? 'hidden' : 'visible';
   }
   return ctaO;
 }
@@ -50,7 +56,10 @@ export function applyCtaHorizontalAnchor(params: {
   leadForCta: Element | null;
   metrics: CtaLayoutMetrics;
 }): void {
-  if (!(params.ctaEl instanceof HTMLElement) || !(params.leadForCta instanceof HTMLElement)) {
+  if (
+    !(params.ctaEl instanceof HTMLElement) ||
+    !(params.leadForCta instanceof HTMLElement)
+  ) {
     return;
   }
   const firstLine = firstLineRectInElement(params.leadForCta);
@@ -173,7 +182,10 @@ export function applyCtaAttachedVeil(params: {
     0,
     boxRect.height,
   );
-  params.boxEl.style.setProperty('--why-cta-veil-top', `${Math.round(topEdge)}px`);
+  params.boxEl.style.setProperty(
+    '--why-cta-veil-top',
+    `${Math.round(topEdge)}px`,
+  );
   params.boxEl.style.setProperty('--why-cta-veil-opacity', o.toFixed(3));
 }
 
@@ -195,8 +207,12 @@ export function buildCtaZone(params: {
     return null;
   }
   const cr = params.ctaEl.getBoundingClientRect();
-  if (cr.width <= params.ctaRectMin || cr.height <= params.ctaRectMin) return null;
-  const padH = Math.max(params.ctaZonePadHMin, cr.width * params.ctaZonePadHFrac);
+  if (cr.width <= params.ctaRectMin || cr.height <= params.ctaRectMin)
+    return null;
+  const padH = Math.max(
+    params.ctaZonePadHMin,
+    cr.width * params.ctaZonePadHFrac,
+  );
   return {
     left: cr.left - padH,
     right: cr.right + padH,
