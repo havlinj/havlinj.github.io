@@ -1,8 +1,9 @@
 ---
 import '../styles/animated-arrow.css';
 /**
- * Segmented chevron; the root `<span>` is not faded so #111 panels behind the arrow (e.g. /why)
- * don’t wash out.
+ * Chevron CTA: default segmented stack (+ optional texture), or `solid-blink` (one path, fill only).
+ * The root `<span>` keeps `--arrow-shape-opacity` off the SVG for segmented mode so #111 panels
+ * behind the arrow (e.g. /why) don’t wash out.
  *
  * Sizing: `fixed` — `size` px; `responsive` — clamp(rem+vw) capped by `size` (scales faster than layout at zoom).
  * `container` — `width: N cqw` on a `container-type: size` ancestor (arrow tracks that box; tame page zoom).
@@ -35,10 +36,27 @@ interface Props {
   textureContrast?: number;
   /** Optional texture zoom (>1 = zoom in, <1 = zoom out). */
   textureZoom?: number;
+  /**
+   * `segmented` — stacked trapezoids + optional texture (default).
+   * `solid-blink` — one filled chevron, same outer outline; fill `--arrow-color`; opacity blinks (see `duration`).
+   */
+  variant?: 'segmented' | 'solid-blink';
+  /**
+   * `solid-blink` only: opacity at the bright part of the blink (always clamped below 1).
+   */
+  solidBlinkPeakOpacity?: number;
+  /**
+   * `solid-blink` only: opacity at the dimmest part of the blink (default never fully off).
+   */
+  solidBlinkFloorOpacity?: number;
 }
 
 const VIEWBOX_W = 220;
 const VIEWBOX_H = 170;
+
+/** Outer shell of the chevron (same silhouette as stacked `.seg` polygons). */
+const SOLID_CHEVRON_PATH =
+  'M 30 148.564 L 190 148.564 L 180.762 132.564 L 176.144 124.564 L 166.906 108.564 L 162.287 100.564 L 153.05 84.564 L 148.431 76.564 L 139.193 60.564 L 134.574 52.564 L 125.337 36.564 L 120.718 28.564 L 110 10 L 99.282 28.564 L 94.663 36.564 L 85.426 52.564 L 80.807 60.564 L 71.569 76.564 L 66.95 84.564 L 57.713 100.564 L 53.094 108.564 L 43.856 124.564 L 39.238 132.564 Z';
 
 const RESPONSIVE_WIDTH = {
   minRem: 2.55,
@@ -105,10 +123,14 @@ const responsiveClampMaxPx = (() => {
   return Math.min(200, Math.max(12, Math.round(n)));
 })();
 
+const variant =
+  props.variant === 'solid-blink' ? ('solid-blink' as const) : ('segmented' as const);
+
 const color = props.color ?? '#111';
 const durationSec = Number(props.duration);
+const durationDefault = variant === 'solid-blink' ? 1.45 : 2.6;
 const duration =
-  Number.isFinite(durationSec) && durationSec > 0 ? durationSec : 2.6;
+  Number.isFinite(durationSec) && durationSec > 0 ? durationSec : durationDefault;
 const className = props.class ?? '';
 const direction = props.direction === 'down' ? 'down' : 'up';
 
@@ -119,7 +141,7 @@ const opacity = (() => {
 
 const texturePatternId = `animated-arrow-texture-${crypto.randomUUID()}`;
 const textureUrl = (props.textureUrl ?? '').trim();
-const hasTexture = textureUrl.length > 0;
+const hasTexture = variant === 'segmented' && textureUrl.length > 0;
 const textureBrightness = (() => {
   const n = Number(props.textureBrightness);
   if (!Number.isFinite(n)) return 1;
@@ -170,19 +192,39 @@ function responsiveSvgStyle(
   return `width: ${width}; height: auto; aspect-ratio: 220 / 170`;
 }
 
+const shapeOpacity = variant === 'solid-blink' ? 1 : opacity;
+
+const solidBlinkOpacityVars = (() => {
+  if (variant !== 'solid-blink') return '';
+  const peakN = Number(props.solidBlinkPeakOpacity);
+  const peakRaw = Number.isFinite(peakN) ? peakN : 0.62;
+  const peak = Math.min(0.985, Math.max(0.06, peakRaw >= 1 ? 0.985 : peakRaw));
+  const floorN = Number(props.solidBlinkFloorOpacity);
+  const floorRaw = Number.isFinite(floorN) ? floorN : 0.13;
+  const floorMax = Math.max(0.02, peak - 0.02);
+  const floor = Math.min(floorMax, Math.max(0.02, floorRaw));
+  return `--arrow-blink-peak-opacity: ${peak.toFixed(3)}; --arrow-blink-floor-opacity: ${floor.toFixed(3)}`;
+})();
+
 const rootStyle = [
   `--arrow-size-px: ${effectiveSizePx}`,
-  `--arrow-shape-opacity: ${opacity}`,
+  `--arrow-shape-opacity: ${shapeOpacity}`,
   `--arrow-color: ${color}`,
   `--arrow-duration: ${duration}s`,
-].join('; ');
+  variant === 'solid-blink' ? `--arrow-blink-duration: ${duration}s` : '',
+  solidBlinkOpacityVars,
+]
+  .filter(Boolean)
+  .join('; ');
 
 const dirClass = direction === 'down' ? 'animated-arrow--down' : '';
+const variantRootClass =
+  variant === 'solid-blink' ? 'animated-arrow-root--solid-blink' : '';
 const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
 ---
 
 <span
-  class:list={['animated-arrow-root', dirClass]}
+  class:list={['animated-arrow-root', dirClass, variantRootClass]}
   style={rootStyle}
   aria-hidden="true"
 >
@@ -205,60 +247,71 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
         : undefined}
     aria-hidden="true"
   >
-    <defs>
-      {
-        hasTexture && (
-          <pattern
-            id={texturePatternId}
-            patternUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width={VIEWBOX_W}
-            height={VIEWBOX_H}
-          >
-            <image
-              href={textureUrl}
-              x={textureX}
-              y={textureY}
-              width={textureW}
-              height={textureH}
-              preserveAspectRatio="xMidYMid slice"
-              style={`filter: brightness(${textureBrightness}) contrast(${textureContrast});`}
+    {
+      variant === 'solid-blink' ? (
+        <path
+          class="animated-arrow__solid"
+          d={SOLID_CHEVRON_PATH}
+          fill="var(--arrow-color)"
+        />
+      ) : (
+        <>
+          <defs>
+            {hasTexture && (
+              <pattern
+                id={texturePatternId}
+                patternUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width={VIEWBOX_W}
+                height={VIEWBOX_H}
+              >
+                <image
+                  href={textureUrl}
+                  x={textureX}
+                  y={textureY}
+                  width={textureW}
+                  height={textureH}
+                  preserveAspectRatio="xMidYMid slice"
+                  style={`filter: brightness(${textureBrightness}) contrast(${textureContrast});`}
+                />
+              </pattern>
+            )}
+          </defs>
+          <g class="arrow-grain-group">
+            <polygon
+              class="seg s1"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="30,148.564 190,148.564 180.762,132.564 39.238,132.564"
             />
-          </pattern>
-        )
-      }
-    </defs>
-    <g class="arrow-grain-group">
-      <polygon
-        class="seg s1"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="30,148.564 190,148.564 180.762,132.564 39.238,132.564"
-      ></polygon>
-      <polygon
-        class="seg s2"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="43.856,124.564 176.144,124.564 166.906,108.564 53.094,108.564"
-      ></polygon>
-      <polygon
-        class="seg s3"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="57.713,100.564 162.287,100.564 153.050,84.564 66.950,84.564"
-      ></polygon>
-      <polygon
-        class="seg s4"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="71.569,76.564 148.431,76.564 139.193,60.564 80.807,60.564"
-      ></polygon>
-      <polygon
-        class="seg s5"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="85.426,52.564 134.574,52.564 125.337,36.564 94.663,36.564"
-      ></polygon>
-      <polygon
-        class="seg s6"
-        style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
-        points="99.282,28.564 120.718,28.564 110,10"></polygon>
-    </g>
+            <polygon
+              class="seg s2"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="43.856,124.564 176.144,124.564 166.906,108.564 53.094,108.564"
+            />
+            <polygon
+              class="seg s3"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="57.713,100.564 162.287,100.564 153.050,84.564 66.950,84.564"
+            />
+            <polygon
+              class="seg s4"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="71.569,76.564 148.431,76.564 139.193,60.564 80.807,60.564"
+            />
+            <polygon
+              class="seg s5"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="85.426,52.564 134.574,52.564 125.337,36.564 94.663,36.564"
+            />
+            <polygon
+              class="seg s6"
+              style={hasTexture ? `fill: url(#${texturePatternId})` : undefined}
+              points="99.282,28.564 120.718,28.564 110,10"
+            />
+          </g>
+        </>
+      )
+    }
   </svg>
 </span>

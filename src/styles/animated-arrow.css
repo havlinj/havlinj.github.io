@@ -133,3 +133,21 @@
     opacity: 0;
   }
 }
+
+/* Solid chevron (`variant="solid-blink"`): one path, fill `--arrow-color`, blink only. */
+.animated-arrow-root--solid-blink .animated-arrow__solid {
+  fill: var(--arrow-color);
+  animation: animated-arrow-blink var(--arrow-blink-duration, 1.45s) ease-in-out
+    infinite;
+  transform-box: fill-box;
+}
+
+@keyframes animated-arrow-blink {
+  0%,
+  100% {
+    opacity: var(--arrow-blink-peak-opacity, 0.62);
+  }
+  50% {
+    opacity: var(--arrow-blink-floor-opacity, 0.13);
+  }
+}

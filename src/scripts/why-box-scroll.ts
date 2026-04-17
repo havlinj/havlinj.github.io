@@ -47,6 +47,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   if (lines.length === 0) return;
 
   const gifEl = scrollEl.querySelector('.why-gif-holder');
+  const introTopBandEl = boxEl.querySelector('.why-intro-top-band');
   const clipVideo = scrollEl.querySelector('video.why-gif');
   const clipPlaybackMid =
     (WHY_CLIP_PLAYBACK_SINE_LOW + WHY_CLIP_PLAYBACK_SINE_HIGH) / 2;
@@ -125,6 +126,9 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     FIT_SAFETY_PX: 3,
     START_COVER_BAND_MIN: 85,
     START_COVER_BAND_FRAC: 0.26,
+    /** Intro top band on `.why-box`: full opacity until this scroll distance, then fades. */
+    INTRO_TOP_BAND_HOLD_SCROLL_PX: 228,
+    INTRO_TOP_BAND_FADE_SCROLL_PX: 340,
     /** Keep the start bottom cover fully visible for the first tiny scroll move(s). */
     START_COVER_HOLD_PX: 52,
     /** Fade span after hold; starts later so cover removal happens around the third notch. */
@@ -298,6 +302,8 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   let settleFrames = 0;
   let resizeQuietTimer = 0;
   let wheelTargetTop = Number.NaN;
+  /** Gap (box top → frame top) last sampled at scroll top; frozen once the user scrolls so the band can overlap the clip without growing past the live inset. */
+  let introTopBandAnchorPx = 0;
   let layoutObserver: ResizeObserver | null = null;
   let ctaScaleBaselineBoxWidth = 0;
 
@@ -405,6 +411,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
 
   /** One rAF per burst while resizing; extra passes only after zoom/resize is quiet. */
   function onViewportResize() {
+    introTopBandAnchorPx = 0;
     prevFrameRevolverIdle = false;
     revolverIdleStreak = 0;
     revolver.resetGifRevolverStyleKey();
@@ -415,6 +422,48 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       settleFrames = Math.max(settleFrames, 4);
       schedule();
     }, 110);
+  }
+
+  function applyIntroTopBand(metrics: { boxOuterRect: DOMRect }) {
+    if (!(introTopBandEl instanceof HTMLElement)) return;
+    if (whyScrollPrefersReducedMotion()) {
+      introTopBandEl.style.setProperty('--why-intro-top-band-opacity', '0');
+      introTopBandEl.style.setProperty('--why-intro-top-band-height', '0px');
+      return;
+    }
+    const boxR = metrics.boxOuterRect;
+    const frame = scrollEl.querySelector('.why-gif-frame');
+    if (!(frame instanceof HTMLElement)) {
+      introTopBandEl.style.setProperty('--why-intro-top-band-height', '0px');
+      introTopBandEl.style.setProperty('--why-intro-top-band-opacity', '0');
+      return;
+    }
+    const fr = frame.getBoundingClientRect();
+    const gapNow = Math.max(0, Math.round(fr.top - boxR.top));
+    const st = scrollEl.scrollTop;
+    const AT_TOP_PX = 1;
+    if (st <= AT_TOP_PX) {
+      introTopBandAnchorPx = gapNow;
+    }
+    const heightPx =
+      introTopBandAnchorPx > 0
+        ? Math.max(1, introTopBandAnchorPx)
+        : Math.max(1, gapNow);
+    const hold = T.INTRO_TOP_BAND_HOLD_SCROLL_PX;
+    const fadeSpan = T.INTRO_TOP_BAND_FADE_SCROLL_PX;
+    let op = 1;
+    if (st <= hold) op = 1;
+    else if (st >= hold + fadeSpan) op = 0;
+    else {
+      const t = clamp((st - hold) / fadeSpan, 0, 1);
+      op = Math.pow(1 - t, 2.4);
+    }
+    op = clamp(op, 0, 1);
+    introTopBandEl.style.setProperty(
+      '--why-intro-top-band-height',
+      op <= 0 ? '0px' : `${heightPx}px`,
+    );
+    introTopBandEl.style.setProperty('--why-intro-top-band-opacity', String(op));
   }
 
   function update() {
@@ -433,6 +482,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     }
 
     const m = layout.readLayoutMetrics();
+    applyIntroTopBand(m);
     if (!prevFrameRevolverIdle) {
       applyFontScaleStep();
     }

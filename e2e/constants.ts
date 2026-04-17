@@ -11,6 +11,8 @@ export const MAX_CONTENT_WIDTH_CH = 70; /* --content-width */
 
 /** /why layout — single source: `src/constants/why-layout.ts` */
 export {
+  WHY_CTA_ARROW_FLOOR_OPACITY,
+  WHY_CTA_ARROW_PEAK_OPACITY,
   WHY_CTA_EDGE_MIN_PX,
   WHY_CTA_EDGE_WIDTH_FRAC,
   WHY_CTA_LEAD_TRACK,

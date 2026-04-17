@@ -1,6 +1,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
   LAYOUT_TOLERANCE,
+  WHY_CTA_ARROW_FLOOR_OPACITY,
+  WHY_CTA_ARROW_PEAK_OPACITY,
   WHY_CTA_EDGE_MIN_PX,
   WHY_CTA_EDGE_WIDTH_FRAC,
   WHY_CTA_LEAD_TRACK,
@@ -162,41 +164,53 @@ test.describe('/why page @serial', () => {
     );
   });
 
-  test('scroll CTA arrow maps texture image into segment fills', async ({
-    page,
-  }) => {
+  test('scroll CTA arrow is solid fill with blink animation', async ({ page }) => {
     const data = await page.evaluate(() => {
+      const root = document.querySelector(
+        '.why-page .why-scroll-cta .animated-arrow-root',
+      );
       const svg = document.querySelector(
         '.why-page .why-scroll-cta svg.animated-arrow',
       );
-      if (!(svg instanceof SVGElement)) return null;
+      const solid = svg?.querySelector('path.animated-arrow__solid');
+      if (!(root instanceof HTMLElement) || !(svg instanceof SVGElement)) {
+        return null;
+      }
+      if (!(solid instanceof SVGPathElement)) return null;
 
-      const patternImage = svg.querySelector('defs pattern image');
-      const imageHref =
-        patternImage?.getAttribute('href') ||
-        patternImage?.getAttribute('xlink:href') ||
-        '';
-
-      const segs = [...svg.querySelectorAll('polygon.seg')];
-      const texturedCount = segs.filter((seg) =>
-        /fill:\s*url\(#animated-arrow-texture-/i.test(
-          seg.getAttribute('style') || '',
-        ),
-      ).length;
-
+      const cs = getComputedStyle(solid);
+      const peakVar = root.style
+        .getPropertyValue('--arrow-blink-peak-opacity')
+        .trim();
+      const floorVar = root.style
+        .getPropertyValue('--arrow-blink-floor-opacity')
+        .trim();
       return {
-        imageHref,
-        segCount: segs.length,
-        texturedCount,
+        rootHasSolidVariant: root.classList.contains(
+          'animated-arrow-root--solid-blink',
+        ),
+        patternCount: svg.querySelectorAll('defs pattern').length,
+        segCount: svg.querySelectorAll('polygon.seg').length,
+        animationName: cs.animationName,
+        fill: cs.fill,
+        peakVar,
+        floorVar,
       };
     });
 
     expect(data).not.toBeNull();
-    expect(data!.imageHref).toBe(
-      '/assets/pages/profile/why/dichrom_background.png',
+    expect(data!.rootHasSolidVariant).toBe(true);
+    expect(data!.patternCount).toBe(0);
+    expect(data!.segCount).toBe(0);
+    expect(data!.animationName.split(',').map((s) => s.trim())).toContain(
+      'animated-arrow-blink',
     );
-    expect(data!.segCount).toBeGreaterThanOrEqual(6);
-    expect(data!.texturedCount).toBe(data!.segCount);
+    expect(data!.fill).toMatch(/rgb\(\s*224\s*,\s*247\s*,\s*250\s*\)/i);
+    expect(parseFloat(data!.peakVar)).toBeCloseTo(WHY_CTA_ARROW_PEAK_OPACITY, 5);
+    expect(parseFloat(data!.floorVar)).toBeCloseTo(
+      WHY_CTA_ARROW_FLOOR_OPACITY,
+      5,
+    );
   });
 
   test('--why-cta-left tracks lead first line (inset + WHY_CTA_LEAD_TRACK × line width)', async ({
