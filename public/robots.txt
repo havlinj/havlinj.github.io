@@ -1,12 +1,4 @@
-# robots.txt – development (current)
 User-agent: *
-Disallow: /
+Allow: /
 
-# ----------------------------------------
-# Production version (commented out for now)
-# When you're ready to allow indexing, switch to this:
-#
-# User-agent: *
-# Allow: /
-# Sitemap: https://havlinj.github.io/sitemap.xml
-
+Sitemap: https://janhavlin.com/sitemap-index.xml
