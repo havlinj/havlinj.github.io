@@ -9,6 +9,8 @@ export type DisplayEnvironmentSignals = {
 
 /**
  * Conservative heuristic: only mark as likely-legacy when all signals align.
+ * Keep in sync with `likelyLegacyDisplayEnvironment` in `Layout.astro` (head),
+ * exposed as `window.__jhLikelyLegacyDisplay` for inline scripts (Settings, body).
  */
 export function isLikelyLegacyDisplayEnvironment(
   signals: DisplayEnvironmentSignals,

@@ -49,34 +49,7 @@ import Layout from '../layouts/Layout.astro';
       var form = document.querySelector(SELECTORS.form);
       if (!(form instanceof HTMLFormElement)) return;
 
-      function likelyLegacyDisplayEnvironment() {
-        var hasMatchMedia = typeof window.matchMedia === 'function';
-        var isStandardRange = hasMatchMedia
-          ? window.matchMedia('(dynamic-range: standard)').matches
-          : true;
-        var isSrgb = hasMatchMedia
-          ? window.matchMedia('(color-gamut: srgb)').matches
-          : true;
-        var isWideGamut = hasMatchMedia
-          ? window.matchMedia('(color-gamut: p3)').matches
-          : false;
-        var lowDpi = (window.devicePixelRatio || 1) <= 1.05;
-        var lowColorDepth = (window.screen && window.screen.colorDepth) <= 24;
-        var maxDim = Math.max(
-          window.screen?.width || 0,
-          window.screen?.height || 0,
-        );
-        var isClassicDesktopPanel = maxDim > 0 && maxDim <= 1920;
-
-        return (
-          isStandardRange &&
-          isSrgb &&
-          !isWideGamut &&
-          lowDpi &&
-          lowColorDepth &&
-          isClassicDesktopPanel
-        );
-      }
+      var likelyLegacyDisplayEnvironment = window.__jhLikelyLegacyDisplay;
 
       function applyMode(mode) {
         if (mode === 'legacy') {
