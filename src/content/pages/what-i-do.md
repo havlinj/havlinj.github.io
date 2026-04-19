@@ -48,6 +48,8 @@ Systems without an existing blueprint are the most engaging to me — where arch
 
 At the same time, I remain pragmatic — not every project is pioneering. In such cases, I prioritize depth of learning, meaningful technical challenge, and exposure to real complexity.
 
+---
+
 ## Work Style
 
 I prefer remote or remote-first environments, where asynchronous communication supports focused work and a sustainable pace.
