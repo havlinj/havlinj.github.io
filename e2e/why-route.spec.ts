@@ -12,6 +12,13 @@ import {
 } from './constants';
 import { RGB_INK } from '../src/constants/colors';
 import { WHY_FIT_REFERENCE_LINE } from '../src/constants/why-fit-reference';
+import {
+  WHY_CLIP_POSTER_DESKTOP,
+  WHY_CLIP_POSTER_MOBILE,
+  WHY_CLIP_VIDEO_DESKTOP,
+  WHY_CLIP_VIDEO_MOBILE,
+  WHY_CLIP_VIEWPORT_MOBILE_MQ,
+} from '../src/constants/why-layout';
 import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
 
 async function setWhyScrollTop(page: Page, top: number): Promise<void> {
@@ -32,6 +39,32 @@ async function setWhyScrollBottom(page: Page): Promise<void> {
     scroll.scrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
     scroll.dispatchEvent(new Event('scroll', { bubbles: true }));
   });
+}
+
+async function whyClipVideoPathname(page: Page): Promise<string> {
+  return page.locator('.why-page video.why-clip').evaluate((el: HTMLVideoElement) => {
+    const raw = el.currentSrc || el.src;
+    if (!raw) return '';
+    try {
+      return new URL(raw, window.location.href).pathname;
+    } catch {
+      return '';
+    }
+  });
+}
+
+async function whyClipPosterImgPathname(page: Page): Promise<string> {
+  return page
+    .locator('.why-page picture.why-clip-poster img')
+    .evaluate((el: HTMLImageElement) => {
+      const raw = el.currentSrc || el.src;
+      if (!raw) return '';
+      try {
+        return new URL(raw, window.location.href).pathname;
+      } catch {
+        return '';
+      }
+    });
 }
 
 test.describe('/why page @serial', () => {
@@ -130,13 +163,56 @@ test.describe('/why page @serial', () => {
     const clip = page.locator('.why-page video.why-clip');
     await expect(clip).toBeVisible();
     await expect(clip).toHaveJSProperty('loop', true);
-    const mp4 = page.locator(
-      '.why-page video.why-clip source[type="video/mp4"]',
-    );
-    await expect(mp4).toHaveAttribute(
+    await expect
+      .poll(() => whyClipVideoPathname(page))
+      .toBe(WHY_CLIP_VIDEO_DESKTOP);
+    const poster = page.locator('.why-page picture.why-clip-poster');
+    await expect(poster).toBeVisible();
+    await expect(poster.locator('img')).toHaveAttribute(
       'src',
-      /\/assets\/pages\/profile\/why\/.+\.mp4/,
+      WHY_CLIP_POSTER_DESKTOP,
     );
+  });
+
+  test('Why clip poster markup matches layout constants', async ({ page }) => {
+    const picture = page.locator('.why-page picture.why-clip-poster');
+    await expect(picture).toBeVisible();
+    const mobileSource = picture.locator('source').first();
+    await expect(mobileSource).toHaveAttribute(
+      'media',
+      WHY_CLIP_VIEWPORT_MOBILE_MQ,
+    );
+    await expect(mobileSource).toHaveAttribute(
+      'srcset',
+      WHY_CLIP_POSTER_MOBILE,
+    );
+    await expect(picture.locator('img')).toHaveAttribute(
+      'src',
+      WHY_CLIP_POSTER_DESKTOP,
+    );
+  });
+
+  test('Why clip video and poster image track viewport width', async ({
+    page,
+  }) => {
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_DESKTOP);
+    await expect
+      .poll(() => whyClipPosterImgPathname(page))
+      .toBe(WHY_CLIP_POSTER_DESKTOP);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_MOBILE);
+    await expect
+      .poll(() => whyClipPosterImgPathname(page))
+      .toBe(WHY_CLIP_POSTER_MOBILE);
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_DESKTOP);
+    await expect
+      .poll(() => whyClipPosterImgPathname(page))
+      .toBe(WHY_CLIP_POSTER_DESKTOP);
   });
 
   test('Clip frame and box use panel background #111', async ({ page }) => {

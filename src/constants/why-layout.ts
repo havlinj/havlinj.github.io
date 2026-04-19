@@ -3,6 +3,21 @@
  * CSS that cannot read TS should duplicate with a “sync:” comment to this file.
  */
 
+/** Viewport: mobile clip assets (picture + video src in `why-clip-media.ts`). */
+export const WHY_CLIP_VIEWPORT_MOBILE_MQ = '(max-width: 767px)';
+
+export const WHY_CLIP_VIDEO_MOBILE =
+  '/assets/pages/profile/why/mobile/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom_mobile.mp4';
+
+export const WHY_CLIP_VIDEO_DESKTOP =
+  '/assets/pages/profile/why/desktop/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom.mp4';
+
+export const WHY_CLIP_POSTER_MOBILE =
+  '/assets/pages/profile/why/mobile/fallback_mobile.jpg';
+
+export const WHY_CLIP_POSTER_DESKTOP =
+  '/assets/pages/profile/why/desktop/fallback_desktop.jpg';
+
 /** Horizontal CTA anchor: fraction of `.why-box` width from the left (arrow center; CSS uses translateX(-50%)). */
 export const WHY_CTA_BOX_WIDTH_FRAC = 0.488;
 

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment -- intentional for this DOM-only entry */
 // @ts-nocheck — DOM-heavy client script; early returns narrow types; full HTMLElement typing is noisy.
+import './why-clip-media';
 import { WHY_FIT_REFERENCE_LINE } from '../constants/why-fit-reference';
 import {
   WHY_BODY_MAX_INSET_REM,

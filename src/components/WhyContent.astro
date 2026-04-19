@@ -1,6 +1,9 @@
 ---
 import AnimatedArrow from './AnimatedArrow.astro';
 import {
+  WHY_CLIP_POSTER_DESKTOP,
+  WHY_CLIP_POSTER_MOBILE,
+  WHY_CLIP_VIEWPORT_MOBILE_MQ,
   WHY_CTA_ARROW_FLOOR_OPACITY,
   WHY_CTA_ARROW_PEAK_OPACITY,
   WHY_CTA_BOX_WIDTH_FRAC,
@@ -45,20 +48,31 @@ import '../styles/why.css';
 
         <div class="why-clip-holder" aria-hidden="true">
           <div class="why-clip-frame">
-            <video
-              class="why-clip"
-              autoplay
-              muted
-              loop
-              playsinline
-              preload="metadata"
-              aria-hidden="true"
-            >
-              <source
-                src="/assets/pages/profile/why/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom.mp4"
-                type="video/mp4"
-              />
-            </video>
+            <div class="why-clip-stack">
+              <picture class="why-clip-poster" aria-hidden="true">
+                <source
+                  media={WHY_CLIP_VIEWPORT_MOBILE_MQ}
+                  srcset={WHY_CLIP_POSTER_MOBILE}
+                />
+                <img
+                  src={WHY_CLIP_POSTER_DESKTOP}
+                  alt=""
+                  decoding="async"
+                  width="1280"
+                  height="720"
+                />
+              </picture>
+              <video
+                class="why-clip"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-hidden="true"
+              >
+              </video>
+            </div>
           </div>
         </div>
 
