@@ -12,7 +12,7 @@ import Layout from '../layouts/Layout.astro';
     <p>This only affects how this site is rendered in this browser.</p>
     <form id="display-settings-form" class="display-settings-form">
       <label class="display-settings-option">
-        <input type="radio" name="display-mode" value="standard" />
+        <input type="radio" name="display-mode" value="standard" checked />
         <span class="display-settings-option__marker" aria-hidden="true"></span>
         <span>Standard (default)</span>
       </label>
@@ -33,64 +33,6 @@ import Layout from '../layouts/Layout.astro';
       </label>
     </form>
   </article>
-
-  <style>
-    .display-settings-form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-    }
-
-    .display-settings-option {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.48rem;
-      cursor: pointer;
-      color: #111;
-    }
-
-    .display-settings-option input {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      clip: rect(0 0 0 0);
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .display-settings-option__marker {
-      position: relative;
-      display: inline-grid;
-      place-items: center;
-      width: 1em;
-      height: 1em;
-      line-height: 1;
-    }
-
-    .display-settings-option__marker::before {
-      content: '\25AB';
-      display: block;
-      color: var(--color-list-marker);
-      line-height: 1;
-    }
-
-    .display-settings-option
-      input:checked
-      + .display-settings-option__marker::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      /* Optical center inside ▫ glyph box (slight upward correction). */
-      transform: translate(-53%, 5%);
-      width: 20%;
-      height: 20%;
-      background: var(--color-list-marker);
-    }
-  </style>
 
   <script is:inline>
     (function () {
@@ -160,10 +102,32 @@ import Layout from '../layouts/Layout.astro';
         document.documentElement.classList.remove('display-legacy-strong');
       }
 
-      var initialMode =
-        window.localStorage.getItem(KEYS.displayMode) || 'standard';
-      var input = form.querySelector('input[value="' + initialMode + '"]');
-      if (input instanceof HTMLInputElement) input.checked = true;
+      var rawMode = window.localStorage.getItem(KEYS.displayMode);
+      var initialMode = rawMode || 'standard';
+      if (
+        initialMode !== 'standard' &&
+        initialMode !== 'legacy' &&
+        initialMode !== 'legacy-strong' &&
+        initialMode !== 'auto'
+      ) {
+        initialMode = 'standard';
+      }
+      var matched = false;
+      form.querySelectorAll('input[name="display-mode"]').forEach(function (el) {
+        if (el instanceof HTMLInputElement) {
+          var on = el.value === initialMode;
+          el.checked = on;
+          if (on) matched = true;
+        }
+      });
+      if (!matched) {
+        initialMode = 'standard';
+        form.querySelectorAll('input[name="display-mode"]').forEach(function (el) {
+          if (el instanceof HTMLInputElement) {
+            el.checked = el.value === 'standard';
+          }
+        });
+      }
       applyMode(initialMode);
 
       form.addEventListener('change', function () {

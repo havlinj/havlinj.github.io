@@ -1,3 +1,54 @@
+/* Settings page (/settings): display mode radios.
+ * Loaded from Layout (same bundle as global) so markers don’t wait on a late page <style>.
+ * rem = :root font-size (16px) — stable across Inter swap vs em on body text. */
+
+.display-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.display-settings-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  cursor: pointer;
+  color: #111;
+}
+
+.display-settings-option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.display-settings-option__marker {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: max(1px, 0.0625rem) solid var(--color-list-marker);
+  line-height: 0;
+}
+
+.display-settings-option input:checked + .display-settings-option__marker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.425rem;
+  height: 0.425rem;
+  background-color: var(--color-list-marker);
+}
+
 /* Legacy display mode.
  * Active only when <html> has class="display-legacy". */
 

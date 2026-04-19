@@ -129,3 +129,82 @@ test.describe('Display mode settings and prompt', () => {
     expect(strongVars.grainOpacity).toBeCloseTo(0.04, 3);
   });
 });
+
+test.describe('Settings marker layout (no FOUC / rem sizing)', () => {
+  test('GET /settings HTML ships standard radio pre-checked', async ({
+    request,
+  }) => {
+    const res = await request.get('/settings');
+    expect(res.ok()).toBeTruthy();
+    const html = await res.text();
+    const tags =
+      html.match(/<input\b[^>]*\bname="display-mode"[^>]*>/gi) ?? [];
+    const standardTag = tags.find((t) => /\bvalue="standard"/i.test(t));
+    expect(standardTag).toBeTruthy();
+    expect(standardTag!.toLowerCase()).toMatch(/\bchecked\b/);
+  });
+
+  test('marker box size tracks root rem, not body font-size', async ({
+    page,
+  }) => {
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const marker = page.locator('.display-settings-option__marker').first();
+    const widthBefore = await marker.evaluate(
+      (el) => getComputedStyle(el).width,
+    );
+    await page.addStyleTag({
+      content: 'body { font-size: 22px !important; }',
+    });
+    const widthAfter = await marker.evaluate(
+      (el) => getComputedStyle(el).width,
+    );
+    expect(widthAfter).toBe(widthBefore);
+    const rootPx = await page.evaluate(() =>
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize),
+    );
+    const markerPx = Number.parseFloat(widthAfter);
+    expect(markerPx).toBeCloseTo(0.85 * rootPx, 1);
+  });
+
+  test('checked row marker ::after matches inner rem (sync: settings.css)', async ({
+    page,
+  }) => {
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const marker = page
+      .locator(
+        'label.display-settings-option:has(input[value="standard"]) .display-settings-option__marker',
+      )
+      .first();
+    const rootPx = await page.evaluate(() =>
+      Number.parseFloat(getComputedStyle(document.documentElement).fontSize),
+    );
+    const after = await marker.evaluate((el) => {
+      const s = getComputedStyle(el, '::after');
+      return {
+        w: Number.parseFloat(s.width),
+        h: Number.parseFloat(s.height),
+        content: s.content,
+      };
+    });
+    expect(after.content).not.toBe('none');
+    expect(after.w).toBeCloseTo(0.425 * rootPx, 1);
+    expect(after.h).toBeCloseTo(0.425 * rootPx, 1);
+  });
+
+  test('localStorage mode is applied without waiting for network idle', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('display-mode', 'legacy');
+    });
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const checked = await page.evaluate(() => {
+      const el = document.querySelector(
+        'input[name="display-mode"]:checked',
+      ) as HTMLInputElement | null;
+      return el?.value ?? '';
+    });
+    expect(checked).toBe('legacy');
+    await expect(page.locator('html')).toHaveClass(/display-legacy/);
+  });
+});
