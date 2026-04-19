@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment -- intentional for this DOM-only entry */
-// @ts-nocheck — DOM-heavy client script; early returns narrow types; full HTMLElement typing is noisy.
 import './why-clip-media';
 import { WHY_FIT_REFERENCE_LINE } from '../constants/why-fit-reference';
 import {
@@ -26,24 +24,38 @@ import {
   whyScrollPrefersReducedMotion,
 } from './why-scroll-helpers';
 import { readRootRemPx } from './why-scroll-dom';
-import { createWhyScrollLayout } from './why-scroll-layout';
+import {
+  createWhyScrollLayout,
+  type WhyScrollLayoutMetrics,
+} from './why-scroll-layout';
 import { createWhyScrollRevolver } from './why-scroll-revolver';
 import { createWhyScrollVeils } from './why-scroll-veils';
 
 (function () {
-  const scrollEl = document.querySelector('.why-page .why-scroll');
-  if (!scrollEl) return;
-  const boxEl = scrollEl.closest('.why-box');
-  if (!boxEl) return;
+  const scrollCandidate = document.querySelector('.why-page .why-scroll');
+  if (!(scrollCandidate instanceof HTMLElement)) return;
+  const scrollEl: HTMLElement = scrollCandidate;
+
+  const boxCandidate = scrollEl.closest('.why-box');
+  if (!(boxCandidate instanceof HTMLElement)) return;
+  const boxEl: HTMLElement = boxCandidate;
+
   const pageMainEl = document.querySelector('main.content');
   const ctaEl = boxEl.querySelector('.why-scroll-cta');
-  const contentEl = scrollEl.querySelector('.why-content');
-  if (!contentEl) return;
-  const topSpacer = scrollEl.querySelector('.why-spacer--top');
-  const bottomSpacer = scrollEl.querySelector('.why-spacer--bottom');
-  if (!topSpacer || !bottomSpacer) return;
+  const contentCandidate = scrollEl.querySelector('.why-content');
+  if (!(contentCandidate instanceof HTMLElement)) return;
+  const contentEl: HTMLElement = contentCandidate;
 
-  const lines = Array.from(scrollEl.querySelectorAll('p'));
+  const topCandidate = scrollEl.querySelector('.why-spacer--top');
+  const bottomCandidate = scrollEl.querySelector('.why-spacer--bottom');
+  if (!(topCandidate instanceof HTMLElement)) return;
+  if (!(bottomCandidate instanceof HTMLElement)) return;
+  const topSpacer: HTMLElement = topCandidate;
+  const bottomSpacer: HTMLElement = bottomCandidate;
+
+  const lines: HTMLElement[] = Array.from(
+    scrollEl.querySelectorAll('p'),
+  ) as HTMLElement[];
   if (lines.length === 0) return;
 
   const gifEl = scrollEl.querySelector('.why-clip-holder');
@@ -330,7 +342,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     gifEl,
     leadForCta,
     T,
-    bumpSettleFrames: (n) => {
+    bumpSettleFrames: (n: number) => {
       settleFrames = Math.max(settleFrames, n);
     },
   });
@@ -348,7 +360,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
    * - end edge: keep final paragraphs fully stable (no revolver transform)
    * Smooth ramps preserve continuity into/out of the effect.
    */
-  function middlePhaseRevolverGateForFrame(m) {
+  function middlePhaseRevolverGateForFrame(m: WhyScrollLayoutMetrics) {
     return middlePhaseRevolverGate(
       scrollEl.scrollTop,
       m.maxScroll,
@@ -643,7 +655,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     }
   }
 
-  function afterTwoFrames(fn) {
+  function afterTwoFrames(fn: () => void) {
     requestAnimationFrame(() => requestAnimationFrame(fn));
   }
 
@@ -674,7 +686,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   scrollEl.addEventListener('scroll', schedule, { passive: true });
   scrollEl.addEventListener(
     'wheel',
-    (event) => {
+    (event: WheelEvent) => {
       if (event.ctrlKey) {
         requestZoomSettle(8);
         return;
