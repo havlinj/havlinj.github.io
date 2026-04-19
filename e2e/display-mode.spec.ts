@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { DISPLAY_MODE_STORAGE_KEY } from '../src/utils/display-mode';
 
 test.describe('Display mode settings and prompt', () => {
   test('settings page shows header and display mode options', async ({
@@ -28,8 +29,9 @@ test.describe('Display mode settings and prompt', () => {
     await page.getByText('Legacy compatibility', { exact: true }).click();
     await expect(page.locator('html')).toHaveClass(/display-legacy/);
 
-    const storedLegacy = await page.evaluate(() =>
-      window.localStorage.getItem('display-mode'),
+    const storedLegacy = await page.evaluate(
+      (key) => window.localStorage.getItem(key),
+      DISPLAY_MODE_STORAGE_KEY,
     );
     expect(storedLegacy).toBe('legacy');
 
@@ -60,8 +62,9 @@ test.describe('Display mode settings and prompt', () => {
     await page.getByRole('button', { name: 'No, keep current' }).click();
     await expect(prompt).toHaveCount(0);
 
-    const mode = await page.evaluate(() =>
-      window.localStorage.getItem('display-mode'),
+    const mode = await page.evaluate(
+      (key) => window.localStorage.getItem(key),
+      DISPLAY_MODE_STORAGE_KEY,
     );
     expect(mode).toBe('standard');
   });
@@ -75,8 +78,9 @@ test.describe('Display mode settings and prompt', () => {
     await expect(prompt).toHaveCount(0);
     await expect(page.locator('html')).toHaveClass(/display-legacy/);
 
-    const mode = await page.evaluate(() =>
-      window.localStorage.getItem('display-mode'),
+    const mode = await page.evaluate(
+      (key) => window.localStorage.getItem(key),
+      DISPLAY_MODE_STORAGE_KEY,
     );
     expect(mode).toBe('legacy');
   });
@@ -193,9 +197,9 @@ test.describe('Settings marker layout (no FOUC / rem sizing)', () => {
   test('localStorage mode is applied without waiting for network idle', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem('display-mode', 'legacy');
-    });
+    await page.addInitScript((key) => {
+      window.localStorage.setItem(key, 'legacy');
+    }, DISPLAY_MODE_STORAGE_KEY);
     await page.goto('/settings', { waitUntil: 'domcontentloaded' });
     const checked = await page.evaluate(() => {
       const el = document.querySelector(

@@ -73,6 +73,7 @@ const navItems = [
         }
 
         window.__jhLikelyLegacyDisplay = likelyLegacyDisplayEnvironment;
+        window.__jhClearDisplayModeClasses = clearDisplayModeClasses;
 
         var mode = window.localStorage.getItem(DISPLAY_MODE_KEY) || 'standard';
         if (mode === 'auto') {
@@ -132,10 +133,7 @@ const navItems = [
 
         var DISPLAY_MODE_KEY = 'display-mode';
         var PROMPT_SEEN_KEY = 'display-mode-prompt-seen';
-        function clearDisplayModeClasses() {
-          document.documentElement.classList.remove('display-legacy');
-          document.documentElement.classList.remove('display-legacy-strong');
-        }
+        var clearDisplayModeClasses = window.__jhClearDisplayModeClasses;
 
         var likelyLegacyDisplayEnvironment = window.__jhLikelyLegacyDisplay;
 
