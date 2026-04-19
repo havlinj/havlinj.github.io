@@ -97,7 +97,13 @@ jobs:
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Verify sitemap output
-        run: test -f dist/sitemap-index.xml
+        run: |
+          test -f dist/sitemap-index.xml
+          test -f dist/sitemap-0.xml
+          grep -q 'why/' dist/sitemap-0.xml
+          grep -q 'contact/' dist/sitemap-0.xml
+          grep -q 'writing/' dist/sitemap-0.xml
+          grep -q 'profile/' dist/sitemap-0.xml
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

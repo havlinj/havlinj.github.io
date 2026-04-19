@@ -210,4 +210,22 @@ test.describe('Settings marker layout (no FOUC / rem sizing)', () => {
     expect(checked).toBe('legacy');
     await expect(page.locator('html')).toHaveClass(/display-legacy/);
   });
+
+  test('invalid display-mode in localStorage falls back to standard', async ({
+    page,
+  }) => {
+    await page.addInitScript((key) => {
+      window.localStorage.setItem(key, '__not_a_real_mode__');
+    }, DISPLAY_MODE_STORAGE_KEY);
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const checked = await page.evaluate(() => {
+      const el = document.querySelector(
+        'input[name="display-mode"]:checked',
+      ) as HTMLInputElement | null;
+      return el?.value ?? '';
+    });
+    expect(checked).toBe('standard');
+    await expect(page.locator('html')).not.toHaveClass(/display-legacy/);
+    await expect(page.locator('html')).not.toHaveClass(/display-legacy-strong/);
+  });
 });

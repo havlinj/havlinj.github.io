@@ -1,21 +1,11 @@
+import { WHY_CLIP_VIEWPORT_MOBILE_MQ } from '../constants/why-layout';
 import {
-  WHY_CLIP_VIDEO_DESKTOP,
-  WHY_CLIP_VIDEO_MOBILE,
-  WHY_CLIP_VIEWPORT_MOBILE_MQ,
-} from '../constants/why-layout';
-
-function clipVideoPathForViewport(mobileMq: MediaQueryList): string {
-  return mobileMq.matches ? WHY_CLIP_VIDEO_MOBILE : WHY_CLIP_VIDEO_DESKTOP;
-}
+  clipVideoPathForViewport,
+  pathnameOfMediaSrc,
+} from '../utils/why-clip-media-logic';
 
 function pathnameOfVideo(el: HTMLVideoElement): string {
-  const raw = el.currentSrc || el.src;
-  if (!raw) return '';
-  try {
-    return new URL(raw, window.location.href).pathname;
-  } catch {
-    return '';
-  }
+  return pathnameOfMediaSrc(el.currentSrc, el.src, window.location.href);
 }
 
 (function setupWhyClipMedia(): void {
