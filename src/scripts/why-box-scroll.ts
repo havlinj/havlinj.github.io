@@ -45,9 +45,9 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   const lines = Array.from(scrollEl.querySelectorAll('p'));
   if (lines.length === 0) return;
 
-  const gifEl = scrollEl.querySelector('.why-gif-holder');
+  const gifEl = scrollEl.querySelector('.why-clip-holder');
   const introTopBandEl = boxEl.querySelector('.why-intro-top-band');
-  const clipVideo = scrollEl.querySelector('video.why-gif');
+  const clipVideo = scrollEl.querySelector('video.why-clip');
   const clipPlaybackMid =
     (WHY_CLIP_PLAYBACK_SINE_LOW + WHY_CLIP_PLAYBACK_SINE_HIGH) / 2;
   if (clipVideo instanceof HTMLVideoElement) {
@@ -444,7 +444,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       return;
     }
     const boxR = metrics.boxOuterRect;
-    const frame = scrollEl.querySelector('.why-gif-frame');
+    const frame = scrollEl.querySelector('.why-clip-frame');
     if (!(frame instanceof HTMLElement)) {
       introTopBandEl.style.setProperty('--why-intro-top-band-height', '0px');
       introTopBandEl.style.setProperty('--why-intro-top-band-opacity', '0');

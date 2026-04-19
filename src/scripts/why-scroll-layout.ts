@@ -54,7 +54,7 @@ export function createWhyScrollLayout(config: WhyScrollLayoutConfig) {
     if (!gifEl) return 0;
     let h = (gifEl as HTMLElement).offsetHeight;
     if (h <= 0) {
-      const frame = gifEl.querySelector('.why-gif-frame');
+      const frame = gifEl.querySelector('.why-clip-frame');
       if (frame) h = (frame as HTMLElement).offsetHeight;
     }
     if (h <= 0) {

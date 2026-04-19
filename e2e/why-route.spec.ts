@@ -60,7 +60,7 @@ test.describe('/why page @serial', () => {
       'opacity',
       '1',
     );
-    await expect(page.locator('.why-page .why-gif')).toBeVisible();
+    await expect(page.locator('.why-page .why-clip')).toBeVisible();
 
     const scroll = page.locator('.why-page .why-scroll');
     await expect(scroll).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('/why page @serial', () => {
       'opacity',
       '1',
     );
-    await expect(page.locator('.why-page .why-gif')).toBeVisible();
+    await expect(page.locator('.why-page .why-clip')).toBeVisible();
 
     await page.waitForTimeout(200);
     expect(pageErrors, `Runtime errors: ${pageErrors.join(' | ')}`).toEqual([]);
@@ -127,11 +127,11 @@ test.describe('/why page @serial', () => {
     await expect(page.locator('.why-page p.why-lead')).toHaveText(
       "I'm a software engineer.",
     );
-    const clip = page.locator('.why-page video.why-gif');
+    const clip = page.locator('.why-page video.why-clip');
     await expect(clip).toBeVisible();
     await expect(clip).toHaveJSProperty('loop', true);
     const mp4 = page.locator(
-      '.why-page video.why-gif source[type="video/mp4"]',
+      '.why-page video.why-clip source[type="video/mp4"]',
     );
     await expect(mp4).toHaveAttribute(
       'src',
@@ -139,9 +139,9 @@ test.describe('/why page @serial', () => {
     );
   });
 
-  test('GIF frame and box use panel background #111', async ({ page }) => {
+  test('Clip frame and box use panel background #111', async ({ page }) => {
     const box = page.locator('.why-page .why-box');
-    const frame = page.locator('.why-page .why-gif-frame');
+    const frame = page.locator('.why-page .why-clip-frame');
     await expect(box).toHaveCSS('background-color', RGB_INK);
     await expect(frame).toHaveCSS('background-color', RGB_INK);
   });
@@ -249,10 +249,10 @@ test.describe('/why page @serial', () => {
     expect(data!.delta).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
-  test('GIF holder is out of flow; JS sets scroll pad and intro GIF band', async ({
+  test('Clip holder is out of flow; JS sets scroll pad and intro clip band', async ({
     page,
   }) => {
-    const holder = page.locator('.why-page .why-gif-holder');
+    const holder = page.locator('.why-page .why-clip-holder');
     await expect(holder).toHaveCSS('position', 'absolute');
 
     const metrics = await page.evaluate(() => {
@@ -284,11 +284,11 @@ test.describe('/why page @serial', () => {
     );
   });
 
-  test('GIF corner overlays use box-bg gradient (not an empty stack)', async ({
+  test('Clip corner overlays use box-bg gradient (not an empty stack)', async ({
     page,
   }) => {
     const afterBg = await page.evaluate(() => {
-      const frame = document.querySelector('.why-page .why-gif-frame');
+      const frame = document.querySelector('.why-page .why-clip-frame');
       if (!frame) return '';
       return getComputedStyle(frame, '::after').backgroundImage;
     });

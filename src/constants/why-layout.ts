@@ -8,14 +8,14 @@ export const WHY_CTA_BOX_WIDTH_FRAC = 0.488;
 
 /**
  * GIF band from scroll inner edge (custom property on `.why-wrapper`).
- * ~2.3rem at ~1.09rem body (2.3/1.09); `em` resolves on `.why-gif-holder` (inherits scroll font-size).
+ * ~2.3rem at ~1.09rem body (2.3/1.09); `em` resolves on `.why-clip-holder` (inherits scroll font-size).
  * Set from `WhyContent.astro`; do not redefine in `why.css`.
  */
 export const WHY_GIF_TOP_INSET = '2.11em';
 
 /**
  * Multiplier for GIF opacity (0–1). Final opacity = scroll-script factor × this.
- * Set on `.why-wrapper` as `--why-gif-base-opacity`; sync `why.css` `.why-gif-holder`.
+ * Set on `.why-wrapper` as `--why-gif-base-opacity`; sync `why.css` `.why-clip-holder`.
  */
 export const WHY_GIF_BASE_OPACITY = 0.7;
 
