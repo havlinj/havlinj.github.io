@@ -113,20 +113,24 @@ import Layout from '../layouts/Layout.astro';
         initialMode = 'standard';
       }
       var matched = false;
-      form.querySelectorAll('input[name="display-mode"]').forEach(function (el) {
-        if (el instanceof HTMLInputElement) {
-          var on = el.value === initialMode;
-          el.checked = on;
-          if (on) matched = true;
-        }
-      });
-      if (!matched) {
-        initialMode = 'standard';
-        form.querySelectorAll('input[name="display-mode"]').forEach(function (el) {
+      form
+        .querySelectorAll('input[name="display-mode"]')
+        .forEach(function (el) {
           if (el instanceof HTMLInputElement) {
-            el.checked = el.value === 'standard';
+            var on = el.value === initialMode;
+            el.checked = on;
+            if (on) matched = true;
           }
         });
+      if (!matched) {
+        initialMode = 'standard';
+        form
+          .querySelectorAll('input[name="display-mode"]')
+          .forEach(function (el) {
+            if (el instanceof HTMLInputElement) {
+              el.checked = el.value === 'standard';
+            }
+          });
       }
       applyMode(initialMode);
 

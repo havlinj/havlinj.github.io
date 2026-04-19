@@ -137,8 +137,7 @@ test.describe('Settings marker layout (no FOUC / rem sizing)', () => {
     const res = await request.get('/settings');
     expect(res.ok()).toBeTruthy();
     const html = await res.text();
-    const tags =
-      html.match(/<input\b[^>]*\bname="display-mode"[^>]*>/gi) ?? [];
+    const tags = html.match(/<input\b[^>]*\bname="display-mode"[^>]*>/gi) ?? [];
     const standardTag = tags.find((t) => /\bvalue="standard"/i.test(t));
     expect(standardTag).toBeTruthy();
     expect(standardTag!.toLowerCase()).toMatch(/\bchecked\b/);

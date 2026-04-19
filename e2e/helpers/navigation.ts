@@ -7,10 +7,11 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
     .waitFor({ state: 'visible', timeout: 15000 });
 }
 
-/** Why page: inline script removes pending class after spacer/GIF metrics settle. */
-export async function gotoWhyWhenReady(page: Page): Promise<void> {
-  await page.goto('/why', { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+/**
+ * Why page: wait until why-box-scroll layout has applied (ready class or pad var).
+ * Use after `reload()` on /why — avoids a redundant full `goto`.
+ */
+export async function awaitWhyLayoutReady(page: Page): Promise<void> {
   await page.locator('.why-page .why-scroll').first().waitFor({
     state: 'attached',
     timeout: 10000,
@@ -44,6 +45,12 @@ export async function gotoWhyWhenReady(page: Page): Promise<void> {
   } catch {
     // Keep tests running; individual assertions should report concrete failures.
   }
+}
+
+/** Navigate to /why and wait for layout script (see `awaitWhyLayoutReady`). */
+export async function gotoWhyWhenReady(page: Page): Promise<void> {
+  await page.goto('/why', { waitUntil: 'domcontentloaded' });
+  await awaitWhyLayoutReady(page);
 }
 
 export async function expectNavLinkActive(

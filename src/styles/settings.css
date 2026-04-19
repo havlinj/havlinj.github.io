@@ -39,7 +39,9 @@
   line-height: 0;
 }
 
-.display-settings-option input:checked + .display-settings-option__marker::after {
+.display-settings-option
+  input:checked
+  + .display-settings-option__marker::after {
   content: '';
   position: absolute;
   inset: 0;

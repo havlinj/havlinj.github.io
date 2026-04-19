@@ -19,7 +19,11 @@ import {
   WHY_CLIP_VIDEO_MOBILE,
   WHY_CLIP_VIEWPORT_MOBILE_MQ,
 } from '../src/constants/why-layout';
-import { gotoWhyWhenReady, waitTwoFrames } from './helpers';
+import {
+  awaitWhyLayoutReady,
+  gotoWhyWhenReady,
+  waitTwoFrames,
+} from './helpers';
 
 async function setWhyScrollTop(page: Page, top: number): Promise<void> {
   await page.evaluate((value) => {
@@ -42,15 +46,17 @@ async function setWhyScrollBottom(page: Page): Promise<void> {
 }
 
 async function whyClipVideoPathname(page: Page): Promise<string> {
-  return page.locator('.why-page video.why-clip').evaluate((el: HTMLVideoElement) => {
-    const raw = el.currentSrc || el.src;
-    if (!raw) return '';
-    try {
-      return new URL(raw, window.location.href).pathname;
-    } catch {
-      return '';
-    }
-  });
+  return page
+    .locator('.why-page video.why-clip')
+    .evaluate((el: HTMLVideoElement) => {
+      const raw = el.currentSrc || el.src;
+      if (!raw) return '';
+      try {
+        return new URL(raw, window.location.href).pathname;
+      } catch {
+        return '';
+      }
+    });
 }
 
 async function whyClipPosterImgPathname(page: Page): Promise<string> {
@@ -123,7 +129,6 @@ test.describe('/why page @serial', () => {
   test('WHY_FIT_REFERENCE_LINE matches longest line among /why copy', async ({
     page,
   }) => {
-    await gotoWhyWhenReady(page);
     const { maxLen, longest, refPresent } = await page.evaluate(() => {
       const scroll = document.querySelector('.why-page .why-scroll');
       if (!scroll) {
@@ -195,21 +200,27 @@ test.describe('/why page @serial', () => {
   test('Why clip video and poster image track viewport width', async ({
     page,
   }) => {
-    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_DESKTOP);
+    await expect
+      .poll(() => whyClipVideoPathname(page))
+      .toBe(WHY_CLIP_VIDEO_DESKTOP);
     await expect
       .poll(() => whyClipPosterImgPathname(page))
       .toBe(WHY_CLIP_POSTER_DESKTOP);
 
     await page.setViewportSize({ width: 390, height: 844 });
 
-    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_MOBILE);
+    await expect
+      .poll(() => whyClipVideoPathname(page))
+      .toBe(WHY_CLIP_VIDEO_MOBILE);
     await expect
       .poll(() => whyClipPosterImgPathname(page))
       .toBe(WHY_CLIP_POSTER_MOBILE);
 
     await page.setViewportSize({ width: 1280, height: 720 });
 
-    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO_DESKTOP);
+    await expect
+      .poll(() => whyClipVideoPathname(page))
+      .toBe(WHY_CLIP_VIDEO_DESKTOP);
     await expect
       .poll(() => whyClipPosterImgPathname(page))
       .toBe(WHY_CLIP_POSTER_DESKTOP);
@@ -862,8 +873,8 @@ test.describe('/why page @serial', () => {
     const damped = await whyWheelScrollDeltaPx(page, rawDelta);
 
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.reload();
-    await gotoWhyWhenReady(page);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await awaitWhyLayoutReady(page);
     const nativeRm = await whyWheelScrollDeltaPx(page, rawDelta);
 
     expect(damped, 'damped path should move').toBeGreaterThan(4);
