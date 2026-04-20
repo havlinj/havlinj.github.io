@@ -14,7 +14,7 @@ I have designed and maintained production systems where reliability, predictabil
 
 ---
 
-## What I Optimize For
+## Design Principles
 
 **Clarity over trendiness**
 Systems should make their constraints and trade-offs explicit. New tools do not replace understanding.
