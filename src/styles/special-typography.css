@@ -237,31 +237,36 @@ sp[space='xl'] {
    <p class="statement-emphasis">...</p>
    <p class="statement-hero">...</p>
 ================================ */
+.blog-post .article-body .statement-plain,
+.blog-post .article-body .statement-soft,
+.blog-post .article-body .statement-emphasis,
+.blog-post .article-body .statement-hero {
+  text-wrap: pretty;
+}
+
 .blog-post .article-body .statement-plain {
   margin-top: 1.4rem;
   margin-bottom: 1.4rem;
 }
 
 .blog-post .article-body .statement-soft {
-  margin: 1.7rem 0 1.85rem 0;
-  line-height: 1.55;
+  margin: 1.7rem 0 1.85rem 0.01em;
+  line-height: 1.58;
   letter-spacing: 0.009em;
 }
 
 .blog-post .article-body .statement-emphasis {
-  margin: 1.9em 1.8em 2em 0.3em;
-  line-height: 1.52;
+  margin: 1.9em 1.8em 2em 0.01em;
+  line-height: 1.6;
   font-size: 1.035em;
   letter-spacing: 0.01em;
-  opacity: 0.98;
 }
 
 .blog-post .article-body .statement-hero {
-  margin: 2.3em 1.5em 2.4em 0.3em;
-  line-height: 1.52;
+  margin: 2.3em 1.5em 2.4em 0.01em;
+  line-height: 1.62;
   font-size: 1.06em;
   letter-spacing: 0.011em;
-  opacity: 0.95;
 }
 
 .blog-post .article-body .inline-emphasis {

@@ -28,12 +28,12 @@ Put simply: that people receive something of real value in exchange for what the
 
 They take satisfaction in work done well. They care about continuity — about whether others continue to expect high-quality results from them. They want to be a clear choice. They want people to return and repeatedly seek out their work.
 
-<p class="statement-emphasis" style="margin: 1.95em 3em 0em 0.3em">
+<p class="statement-emphasis" style="margin: 1.95em 3em 0em 0.03em">
     Reputation matters.<br>
     A reputation built on quality is hard to destroy.
 </p>
 
-<p class="statement-hero" style="margin: 2.05em 3em 2.15em 0.3em">
+<p class="statement-hero" style="margin: 2.05em 3em 2.15em 0.03em">
     Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
 </p>
 
