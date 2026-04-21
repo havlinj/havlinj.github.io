@@ -64,9 +64,12 @@ function formatWritingListDate(d: Date): string {
       '--panel-bg': defaultWritingBg,
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
+      /* Softer pool photos over page wash (reverted from tile-only filter — read closer to intent). */
+      '--panel-bg-layer-opacity': '0.94',
+      /* Slightly below 1: pool shots often read loud on page wash; tune per asset if needed. */
       '--panel-bg-saturation': '0.97',
-      '--panel-bg-brightness': '0.995',
-      '--panel-bg-contrast': '0.985',
+      '--panel-bg-brightness': '0.985',
+      '--panel-bg-contrast': '0.97',
       // Gap under title: --page-title-margin-bottom above; optional extra: '--panel-margin-top': '0.5rem'
       '--panel-padding-top': '2rem',
       '--panel-padding-left': '2rem',

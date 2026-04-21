@@ -43,6 +43,8 @@
   filter: saturate(var(--panel-bg-saturation, 1))
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
+  /* Optional: <1 lets the #111 panel show through (Writing pool BG vs profile portrait). */
+  opacity: var(--panel-bg-layer-opacity, 1);
   pointer-events: none;
 }
 

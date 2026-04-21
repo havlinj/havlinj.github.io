@@ -239,6 +239,7 @@ a:hover {
 
   .page-buttons-panel::before {
     filter: none !important;
+    opacity: 1 !important;
   }
 }
 

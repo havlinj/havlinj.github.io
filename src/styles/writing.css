@@ -50,10 +50,20 @@ ul.post-list > li::before {
   margin-top: 2.1rem;
 }
 
-/* Writing: make the whole panel square, so the background fills it */
+/* Writing: square panel; wash behind pool photo (no #111 — only global page background). */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
+  background-color: var(--color-page-bg);
 }
+
+.writing-page .page-buttons-panel::before {
+  background-color: var(--color-page-bg);
+}
+
+/*
+ * Pool photo strength: `--panel-bg-*` + `--panel-bg-layer-opacity` on `article.writing-page`
+ * (writing.astro). Uses default `.page-buttons-panel::before` filter stack from page-buttons.css.
+ */
 
 /* Writing index: a bit taller rows than default page-button (1.75–2rem) for long titles */
 .writing-page .page-button {
