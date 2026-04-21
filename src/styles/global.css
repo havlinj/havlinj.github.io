@@ -25,6 +25,23 @@
   --color-page-bg: #e0f7fa;
   --hero-highlight-bg: var(--color-page-bg);
   --hero-optical-offset: 0.1em;
+  /* Hero photo: avoid heavy saturate() defaults (uneven on some color paths). */
+  --hero-bg-brightness: 0.88;
+  --hero-bg-saturate: 1.12;
+  --hero-bg-image-opacity: 0.9;
+  /*
+   * Image pipeline defaults (profile tiles, portrait, dark panel bg layer).
+   * Slightly below 1 ≈ former “legacy” mild pass — one consistent baseline for all users.
+   */
+  --panel-bg-saturation: 0.97;
+  --panel-bg-brightness: 0.995;
+  --panel-bg-contrast: 0.985;
+  --tile-brightness: 0.988;
+  --tile-contrast: 0.975;
+  --tile-image-opacity: 0.992;
+  --portrait-brightness: 0.99;
+  --portrait-contrast: 0.97;
+  --portrait-opacity: 0.992;
   /* Markdown --- -> <hr>: subtle divider, same hue as body text */
   --color-divider: rgba(17, 17, 17, 0.22);
   /* List bullets / numbers: visible but slightly softer than body text */
@@ -270,6 +287,42 @@ a:hover {
 
 .display-mode-prompt__note li + li {
   margin-top: 0.1rem;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-list-marker: rgba(17, 17, 17, 0.78);
+    --color-divider: rgba(17, 17, 17, 0.38);
+    --hero-bg-saturate: 1.02;
+    --panel-bg-saturation: 0.94;
+    --panel-bg-contrast: 0.97;
+    --tile-contrast: 0.99;
+    --portrait-contrast: 0.99;
+  }
+
+  .site-footer__inner > * {
+    opacity: 0.88;
+  }
+}
+
+/* Windows / OS high-contrast: drop decorative filters and film grain. */
+@media (forced-colors: active) {
+  .hero-bg__image {
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  .profile-photo-box::after,
+  .profile-image-tile::after,
+  .profile-gif-tile::after,
+  .profile-section .page-buttons-panel::after {
+    opacity: 0 !important;
+    mix-blend-mode: normal !important;
+  }
+
+  .page-buttons-panel::before {
+    filter: none !important;
+  }
 }
 
 /* ===============================

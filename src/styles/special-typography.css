@@ -103,8 +103,8 @@ hr {
 blockquote {
   margin: 1.25rem 0;
   padding: 0.15rem 0 0.15rem 1rem;
-  border-left: 3px solid rgba(17, 17, 17, 0.35);
-  color: rgba(17, 17, 17, 0.78);
+  border-left: 3px solid rgba(17, 17, 17, 0.42);
+  color: rgba(17, 17, 17, 0.84);
 }
 
 blockquote p:last-child {

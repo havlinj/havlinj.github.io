@@ -86,7 +86,7 @@
 
 .contact-form button:hover {
   background-color: #111;
-  color: #e0f7fa;
+  color: var(--color-page-bg);
 }
 
 .contact-form .hidden {

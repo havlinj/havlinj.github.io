@@ -55,6 +55,10 @@
  * Active only when <html> has class="display-legacy". */
 
 html.display-legacy {
+  --hero-bg-brightness: 0.9;
+  --hero-bg-saturate: 1.04;
+  --hero-bg-image-opacity: 0.92;
+
   --panel-bg-saturation: 0.92;
   --panel-bg-brightness: 0.99;
   --panel-bg-contrast: 0.96;
@@ -71,6 +75,10 @@ html.display-legacy {
 }
 
 html.display-legacy-strong {
+  --hero-bg-brightness: 0.92;
+  --hero-bg-saturate: 1;
+  --hero-bg-image-opacity: 0.94;
+
   --panel-bg-saturation: 0.82;
   --panel-bg-brightness: 0.97;
   --panel-bg-contrast: 0.9;
