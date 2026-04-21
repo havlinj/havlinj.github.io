@@ -228,6 +228,49 @@ article .profile-section:last-child {
   background-color: var(--color-page-bg);
 }
 
+/* What I do: poster + video stack (sync behaviour with why-clip-media.ts + WhyContent). */
+.profile-gif-tile__stack {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.profile-gif-tile-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.profile-gif-tile-poster.is-hidden {
+  opacity: 0;
+}
+
+.profile-gif-tile-poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
+  filter: brightness(var(--tile-brightness, 1))
+    contrast(var(--tile-contrast, 1));
+  transform: translate(var(--tile-pan-x, 0%), var(--tile-pan-y, 0%))
+    scale(var(--tile-zoom, 1));
+  transform-origin: center;
+  opacity: var(--tile-image-opacity, 1);
+  pointer-events: none;
+}
+
 .profile-image-tile::before {
   content: '';
   position: absolute;
@@ -254,9 +297,10 @@ article .profile-section:last-child {
 
 .profile-gif-tile__media {
   position: absolute;
-  inset: -1px;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
   filter: brightness(var(--tile-brightness, 1))

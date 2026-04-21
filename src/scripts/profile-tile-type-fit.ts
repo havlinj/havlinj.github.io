@@ -8,6 +8,7 @@
  * Implementation is split across profile-tile-type-fit-*.ts modules; this file is the entry + startup sequence only.
  */
 
+import { wireProfileGifTileMedia } from './profile-gif-tile-video';
 import { TYPE_FIT_EVENT } from './profile-tile-type-fit-constants';
 import {
   wireFoundationsRevealResize,
@@ -21,6 +22,8 @@ function signalTypeFitReady(): void {
 }
 
 async function start(): Promise<void> {
+  wireProfileGifTileMedia();
+
   try {
     await Promise.race([
       document.fonts.ready,

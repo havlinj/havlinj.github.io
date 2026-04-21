@@ -85,7 +85,7 @@ All Pexels media listed below are used according to the
 - **Profile tile video (What I do)**
   - Author: [Raddy](https://www.pexels.com/@raddy/)
   - Source: [Pexels](https://www.pexels.com/video/13522186/)
-  - Edits: converted to GIF, dichromatic treatment
+  - Edits: dichromatic treatment; desktop/mobile MP4 + static poster frames (`public/assets/pages/profile/what-i-do/`)
 
 - **Why section background video**
   - Author: [Nicola Narraci](https://www.pexels.com/@nicola-narraci/)

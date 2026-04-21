@@ -27,9 +27,9 @@ title: 'Profile'
     --profile-tile-3-pan-x: 10%;
     --profile-tile-3-pan-y: 5%;
     --profile-tile-3-zoom: 1.39;
-    --profile-tile-3-brightness: 1;
+    --profile-tile-3-brightness: 1.1;
     --profile-tile-3-contrast: 1;
-    --profile-tile-3-opacity: 0.8;
+    --profile-tile-3-opacity: 0.7;
     --profile-tile-4-bg: url('/assets/pages/profile/evgeniy-sholokh-5Xf2hLm6yj8-unsplash_dichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 60%;
@@ -80,18 +80,32 @@ title: 'Profile'
     "
     aria-label="What I do"
   >
-    <video
-      class="profile-gif-tile__media"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-      aria-hidden="true"
-    >
-      <source src="/assets/pages/profile/raddy_13522186-hd_1920_1080_25fps_pexels_dichrom.webm" type="video/webm" />
-      <source src="/assets/pages/profile/raddy_13522186-hd_1920_1080_25fps_pexels_dichrom.mp4" type="video/mp4" />
-    </video>
+    <div class="profile-gif-tile__stack">
+      <picture class="profile-gif-tile-poster" aria-hidden="true">
+        <!-- sync: WHY_CLIP_VIEWPORT_MOBILE_MQ in src/constants/why-layout.ts -->
+        <source
+          media="(max-width: 767px)"
+          srcset="/assets/pages/profile/what-i-do/fallback_mobile.jpg"
+        />
+        <img
+          src="/assets/pages/profile/what-i-do/fallback_desktop.jpg"
+          alt=""
+          decoding="async"
+          width="1920"
+          height="1080"
+        />
+      </picture>
+      <video
+        class="profile-gif-tile__media"
+        data-playback-rate="0.62"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      ></video>
+    </div>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
