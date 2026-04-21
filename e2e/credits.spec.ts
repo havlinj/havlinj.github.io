@@ -11,10 +11,6 @@ test.describe('/credits page', () => {
       await document.fonts?.ready;
     });
 
-    await page.addStyleTag({
-      content: '.site-footer__settings { display: none !important; }',
-    });
-
     const main = page.locator('main.content');
     await expect(main).toBeVisible();
     await expect(main).toHaveScreenshot('credits-content.png', {

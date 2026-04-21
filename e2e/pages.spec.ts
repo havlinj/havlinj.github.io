@@ -53,10 +53,6 @@ test.describe('Profile page (/profile, /why)', () => {
 
   test('profile section - last screenshot matches', async ({ page }) => {
     await gotoProfileWhenReady(page);
-    // Keep historical snapshot stable: Settings footer link is unrelated to profile tile visual.
-    await page.addStyleTag({
-      content: '.site-footer__settings { display: none !important; }',
-    });
     // Stabilize autoplay media in profile tiles for deterministic snapshots.
     await page.evaluate(() => {
       document.querySelectorAll('video').forEach((node) => {
