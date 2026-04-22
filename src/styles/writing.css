@@ -42,12 +42,14 @@ ul.post-list > li::before {
 
 /* Writing index only: extra space between article rows (default .page-buttons gap is 0.4rem). */
 .writing-page .page-buttons {
-  gap: 0.7rem;
+  gap: var(--writing-row-gap, 2.8cqi);
 }
 
 /* Featured vs rest: ~3× the writing row gap */
 .writing-page .writing-groups > .post-list + .post-list {
-  margin-top: 2.1rem;
+  margin-top: calc(
+    var(--writing-row-gap, 2.8cqi) * var(--writing-group-gap-mult, 3)
+  );
 }
 
 /* Writing: square panel; wash behind pool photo (no #111 — only global page background). */
@@ -65,10 +67,10 @@ ul.post-list > li::before {
  * (writing.astro). Uses default `.page-buttons-panel::before` filter stack from page-buttons.css.
  */
 
-/* Writing index: a bit taller rows than default page-button (1.75–2rem) for long titles */
+/* Writing index row height tied to panel size (cqi), with rem guardrails for extremes. */
 .writing-page .page-button {
-  min-height: var(--writing-row-min-h, 2.2rem);
-  max-height: var(--writing-row-max-h, 2.55rem);
+  min-height: clamp(1.75rem, var(--writing-row-min-h, 5.8cqi), 2.35rem);
+  max-height: clamp(2.2rem, var(--writing-row-max-h, 6.8cqi), 2.8rem);
 }
 
 /* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).
@@ -82,18 +84,12 @@ ul.post-list > li::before {
   --writing-title-lh: clamp(1.18, 1.14 + 0.24cqi, 1.34);
   justify-content: space-between;
   gap: 0.65em;
-  padding-block: var(--writing-row-pad-block, 2px);
+  padding-block: var(--writing-row-pad-block, 0.32cqi);
   font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
 }
 
 /* Mobile / narrow panels: force tighter title rows (cqi alone can be too subtle). */
 @container (max-width: 34rem) {
-  .writing-page .page-button {
-    --writing-row-min-h: 1.75rem;
-    --writing-row-max-h: 2.2rem;
-    --writing-row-pad-block: 0px;
-  }
-
   .writing-page .page-button__inner {
     --writing-title-lh: 1.06;
   }
@@ -101,12 +97,6 @@ ul.post-list > li::before {
 
 /* Wide panels: slightly more air in rows and title line rhythm. */
 @container (min-width: 52rem) {
-  .writing-page .page-button {
-    --writing-row-min-h: 2.3rem;
-    --writing-row-max-h: 2.75rem;
-    --writing-row-pad-block: 3px;
-  }
-
   .writing-page .page-button__inner {
     --writing-title-lh: 1.3;
   }
