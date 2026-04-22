@@ -40,7 +40,7 @@ article.has-buttons-panel {
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
   --profile-tile-text-inset-x: 2rem;
-  --profile-photo-frame-size: 6px;
+  --profile-photo-frame-size: 0px;
   /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
    * Keep in sync: e2e/profile-seam-ratios.ts (no --_ prefix: avoids var/inherit quirks in some engines). */
   --profile-shared-edge-ratio-base: 0.77;
@@ -228,10 +228,16 @@ article .profile-section:last-child {
   background-color: var(--color-page-bg);
 }
 
+.profile-gif-tile .page-button__bg,
+.profile-gif-tile .page-button__overlay {
+  z-index: 2;
+}
+
 /* What I do: poster + video stack (sync behaviour with why-clip-media.ts + WhyContent). */
 .profile-gif-tile__stack {
   position: absolute;
   inset: -1px;
+  z-index: 1;
   width: calc(100% + 2px);
   height: calc(100% + 2px);
   overflow: hidden;
@@ -400,6 +406,10 @@ article .profile-section:last-child {
   max-width: 100%;
   overflow: visible;
   justify-content: flex-start;
+}
+
+.profile-section .prof-tile--foundations .page-button__inner {
+  justify-content: flex-end;
 }
 
 .prof-tile .page-button__bg {
