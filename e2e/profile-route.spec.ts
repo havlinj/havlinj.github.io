@@ -6,7 +6,7 @@ import {
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../src/utils/profile-reveal-constants';
-import { gotoProfileWhenReady, mustBox } from './helpers';
+import { gotoProfileWhenReady, mustBox, pathnameIsProfile } from './helpers';
 import {
   PROFILE_SEAM_VIEWPORT_WIDTHS,
   PROFILE_SHARED_EDGE_RATIO_BY_STEP,
@@ -328,6 +328,15 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
   }) => {
     for (const width of PROFILE_SEAM_VIEWPORT_WIDTHS) {
       await page.setViewportSize({ width, height: 900 });
+      /*
+       * Chromium can leave `border-bottom-width` on the Why tile stale after a viewport
+       * resize even when inherited `--profile-*` vars on `.profile-section` already match
+       * the new @media step — `getComputedStyle` shows an updated ratio but an old used
+       * border. Reload when already on /profile so each width is a fresh style resolve.
+       */
+      if (pathnameIsProfile(page.url())) {
+        await page.reload({ waitUntil: 'load' });
+      }
       await gotoProfileWhenReady(page);
       const { framePx, stitchedPx, innerW } = await page.evaluate(() => {
         const section = document.querySelector('.profile-section');

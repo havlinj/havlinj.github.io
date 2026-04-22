@@ -1,7 +1,23 @@
 import { expect, type Page } from '@playwright/test';
 
+/**
+ * True when the page is already on /profile (with optional trailing slash / query / hash).
+ * Used to skip a redundant `goto('/profile')`: Chromium can restore the same URL from
+ * BFCache without re-running inline/module boot, leaving `.profile-section--loading` stuck.
+ */
+export function pathnameIsProfile(url: string): boolean {
+  try {
+    const path = new URL(url).pathname.replace(/\/$/, '') || '/';
+    return path === '/profile';
+  } catch {
+    return false;
+  }
+}
+
 export async function gotoProfileWhenReady(page: Page): Promise<void> {
-  await page.goto('/profile');
+  if (!pathnameIsProfile(page.url())) {
+    await page.goto('/profile');
+  }
   await page
     .locator('.profile-section:not(.profile-section--loading)')
     .waitFor({ state: 'visible', timeout: 15000 });

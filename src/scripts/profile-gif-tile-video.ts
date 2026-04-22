@@ -45,7 +45,9 @@ export function wireProfileGifTileMedia(root: ParentNode = document): void {
   const stacks = section.querySelectorAll('.profile-gif-tile__stack');
   if (stacks.length === 0) {
     /* Backward compat: bare video without stack */
-    for (const el of section.querySelectorAll('video.profile-gif-tile__media')) {
+    for (const el of section.querySelectorAll(
+      'video.profile-gif-tile__media',
+    )) {
       if (!(el instanceof HTMLVideoElement)) continue;
       wireSingleVideoWithoutPoster(el);
     }
@@ -55,9 +57,11 @@ export function wireProfileGifTileMedia(root: ParentNode = document): void {
   const mobileMq = window.matchMedia(WHY_CLIP_VIEWPORT_MOBILE_MQ);
 
   for (const stack of stacks) {
-    const clipVideo = stack.querySelector('video.profile-gif-tile__media');
+    const rawClip = stack.querySelector('video.profile-gif-tile__media');
     const posterEl = stack.querySelector('picture.profile-gif-tile-poster');
-    if (!(clipVideo instanceof HTMLVideoElement)) continue;
+    if (!(rawClip instanceof HTMLVideoElement)) continue;
+    /* Typed binding so nested `applySrc` (matchMedia callback) keeps HTMLVideoElement, not Element | null. */
+    const clipVideo: HTMLVideoElement = rawClip;
 
     const hidePoster = (): void => {
       if (posterEl instanceof HTMLPictureElement) {

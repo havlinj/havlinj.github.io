@@ -3,6 +3,7 @@ export {
   expectNavLinkActive,
   gotoProfileWhenReady,
   gotoWhyWhenReady,
+  pathnameIsProfile,
 } from './navigation';
 export { waitTwoFrames } from './raf';
 export { mustBox } from './geometry';
