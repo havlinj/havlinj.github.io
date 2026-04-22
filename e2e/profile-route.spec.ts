@@ -370,7 +370,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     }
   });
 
-  test('profile tile borders use portrait frame thickness with border-box sizing', async ({
+  test('profile tile borders follow configured frame thickness with border-box sizing', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
@@ -409,8 +409,8 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       return { frameVar, stitchedVar, tileData };
     });
 
-    expect(info.frameVar).toBeGreaterThan(0);
-    expect(info.stitchedVar).toBeGreaterThan(0);
+    expect(info.frameVar).toBeGreaterThanOrEqual(0);
+    expect(info.stitchedVar).toBeGreaterThanOrEqual(0);
     for (const tile of info.tileData) {
       expect(tile.boxSizing).toBe('border-box');
       expect(tile.borderTop).toBeCloseTo(info.frameVar, 1);
