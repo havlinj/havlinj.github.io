@@ -6,13 +6,15 @@ title: 'Profile'
   class="profile-section profile-section--loading"
   style="
     /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
+    --profile-tile-text-inset-anchor-x: 7%;
+    --profile-tile-text-inset-far-x: 12%;
     --profile-portrait-width-vs-tile: 80%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;
     --portrait-brightness: 1.08;
     --portrait-contrast: 1;
-    --portrait-opacity: 1;
+    --portrait-opacity: 0.9;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;

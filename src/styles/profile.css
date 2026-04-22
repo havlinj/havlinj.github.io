@@ -38,7 +38,9 @@ article.has-buttons-panel {
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
-  --profile-tile-text-inset-x: 10%;
+  --profile-tile-text-inset-anchor-x: 10%;
+  --profile-tile-text-inset-far-x: 6%;
+  --profile-tile-text-inset-x: var(--profile-tile-text-inset-anchor-x);
   --profile-photo-frame-size: 0px;
   /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
    * Keep in sync: e2e/profile-seam-ratios.ts (no --_ prefix: avoids var/inherit quirks in some engines). */
@@ -340,7 +342,9 @@ article .profile-section:last-child {
 }
 
 .prof-tile .page-button__inner {
-  padding: 0 var(--profile-tile-text-inset-x);
+  padding-inline-start: var(--profile-tile-text-inset-anchor-x);
+  padding-inline-end: var(--profile-tile-text-inset-far-x);
+  padding-block: 0;
   box-sizing: border-box;
   max-width: 100%;
   overflow: visible;
@@ -348,6 +352,8 @@ article .profile-section:last-child {
 }
 
 .profile-section .prof-tile--foundations .page-button__inner {
+  padding-inline-start: var(--profile-tile-text-inset-far-x);
+  padding-inline-end: var(--profile-tile-text-inset-anchor-x);
   justify-content: flex-end;
 }
 
@@ -447,13 +453,13 @@ article .profile-section:last-child {
 .profile-section > a[href='/why'] .page-button__text,
 .profile-section > a[href='/what-i-do'] .page-button__text {
   --profile-label-strip-left: calc(
-    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size) + 1px
+    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) + 1px
   );
 }
 
 .profile-section .prof-tile--foundations .page-button__text {
   --profile-label-strip-right: calc(
-    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size) + 1px
+    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) + 1px
   );
 }
 
