@@ -136,9 +136,8 @@ export function wireFoundationsReveal(): void {
       }, REVEAL_COPY_FALLBACK_MS);
 
       /*
-       * Tile height and portrait scale animate (~--profile-motion-duration). Early rAF fits
-       * target a mid-transition box; ResizeObserver then refits → visible “smear”. Wait until
-       * stanza size and reveal font var match for several frames after each fit.
+       * Wait for a stable stanza box + reveal font var across consecutive frames before
+       * showing reveal copy; this avoids first-paint clipping/smear on slower devices.
        */
       let lastW = NaN;
       let lastH = NaN;

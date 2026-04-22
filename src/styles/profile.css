@@ -8,8 +8,7 @@
  *   --profile-stitched-seam-thickness (breakpoints below must match TS constants).
  * - Type fit (JS): --profile-tile-label-font-size, --profile-reveal-font-size,
  *   --foundations-reveal-uniform-scale (Foundations reveal stanza).
- * - Right column geometry (JS): --profile-right-height-px, --profile-portrait-side-px,
- *   --portrait-effective-scale; state2 uses :has(.is-revealed) overrides on .profile-right-column.
+ * - Right column geometry is static in CSS (portrait top-right + Foundations bottom half).
  */
 
 /* Clip panel by content-body when it extends (soft edges stay inside) */
@@ -95,43 +94,13 @@ article.has-buttons-panel {
   grid-row: 2;
 }
 
-/* --- Right column (A / a / c model; vars from JS) --- */
-/*
- * Right column geometry (A/a/c model):
- * - A: "big square" height (= full right region height, 100%).
- * - a: default Foundations height (state 1) = A/2 = 50%.
- * - c: portrait wrapper side length (measured in JS into `--profile-portrait-side-px`).
- *
- * State 1: Foundations = a (50% height), portrait bottom = 50%.
- * State 2: Foundations = h_max = A - c, portrait lifts and still touches
- *          the top edge (bottom = FoundationsHeight).
- *
- * Important: animate vertical position (`bottom`) and height (`height`) only.
- * Horizontal positioning stays fixed (no left/right animation => no flicker).
- */
+/* --- Right column (static portrait + static Foundations half) --- */
 .profile-right-column {
   grid-column: 2;
   grid-row: 1 / span 2;
   position: relative;
   min-height: 0;
   min-width: 0;
-
-  /*
-   * A/a/c geometry in px.
-   * Using px instead of % keeps state2 stable against tiny hover/focus reflow changes.
-   */
-  --profile-right-height-px: 0px; /* A */
-  --profile-portrait-side-px: 0px; /* c */
-  --portrait-effective-scale: 1;
-  --profile-portrait-effective-px: calc(
-    var(--profile-portrait-side-px) * var(--portrait-effective-scale)
-  );
-
-  /* state1 (a = A/2): same model as left-column tiles — exact half height */
-  --profile-foundations-height: 50%;
-  --portrait-stand-bottom: 50%;
-  --profile-motion-duration: 0.45s;
-  --profile-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --profile-photo-gutter-x: var(
     --profile-inner-gutter-x,
     var(
@@ -140,7 +109,7 @@ article.has-buttons-panel {
     )
   );
   --profile-portrait-content-side: calc(
-    100% - (2 * var(--profile-photo-gutter-x))
+    50% - (2 * var(--profile-photo-gutter-x))
   );
   --profile-portrait-shell-width: calc(
     var(--profile-portrait-content-side) + (2 * var(--profile-photo-frame-size))
@@ -160,21 +129,8 @@ article.has-buttons-panel {
   right: 0;
   bottom: 0;
   z-index: 1;
-
-  height: var(--profile-foundations-height);
-  transition: height var(--profile-motion-duration) var(--profile-motion-ease);
+  height: 50%;
   border-left-width: var(--profile-stitched-seam-thickness);
-}
-
-/* state2: after click (is-revealed), Foundations smoothly expands to h_max */
-.profile-right-column:has(.prof-tile--foundations.is-revealed) {
-  --portrait-effective-scale: 0.8;
-  --profile-foundations-height: calc(
-    var(--profile-right-height-px) - var(--profile-portrait-effective-px)
-  );
-  --portrait-stand-bottom: calc(
-    var(--profile-right-height-px) - var(--profile-portrait-effective-px)
-  );
 }
 
 /* When profile-section is the last block in the article, avoid extra gap before footer */
@@ -327,8 +283,8 @@ article .profile-section:last-child {
 }
 
 /*
- * Portrait: square side calc(100% - 2x horizontal gutter), anchored right and bottom.
- * Size remains gutter-based; max right alignment via --profile-photo-inset-right (default 0).
+ * Portrait: static square in the right-top corner of the big right column.
+ * Size is controlled by --profile-portrait-width-vs-tile where 70% = one base tile side.
  */
 .profile-photo-shell {
   --profile-photo-gutter-x: var(
@@ -339,35 +295,18 @@ article .profile-section:last-child {
     )
   );
   --profile-photo-overhang-y: 1px;
-  --profile-portrait-content-side: calc(
-    100% - (2 * var(--profile-photo-gutter-x))
-  );
   position: absolute;
-  top: auto;
+  top: var(--profile-photo-inset-top, 0px);
   left: auto;
-  right: var(--profile-photo-inset-right, 0);
-  bottom: calc(
-    var(--portrait-stand-bottom, 50%) - var(--profile-photo-overhang-y)
-  );
-  transition: bottom var(--profile-motion-duration) var(--profile-motion-ease);
-  width: min(
-    calc(
-      var(--profile-portrait-content-side) +
-        (2 * var(--profile-photo-frame-size))
-    ),
-    100%
-  );
+  right: var(--profile-photo-inset-right, 0px);
+  bottom: auto;
+  width: min(100%, var(--profile-portrait-width-vs-tile, 100%));
   height: auto;
   aspect-ratio: 1;
   max-height: 100%;
   overflow: hidden;
   background: #111;
-  --portrait-shell-shrink: 1;
-  transform: scale(var(--portrait-shell-shrink));
-  transform-origin: bottom center;
-  transition:
-    bottom var(--profile-motion-duration) var(--profile-motion-ease),
-    transform var(--profile-motion-duration) var(--profile-motion-ease);
+  transform: none;
 }
 
 .profile-photo-box {
@@ -832,14 +771,6 @@ article .profile-section:last-child {
   /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: bottom center;
-  transition: transform var(--profile-motion-duration)
-    var(--profile-motion-ease);
-}
-
-/* state2: during expand (is-revealed), visually shrink portrait (~20%) */
-.profile-right-column:has(.prof-tile--foundations.is-revealed)
-  .profile-photo-shell {
-  --portrait-shell-shrink: var(--portrait-effective-scale, 0.8);
 }
 
 @keyframes profile-foundations-reveal-tile-breathe {
@@ -864,11 +795,6 @@ article .profile-section:last-child {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-right-column .profile-photo-frame,
-  .profile-right-column .prof-tile--foundations {
-    transition: none;
-  }
-
   .prof-tile--foundations.is-revealed .prof-tile__reveal {
     transition:
       opacity var(--profile-reveal-fade-duration, 0.18s) ease,

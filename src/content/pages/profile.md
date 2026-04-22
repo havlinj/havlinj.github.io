@@ -6,7 +6,7 @@ title: 'Profile'
   class="profile-section profile-section--loading"
   style="
     /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
-    --profile-inner-gutter: 12%;
+    --profile-portrait-width-vs-tile: 80%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;

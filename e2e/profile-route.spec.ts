@@ -26,17 +26,17 @@ function expectUsedBorderWidthInComputedRange(
   expect(received, msg).toBeLessThanOrEqual(high);
 }
 
-type FoundationsGeometry = {
+type StaticProfileGeometry = {
   columnHeight: number;
   foundationsHeight: number;
-  portraitSide: number;
-  portraitBottom: number;
-  effectiveScale: number;
+  portraitTop: number;
+  portraitRight: number;
+  portraitBottomGapToFoundations: number;
 };
 
-async function readFoundationsGeometry(
+async function readStaticProfileGeometry(
   page: Page,
-): Promise<FoundationsGeometry> {
+): Promise<StaticProfileGeometry> {
   return page.evaluate(() => {
     const col = document.querySelector('.profile-right-column');
     const tile = document.querySelector('.prof-tile--foundations');
@@ -48,23 +48,17 @@ async function readFoundationsGeometry(
     if (!(shell instanceof HTMLElement))
       throw new Error('missing .profile-photo-shell');
 
-    const cs = getComputedStyle(col);
-    const parseNum = (name: string): number => {
-      const raw = cs.getPropertyValue(name).trim();
-      const n = Number.parseFloat(raw);
-      return Number.isFinite(n) ? n : 0;
-    };
     const colRect = col.getBoundingClientRect();
     const tileRect = tile.getBoundingClientRect();
     const shellRect = shell.getBoundingClientRect();
-    const portraitSidePxVar = parseNum('--profile-portrait-side-px');
+    const foundationsTop = tileRect.top - colRect.top;
 
     return {
       columnHeight: colRect.height,
       foundationsHeight: tileRect.height,
-      portraitSide: portraitSidePxVar > 0 ? portraitSidePxVar : shellRect.width,
-      portraitBottom: colRect.bottom - shellRect.bottom,
-      effectiveScale: parseNum('--portrait-effective-scale'),
+      portraitTop: shellRect.top - colRect.top,
+      portraitRight: colRect.right - shellRect.right,
+      portraitBottomGapToFoundations: foundationsTop - shellRect.bottom + colRect.top,
     };
   });
 }
@@ -77,22 +71,6 @@ async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
     if (!tile) throw new Error('missing .prof-tile--foundations');
     tile.style.setProperty('--profile-reveal-timeout-ms', `${timeout}`);
   }, ms);
-}
-
-async function waitForState2Settled(page: Page): Promise<FoundationsGeometry> {
-  await expect
-    .poll(
-      async () => {
-        const g = await readFoundationsGeometry(page);
-        const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
-        const deltaH = Math.abs(g.foundationsHeight - expected);
-        const deltaB = Math.abs(g.portraitBottom - expected);
-        return deltaH < 2.5 && deltaB < 2.5;
-      },
-      { timeout: 3000, intervals: [100, 150, 250] },
-    )
-    .toBe(true);
-  return readFoundationsGeometry(page);
 }
 
 async function openFoundationsReveal(tile: ReturnType<Page['getByRole']>) {
@@ -147,7 +125,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     });
     expect(revealPx).toBeGreaterThan(0);
     expect(labelPx).toBeGreaterThan(0);
-    // Reveal copy can be capped by current state2 box geometry; keep it positive and bounded.
+    // Reveal copy must be positive and bounded against the label baseline.
     expect(revealPx).toBeGreaterThanOrEqual(1);
     expect(revealPx).toBeLessThan(labelPx);
   });
@@ -471,20 +449,22 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       });
   });
 
-  test('state1 geometry stays locked at half height across viewport resize', async ({
+  test('portrait stays pinned to top-right and Foundations stays half-height across viewport resize', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
 
-    const assertState1Half = async () => {
+    const assertStaticLayout = async () => {
       await expect
         .poll(
           async () => {
-            const g = await readFoundationsGeometry(page);
+            const g = await readStaticProfileGeometry(page);
             const half = g.columnHeight / 2;
             return (
-              Math.abs(g.foundationsHeight - half) < 20 &&
-              Math.abs(g.portraitBottom - half) < 20
+              Math.abs(g.foundationsHeight - half) < 2.5 &&
+              Math.abs(g.portraitTop) < 2.5 &&
+              Math.abs(g.portraitRight) < 2.5 &&
+              g.portraitBottomGapToFoundations > 0
             );
           },
           { timeout: 2500, intervals: [100, 200, 350] },
@@ -492,103 +472,21 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         .toBe(true);
     };
 
-    await assertState1Half();
+    await assertStaticLayout();
     await page.setViewportSize({ width: 980, height: 700 });
-    await assertState1Half();
+    await assertStaticLayout();
     await page.setViewportSize({ width: 1440, height: 980 });
-    await assertState1Half();
+    await assertStaticLayout();
   });
 
-  test('state2 geometry follows A - (c * scale) and does not react to mouse position', async ({
-    page,
-  }) => {
-    await gotoProfileWhenReady(page);
-    const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    const g1 = await waitForState2Settled(page);
-    expect(g1.effectiveScale).toBeCloseTo(0.8, 2);
-    const expected = g1.columnHeight - g1.portraitSide * g1.effectiveScale;
-    expect(Math.abs(g1.foundationsHeight - expected)).toBeLessThan(2.5);
-    expect(Math.abs(g1.portraitBottom - expected)).toBeLessThan(2.5);
-
-    const tileBox = await mustBox(tile);
-    await page.mouse.move(8, 8);
-    await page.waitForTimeout(120);
-    await page.mouse.move(tileBox.x + tileBox.width * 0.5, tileBox.y + 8);
-    await page.waitForTimeout(120);
-    await page.mouse.move(
-      tileBox.x + tileBox.width * 0.8,
-      tileBox.y + tileBox.height * 0.8,
-    );
-    await page.waitForTimeout(120);
-
-    const g2 = await readFoundationsGeometry(page);
-    expect(Math.abs(g2.foundationsHeight - g1.foundationsHeight)).toBeLessThan(
-      3,
-    );
-    expect(Math.abs(g2.portraitBottom - g1.portraitBottom)).toBeLessThan(3);
-  });
-
-  test('state2 stays clamped during zoom-like viewport changes', async ({
-    page,
-  }) => {
-    await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 2200);
-    const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    await waitForState2Settled(page);
-
-    const assertState2Clamped = async () => {
-      await expect
-        .poll(
-          async () => {
-            const g = await readFoundationsGeometry(page);
-            const expected = g.columnHeight - g.portraitSide * g.effectiveScale;
-            const topDelta = await page.evaluate(() => {
-              const col = document.querySelector('.profile-right-column');
-              const shell = document.querySelector('.profile-photo-shell');
-              if (!(col instanceof HTMLElement))
-                throw new Error('missing .profile-right-column');
-              if (!(shell instanceof HTMLElement))
-                throw new Error('missing .profile-photo-shell');
-              const colRect = col.getBoundingClientRect();
-              const shellRect = shell.getBoundingClientRect();
-              return shellRect.top - colRect.top;
-            });
-            return (
-              Math.abs(g.foundationsHeight - expected) < 4 &&
-              Math.abs(g.portraitBottom - expected) < 4 &&
-              topDelta >= -2
-            );
-          },
-          { timeout: 3000, intervals: [100, 180, 300] },
-        )
-        .toBe(true);
-    };
-
-    await assertState2Clamped();
-    await page.setViewportSize({ width: 1024, height: 720 });
-    await assertState2Clamped();
-    await page.setViewportSize({ width: 1460, height: 920 });
-    await assertState2Clamped();
-    await page.setViewportSize({ width: 900, height: 980 });
-    await assertState2Clamped();
-  });
-
-  test('state2 holds until timeout, then returns to state1 geometry', async ({
+  test('reveal timeout returns classes to default without shape changes', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
     await setRevealTimeoutMs(page, 900);
     const tile = page.getByRole('link', { name: 'Foundations' });
-    await tile.click();
-    await expect(tile).toHaveClass(/is-revealed/);
-    const state2 = await waitForState2Settled(page);
-    expect(state2.foundationsHeight).toBeGreaterThan(
-      state2.columnHeight * 0.5 + 2,
-    );
+    const before = await readStaticProfileGeometry(page);
+    await openFoundationsReveal(tile);
 
     await expect
       .poll(
@@ -600,18 +498,13 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       )
       .toBe(false);
 
-    await expect
-      .poll(
-        async () => {
-          const state1 = await readFoundationsGeometry(page);
-          const half = state1.columnHeight / 2;
-          return (
-            Math.abs(state1.foundationsHeight - half) < 20 &&
-            Math.abs(state1.portraitBottom - half) < 20
-          );
-        },
-        { timeout: 3000, intervals: [100, 180, 300] },
-      )
-      .toBe(true);
+    const after = await readStaticProfileGeometry(page);
+    expect(Math.abs(after.foundationsHeight - before.foundationsHeight)).toBeLessThan(
+      2.5,
+    );
+    expect(Math.abs(after.portraitTop - before.portraitTop)).toBeLessThan(2.5);
+    expect(Math.abs(after.portraitRight - before.portraitRight)).toBeLessThan(
+      2.5,
+    );
   });
 });

@@ -1,7 +1,5 @@
 export const LABEL_VAR = '--profile-tile-label-font-size';
 export const REVEAL_VAR = '--profile-reveal-font-size';
-export const PROFILE_RIGHT_HEIGHT_VAR = '--profile-right-height-px';
-export const PROFILE_PORTRAIT_SIDE_VAR = '--profile-portrait-side-px';
 
 export const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 export const REVEAL_FADE_MS = 180;
@@ -34,8 +32,6 @@ export const SELECTORS = {
   foundationsRevealCopyInner: '.tile-state-secondary__inner',
   foundationsRevealStanza:
     '.tile-state-secondary .line-1, .tile-state-secondary .line-2',
-  profileRightColumn: '.profile-right-column',
-  profilePhotoShell: '.profile-photo-shell',
 } as const;
 export const REVEAL_CLASSES = {
   revealed: 'is-revealed',

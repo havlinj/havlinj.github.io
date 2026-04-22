@@ -2,7 +2,6 @@
  * Profile grid typography:
  * - Shared tile label size from the longest of Why / What I do / Foundations → --profile-tile-label-font-size.
  * - Foundations reveal → --profile-reveal-font-size (often derived from tile size).
- * - Portrait column geometry → --profile-right-height-px, --profile-portrait-side-px.
  * Dispatches `profileTileTypeFit` when ready so Layout can drop the loading veil (reveal uses a fixed rem fallback in CSS if JS is off — no clamp).
  *
  * Implementation is split across profile-tile-type-fit-*.ts modules; this file is the entry + startup sequence only.
