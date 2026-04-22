@@ -38,7 +38,7 @@ article.has-buttons-panel {
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
-  --profile-tile-text-inset-x: 2rem;
+  --profile-tile-text-inset-x: 10%;
   --profile-photo-frame-size: 0px;
   /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
    * Keep in sync: e2e/profile-seam-ratios.ts (no --_ prefix: avoids var/inherit quirks in some engines). */
@@ -447,14 +447,23 @@ article .profile-section:last-child {
 .profile-section > a[href='/why'] .page-button__text,
 .profile-section > a[href='/what-i-do'] .page-button__text {
   --profile-label-strip-left: calc(
-    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size) + 1px
   );
 }
 
 .profile-section .prof-tile--foundations .page-button__text {
   --profile-label-strip-right: calc(
-    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size)
+    var(--profile-tile-text-inset-x) + var(--profile-photo-frame-size) + 1px
   );
+}
+
+.profile-section > a[href='/why'] .page-button__text::before,
+.profile-section > a[href='/what-i-do'] .page-button__text::before {
+  left: -1000px;
+}
+
+.profile-section .prof-tile--foundations .page-button__text::before {
+  right: -1000px;
 }
 
 /* Second state only: pointer — hover avoids transform (text raster “skube”); use soft bg instead */

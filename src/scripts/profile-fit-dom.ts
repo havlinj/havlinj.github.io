@@ -13,9 +13,8 @@ export function rootRemPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 }
 
-/** Lower bound for reveal type fit; also used as immediate inline size before post-fit settle. */
 export function minRevealFontPx(): number {
-  return Math.max(2, rootRemPx() * 0.32);
+  return 0;
 }
 
 export function setPxCustomProperty(

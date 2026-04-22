@@ -122,7 +122,7 @@ ul.post-list > li::before {
   font-size: 0.98em;
   line-height: var(--writing-title-lh);
   letter-spacing: 0.08em;
-  color: rgba(17, 17, 17, 0.88);
+  color: rgba(17, 17, 17, 0.99);
   padding: 0.2em;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;

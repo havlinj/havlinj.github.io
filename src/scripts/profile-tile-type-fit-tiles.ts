@@ -3,7 +3,6 @@ import {
   contentWidthWithoutHorizontalPadding,
   maxLineWidth,
   queryElement,
-  rootRemPx,
 } from './profile-fit-dom';
 import { LABEL_VAR, SELECTORS } from './profile-tile-type-fit-constants';
 
@@ -34,11 +33,10 @@ export function fitTileLabels(section: HTMLElement): void {
   );
   if (!inner || !textEl) return;
 
-  const rem = rootRemPx();
-  const minPx = rem * 0.7;
+  const minPx = 0;
   const available = contentWidthWithoutHorizontalPadding(inner);
   // Use full inner width as max — tiles should use the column, not cap to page-title optical size.
-  const maxPx = Math.max(minPx, available);
+  const maxPx = Math.max(0, available);
   const tcs = getComputedStyle(textEl);
   const lines = Array.from(
     section.querySelectorAll<HTMLElement>(
