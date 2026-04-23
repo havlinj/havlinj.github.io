@@ -61,21 +61,9 @@ import '../styles/hero.css';
     (function () {
       'use strict';
 
-      const FIT_TEXT = { min: 16, max: 220, precision: 0.1 };
-      const FIT_ROLE = {
-        minFont: 10,
-        precision: 0.1,
-        highCapFallback: 120,
-        ratioMax: 0.4,
-        ratioMin: 0.3,
-      };
       const SEL = {
         hero: '.hero',
         heroBgImage: '.hero-bg__image',
-        heroName: '.hero-name',
-        heroRole: '.hero-role',
-        heroNameBox: '.hero-name-box',
-        fitText: '[data-fit-text]',
       };
 
       function revealHeroWhenImageReady() {
@@ -96,115 +84,11 @@ import '../styles/hero.css';
         heroImg.addEventListener('error', reveal, { once: true });
       }
 
-      function fitTextToContainer(textEl, options = {}) {
-        const container = textEl.parentElement;
-        if (!container) return;
-
-        const minFont = options.minFont ?? FIT_TEXT.min;
-        const maxFont = options.maxFont ?? FIT_TEXT.max;
-        const precision = options.precision ?? 0.25;
-        const best = fitBinarySearch(minFont, maxFont, precision, (fontPx) => {
-          setElementsFontSizePx([textEl], fontPx);
-          return textEl.scrollWidth <= container.clientWidth;
-        });
-        setElementsFontSizePx([textEl], best);
-      }
-
-      function fitAllHeroNames() {
-        document.querySelectorAll(SEL.fitText).forEach((el) => {
-          fitTextToContainer(el, {
-            minFont: FIT_TEXT.min,
-            maxFont: FIT_TEXT.max,
-            precision: FIT_TEXT.precision,
-          });
-        });
-      }
-
-      function fitHeroRoles() {
-        const heroNameEl = document.querySelector(SEL.heroName);
-        if (!heroNameEl) return;
-
-        const heroNameSize =
-          parseFloat(getComputedStyle(heroNameEl).fontSize) || 0;
-
-        document.querySelectorAll(SEL.heroRole).forEach((roleEl) => {
-          const spans = Array.from(roleEl.querySelectorAll('span'));
-          if (spans.length === 0) return;
-
-          const minFont = FIT_ROLE.minFont;
-          const precision = FIT_ROLE.precision;
-          const highCap = heroNameSize || FIT_ROLE.highCapFallback;
-          const bestWidth = fitBinarySearch(
-            minFont,
-            highCap,
-            precision,
-            (fontPx) => {
-              setElementsFontSizePx(spans, fontPx);
-              return spans.every((s) => s.scrollWidth <= roleEl.clientWidth);
-            },
-          );
-
-          let roleFont = bestWidth;
-          if (heroNameSize) {
-            roleFont = Math.min(roleFont, heroNameSize * FIT_ROLE.ratioMax);
-            roleFont = Math.max(roleFont, heroNameSize * FIT_ROLE.ratioMin);
-          }
-          setElementsFontSizePx(spans, roleFont);
-        });
-      }
-
-      function setElementsFontSizePx(elements, fontPx) {
-        const value = fontPx + 'px';
-        elements.forEach((el) => {
-          el.style.fontSize = value;
-        });
-      }
-
-      function fitBinarySearch(min, max, precision, fitsAt) {
-        let low = min;
-        let high = max;
-        let best = min;
-        while (high - low > precision) {
-          const mid = (low + high) / 2;
-          if (fitsAt(mid)) {
-            best = mid;
-            low = mid;
-          } else {
-            high = mid;
-          }
-        }
-        return best;
-      }
-
-      let scheduledFit = false;
-      function scheduleHeroFit() {
-        if (scheduledFit) return;
-        scheduledFit = true;
-        requestAnimationFrame(() => {
-          scheduledFit = false;
-          fitAllHeroNames();
-          fitHeroRoles();
-        });
-      }
-
-      const resizeObserver = new ResizeObserver(scheduleHeroFit);
-
       function onLoad() {
         revealHeroWhenImageReady();
-        fitAllHeroNames();
-        fitHeroRoles();
-        document
-          .querySelectorAll(`${SEL.heroNameBox}, ${SEL.heroRole}`)
-          .forEach((el) => resizeObserver.observe(el));
       }
 
       window.addEventListener('load', onLoad);
-      window.addEventListener('resize', scheduleHeroFit);
-
-      document.fonts?.ready?.then(() => {
-        fitAllHeroNames();
-        fitHeroRoles();
-      });
     })();
   </script>
 </Layout>

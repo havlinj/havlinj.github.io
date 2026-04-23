@@ -16,6 +16,20 @@
   /* Composition anchor offsets (default: exact center of the square) */
   --hero-composition-offset-x: 0%;
   --hero-composition-offset-y: -0.5%;
+  /*
+   * Typography and spacing as fractions of hero edge (100cqw),
+   * calibrated from the original 100% layout.
+   */
+  --hero-grid-gap: 5.0314cqw;
+  --hero-name-font-size: 9.7202cqw;
+  --hero-role-font-size: 2.9161cqw;
+  --hero-role-row-gap: 1.0063cqw;
+  --hero-tagline-font-size: 8cqw;
+  --hero-tagline-margin-top: 5.5346cqw;
+  --hero-tagline-pad-y: 0.96cqw;
+  --hero-tagline-pad-x-right: 1.6cqw;
+  --hero-tagline-pad-x-left: 0.24cqw;
+  --hero-tagline-max-width: 213.8365cqw;
 }
 
 .hero-figure {
@@ -83,7 +97,7 @@
   margin-top: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 2rem;
+  column-gap: var(--hero-grid-gap);
   align-items: center;
 }
 
@@ -118,7 +132,7 @@
 
 .hero-name {
   margin: 0;
-  font-size: clamp(2.4rem, 1.2rem + 2cqw, 3.2rem);
+  font-size: var(--hero-name-font-size);
   line-height: 0.9;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -171,13 +185,14 @@ h1 + .hero-wrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.4em;
+  gap: var(--hero-role-row-gap);
 }
 
 .hero-role span {
   min-width: 0;
   margin: 0;
   white-space: nowrap;
+  font-size: var(--hero-role-font-size);
   line-height: 1.1;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -196,14 +211,14 @@ h1 + .hero-wrap {
 }
 
 .tagline {
-  /* More consistent scaling on resize/zoom: use container query units */
-  font-size: clamp(1rem, 8cqw, 4rem);
+  font-size: var(--hero-tagline-font-size);
   font-weight: 700;
   line-height: 1.4;
-  max-width: 40ch;
+  max-width: var(--hero-tagline-max-width);
   letter-spacing: 0.01em;
-  margin-block-start: 2.2rem;
-  padding: 0.12em 0.2em 0.12em 0.03em;
+  margin-block-start: var(--hero-tagline-margin-top);
+  padding: var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-right)
+    var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-left);
   position: relative;
   display: inline-block;
   z-index: 1;
