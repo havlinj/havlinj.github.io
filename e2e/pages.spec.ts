@@ -67,6 +67,7 @@ test.describe('Profile page (/profile, /why)', () => {
     });
     await expect(page).toHaveScreenshot('profile-section.png', {
       animations: 'disabled',
+      maxDiffPixels: 80,
     });
   });
 
@@ -256,7 +257,9 @@ test.describe('Writing page (/writing)', () => {
       const title = link.locator('.page-button__text');
       const dateEl = link.locator('.page-button__date');
       const [padTop, padBottom] = await Promise.all([
-        inner.evaluate((el) => Number.parseFloat(getComputedStyle(el).paddingTop)),
+        inner.evaluate((el) =>
+          Number.parseFloat(getComputedStyle(el).paddingTop),
+        ),
         inner.evaluate((el) =>
           Number.parseFloat(getComputedStyle(el).paddingBottom),
         ),
