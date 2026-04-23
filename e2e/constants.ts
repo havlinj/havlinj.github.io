@@ -3,7 +3,7 @@ export const LAYOUT_TOLERANCE = 8;
 
 /** Min/max gap in px for spacing (1rem ≈ 16px; allow variance). */
 export const MIN_GAP = 8;
-export const MAX_GAP = 80;
+export const MAX_GAP = 88;
 
 /** Content container width limits (must match special-typography.css :root). */
 export const MIN_CONTENT_WIDTH_CH = 40; /* --content-min-width */

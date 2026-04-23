@@ -397,8 +397,8 @@ article .profile-section:last-child {
 .prof-tile .page-button__text::before {
   content: '';
   position: absolute;
-  top: -0.18em;
-  bottom: -0.18em;
+  top: -0.19em;
+  bottom: -0.19em;
   left: calc(-1 * var(--profile-label-strip-left, 0.35em));
   right: calc(-1 * var(--profile-label-strip-right, 0.35em));
   z-index: -1;
@@ -414,11 +414,11 @@ article .profile-section:last-child {
 
 /* State1 invert: dark text by default; light-on-dark on focus (keyboard) */
 .prof-tile:not(.is-revealed):focus-visible .page-button__bg {
-  background-color: #111;
+  background-color: transparent;
 }
 
 .prof-tile:not(.is-revealed):focus-visible .page-button__overlay {
-  background: #111;
+  background: transparent;
 }
 
 .prof-tile:not(.is-revealed):focus-visible .page-button__text {
@@ -426,18 +426,32 @@ article .profile-section:last-child {
 }
 
 .prof-tile:not(.is-revealed):focus-visible .page-button__text::before {
-  background-color: #111;
-  border-color: var(--color-page-bg);
+  background-color: rgba(17, 17, 17, 1);
+}
+
+.prof-tile--foundations:not(.is-revealed):focus-visible
+  .page-button__text::before {
+  left: calc(-1 * 0.42em);
+  right: calc(-1 * 0.42em);
+}
+
+.prof-tile--foundations:not(.is-revealed):focus-visible .page-button__bg {
+  background-color: rgba(17, 17, 17, 0.1);
 }
 
 /* Hover invert only when the primary input can hover (not touch — avoids sticky :hover after Foundations reveal closes). */
 @media (hover: hover) {
   .prof-tile:not(.is-revealed):hover .page-button__bg {
-    background-color: #111;
+    background-color: rgba(17, 17, 17, 0.1);
   }
 
   .prof-tile:not(.is-revealed):hover .page-button__overlay {
-    background: #111;
+    background: linear-gradient(
+      90deg,
+      rgba(17, 17, 17, 0.75) 0%,
+      rgba(17, 17, 17, 0.67) 20%,
+      rgba(17, 17, 17, 0.52) 50%
+    );
   }
 
   .prof-tile:not(.is-revealed):hover .page-button__text {
@@ -445,21 +459,31 @@ article .profile-section:last-child {
   }
 
   .prof-tile:not(.is-revealed):hover .page-button__text::before {
-    background-color: #111;
-    border-color: var(--color-page-bg);
+    background-color: rgba(17, 17, 17, 1);
+  }
+
+  .prof-tile--foundations:not(.is-revealed):hover .page-button__text::before {
+    left: calc(-1 * 0.42em);
+    right: calc(-1 * 0.42em);
+  }
+
+  .prof-tile--foundations:not(.is-revealed):hover .page-button__overlay {
+    background: none;
   }
 }
 
 .profile-section > a[href='/why'] .page-button__text,
 .profile-section > a[href='/what-i-do'] .page-button__text {
   --profile-label-strip-left: calc(
-    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) + 1px
+    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) +
+      1px
   );
 }
 
 .profile-section .prof-tile--foundations .page-button__text {
   --profile-label-strip-right: calc(
-    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) + 1px
+    var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) +
+      1px
   );
 }
 

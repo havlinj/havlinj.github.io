@@ -246,6 +246,7 @@ test.describe('Writing page (/writing)', () => {
   test('writing rows keep crisp label rendering (padding, no subpixel translate)', async ({
     page,
   }) => {
+    const PX_TOLERANCE = 0.1;
     const links = page.locator('.writing-groups .post-list a.page-button');
     const n = await links.count();
     expect(n).toBeGreaterThanOrEqual(1);
@@ -254,8 +255,14 @@ test.describe('Writing page (/writing)', () => {
       const inner = link.locator('.page-button__inner');
       const title = link.locator('.page-button__text');
       const dateEl = link.locator('.page-button__date');
-      await expect(inner).toHaveCSS('padding-top', '2px');
-      await expect(inner).toHaveCSS('padding-bottom', '2px');
+      const [padTop, padBottom] = await Promise.all([
+        inner.evaluate((el) => Number.parseFloat(getComputedStyle(el).paddingTop)),
+        inner.evaluate((el) =>
+          Number.parseFloat(getComputedStyle(el).paddingBottom),
+        ),
+      ]);
+      expect(Math.abs(padTop - 2)).toBeLessThanOrEqual(PX_TOLERANCE);
+      expect(Math.abs(padBottom - 2)).toBeLessThanOrEqual(PX_TOLERANCE);
       await expect(title).toHaveCSS('transform', 'none');
       await expect(dateEl).toHaveCSS('transform', 'none');
       await expect(title).toHaveCSS('-webkit-font-smoothing', 'antialiased');

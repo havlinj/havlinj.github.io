@@ -44,6 +44,7 @@ function readWritingButtonMetrics() {
     dateTrackingRatio:
       Number.isFinite(dateTrackPx) && datePx > 0 ? dateTrackPx / datePx : NaN,
     fontWeight: csText.fontWeight,
+    fontStyle: csText.fontStyle,
   };
 }
 
@@ -60,6 +61,7 @@ test.describe('Writing page button typography', () => {
     expect(m!.dateOverInner).toBeLessThan(0.8);
     expect(m!.textOverInner).toBeGreaterThan(0.96);
     expect(m!.textOverInner).toBeLessThan(1.0);
+    expect(m!.fontStyle).toContain('oblique');
   });
 
   test('inner font-size is smaller on narrow viewport than on wide', async ({

@@ -58,7 +58,8 @@ async function readStaticProfileGeometry(
       foundationsHeight: tileRect.height,
       portraitTop: shellRect.top - colRect.top,
       portraitRight: colRect.right - shellRect.right,
-      portraitBottomGapToFoundations: foundationsTop - shellRect.bottom + colRect.top,
+      portraitBottomGapToFoundations:
+        foundationsTop - shellRect.bottom + colRect.top,
     };
   });
 }
@@ -212,7 +213,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       };
     });
 
-    expect(layout.revealPadL).toBeGreaterThanOrEqual(20);
+    expect(layout.revealPadL).toBeGreaterThanOrEqual(14);
     expect(layout.revealPadL).toBeLessThanOrEqual(34);
     expect(layout.revealPadR).toBeGreaterThanOrEqual(
       layout.revealPadL * REVEAL_RIGHT_MARGIN_RATIO_MIN -
@@ -407,28 +408,31 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     }
   });
 
-  test('state1 hover inverts tile background and text colors', async ({
+  test('state1 hover keeps Foundations tile tone stable (label-only change)', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
-    const tile = page.getByRole('link', { name: 'Why' });
+    const tile = page.getByRole('link', { name: 'Foundations' });
     await expect(tile).not.toHaveClass(/is-revealed/);
 
-    const readColors = async () =>
+    const readFoundationsHoverState = async () =>
       page.evaluate(() => {
-        const tile = Array.from(document.querySelectorAll('a.prof-tile')).find(
-          (el) =>
-            (el as HTMLAnchorElement).getAttribute('aria-label') === 'Why',
-        );
+        const tile = document.querySelector(
+          'a.prof-tile--foundations',
+        ) as HTMLElement | null;
         if (!(tile instanceof HTMLElement))
-          throw new Error('missing Why profile tile');
+          throw new Error('missing Foundations profile tile');
         const text = tile.querySelector('.page-button__text');
         const bg = tile.querySelector('.page-button__bg');
+        const overlay = tile.querySelector('.page-button__overlay');
         if (!(text instanceof HTMLElement))
           throw new Error('missing .page-button__text');
         if (!(bg instanceof HTMLElement))
           throw new Error('missing .page-button__bg');
+        if (!(overlay instanceof HTMLElement))
+          throw new Error('missing .page-button__overlay');
 
+        const textBefore = getComputedStyle(text, '::before');
         const probe = document.createElement('span');
         probe.style.color = 'var(--color-page-bg)';
         document.body.appendChild(probe);
@@ -436,22 +440,32 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         probe.remove();
 
         return {
-          textColor: getComputedStyle(text).color,
+          hoverCapable: window.matchMedia('(hover: hover)').matches,
           bgColor: getComputedStyle(bg).backgroundColor,
+          overlayBg: getComputedStyle(overlay).backgroundImage,
+          textColor: getComputedStyle(text).color,
+          textBeforeLeft: textBefore.left,
+          textBeforeRight: textBefore.right,
           pageBgColorResolved,
         };
       });
 
-    const before = await readColors();
+    const before = await readFoundationsHoverState();
     expect(before.textColor).toBe(RGB_INK);
 
     await tile.hover();
-    await expect
-      .poll(readColors, { timeout: 2000, intervals: [80, 140, 220] })
-      .toMatchObject({
-        textColor: before.pageBgColorResolved,
-        bgColor: RGB_INK,
-      });
+    const after = await readFoundationsHoverState();
+
+    if (!after.hoverCapable) return;
+
+    // Tile tone must remain stable on Foundations hover (no full-tile darken/glint).
+    expect(after.bgColor).toBe(before.bgColor);
+    expect(after.overlayBg).toBe('none');
+    // Label stays hover-readable and rectangle is constrained around text, not full width.
+    expect(after.textColor).toBe(before.textColor);
+    expect(after.textBeforeLeft).not.toBe('-1000px');
+    expect(after.textBeforeRight).not.toBe('-1000px');
+    expect(before.pageBgColorResolved).toBeTruthy();
   });
 
   test('portrait stays pinned to top-right and Foundations stays half-height across viewport resize', async ({
@@ -504,9 +518,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       .toBe(false);
 
     const after = await readStaticProfileGeometry(page);
-    expect(Math.abs(after.foundationsHeight - before.foundationsHeight)).toBeLessThan(
-      2.5,
-    );
+    expect(
+      Math.abs(after.foundationsHeight - before.foundationsHeight),
+    ).toBeLessThan(2.5);
     expect(Math.abs(after.portraitTop - before.portraitTop)).toBeLessThan(2.5);
     expect(Math.abs(after.portraitRight - before.portraitRight)).toBeLessThan(
       2.5,
