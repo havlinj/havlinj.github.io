@@ -378,16 +378,16 @@ article .profile-section:last-child {
 }
 
 .prof-tile .page-button__text {
-  color: #111;
+  color: rgba(17, 17, 17, 1);
   /* Inherited from .profile-section (fit from "PROFESSIONAL" on /what-i-do tile) */
   font-size: var(
     --profile-tile-label-font-size,
     clamp(0.7rem, 6cqi, var(--page-title-font-size))
   );
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.15;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   max-width: 100%;
   white-space: nowrap;
   text-align: left;
@@ -399,8 +399,8 @@ article .profile-section:last-child {
   position: absolute;
   top: -0.18em;
   bottom: -0.18em;
-  left: calc(-1 * var(--profile-label-strip-left, 0.42em));
-  right: calc(-1 * var(--profile-label-strip-right, 0.42em));
+  left: calc(-1 * var(--profile-label-strip-left, 0.35em));
+  right: calc(-1 * var(--profile-label-strip-right, 0.35em));
   z-index: -1;
   pointer-events: none;
   background-color: var(--color-page-bg);
