@@ -1,51 +1,26 @@
 ---
 import { getCollection } from 'astro:content';
-import { readdir } from 'node:fs/promises';
-import { extname, join } from 'node:path';
 import Layout from '../layouts/Layout.astro';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
+import {
+  FALLBACK_WRITING_POOL_OPACITY,
+  WRITING_POOL_ENTRIES,
+  resolveWritingPoolEntry,
+  toPanelBgPosition,
+} from '../utils/writing-pool';
 
 const posts = await getCollection('blog');
 const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
-const WRITING_POOL_DIR = join(
-  process.cwd(),
-  'public',
-  'assets',
-  'pages',
-  'writing',
-  'pool',
-);
-const IMAGE_EXTENSIONS = new Set([
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.webp',
-  '.avif',
-  '.gif',
-  '.svg',
-]);
-
-let writingPoolUrls: string[] = [];
-try {
-  const dirEntries = await readdir(WRITING_POOL_DIR, { withFileTypes: true });
-  writingPoolUrls = dirEntries
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .filter((fileName: string) =>
-      IMAGE_EXTENSIONS.has(extname(fileName).toLowerCase()),
-    )
-    .sort((a: string, b: string) => a.localeCompare(b, 'en'))
-    .map(
-      (fileName: string) =>
-        `/assets/pages/writing/pool/${encodeURIComponent(fileName)}`,
-    );
-} catch {
-  writingPoolUrls = [];
-}
-const defaultWritingBg = writingPoolUrls[0]
-  ? `url('${writingPoolUrls[0]}')`
-  : 'none';
+const writingPoolEntries = WRITING_POOL_ENTRIES;
+const defaultEntry = resolveWritingPoolEntry(writingPoolEntries[0]);
+const defaultWritingBgUrl = defaultEntry?.url ?? 'none';
+const defaultWritingBgOpacity =
+  defaultEntry?.opacity ?? FALLBACK_WRITING_POOL_OPACITY;
+const defaultWritingBgNudgeX = defaultEntry?.nudgeX ?? 0;
+const defaultWritingBgNudgeY = defaultEntry?.nudgeY ?? 0;
+const defaultWritingBg =
+  defaultWritingBgUrl === 'none' ? 'none' : `url('${defaultWritingBgUrl}')`;
 
 function formatWritingListDate(d: Date): string {
   return d.toLocaleDateString('en-GB', {
@@ -62,10 +37,10 @@ function formatWritingListDate(d: Date): string {
     style={{
       '--page-title-margin-bottom': '1.35rem',
       '--panel-bg': defaultWritingBg,
-      '--panel-bg-pos-x': '50%',
-      '--panel-bg-pos-y': '50%',
+      '--panel-bg-pos-x': toPanelBgPosition(defaultWritingBgNudgeX),
+      '--panel-bg-pos-y': toPanelBgPosition(defaultWritingBgNudgeY),
       /* Softer pool photos over page wash (reverted from tile-only filter — read closer to intent). */
-      '--panel-bg-layer-opacity': '0.94',
+      '--panel-bg-layer-opacity': String(defaultWritingBgOpacity),
       /* Slightly below 1: pool shots often read loud on page wash; tune per asset if needed. */
       '--panel-bg-saturation': '0.97',
       '--panel-bg-brightness': '0.985',
@@ -149,7 +124,7 @@ function formatWritingListDate(d: Date): string {
       }
     </style>
   </noscript>
-  <script is:inline define:vars={{ writingPoolUrls }}>
+  <script is:inline define:vars={{ writingPoolEntries }}>
     (() => {
       const SELECTORS = {
         writingArticle: 'article.writing-page',
@@ -177,22 +152,66 @@ function formatWritingListDate(d: Date): string {
       window.setTimeout(revealWritingButtons, 2500);
 
       if (!writingArticle) return;
-      if (!Array.isArray(writingPoolUrls) || writingPoolUrls.length === 0)
+      if (!Array.isArray(writingPoolEntries) || writingPoolEntries.length === 0)
         return;
 
-      const currentIndex = readNonNegativeInt(
+      const step = getWritingPoolStep(
+        writingPoolEntries,
         window.localStorage.getItem(STORAGE_KEY),
       );
-      const selectedUrl =
-        writingPoolUrls[currentIndex % writingPoolUrls.length];
-      const nextIndex = (currentIndex + 1) % writingPoolUrls.length;
+      if (!step) return;
 
-      window.localStorage.setItem(STORAGE_KEY, String(nextIndex));
-      writingArticle.style.setProperty('--panel-bg', `url('${selectedUrl}')`);
+      window.localStorage.setItem(STORAGE_KEY, String(step.nextIndex));
+      writingArticle.style.setProperty(
+        '--panel-bg',
+        `url('${step.entry.url}')`,
+      );
+      writingArticle.style.setProperty(
+        '--panel-bg-layer-opacity',
+        String(step.entry.opacity),
+      );
+      writingArticle.style.setProperty(
+        '--panel-bg-pos-x',
+        toPanelBgPosition(step.entry.nudgeX),
+      );
+      writingArticle.style.setProperty(
+        '--panel-bg-pos-y',
+        toPanelBgPosition(step.entry.nudgeY),
+      );
 
       function readNonNegativeInt(rawValue) {
         const parsed = Number.parseInt(rawValue ?? '0', 10);
         return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+      }
+
+      function getWritingPoolStep(entries, rawIndex) {
+        if (!Array.isArray(entries) || entries.length === 0) return null;
+        const currentIndex = readNonNegativeInt(rawIndex) % entries.length;
+        const nextIndex = (currentIndex + 1) % entries.length;
+        const entry = resolveWritingPoolEntry(entries[currentIndex]);
+        if (!entry) return null;
+        return { entry, currentIndex, nextIndex };
+      }
+
+      function resolveWritingPoolEntry(value) {
+        if (!Array.isArray(value) || value.length < 4) return null;
+        const [url, opacity, nudgeX, nudgeY] = value;
+        if (typeof url !== 'string' || url.length === 0) return null;
+        return {
+          url,
+          opacity: safeNumber(opacity, 0.94),
+          nudgeX: safeNumber(nudgeX, 0),
+          nudgeY: safeNumber(nudgeY, 0),
+        };
+      }
+
+      function safeNumber(value, fallback) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      }
+
+      function toPanelBgPosition(value) {
+        return `calc(50% + ${value}px)`;
       }
     })();
   </script>
