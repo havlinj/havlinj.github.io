@@ -391,9 +391,9 @@ test.describe('Contact page (/contact)', () => {
   test('shows navbar with active Contact', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Contact' })).toHaveClass(
-      /site-nav__link--active/,
-    );
+    await expect(
+      page.getByRole('link', { name: 'Contact', exact: true }),
+    ).toHaveClass(/site-nav__link--active/);
   });
 
   test('shows Contact as page heading', async ({ page }) => {
@@ -405,11 +405,17 @@ test.describe('Contact page (/contact)', () => {
 
   test('landing shows intro on panel and links to form', async ({ page }) => {
     await page.goto('/contact');
-    await expect(page.locator('.contact-page__inset-square')).toBeVisible();
-    await expect(page.locator('.contact-page__intro')).toBeVisible();
+    await expect(
+      page.locator('.contact-page__fit-content--visible'),
+    ).toBeAttached();
+    await expect(
+      page.locator('.contact-page__inset-rect--intro'),
+    ).toBeVisible();
+    await expect(page.locator('.contact-page__intro').first()).toBeVisible();
     await expect(page.getByText('Glad you stopped by.')).toBeVisible();
-    await expect(page.getByText('Feel free to reach out about')).toBeVisible();
-    await expect(page.getByText('engineering opportunities.')).toBeVisible();
+    await expect(
+      page.getByText('Open to engineering opportunities.'),
+    ).toBeVisible();
 
     const formLink = page.getByRole('link', { name: /Direct contact/i });
     await expect(formLink).toBeVisible();
@@ -418,6 +424,95 @@ test.describe('Contact page (/contact)', () => {
       'src',
       '/assets/pages/contact/bubble.png',
     );
+  });
+
+  test('landing fit stays non-overflowing across aggressive zoom and mobile widths', async ({
+    page,
+  }) => {
+    const viewports = [
+      { width: 1440, height: 900 },
+      { width: 1024, height: 768 },
+      { width: 390, height: 844 },
+    ];
+    const zooms = [1, 2, 3];
+
+    for (const viewport of viewports) {
+      await page.setViewportSize(viewport);
+      await page.goto('/contact');
+      await expect(
+        page.locator('.contact-page__fit-content--visible'),
+      ).toBeAttached();
+      await expect(
+        page.locator('.contact-page__inset-rect--intro'),
+      ).toBeVisible();
+      await expect(
+        page.locator('.contact-page__inset-rect--links'),
+      ).toBeVisible();
+
+      for (const zoom of zooms) {
+        await page.evaluate((z) => {
+          document.documentElement.style.zoom = String(z);
+          window.dispatchEvent(new Event('resize'));
+        }, zoom);
+        await page.waitForTimeout(80);
+
+        const result = await page.evaluate(() => {
+          const intro = document.querySelector(
+            '.contact-page__inset-rect--intro',
+          ) as HTMLElement | null;
+          const links = document.querySelector(
+            '.contact-page__inset-rect--links',
+          ) as HTMLElement | null;
+          const fitContent = document.querySelector(
+            '.contact-page__fit-content',
+          ) as HTMLElement | null;
+          if (!intro || !links || !fitContent) {
+            return {
+              ok: false,
+              reason: 'missing required contact nodes',
+            };
+          }
+
+          const tol = 1;
+          const introOk =
+            intro.scrollWidth <= intro.clientWidth + tol &&
+            intro.scrollHeight <= intro.clientHeight + tol;
+          const linksOk =
+            links.scrollWidth <= links.clientWidth + tol &&
+            links.scrollHeight <= links.clientHeight + tol;
+
+          const introText = Array.from(
+            intro.querySelectorAll('.contact-page__intro'),
+          ) as HTMLElement[];
+          const linkRows = Array.from(
+            links.querySelectorAll('.contact-extra-link'),
+          ) as HTMLElement[];
+          const allRows = [...introText, ...linkRows];
+          const rowsNoWrap = allRows.every((el) => {
+            const cs = getComputedStyle(el);
+            return cs.whiteSpace === 'nowrap';
+          });
+
+          return {
+            ok: introOk && linksOk && rowsNoWrap,
+            introOk,
+            linksOk,
+            rowsNoWrap,
+            zoom: getComputedStyle(document.documentElement).zoom || 'n/a',
+          };
+        });
+
+        expect(
+          result.ok,
+          `contact fit overflow at viewport ${viewport.width}x${viewport.height}, zoom ${zoom}: ${JSON.stringify(result)}`,
+        ).toBe(true);
+      }
+    }
+
+    await page.evaluate(() => {
+      document.documentElement.style.zoom = '1';
+      window.dispatchEvent(new Event('resize'));
+    });
   });
 
   test('form page shows contact form fields', async ({ page }) => {

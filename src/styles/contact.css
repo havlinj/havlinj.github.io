@@ -29,6 +29,27 @@
 
 .contact-page .page-buttons-panel::before {
   background-color: var(--color-page-bg);
+  background-position: calc(
+      var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
+        var(--contact-panel-edge, 320px)
+    )
+    calc(
+      var(--panel-bg-pos-y, 50%) + var(--panel-bg-nudge-y, 0) *
+        var(--contact-panel-edge, 320px)
+    );
+  background-size: calc(var(--panel-bg-zoom, 1) * 100%) auto;
+}
+
+/* Keep fit-driven content hidden until first stable layout pass completes. */
+.contact-page .contact-page__fit-content.contact-page__fit-content--pending {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-page .contact-page__fit-content.contact-page__fit-content--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.22s ease-out;
 }
 
 .contact-page__inset-rect {

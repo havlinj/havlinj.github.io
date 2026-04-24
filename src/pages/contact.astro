@@ -15,72 +15,96 @@ const panelBg = `url('/assets/pages/contact/lisettkruusimae-13817351_pexelsdichr
       '--panel-bg': panelBg,
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
-      '--panel-bg-layer-opacity': '0.82',
+      '--panel-bg-layer-opacity': '0.8',
       '--panel-bg-saturation': '0.97',
       '--panel-bg-brightness': '0.985',
       '--panel-bg-contrast': '0.97',
+      '--panel-bg-zoom': '1.252',
+      '--panel-bg-nudge-x': '0.125',
+      '--panel-bg-nudge-y': '-0.265',
     }}
   >
     <h1 class="page-title">Contact</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
-        <div class="contact-page__inset-rect contact-page__inset-rect--intro">
-          <p class="contact-page__intro contact-page__intro--lead">Glad you stopped by.</p>
-          <p class="contact-page__intro">
-            <span class="contact-page__intro-line1">Open to engineering opportunities.</span>
-          </p>
-        </div>
-        <div class="contact-page__inset-rect contact-page__inset-rect--links">
-          <nav class="contact-page__links" aria-label="Contact and profiles">
-            <a href="/contact/form" class="contact-extra-link">
-              <img
-                class="contact-extra-link__icon contact-extra-link__icon--bubble"
-                src="/assets/pages/contact/bubble.png"
-                alt=""
-                loading="eager"
-                decoding="async"
-              />
-              <span class="contact-extra-link__text">Direct contact</span>
-            </a>
-            <a
-              class="contact-extra-link"
-              href="https://github.com/havlinj"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                class="contact-extra-link__icon"
-                src="/assets/pages/contact/github.svg"
-                alt=""
-                width="24"
-                height="24"
-                loading="eager"
-                decoding="async"
-              />
-              <span class="contact-extra-link__text">GitHub</span>
-            </a>
-            <a
-              class="contact-extra-link"
-              href="https://www.linkedin.com/in/jan-havlin"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                class="contact-extra-link__icon"
-                src="/assets/pages/contact/InBug-Black.png"
-                alt=""
-                width="24"
-                height="24"
-                loading="eager"
-                decoding="async"
-              />
-              <span class="contact-extra-link__text">LinkedIn</span>
-            </a>
-          </nav>
+        <div
+          class="contact-page__fit-content contact-page__fit-content--pending"
+          aria-busy="true"
+        >
+          <div class="contact-page__inset-rect contact-page__inset-rect--intro">
+            <p class="contact-page__intro contact-page__intro--lead">
+              Glad you stopped by.
+            </p>
+            <p class="contact-page__intro">
+              <span class="contact-page__intro-line1"
+                >Open to engineering opportunities.</span
+              >
+            </p>
+          </div>
+          <div class="contact-page__inset-rect contact-page__inset-rect--links">
+            <nav class="contact-page__links" aria-label="Contact and profiles">
+              <a href="/contact/form" class="contact-extra-link">
+                <img
+                  class="contact-extra-link__icon contact-extra-link__icon--bubble"
+                  src="/assets/pages/contact/bubble.png"
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                />
+                <span class="contact-extra-link__text">Direct contact</span>
+              </a>
+              <a
+                class="contact-extra-link"
+                href="https://github.com/havlinj"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  class="contact-extra-link__icon"
+                  src="/assets/pages/contact/github.svg"
+                  alt=""
+                  width="24"
+                  height="24"
+                  loading="eager"
+                  decoding="async"
+                />
+                <span class="contact-extra-link__text">GitHub</span>
+              </a>
+              <a
+                class="contact-extra-link"
+                href="https://www.linkedin.com/in/jan-havlin"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  class="contact-extra-link__icon"
+                  src="/assets/pages/contact/InBug-Black.png"
+                  alt=""
+                  width="24"
+                  height="24"
+                  loading="eager"
+                  decoding="async"
+                />
+                <span class="contact-extra-link__text">LinkedIn</span>
+              </a>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
   </article>
 
-  <script>import '../scripts/contact-inset-fit.ts';</script>
+  <noscript>
+    <style>
+      .contact-page
+        .contact-page__fit-content.contact-page__fit-content--pending {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+    </style>
+  </noscript>
+
+  <script>
+    import '../scripts/contact-inset-fit.ts';
+  </script>
 </Layout>

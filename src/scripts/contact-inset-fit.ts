@@ -7,6 +7,9 @@ const CONTACT_INSET_MAX_FIT_PASSES = 5;
 
 function startContactInsetFit(): void {
   const panel = document.querySelector('.contact-page .page-buttons-panel');
+  const fitContent = document.querySelector(
+    '.contact-page .contact-page__fit-content',
+  );
   const introRect = document.querySelector('.contact-page__inset-rect--intro');
   const linksRect = document.querySelector('.contact-page__inset-rect--links');
   const zone = document.querySelector('.contact-page .page-buttons-zone');
@@ -20,14 +23,29 @@ function startContactInsetFit(): void {
     return;
   }
   const panelEl = panel;
+  const fitContentEl = fitContent instanceof HTMLElement ? fitContent : null;
   const introRectEl = introRect;
   const linksRectEl = linksRect;
 
   const padFrac =
-    Number.isFinite(CONTACT_INSET_PANEL_PAD_FRAC) && CONTACT_INSET_PANEL_PAD_FRAC > 0
+    Number.isFinite(CONTACT_INSET_PANEL_PAD_FRAC) &&
+    CONTACT_INSET_PANEL_PAD_FRAC > 0
       ? Math.min(0.5, CONTACT_INSET_PANEL_PAD_FRAC)
       : 0.1;
   let raf = 0;
+  let revealed = false;
+
+  function revealAfterStableLayout(): void {
+    if (revealed || !fitContentEl) return;
+    revealed = true;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fitContentEl.classList.remove('contact-page__fit-content--pending');
+        fitContentEl.classList.add('contact-page__fit-content--visible');
+        fitContentEl.removeAttribute('aria-busy');
+      });
+    });
+  }
 
   function getZoomScale(): number {
     const vv = window.visualViewport;
@@ -40,7 +58,10 @@ function startContactInsetFit(): void {
     panelEl.style.setProperty('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
 
     const insetPadPx = panelEl.clientWidth * padFrac * 0.5;
-    panelEl.style.setProperty('--contact-stack-top-px', `${Math.round(insetPadPx)}px`);
+    panelEl.style.setProperty(
+      '--contact-stack-top-px',
+      `${Math.round(insetPadPx)}px`,
+    );
     panelEl.style.setProperty(
       '--contact-stack-right-px',
       `${Math.round(insetPadPx * 0.5)}px`,
@@ -59,7 +80,7 @@ function startContactInsetFit(): void {
     };
   }
 
-  function measureNeededContent(panelEdge: number): {
+  function measureNeededContent(): {
     neededWidth: number;
     neededHeight: number;
     topPad: number;
@@ -69,7 +90,10 @@ function startContactInsetFit(): void {
   } {
     const topPad = Math.round(panelEl.clientWidth * padFrac * 0.5);
     const rightPad = Math.round(topPad * 0.5);
-    const rowGap = parseFloat(getComputedStyle(panelEl).getPropertyValue('--contact-box-gap-px')) || 18;
+    const rowGap =
+      parseFloat(
+        getComputedStyle(panelEl).getPropertyValue('--contact-box-gap-px'),
+      ) || 18;
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
     const neededWidth =
@@ -92,15 +116,19 @@ function startContactInsetFit(): void {
   }
 
   function flush(): void {
-    const panelEdge = Math.max(1, Math.min(panelEl.clientWidth, panelEl.clientHeight));
+    const panelEdge = Math.max(
+      1,
+      Math.min(panelEl.clientWidth, panelEl.clientHeight),
+    );
     const zoomScale = getZoomScale();
     const baselinePanelEdge = panelEdge * zoomScale;
-    const fontToEdgeRatio = CONTACT_BASELINE_FONT_PX / Math.max(1, baselinePanelEdge);
+    const fontToEdgeRatio =
+      CONTACT_BASELINE_FONT_PX / Math.max(1, baselinePanelEdge);
     let desiredFontPx = Math.max(1, panelEdge * fontToEdgeRatio);
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
     let { neededWidth, neededHeight, topPad, rowGap, introH } =
-      measureNeededContent(panelEdge);
+      measureNeededContent();
 
     const availW = panelEdge * CONTACT_INSET_MAX_RATIO;
     const availH = panelEdge * CONTACT_INSET_MAX_RATIO;
@@ -113,12 +141,16 @@ function startContactInsetFit(): void {
       desiredFontPx = Math.max(1, desiredFontPx * scale);
       applyFontAndPanelMetrics(desiredFontPx, panelEdge);
       ({ neededWidth, neededHeight, topPad, rowGap, introH } =
-        measureNeededContent(panelEdge));
+        measureNeededContent());
       pass += 1;
     }
 
     panelEl.style.setProperty('--contact-intro-top-px', `${topPad}px`);
-    panelEl.style.setProperty('--contact-links-top-px', `${topPad + introH + rowGap}px`);
+    panelEl.style.setProperty(
+      '--contact-links-top-px',
+      `${topPad + introH + rowGap}px`,
+    );
+    revealAfterStableLayout();
   }
 
   function schedule(): void {
@@ -136,8 +168,12 @@ function startContactInsetFit(): void {
 
   window.addEventListener('resize', schedule, { passive: true });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', schedule, { passive: true });
-    window.visualViewport.addEventListener('scroll', schedule, { passive: true });
+    window.visualViewport.addEventListener('resize', schedule, {
+      passive: true,
+    });
+    window.visualViewport.addEventListener('scroll', schedule, {
+      passive: true,
+    });
   }
   window.addEventListener('orientationchange', schedule, { passive: true });
   window.addEventListener(
@@ -153,6 +189,7 @@ function startContactInsetFit(): void {
     fonts.ready.then(() => schedule()).catch(() => {});
   }
   window.addEventListener('load', schedule, { passive: true });
+  window.setTimeout(() => revealAfterStableLayout(), 2500);
 
   schedule();
   requestAnimationFrame(() => {
@@ -161,7 +198,9 @@ function startContactInsetFit(): void {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startContactInsetFit, { once: true });
+  document.addEventListener('DOMContentLoaded', startContactInsetFit, {
+    once: true,
+  });
 } else {
   startContactInsetFit();
 }
