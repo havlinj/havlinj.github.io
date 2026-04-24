@@ -6,7 +6,13 @@ import {
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../src/utils/profile-reveal-constants';
-import { gotoProfileWhenReady, mustBox, pathnameIsProfile } from './helpers';
+import {
+  countRevealRasterSignature,
+  expectFoundationsRevealCopyPainted,
+  gotoProfileWhenReady,
+  mustBox,
+  pathnameIsProfile,
+} from './helpers';
 import {
   PROFILE_SEAM_VIEWPORT_WIDTHS,
   PROFILE_SHARED_EDGE_RATIO_BY_STEP,
@@ -78,6 +84,7 @@ async function openFoundationsReveal(tile: ReturnType<Page['getByRole']>) {
   await tile.click();
   await expect(tile).toHaveClass(/is-revealed/);
   await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+  await expectFoundationsRevealCopyPainted(tile);
 }
 
 test.describe('/profile — type fit, Foundations tile, reveal', () => {
@@ -124,10 +131,9 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         labelPx: Number.parseFloat(labelRaw),
       };
     });
-    expect(revealPx).toBeGreaterThanOrEqual(0);
     expect(labelPx).toBeGreaterThan(0);
-    // Reveal copy is allowed to shrink to zero after removing lower bounds.
-    expect(revealPx).toBeGreaterThanOrEqual(0);
+    // Zero would mean collapsed `em` copy (black tile, no readable text); see openFoundationsReveal().
+    expect(revealPx).toBeGreaterThan(0);
     expect(revealPx).toBeLessThan(labelPx);
   });
 
@@ -148,6 +154,77 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(tile.locator('.prof-tile__reveal')).toContainText(
       /Tried\s*Writing/i,
     );
+  });
+
+  test('Foundations state2 reveal screenshot mixes #111 panel with page-wash ink', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const tile = page.getByRole('link', { name: 'Foundations' });
+    await openFoundationsReveal(tile);
+    const box = await tile.boundingBox();
+    expect(box, 'Foundations tile must have a layout box').toBeTruthy();
+    const domDims = await tile.evaluate((el) => {
+      if (!(el instanceof HTMLElement)) return null;
+      return {
+        clientW: el.clientWidth,
+        clientH: el.clientHeight,
+        rectW: Math.round(el.getBoundingClientRect().width),
+        rectH: Math.round(el.getBoundingClientRect().height),
+      };
+    });
+    expect(domDims).toBeTruthy();
+    // Only the Foundations `<a>` — Playwright clips to that element’s border box, never siblings.
+    // `scale: 'css'` keeps PNG pixel size aligned to CSS layout (not DPR-expanded viewport).
+    const pngBuffer = await tile.screenshot({
+      animations: 'disabled',
+      scale: 'css',
+    });
+    const sig = countRevealRasterSignature(pngBuffer);
+    for (const [label, css, pngDim] of [
+      ['width', domDims!.clientW, sig.width],
+      ['height', domDims!.clientH, sig.height],
+    ] as const) {
+      expect(
+        Math.abs(pngDim - css),
+        `PNG ${label} ${pngDim} must match tile client${label === 'width' ? 'Width' : 'Height'} ${css} (tile-only crop)`,
+      ).toBeLessThanOrEqual(1);
+    }
+    expect(
+      Math.abs(sig.width - domDims!.rectW),
+      'PNG width should match rounded getBoundingClientRect()',
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(sig.height - domDims!.rectH),
+      'PNG height should match rounded getBoundingClientRect()',
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(sig.width - Math.round(box!.width)),
+      `PNG width ${sig.width} should match Playwright boundingBox width ~${Math.round(box!.width)}`,
+    ).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(sig.height - Math.round(box!.height)),
+      `PNG height ${sig.height} should match Playwright boundingBox height ~${Math.round(box!.height)}`,
+    ).toBeLessThanOrEqual(1);
+    // Rám těsně uvnitř fyzického okraje snímku musí být #111 (vnější 1–2 px bývají AA u rohů).
+    expect(
+      sig.insetRimBlackRatio,
+      'uvnitř okraje výřezu musí být převážně černý panel #111 (ne okolí stránky)',
+    ).toBeGreaterThanOrEqual(0.92);
+    const area = sig.width * sig.height;
+    expect(
+      sig.opaque,
+      'element screenshot should be mostly opaque',
+    ).toBeGreaterThan(area * 0.5);
+    expect(
+      sig.panelBlack / area,
+      'state2 panel should include large #111 regions',
+    ).toBeGreaterThan(0.22);
+    const minInk = Math.max(100, area * 0.001);
+    expect(
+      sig.pageWashInk,
+      `raster should include pixels near page text wash #e0f7fa (anti-alias), got ${sig.pageWashInk}, need >= ${minInk}`,
+    ).toBeGreaterThanOrEqual(minInk);
   });
 
   test('Foundations reveal copy uses two-tier stanza layout and scaled subcopy', async ({

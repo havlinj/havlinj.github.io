@@ -5,7 +5,10 @@ import {
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../src/utils/profile-reveal-constants';
-import { gotoProfileWhenReady } from './helpers';
+import {
+  expectFoundationsRevealCopyPainted,
+  gotoProfileWhenReady,
+} from './helpers';
 
 async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
   await page.evaluate((timeout) => {
@@ -26,6 +29,7 @@ test.describe('/profile mobile regressions @serial', () => {
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await expectFoundationsRevealCopyPainted(tile);
 
     const reveal = page.locator('.prof-tile--foundations .prof-tile__reveal');
     await expect(reveal).toBeVisible();
@@ -40,6 +44,7 @@ test.describe('/profile mobile regressions @serial', () => {
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await expectFoundationsRevealCopyPainted(tile);
 
     await expect
       .poll(

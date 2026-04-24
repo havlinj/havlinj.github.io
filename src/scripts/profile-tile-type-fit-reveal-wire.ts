@@ -107,7 +107,13 @@ export function wireFoundationsReveal(): void {
     if (reveal) {
       // Avoid first paint using the CSS `clamp(...)` fallback: it can overshoot on narrow viewports
       // while the stanza box is still mid-transition (looks “huge” and clips `?`).
-      setPxCustomProperty(reveal, REVEAL_VAR, minRevealFontPx());
+      // Seed must stay >0: line copy sizes use `em` vs this var; 0px collapses the stanza and breaks fit.
+      const revealSeedPx = minRevealFontPx();
+      if (revealSeedPx > 0) {
+        setPxCustomProperty(reveal, REVEAL_VAR, revealSeedPx);
+      } else {
+        reveal.style.removeProperty(REVEAL_VAR);
+      }
 
       const showRevealCopy = () => {
         if (revealStableRafId) {

@@ -13,8 +13,9 @@ export function rootRemPx(): number {
   return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 }
 
+/** Lower bound for Foundations reveal type-fit (binary search + failure path). Must be >0 so `em`-sized lines keep a measurable box. */
 export function minRevealFontPx(): number {
-  return 0;
+  return Math.max(2, rootRemPx() * 0.32);
 }
 
 export function setPxCustomProperty(
