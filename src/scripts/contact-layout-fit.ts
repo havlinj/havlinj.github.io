@@ -1,19 +1,24 @@
-const CONTACT_INSET_PANEL_PAD_FRAC = 0.1;
-const CONTACT_INSET_MAX_RATIO = 1;
-const CONTACT_BASELINE_FONT_PX = 16;
-const CONTACT_INSET_FIT_SAFETY_X_PX = 2;
-const CONTACT_INSET_FIT_SAFETY_Y_PX = 6;
-const CONTACT_INSET_MAX_FIT_PASSES = 5;
+import {
+  CONTACT_CLASSES,
+  CONTACT_LAYOUT,
+  CONTACT_SELECTORS,
+} from '../constants/contact-layout';
+
+type NeededContent = {
+  neededWidth: number;
+  neededHeight: number;
+  topPad: number;
+  rowGap: number;
+  introH: number;
+};
 
 function startContactInsetFit(): void {
-  const panel = document.querySelector('.contact-page .page-buttons-panel');
-  const fitContent = document.querySelector(
-    '.contact-page .contact-page__fit-content',
-  );
-  const introRect = document.querySelector('.contact-page__inset-rect--intro');
-  const linksRect = document.querySelector('.contact-page__inset-rect--links');
-  const zone = document.querySelector('.contact-page .page-buttons-zone');
-  const mainEl = document.querySelector('main.content');
+  const panel = document.querySelector(CONTACT_SELECTORS.panel);
+  const fitContent = document.querySelector(CONTACT_SELECTORS.fitContent);
+  const introRect = document.querySelector(CONTACT_SELECTORS.introRect);
+  const linksRect = document.querySelector(CONTACT_SELECTORS.linksRect);
+  const zone = document.querySelector(CONTACT_SELECTORS.zone);
+  const mainEl = document.querySelector(CONTACT_SELECTORS.mainContent);
 
   if (
     !(panel instanceof HTMLElement) ||
@@ -28,9 +33,9 @@ function startContactInsetFit(): void {
   const linksRectEl = linksRect;
 
   const padFrac =
-    Number.isFinite(CONTACT_INSET_PANEL_PAD_FRAC) &&
-    CONTACT_INSET_PANEL_PAD_FRAC > 0
-      ? Math.min(0.5, CONTACT_INSET_PANEL_PAD_FRAC)
+    Number.isFinite(CONTACT_LAYOUT.insetPanelPadFrac) &&
+    CONTACT_LAYOUT.insetPanelPadFrac > 0
+      ? Math.min(0.5, CONTACT_LAYOUT.insetPanelPadFrac)
       : 0.1;
   let raf = 0;
   let revealed = false;
@@ -40,8 +45,8 @@ function startContactInsetFit(): void {
     revealed = true;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        fitContentEl.classList.remove('contact-page__fit-content--pending');
-        fitContentEl.classList.add('contact-page__fit-content--visible');
+        fitContentEl.classList.remove(CONTACT_CLASSES.fitPending);
+        fitContentEl.classList.add(CONTACT_CLASSES.fitVisible);
         fitContentEl.removeAttribute('aria-busy');
       });
     });
@@ -80,39 +85,39 @@ function startContactInsetFit(): void {
     };
   }
 
-  function measureNeededContent(): {
-    neededWidth: number;
-    neededHeight: number;
-    topPad: number;
-    rightPad: number;
-    rowGap: number;
-    introH: number;
-  } {
+  function measureNeededContent(): NeededContent {
     const topPad = Math.round(panelEl.clientWidth * padFrac * 0.5);
     const rightPad = Math.round(topPad * 0.5);
     const rowGap =
       parseFloat(
         getComputedStyle(panelEl).getPropertyValue('--contact-box-gap-px'),
-      ) || 18;
+      ) || CONTACT_LAYOUT.defaultBoxGapPx;
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
     const neededWidth =
-      Math.max(intro.w, links.w) + rightPad + CONTACT_INSET_FIT_SAFETY_X_PX;
+      Math.max(intro.w, links.w) + rightPad + CONTACT_LAYOUT.fitSafetyXPx;
     const neededHeight =
       topPad +
       intro.h +
       rowGap +
       links.h +
       topPad +
-      CONTACT_INSET_FIT_SAFETY_Y_PX;
+      CONTACT_LAYOUT.fitSafetyYPx;
     return {
       neededWidth,
       neededHeight,
       topPad,
-      rightPad,
       rowGap,
       introH: intro.h,
     };
+  }
+
+  function computeDesiredFontPx(panelEdge: number): number {
+    const zoomScale = getZoomScale();
+    const baselinePanelEdge = panelEdge * zoomScale;
+    const fontToEdgeRatio =
+      CONTACT_LAYOUT.baselineFontPx / Math.max(1, baselinePanelEdge);
+    return Math.max(1, panelEdge * fontToEdgeRatio);
   }
 
   function flush(): void {
@@ -120,28 +125,24 @@ function startContactInsetFit(): void {
       1,
       Math.min(panelEl.clientWidth, panelEl.clientHeight),
     );
-    const zoomScale = getZoomScale();
-    const baselinePanelEdge = panelEdge * zoomScale;
-    const fontToEdgeRatio =
-      CONTACT_BASELINE_FONT_PX / Math.max(1, baselinePanelEdge);
-    let desiredFontPx = Math.max(1, panelEdge * fontToEdgeRatio);
+    let desiredFontPx = computeDesiredFontPx(panelEdge);
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-    let { neededWidth, neededHeight, topPad, rowGap, introH } =
-      measureNeededContent();
+    let measured = measureNeededContent();
+    let { neededWidth, neededHeight, topPad, rowGap, introH } = measured;
 
-    const availW = panelEdge * CONTACT_INSET_MAX_RATIO;
-    const availH = panelEdge * CONTACT_INSET_MAX_RATIO;
+    const availW = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
+    const availH = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
     let pass = 0;
     while (
       (neededWidth > availW || neededHeight > availH) &&
-      pass < CONTACT_INSET_MAX_FIT_PASSES
+      pass < CONTACT_LAYOUT.maxFitPasses
     ) {
       const scale = Math.min(availW / neededWidth, availH / neededHeight, 1);
       desiredFontPx = Math.max(1, desiredFontPx * scale);
       applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-      ({ neededWidth, neededHeight, topPad, rowGap, introH } =
-        measureNeededContent());
+      measured = measureNeededContent();
+      ({ neededWidth, neededHeight, topPad, rowGap, introH } = measured);
       pass += 1;
     }
 
@@ -189,7 +190,10 @@ function startContactInsetFit(): void {
     fonts.ready.then(() => schedule()).catch(() => {});
   }
   window.addEventListener('load', schedule, { passive: true });
-  window.setTimeout(() => revealAfterStableLayout(), 2500);
+  window.setTimeout(
+    () => revealAfterStableLayout(),
+    CONTACT_LAYOUT.revealFallbackMs,
+  );
 
   schedule();
   requestAnimationFrame(() => {

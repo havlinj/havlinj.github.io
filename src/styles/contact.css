@@ -71,9 +71,6 @@
 
 .contact-page__inset-rect--intro {
   top: var(--contact-intro-top-px);
-}
-
-.contact-page__inset-rect--intro {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
