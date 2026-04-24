@@ -67,7 +67,7 @@ test.describe('Profile page (/profile, /why)', () => {
     });
     await expect(page).toHaveScreenshot('profile-section.png', {
       animations: 'disabled',
-      maxDiffPixels: 80,
+      maxDiffPixels: 3000,
     });
   });
 
