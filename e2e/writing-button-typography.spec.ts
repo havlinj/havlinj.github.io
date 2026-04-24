@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 /**
  * Locks in Writing index row typography: fluid inner font-size (clamp + cqi),
@@ -48,6 +49,13 @@ function readWritingButtonMetrics() {
   };
 }
 
+async function hasWritingFallbackRuleInSource() {
+  const css = await readFile('src/styles/writing.css', 'utf-8');
+  const fallbackRulePattern =
+    /@supports\s+not\s*\(\s*font-style:\s*oblique\s+7deg\s*\)\s*\{[\s\S]*?\.writing-page\s+\.page-button__text\s*\{[\s\S]*?transform:\s*skewX\(-7deg\)\s*translateX\(0\.05em\)\s*;[\s\S]*?\}[\s\S]*?\}/m;
+  return fallbackRulePattern.test(css);
+}
+
 test.describe('Writing page button typography', () => {
   test('title weight 600; date height tracks inner (~0.78em); title ~0.98em of inner', async ({
     page,
@@ -80,17 +88,26 @@ test.describe('Writing page button typography', () => {
     expect(narrow!.innerPx).toBeLessThan(wide!.innerPx);
   });
 
-  test('wide column: title ~0.08em tracking; date ~0.02em', async ({
+  test('wide column: title ~0.07em tracking; date ~0.02em', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await gotoWritingReady(page);
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m).not.toBeNull();
-    expect(m!.textTrackingRatio).toBeGreaterThan(0.075);
-    expect(m!.textTrackingRatio).toBeLessThan(0.085);
+    expect(m!.textTrackingRatio).toBeGreaterThan(0.065);
+    expect(m!.textTrackingRatio).toBeLessThan(0.075);
     expect(m!.dateTrackingRatio).toBeGreaterThan(0.015);
     expect(m!.dateTrackingRatio).toBeLessThan(0.025);
+  });
+
+  test('fallback CSS rule for oblique unsupported path is present', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await gotoWritingReady(page);
+    const hasFallback = await hasWritingFallbackRuleInSource();
+    expect(hasFallback).toBe(true);
   });
 
   test('narrow column (container ≤34rem): title tighter than wide; date looser than wide', async ({

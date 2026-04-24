@@ -110,14 +110,24 @@ ul.post-list > li::before {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.98em;
-  font-style: oblique 8deg;
+  font-style: oblique 7deg;
+  font-synthesis: style;
   line-height: var(--writing-title-lh);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   color: rgba(17, 17, 17, 0.99);
   padding: 0.2em;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@supports not (font-style: oblique 7deg) {
+  .writing-page .page-button__text {
+    font-style: normal;
+    display: inline-block;
+    transform: skewX(-7deg) translateX(0.05em);
+    transform-origin: left center;
+  }
 }
 
 .writing-page .page-button__date {
