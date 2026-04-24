@@ -1,36 +1,137 @@
 /* ===============================
-   CONTACT PAGE
+   CONTACT — form page (.contact) + landing (.contact-page)
 ================================ */
 
 .contact {
   display: flex;
   flex-direction: column;
   gap: 0;
-  /* Same token as Credits title rule (special-typography.css --page-title-rule-gap) */
-  --contact-divider-gap: var(--page-title-rule-gap);
 }
 
-.contact > h1 {
-  margin-bottom: 0;
-  position: relative;
+/* Landing: square panel (same contract as Writing — page-buttons.css + tokens). */
+.contact-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.contact > h1::after {
-  content: '';
-  display: block;
-  margin-top: var(--contact-divider-gap);
-  width: 100%;
-  height: 1px;
-  background-color: #111;
+.contact-page .page-buttons-panel {
+  aspect-ratio: 1 / 1;
+  background-color: var(--color-page-bg);
+  --contact-panel-edge: 320px;
+  --contact-stack-top-px: 16px;
+  --contact-stack-right-px: 8px;
+  --contact-box-gap-px: 18px;
+  --contact-intro-top-px: 16px;
+  --contact-links-top-px: 120px;
+  --contact-fluid-font: 1rem;
 }
 
-.contact-intro {
-  margin-bottom: 0.75rem;
+.contact-page .page-buttons-panel::before {
+  background-color: var(--color-page-bg);
 }
 
-/* First intro paragraph: same gap below the line as above */
-.contact-intro:first-of-type {
-  margin-top: var(--contact-divider-gap);
+.contact-page__inset-rect {
+  position: absolute;
+  left: 0;
+  right: auto;
+  box-sizing: border-box;
+  font-size: var(--contact-fluid-font);
+  width: max-content;
+  max-width: calc(100% - var(--contact-stack-right-px));
+  min-width: 0;
+  min-height: 0;
+  text-align: left;
+  border: none;
+  background: var(--color-page-bg);
+  overflow: visible;
+  z-index: 2;
+}
+
+.contact-page__inset-rect--intro {
+  top: var(--contact-intro-top-px);
+}
+
+.contact-page__inset-rect--intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.7em;
+  padding: 1rem 0.8rem;
+}
+
+.contact-page__inset-rect--links {
+  top: var(--contact-links-top-px);
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.8rem;
+}
+
+.contact-page__intro {
+  margin: 0;
+  padding: 0;
+  font-size: var(--contact-fluid-font);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  color: rgba(17, 17, 17, 0.96);
+  white-space: nowrap;
+}
+
+.contact-page__intro--lead {
+  line-height: 1.48;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  font-size: calc(var(--contact-fluid-font) * 1.015);
+}
+
+.contact-page__intro-line1 {
+  white-space: nowrap;
+}
+
+.contact-page__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7em;
+  width: max-content;
+}
+
+.contact-page .contact-extra-link {
+  display: inline-flex;
+  align-items: center;
+  --contact-link-icon-size: 1.12em;
+  --contact-bubble-size-mul: 1;
+  color: rgba(17, 17, 17, 0.96);
+  font-size: var(--contact-fluid-font);
+  gap: 0.6em;
+  white-space: nowrap;
+}
+
+.contact-page__links .contact-extra-link:first-child .contact-extra-link__text {
+  transform: translateX(-0.01em);
+}
+
+.contact-page .contact-extra-link .contact-extra-link__text {
+  font-size: inherit;
+  min-width: 0;
+}
+
+.contact-page .contact-extra-link__icon:not(.contact-extra-link__icon--bubble) {
+  width: var(--contact-link-icon-size);
+  height: var(--contact-link-icon-size);
+}
+
+.contact-page .contact-extra-link:hover {
+  color: rgba(17, 17, 17, 1);
+}
+
+/* Icon size relative to link text size (`em`) */
+.contact-page .contact-extra-link__icon--bubble {
+  width: calc(var(--contact-link-icon-size) * var(--contact-bubble-size-mul));
+  height: calc(var(--contact-link-icon-size) * var(--contact-bubble-size-mul));
+  object-fit: contain;
+  transform: none;
 }
 
 .contact-form {
@@ -114,13 +215,6 @@
   min-height: 1em;
 }
 
-/* Additional links shown after the Send button (created by JS) */
-.contact-extra-links-wrapper {
-  /* contact-form has grid gap (1rem) between items, so add half rem
-     to reach ~1.5rem total after the Send button. */
-  margin-top: 1.5rem; /* 1rem + 1.5rem = ~2.5rem total */
-}
-
 .contact-extra-links-intro {
   margin: 0;
   padding: 0;
@@ -128,15 +222,15 @@
 
 .contact-extra-links {
   display: grid;
-  gap: 1rem; /* 1rem between the two links */
-  margin-top: 1rem; /* 1rem between the intro text and the first link */
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .contact-extra-link {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  text-decoration: none; /* underline only on hover via global a:hover */
+  text-decoration: none;
   color: inherit;
 }
 

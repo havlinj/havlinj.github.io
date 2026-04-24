@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import '../../styles/contact.css';
+
+const title = 'Contact form — Jan Havlín';
+---
+
+<Layout title={title} activeSection="contact">
+  <Fragment slot="head">
+    <script
+      is:inline
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      async
+      defer></script>
+  </Fragment>
+  <article class="contact has-page-title-rule">
+    <h1 class="page-title">Contact</h1>
+    <ContactForm />
+  </article>
+</Layout>

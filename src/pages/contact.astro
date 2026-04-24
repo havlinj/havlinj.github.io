@@ -3,231 +3,84 @@ import Layout from '../layouts/Layout.astro';
 import '../styles/contact.css';
 
 const title = 'Contact — Jan Havlín';
+
+const panelBg = `url('/assets/pages/contact/lisettkruusimae-13817351_pexelsdichrom.png')`;
 ---
 
 <Layout title={title} activeSection="contact">
-  <Fragment slot="head">
-    <script
-      is:inline
-      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-      async
-      defer></script>
-  </Fragment>
-  <article class="contact">
-    <h1>Contact</h1>
-    <p class="contact-intro">Glad you stopped by.</p>
-    <p class="contact-intro">
-      Feel free to reach out about engineering, architecture, or opportunities.
-    </p>
-
-    <form id="contact-form" class="contact-form" novalidate autocomplete="off">
-      <label>
-        Name
-        <input
-          type="text"
-          name="name"
-          maxlength="100"
-          required
-          autocomplete="name"
-        />
-      </label>
-
-      <label>
-        Email
-        <input type="email" name="email" required autocomplete="email" />
-      </label>
-
-      <label>
-        Message
-        <textarea
-          name="message"
-          minlength="10"
-          maxlength="5000"
-          required
-          autocomplete="off"></textarea>
-      </label>
-
-      <div class="hidden" aria-hidden="true">
-        <label>
-          Company
-          <input
-            type="text"
-            name="company"
-            tabindex="-1"
-            autocomplete="off"
-            inputmode="none"
-          />
-        </label>
+  <article
+    class="contact-page"
+    style={{
+      '--page-title-margin-bottom': '1.35rem',
+      '--panel-bg': panelBg,
+      '--panel-bg-pos-x': '50%',
+      '--panel-bg-pos-y': '50%',
+      '--panel-bg-layer-opacity': '0.82',
+      '--panel-bg-saturation': '0.97',
+      '--panel-bg-brightness': '0.985',
+      '--panel-bg-contrast': '0.97',
+    }}
+  >
+    <h1 class="page-title">Contact</h1>
+    <div class="page-buttons-zone">
+      <div class="page-buttons-panel">
+        <div class="contact-page__inset-rect contact-page__inset-rect--intro">
+          <p class="contact-page__intro contact-page__intro--lead">Glad you stopped by.</p>
+          <p class="contact-page__intro">
+            <span class="contact-page__intro-line1">Open to engineering opportunities.</span>
+          </p>
+        </div>
+        <div class="contact-page__inset-rect contact-page__inset-rect--links">
+          <nav class="contact-page__links" aria-label="Contact and profiles">
+            <a href="/contact/form" class="contact-extra-link">
+              <img
+                class="contact-extra-link__icon contact-extra-link__icon--bubble"
+                src="/assets/pages/contact/bubble.png"
+                alt=""
+                loading="eager"
+                decoding="async"
+              />
+              <span class="contact-extra-link__text">Direct contact</span>
+            </a>
+            <a
+              class="contact-extra-link"
+              href="https://github.com/havlinj"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                class="contact-extra-link__icon"
+                src="/assets/pages/contact/github.svg"
+                alt=""
+                width="24"
+                height="24"
+                loading="eager"
+                decoding="async"
+              />
+              <span class="contact-extra-link__text">GitHub</span>
+            </a>
+            <a
+              class="contact-extra-link"
+              href="https://www.linkedin.com/in/jan-havlin"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                class="contact-extra-link__icon"
+                src="/assets/pages/contact/InBug-Black.png"
+                alt=""
+                width="24"
+                height="24"
+                loading="eager"
+                decoding="async"
+              />
+              <span class="contact-extra-link__text">LinkedIn</span>
+            </a>
+          </nav>
+        </div>
       </div>
-
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAACpJlpuMEv-nLyuB"></div>
-
-      <div class="contact-form__actions">
-        <button type="submit">Send</button>
-        <p id="status" class="contact-status" role="status" aria-live="polite">
-        </p>
-      </div>
-    </form>
+    </div>
   </article>
 
-  <script is:inline>
-    const SELECTORS = {
-      form: '#contact-form',
-      status: '#status',
-      submitButton: 'button[type="submit"]',
-      actionsRow: '.contact-form__actions',
-      extraLinksWrapper: '.contact-extra-links-wrapper',
-    };
-    const FIELD_NAMES = ['name', 'email', 'message', 'company'];
-
-    const form = document.querySelector(SELECTORS.form);
-    const status = document.querySelector(SELECTORS.status);
-
-    if (form && status) {
-      // Build profile URLs from segmented parts to avoid plain static href strings.
-      const assembleUrl = (parts) => parts.join('');
-      const githubUrl = assembleUrl([
-        'https',
-        '://',
-        'github',
-        '.com',
-        '/',
-        'havlinj',
-      ]);
-      const linkedInUrl = assembleUrl([
-        'https',
-        '://',
-        'www',
-        '.',
-        'linkedin',
-        '.com',
-        '/',
-        'in',
-        '/',
-        'jan-havlin',
-      ]);
-
-      // Insert 2 additional organization links right after the Send button.
-      const sendButton = form.querySelector(SELECTORS.submitButton);
-      const actionsRow = form.querySelector(SELECTORS.actionsRow);
-      if (
-        sendButton &&
-        actionsRow instanceof HTMLElement &&
-        !form.querySelector(SELECTORS.extraLinksWrapper)
-      ) {
-        const extraLinks = [
-          {
-            href: githubUrl,
-            iconSrc: '/assets/pages/contact/github.svg',
-            iconAlt: 'GitHub',
-            label: 'GitHub',
-          },
-          {
-            href: linkedInUrl,
-            iconSrc: '/assets/pages/contact/InBug-Black.png',
-            iconAlt: 'LinkedIn',
-            label: 'LinkedIn',
-          },
-        ];
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'contact-extra-links-wrapper';
-
-        const intro = document.createElement('p');
-        intro.className = 'contact-extra-links-intro';
-        intro.textContent = 'You can also find me on:';
-
-        const container = document.createElement('div');
-        container.className = 'contact-extra-links';
-        container.setAttribute('aria-label', 'Additional links');
-
-        extraLinks.forEach(({ href, iconSrc, iconAlt, label }) => {
-          const a = document.createElement('a');
-          a.className = 'contact-extra-link';
-          a.href = href;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-
-          const img = document.createElement('img');
-          img.className = 'contact-extra-link__icon';
-          img.src = iconSrc;
-          img.alt = iconAlt;
-          img.loading = 'lazy';
-
-          const text = document.createElement('span');
-          text.className = 'contact-extra-link__text';
-          text.textContent = label;
-
-          a.appendChild(img);
-          a.appendChild(text);
-          container.appendChild(a);
-        });
-
-        wrapper.appendChild(intro);
-        wrapper.appendChild(container);
-        actionsRow.insertAdjacentElement('afterend', wrapper);
-      }
-
-      /** New DOM nodes so the browser does not re-apply autofill to the same elements. */
-      function replaceContactFieldsWithFreshElements() {
-        for (const fieldName of FIELD_NAMES) {
-          const oldEl = form.querySelector('[name="' + fieldName + '"]');
-          if (!oldEl) continue;
-          const tag = oldEl.tagName.toLowerCase();
-          if (tag !== 'input' && tag !== 'textarea') continue;
-          const fresh = document.createElement(tag);
-          for (let i = 0; i < oldEl.attributes.length; i++) {
-            const a = oldEl.attributes[i];
-            fresh.setAttribute(a.name, a.value);
-          }
-          oldEl.replaceWith(fresh);
-        }
-      }
-
-      let isSubmitting = false;
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (isSubmitting) return;
-        isSubmitting = true;
-        if (sendButton) sendButton.disabled = true;
-
-        status.textContent = 'Sending...';
-
-        const formData = new FormData(form);
-
-        try {
-          const response = await fetch('/api/contact', {
-            method: 'POST',
-            body: formData,
-          });
-
-          const data = await response.json();
-
-          if (data.ok) {
-            status.textContent = 'Thanks! Your message has been sent.';
-            if (window.turnstile) {
-              window.turnstile.reset();
-            }
-            form.reset();
-            replaceContactFieldsWithFreshElements();
-          } else {
-            status.textContent = data.error || 'Something went wrong.';
-
-            if (window.turnstile && data.resetTurnstile) {
-              window.turnstile.reset();
-            }
-          }
-        } catch {
-          status.textContent = 'Network error. Please try again.';
-
-          if (window.turnstile) {
-            window.turnstile.reset();
-          }
-        } finally {
-          isSubmitting = false;
-          if (sendButton) sendButton.disabled = false;
-        }
-      });
-    }
-  </script>
+  <script>import '../scripts/contact-inset-fit.ts';</script>
 </Layout>

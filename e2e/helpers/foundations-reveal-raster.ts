@@ -66,8 +66,8 @@ function isPanelBlack(
  *
  * `insetRimBlackRatio` — among opaque pixels on a **frame inset a few CSS px inside** the PNG
  * edge, fraction matching #111. The outermost 1–2 px are often AA blends at rounded corners;
- * a few px inward the reveal fill is solid #111. Wrong crop (viewport / jiná dlaždice) stays
- * světlý nebo barevný i na tomto rámu.
+ * a few px inward the reveal fill is solid #111. A wrong crop (viewport / different tile) remains
+ * light or tinted even on this frame.
  */
 export function countRevealRasterSignature(pngBuffer: Buffer): {
   width: number;

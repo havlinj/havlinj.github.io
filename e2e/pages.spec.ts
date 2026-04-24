@@ -403,27 +403,36 @@ test.describe('Contact page (/contact)', () => {
     ).toBeVisible();
   });
 
-  test('shows intro text and contact form fields', async ({ page }) => {
+  test('landing shows intro on panel and links to form', async ({ page }) => {
     await page.goto('/contact');
+    await expect(page.locator('.contact-page__inset-square')).toBeVisible();
+    await expect(page.locator('.contact-page__intro')).toBeVisible();
+    await expect(page.getByText('Glad you stopped by.')).toBeVisible();
+    await expect(page.getByText('Feel free to reach out about')).toBeVisible();
+    await expect(page.getByText('engineering opportunities.')).toBeVisible();
 
-    await expect(
-      page.getByText(
-        'Feel free to reach out about engineering, architecture, or opportunities.',
-      ),
-    ).toBeVisible();
+    const formLink = page.getByRole('link', { name: /Direct contact/i });
+    await expect(formLink).toBeVisible();
+    await expect(formLink).toHaveAttribute('href', '/contact/form');
+    await expect(formLink.locator('img')).toHaveAttribute(
+      'src',
+      '/assets/pages/contact/bubble.png',
+    );
+  });
+
+  test('form page shows contact form fields', async ({ page }) => {
+    await page.goto('/contact/form');
 
     await expect(page.getByLabel('Name')).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
     await expect(page.getByLabel('Message')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send' })).toBeVisible();
 
-    // Turnstile placeholder should be present in the DOM (widget can stay hidden in headless).
     await expect(page.locator('.cf-turnstile')).toHaveCount(1);
   });
 
-  test('shows first intro line and contact form id', async ({ page }) => {
-    await page.goto('/contact');
-    await expect(page.getByText('Glad you stopped by.')).toBeVisible();
+  test('form page shows contact form id and attributes', async ({ page }) => {
+    await page.goto('/contact/form');
     await expect(page.locator('#contact-form')).toBeVisible();
     await expect(page.locator('#contact-form')).toHaveAttribute(
       'novalidate',
@@ -438,7 +447,7 @@ test.describe('Contact page (/contact)', () => {
   test('send status is rendered inline next to Send button', async ({
     page,
   }) => {
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     const actions = page.locator('#contact-form .contact-form__actions');
     const send = actions.getByRole('button', { name: 'Send' });
     const status = actions.locator('#status');
@@ -451,7 +460,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('honeypot company field is hidden from a11y tree', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     const company = page.locator('#contact-form input[name="company"]');
     const hiddenWrapper = page.locator('#contact-form .hidden');
     await expect(company).toBeAttached();
@@ -474,7 +483,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('status region is present and empty before submit', async ({ page }) => {
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     const status = page.locator('#status');
     await expect(status).toBeAttached();
     await expect(status).toHaveText('');
@@ -483,7 +492,7 @@ test.describe('Contact page (/contact)', () => {
   test('contact field autocomplete policy is set as intended', async ({
     page,
   }) => {
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await expect(page.getByLabel('Name')).toHaveAttribute(
       'autocomplete',
       'name',
@@ -498,19 +507,16 @@ test.describe('Contact page (/contact)', () => {
     );
   });
 
-  test('after load: org links and intro text below Send', async ({ page }) => {
+  test('landing shows GitHub and LinkedIn with form link', async ({ page }) => {
     await page.goto('/contact');
-    await expect(
-      page.getByText('You can also find me on:', { exact: true }),
-    ).toBeVisible();
-    const extra = page.locator('.contact-extra-links');
-    await expect(extra).toBeVisible();
-    const github = extra.getByRole('link', { name: /GitHub/i });
-    const linkedin = extra.getByRole('link', { name: /LinkedIn/i });
+    const links = page.locator('.contact-page__links');
+    await expect(links).toBeVisible();
+    const github = links.getByRole('link', { name: /GitHub/i });
+    const linkedin = links.getByRole('link', { name: /LinkedIn/i });
     await expect(github).toBeVisible();
     await expect(linkedin).toBeVisible();
-    await expect(github.locator('img[alt="GitHub"]')).toBeVisible();
-    await expect(linkedin.locator('img[alt="LinkedIn"]')).toBeVisible();
+    await expect(github.locator('img')).toBeVisible();
+    await expect(linkedin.locator('img')).toBeVisible();
     await expect(github.locator('img')).toHaveAttribute(
       'src',
       '/assets/pages/contact/github.svg',
@@ -543,7 +549,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await fillContactFormWithValidData(page);
 
     await page.getByRole('button', { name: 'Send' }).click();
@@ -575,7 +581,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await fillContactFormWithValidData(page);
 
     const nameBefore = await page
@@ -641,7 +647,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await installTurnstileResetCounter(page);
     await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
@@ -656,7 +662,7 @@ test.describe('Contact page (/contact)', () => {
       await route.abort();
     });
 
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await installTurnstileResetCounter(page);
     await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
@@ -685,7 +691,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact');
+    await page.goto('/contact/form');
     await fillContactFormWithValidData(page);
 
     const send = page.getByRole('button', { name: 'Send' });

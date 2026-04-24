@@ -10,6 +10,7 @@ const ROUTES_WITH_HEADINGS = [
   '/',
   '/writing',
   '/contact',
+  '/contact/form',
   '/profile',
   '/why',
   '/what-i-do',

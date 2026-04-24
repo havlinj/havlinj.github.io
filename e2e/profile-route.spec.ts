@@ -206,10 +206,10 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       Math.abs(sig.height - Math.round(box!.height)),
       `PNG height ${sig.height} should match Playwright boundingBox height ~${Math.round(box!.height)}`,
     ).toBeLessThanOrEqual(1);
-    // Rám těsně uvnitř fyzického okraje snímku musí být #111 (vnější 1–2 px bývají AA u rohů).
+    // A frame just inside the physical image edge must be #111 (outer 1-2 px are often AA corner blends).
     expect(
       sig.insetRimBlackRatio,
-      'uvnitř okraje výřezu musí být převážně černý panel #111 (ne okolí stránky)',
+      'inside the crop edge the frame should be predominantly panel black #111 (not surrounding page)',
     ).toBeGreaterThanOrEqual(0.92);
     const area = sig.width * sig.height;
     expect(
