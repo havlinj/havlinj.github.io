@@ -6,8 +6,8 @@ title: 'Profile'
   class="profile-section profile-section--loading"
   style="
     /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
-    --profile-tile-text-inset-anchor-x: 15%;
-    --profile-tile-text-inset-far-x: var(--profile-tile-text-inset-anchor-x);
+    --profile-tile-text-inset-anchor-x: 10%;
+    --profile-tile-text-inset-far-x: 20%;
     --profile-portrait-width-vs-tile: 85%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;

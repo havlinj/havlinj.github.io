@@ -431,7 +431,7 @@ article .profile-section:last-child {
 
 .prof-tile--foundations:not(.is-revealed):focus-visible
   .page-button__text::before {
-  left: -1000px;
+  left: calc(-1 * var(--profile-label-strip-tail-extra, 0.5em));
   right: -1000px;
 }
 
@@ -463,7 +463,7 @@ article .profile-section:last-child {
   }
 
   .prof-tile--foundations:not(.is-revealed):hover .page-button__text::before {
-    left: -1000px;
+    left: calc(-1 * var(--profile-label-strip-tail-extra, 0.5em));
     right: -1000px;
   }
 
@@ -495,7 +495,7 @@ article .profile-section:last-child {
 }
 
 .profile-section .prof-tile--foundations .page-button__text::before {
-  left: -1000px;
+  left: calc(-1 * var(--profile-label-strip-tail-extra, 0.5em));
   right: -1000px;
 }
 
