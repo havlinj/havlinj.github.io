@@ -73,6 +73,31 @@ function startContactInsetFit(): void {
     );
   }
 
+  function readPanelTopPadPx(): number {
+    const paddingTopPx = parseFloat(getComputedStyle(panelEl).paddingTop);
+    return Number.isFinite(paddingTopPx) ? paddingTopPx : 0;
+  }
+
+  function resolveLengthPx(rawValue: string, fallbackPx: number): number {
+    const token = rawValue.trim();
+    if (!token) return fallbackPx;
+    const probe = document.createElement('div');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.pointerEvents = 'none';
+    probe.style.width = '0';
+    probe.style.height = token;
+    panelEl.appendChild(probe);
+    const px = parseFloat(getComputedStyle(probe).height);
+    probe.remove();
+    return Number.isFinite(px) ? px : fallbackPx;
+  }
+
+  function readWritingRowGapPx(panelTopPadPx: number): number {
+    const raw = getComputedStyle(panelEl).getPropertyValue('--writing-row-gap');
+    return resolveLengthPx(raw, CONTACT_LAYOUT.defaultBoxGapPx || panelTopPadPx);
+  }
+
   function measureRectOuterSize(rectEl: HTMLElement): { w: number; h: number } {
     const cs = getComputedStyle(rectEl);
     const ml = parseFloat(cs.marginLeft) || 0;
@@ -86,12 +111,9 @@ function startContactInsetFit(): void {
   }
 
   function measureNeededContent(): NeededContent {
-    const topPad = Math.round(panelEl.clientWidth * padFrac * 0.5);
+    const topPad = Math.round(readPanelTopPadPx());
     const rightPad = Math.round(topPad * 0.5);
-    const rowGap =
-      parseFloat(
-        getComputedStyle(panelEl).getPropertyValue('--contact-box-gap-px'),
-      ) || CONTACT_LAYOUT.defaultBoxGapPx;
+    const rowGap = readWritingRowGapPx(topPad);
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
     const neededWidth =
@@ -117,7 +139,12 @@ function startContactInsetFit(): void {
     const baselinePanelEdge = panelEdge * zoomScale;
     const fontToEdgeRatio =
       CONTACT_LAYOUT.baselineFontPx / Math.max(1, baselinePanelEdge);
-    return Math.max(1, panelEdge * fontToEdgeRatio);
+    const baseFontPx = panelEdge * fontToEdgeRatio;
+    const smallPanelScale =
+      panelEdge <= CONTACT_LAYOUT.smallPanelEdgePx
+        ? CONTACT_LAYOUT.smallPanelFontScale
+        : 1;
+    return Math.max(1, baseFontPx * smallPanelScale);
   }
 
   function flush(): void {

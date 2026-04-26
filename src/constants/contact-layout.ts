@@ -1,7 +1,9 @@
 export const CONTACT_LAYOUT = {
   insetPanelPadFrac: 0.1,
   insetMaxRatio: 1,
-  baselineFontPx: 16,
+  baselineFontPx: 14.8,
+  smallPanelEdgePx: 380,
+  smallPanelFontScale: 0.94,
   fitSafetyXPx: 2,
   fitSafetyYPx: 6,
   maxFitPasses: 5,
