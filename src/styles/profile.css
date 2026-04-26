@@ -342,9 +342,9 @@ article .profile-section:last-child {
 }
 
 .profile-section > a[href='/why'] .page-button__inner {
-  align-items: flex-start;
+  align-items: flex-end;
   /* Profile tiles are half-width; multiply to keep % relative to the big box side. */
-  padding-block-start: calc(var(--panel-padding-top, 10%) * 2);
+  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
 }
 
 .profile-section > a[href='/what-i-do'] .page-button__inner {
@@ -505,9 +505,14 @@ article .profile-section:last-child {
   --profile-label-strip-left: var(--profile-label-strip-tail-extra, 0.5em);
 }
 
+/* Left-anchored label strip: tile edge + fixed width (Why + What I do). */
 .profile-section > a[href='/why'] .page-button__text::before,
 .profile-section > a[href='/what-i-do'] .page-button__text::before {
-  left: -1000px;
+  left: calc(-1 * (10cqi + var(--profile-photo-frame-size, 0px)));
+  right: auto;
+  width: 80.5cqi;
+  -webkit-clip-path: none;
+  clip-path: none;
 }
 
 .profile-section .prof-tile--foundations .page-button__text::before {
