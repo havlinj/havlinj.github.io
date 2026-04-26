@@ -74,10 +74,10 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.7em;
+  gap: 1.05em;
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
-  padding: 1rem 0.8rem;
+  padding: 1rem 0.8rem calc(1rem - 0.35em) 0.8rem;
 }
 
 .contact-page__inset-rect--links {
@@ -109,11 +109,13 @@
 .contact-page__intro--lead {
   line-height: 1.48;
   letter-spacing: -0.01em;
-  font-weight: 500;
+  font-weight: 600;
+  font-style: italic;
   font-size: calc(var(--contact-fluid-font) * 1.015);
 }
 
 .contact-page__intro-line1 {
+  font-style: italic;
   white-space: nowrap;
 }
 
@@ -133,19 +135,16 @@
   inline-size: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
-  min-height: clamp(
-    2rem,
-    var(--contact-link-row-min-h, 2.2rem),
-    var(--contact-link-row-max-h, 2.85rem)
-  );
+  min-height: clamp(1.75rem, var(--contact-link-row-min-h, 5.8cqi), 2.35rem);
+  max-height: clamp(2.2rem, var(--contact-link-row-max-h, 6.8cqi), 2.8rem);
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
   font-size: var(--contact-fluid-font);
   gap: 0.62em;
-  padding: 0.2rem
+  padding: var(--contact-link-pad-block, 0.32cqi)
     calc(var(--contact-link-pad-inline, 0.95rem) + var(--contact-link-tail-pad, 0.55rem))
-    0.2rem var(--contact-link-pad-inline, 0.95rem);
+    var(--contact-link-pad-block, 0.32cqi) var(--contact-link-pad-inline, 0.95rem);
   background-color: var(--color-page-bg);
   text-decoration: none;
   white-space: nowrap;
@@ -177,6 +176,11 @@
   color: var(--color-page-bg);
   background-color: #111;
   outline: none;
+}
+
+.contact-page .contact-extra-link:hover .contact-extra-link__icon,
+.contact-page .contact-extra-link:focus-visible .contact-extra-link__icon {
+  filter: invert(1) brightness(1.05);
 }
 
 /* Icon size relative to link text size (`em`) */
