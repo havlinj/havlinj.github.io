@@ -33,13 +33,15 @@ article.has-buttons-panel {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 0;
+  --profile-grid-gap: var(--writing-row-gap, 2cqi);
+  gap: var(--profile-grid-gap);
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
   height: 100cqw;
   --profile-tile-text-inset-anchor-x: 10%;
   --profile-tile-text-inset-far-x: 6%;
+  --profile-top-label-strip-ratio: 80.5;
   --profile-tile-text-inset-x: var(--profile-tile-text-inset-anchor-x);
   --profile-photo-frame-size: 0px;
   /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
@@ -131,7 +133,9 @@ article.has-buttons-panel {
   right: 0;
   bottom: 0;
   z-index: 1;
-  height: 50%;
+  height: calc(
+    50% - (var(--profile-grid-gap, var(--writing-row-gap, 2cqi)) / 2)
+  );
   border-left-width: var(--profile-stitched-seam-thickness);
 }
 
@@ -302,7 +306,8 @@ article .profile-section:last-child {
   left: auto;
   right: var(--profile-photo-inset-right, 0px);
   bottom: auto;
-  width: min(100%, var(--profile-portrait-width-vs-tile, 100%));
+  /* Keep portrait width equal to Why/What label strip length. */
+  width: min(100%, calc(var(--profile-top-label-strip-ratio, 80.5) * 1%));
   height: auto;
   aspect-ratio: 1;
   max-height: 100%;
@@ -510,7 +515,7 @@ article .profile-section:last-child {
 .profile-section > a[href='/what-i-do'] .page-button__text::before {
   left: calc(-1 * (10cqi + var(--profile-photo-frame-size, 0px)));
   right: auto;
-  width: 80.5cqi;
+  width: calc(var(--profile-top-label-strip-ratio, 80.5) * 1cqi);
   -webkit-clip-path: none;
   clip-path: none;
 }
