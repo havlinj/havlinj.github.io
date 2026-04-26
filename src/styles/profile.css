@@ -431,8 +431,8 @@ article .profile-section:last-child {
 
 .prof-tile--foundations:not(.is-revealed):focus-visible
   .page-button__text::before {
-  left: calc(-1 * 0.42em);
-  right: calc(-1 * 0.42em);
+  left: -1000px;
+  right: -1000px;
 }
 
 .prof-tile--foundations:not(.is-revealed):focus-visible .page-button__bg {
@@ -463,8 +463,8 @@ article .profile-section:last-child {
   }
 
   .prof-tile--foundations:not(.is-revealed):hover .page-button__text::before {
-    left: calc(-1 * 0.42em);
-    right: calc(-1 * 0.42em);
+    left: -1000px;
+    right: -1000px;
   }
 
   .prof-tile--foundations:not(.is-revealed):hover .page-button__overlay {
@@ -478,6 +478,7 @@ article .profile-section:last-child {
     var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) +
       1px
   );
+  --profile-label-strip-right: var(--profile-label-strip-tail-extra, 0.5em);
 }
 
 .profile-section .prof-tile--foundations .page-button__text {
@@ -485,6 +486,7 @@ article .profile-section:last-child {
     var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) +
       1px
   );
+  --profile-label-strip-left: var(--profile-label-strip-tail-extra, 0.5em);
 }
 
 .profile-section > a[href='/why'] .page-button__text::before,
@@ -493,6 +495,7 @@ article .profile-section:last-child {
 }
 
 .profile-section .prof-tile--foundations .page-button__text::before {
+  left: -1000px;
   right: -1000px;
 }
 
