@@ -341,6 +341,22 @@ article .profile-section:last-child {
   border-bottom-width: var(--profile-stitched-seam-thickness);
 }
 
+.profile-section > a[href='/why'] .page-button__inner {
+  align-items: flex-start;
+  /* Profile tiles are half-width; multiply to keep % relative to the big box side. */
+  padding-block-start: calc(var(--panel-padding-top, 10%) * 2);
+}
+
+.profile-section > a[href='/what-i-do'] .page-button__inner {
+  align-items: flex-end;
+  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
+}
+
+.profile-section .prof-tile--foundations .page-button__inner {
+  align-items: flex-end;
+  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
+}
+
 .prof-tile .page-button__inner {
   padding-inline-start: var(--profile-tile-text-inset-anchor-x);
   padding-inline-end: var(--profile-tile-text-inset-far-x);

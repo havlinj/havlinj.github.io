@@ -8,6 +8,7 @@ title: 'Profile'
     /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
     --profile-tile-text-inset-anchor-x: 10%;
     --profile-tile-text-inset-far-x: 20%;
+    --panel-padding-top: 10%;
     --profile-portrait-width-vs-tile: 85%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
