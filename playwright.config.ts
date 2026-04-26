@@ -31,6 +31,14 @@ export default defineConfig({
       use: { ...devices['Pixel 7'] },
       testMatch: /.*-mobile\.spec\.ts/,
     },
+    {
+      name: 'mobile-webkit',
+      use: { ...devices['iPhone 13'] },
+      testMatch: [
+        /.*-mobile\.spec\.ts/,
+        /.*-typography-safari\.spec\.ts/,
+      ],
+    },
   ],
   webServer: {
     command: webServerCommand,

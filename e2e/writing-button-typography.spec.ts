@@ -51,9 +51,14 @@ function readWritingButtonMetrics() {
 
 async function hasWritingFallbackRuleInSource() {
   const css = await readFile('src/styles/writing.css', 'utf-8');
-  const fallbackRulePattern =
-    /@supports\s+not\s*\(\s*font-style:\s*oblique\s+7deg\s*\)\s*\{[\s\S]*?\.writing-page\s+\.page-button__text\s*\{[\s\S]*?transform:\s*skewX\(-7deg\)\s*translateX\(0\.05em\)\s*;[\s\S]*?\}[\s\S]*?\}/m;
-  return fallbackRulePattern.test(css);
+  const hasDefaultItalic = /\.writing-page\s+\.page-button__text\s*\{[\s\S]*?font-style:\s*italic\s*;/m.test(
+    css,
+  );
+  const hasObliqueEnhancement =
+    /@supports\s*\(\s*font-style:\s*oblique\s+7deg\s*\)\s*\{[\s\S]*?\.writing-page\s+\.page-button__text\s*\{[\s\S]*?font-style:\s*oblique\s+7deg\s*;/m.test(
+      css,
+    );
+  return hasDefaultItalic && hasObliqueEnhancement;
 }
 
 test.describe('Writing page button typography', () => {
@@ -69,7 +74,9 @@ test.describe('Writing page button typography', () => {
     expect(m!.dateOverInner).toBeLessThan(0.8);
     expect(m!.textOverInner).toBeGreaterThan(0.96);
     expect(m!.textOverInner).toBeLessThan(1.0);
-    expect(m!.fontStyle).toContain('oblique');
+    expect(
+      m!.fontStyle.includes('italic') || m!.fontStyle.includes('oblique'),
+    ).toBe(true);
   });
 
   test('inner font-size is smaller on narrow viewport than on wide', async ({
@@ -101,7 +108,7 @@ test.describe('Writing page button typography', () => {
     expect(m!.dateTrackingRatio).toBeLessThan(0.025);
   });
 
-  test('fallback CSS rule for oblique unsupported path is present', async ({
+  test('fallback + enhancement CSS rules for slanted style are present', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
