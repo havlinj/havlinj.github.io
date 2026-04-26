@@ -67,15 +67,16 @@ function startContactInsetFit(): void {
       '--contact-stack-top-px',
       `${Math.round(insetPadPx)}px`,
     );
-    panelEl.style.setProperty(
-      '--contact-stack-right-px',
-      `${Math.round(insetPadPx * 0.5)}px`,
-    );
   }
 
   function readPanelTopPadPx(): number {
     const paddingTopPx = parseFloat(getComputedStyle(panelEl).paddingTop);
     return Number.isFinite(paddingTopPx) ? paddingTopPx : 0;
+  }
+
+  function readPanelLeftPadPx(): number {
+    const paddingLeftPx = parseFloat(getComputedStyle(panelEl).paddingLeft);
+    return Number.isFinite(paddingLeftPx) ? paddingLeftPx : 0;
   }
 
   function resolveLengthPx(rawValue: string, fallbackPx: number): number {
@@ -112,12 +113,12 @@ function startContactInsetFit(): void {
 
   function measureNeededContent(): NeededContent {
     const topPad = Math.round(readPanelTopPadPx());
-    const rightPad = Math.round(topPad * 0.5);
+    const leftPad = Math.round(readPanelLeftPadPx());
     const rowGap = readWritingRowGapPx(topPad);
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
     const neededWidth =
-      Math.max(intro.w, links.w) + rightPad + CONTACT_LAYOUT.fitSafetyXPx;
+      Math.max(intro.w, links.w) + leftPad + CONTACT_LAYOUT.fitSafetyXPx;
     const neededHeight =
       topPad +
       intro.h +

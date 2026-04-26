@@ -20,7 +20,6 @@
   background-color: var(--color-page-bg);
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
-  --contact-stack-right-px: 8px;
   --contact-intro-top-px: 16px;
   --contact-links-top-px: 120px;
   --contact-fluid-font: 1rem;
@@ -37,6 +36,8 @@
         var(--contact-panel-edge, 320px)
     );
   background-size: calc(var(--panel-bg-zoom, 1) * 100%) auto;
+  transform: scaleX(-1);
+  transform-origin: center;
 }
 
 /* Keep fit-driven content hidden until first stable layout pass completes. */
@@ -53,12 +54,12 @@
 
 .contact-page__inset-rect {
   position: absolute;
-  left: 0;
-  right: auto;
+  left: auto;
+  right: 0;
   box-sizing: border-box;
   font-size: var(--contact-fluid-font);
   width: max-content;
-  max-width: calc(100% - var(--contact-stack-right-px));
+  max-width: calc(100% - var(--panel-padding-left, 2rem));
   min-width: 0;
   min-height: 0;
   text-align: left;
@@ -74,14 +75,24 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 0.7em;
+  width: calc(100% - var(--panel-padding-left, 2rem));
+  max-width: calc(100% - var(--panel-padding-left, 2rem));
   padding: 1rem 0.8rem;
 }
 
 .contact-page__inset-rect--links {
   top: var(--contact-links-top-px);
+  left: auto;
+  right: 0;
+  inset-inline-start: auto;
+  inset-inline-end: 0;
   display: flex;
-  align-items: center;
-  padding: 1rem 0.8rem;
+  justify-content: flex-end;
+  align-items: stretch;
+  inline-size: fit-content;
+  max-inline-size: min(100%, calc(100% - var(--panel-padding-left, 2rem)));
+  padding: 0;
+  background: transparent;
 }
 
 .contact-page__intro {
@@ -109,20 +120,38 @@
 .contact-page__links {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.7em;
-  width: max-content;
+  align-items: stretch;
+  gap: var(--writing-row-gap, 2cqi);
+  inline-size: fit-content;
+  max-inline-size: min(100%, calc(100% - var(--panel-padding-left, 2rem)));
 }
 
 .contact-page .contact-extra-link {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
+  inline-size: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  min-height: clamp(
+    2rem,
+    var(--contact-link-row-min-h, 2.2rem),
+    var(--contact-link-row-max-h, 2.85rem)
+  );
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
   font-size: var(--contact-fluid-font);
-  gap: 0.6em;
+  gap: 0.62em;
+  padding: 0.2rem
+    calc(var(--contact-link-pad-inline, 0.95rem) + var(--contact-link-tail-pad, 0.55rem))
+    0.2rem var(--contact-link-pad-inline, 0.95rem);
+  background-color: var(--color-page-bg);
+  text-decoration: none;
   white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .contact-page__links .contact-extra-link:first-child .contact-extra-link__text {
@@ -140,7 +169,14 @@
 }
 
 .contact-page .contact-extra-link:hover {
-  color: rgba(17, 17, 17, 1);
+  color: var(--color-page-bg);
+  background-color: #111;
+}
+
+.contact-page .contact-extra-link:focus-visible {
+  color: var(--color-page-bg);
+  background-color: #111;
+  outline: none;
 }
 
 /* Icon size relative to link text size (`em`) */
