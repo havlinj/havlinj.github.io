@@ -108,14 +108,15 @@
 
 .contact-page__intro--lead {
   line-height: 1.48;
-  letter-spacing: -0.01em;
-  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-weight: 400;
   font-style: italic;
-  font-size: calc(var(--contact-fluid-font) * 1.015);
+  font-size: calc(var(--contact-fluid-font) * 1.08);
 }
 
 .contact-page__intro-line1 {
-  font-style: italic;
+  opacity: 0.95;
+  line-height: 1.65;
   white-space: nowrap;
 }
 
@@ -135,16 +136,16 @@
   inline-size: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
-  min-height: clamp(1.75rem, var(--contact-link-row-min-h, 5.8cqi), 2.35rem);
-  max-height: clamp(2.2rem, var(--contact-link-row-max-h, 6.8cqi), 2.8rem);
+  min-height: var(--contact-link-row-min-h, 2.2em);
+  max-height: var(--contact-link-row-max-h, 2.85em);
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
   font-size: var(--contact-fluid-font);
   gap: 0.62em;
-  padding: var(--contact-link-pad-block, 0.32cqi)
+  padding: var(--contact-link-pad-block, 0.2em)
     calc(var(--contact-link-pad-inline, 0.95rem) + var(--contact-link-tail-pad, 0.55rem))
-    var(--contact-link-pad-block, 0.32cqi) var(--contact-link-pad-inline, 0.95rem);
+    var(--contact-link-pad-block, 0.2em) var(--contact-link-pad-inline, 0.95rem);
   background-color: var(--color-page-bg);
   text-decoration: none;
   white-space: nowrap;
