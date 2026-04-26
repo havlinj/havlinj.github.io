@@ -27,6 +27,42 @@
 
 .contact-page .page-buttons-panel::before {
   background-color: var(--color-page-bg);
+  /*
+   * Layer 1 (top): author-controlled zoom (can be < 1 for "zoom out").
+   * Layer 2 (underlay): cover fallback of the same image, so uncovered panel
+   * areas are always patched with related pixels instead of flat background.
+   */
+  background-image:
+    var(--panel-bg, none),
+    var(--panel-bg, none);
+  background-repeat: no-repeat, no-repeat;
+  background-position:
+    calc(
+        var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
+          var(--contact-panel-edge, 320px)
+      )
+      calc(
+        var(--panel-bg-pos-y, 50%) + var(--panel-bg-nudge-y, 0) *
+          var(--contact-panel-edge, 320px)
+      ),
+    50% 50%;
+  background-size:
+    calc(var(--panel-bg-zoom, 1) * 100%) auto,
+    cover;
+  opacity: var(--panel-bg-layer-opacity, 1);
+  transform: scaleX(-1);
+  transform-origin: center;
+}
+
+.contact-page .page-buttons-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Right-edge brightening of the top (zoomed) image only. */
+  background-image: var(--panel-bg, none);
+  background-repeat: no-repeat;
   background-position: calc(
       var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
         var(--contact-panel-edge, 320px)
@@ -36,6 +72,20 @@
         var(--contact-panel-edge, 320px)
     );
   background-size: calc(var(--panel-bg-zoom, 1) * 100%) auto;
+  opacity: calc(var(--panel-bg-layer-opacity, 1) * 0.2);
+  filter: brightness(1.29);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.78) 14%,
+    rgba(0, 0, 0, 0) 34%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.78) 14%,
+    rgba(0, 0, 0, 0) 34%
+  );
   transform: scaleX(-1);
   transform-origin: center;
 }
@@ -109,13 +159,15 @@
 .contact-page__intro--lead {
   line-height: 1.48;
   letter-spacing: -0.02em;
-  font-weight: 400;
-  font-style: italic;
+  font-weight: 600;
+  opacity: 0.95;
   font-size: calc(var(--contact-fluid-font) * 1.08);
 }
 
 .contact-page__intro-line1 {
-  opacity: 0.95;
+  display: inline-block;
+  padding-right: var(--contact-intro-line-tail-pad, 0.6em);
+  opacity: 0.98;
   line-height: 1.65;
   white-space: nowrap;
 }
