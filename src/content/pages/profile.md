@@ -9,13 +9,13 @@ title: 'Profile'
     --profile-tile-text-inset-anchor-x: 10%;
     --profile-tile-text-inset-far-x: 25%;
     --panel-padding-top: 10%;
-    --profile-portrait-width-vs-tile: 80.5%;
+    --profile-portrait-width-vs-tile: calc(100% - (4 * var(--panel-padding-top, 10%)));
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;
     --portrait-brightness: 1.08;
     --portrait-contrast: 1;
-    --portrait-opacity: 0.9;
+    --portrait-opacity: 0.95;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;

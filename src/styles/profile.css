@@ -33,8 +33,7 @@ article.has-buttons-panel {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  --profile-grid-gap: var(--writing-row-gap, 2cqi);
-  gap: var(--profile-grid-gap);
+  gap: 0;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   /* Grid is 2x2 exact squares: total height = content width */
@@ -133,9 +132,7 @@ article.has-buttons-panel {
   right: 0;
   bottom: 0;
   z-index: 1;
-  height: calc(
-    50% - (var(--profile-grid-gap, var(--writing-row-gap, 2cqi)) / 2)
-  );
+  height: 50%;
   border-left-width: var(--profile-stitched-seam-thickness);
 }
 
@@ -302,18 +299,18 @@ article .profile-section:last-child {
   );
   --profile-photo-overhang-y: 1px;
   position: absolute;
-  top: var(--profile-photo-inset-top, 0px);
-  left: auto;
-  right: var(--profile-photo-inset-right, 0px);
+  top: var(--profile-photo-center-y, 25%);
+  left: var(--profile-photo-center-x, 50%);
+  right: auto;
   bottom: auto;
-  /* Keep portrait width equal to Why/What label strip length. */
-  width: min(100%, calc(var(--profile-top-label-strip-ratio, 80.5) * 1%));
+  /* tile side - 2 * (label distance from bottom edge) */
+  width: min(100%, var(--profile-portrait-width-vs-tile, 100%));
   height: auto;
   aspect-ratio: 1;
   max-height: 100%;
   overflow: hidden;
   background: #111;
-  transform: none;
+  transform: translate(-50%, -50%);
 }
 
 .profile-photo-box {
