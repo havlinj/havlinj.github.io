@@ -39,9 +39,13 @@ function startContactInsetFit(): void {
       : 0.1;
   let raf = 0;
   let revealed = false;
+  let fontsReady = false;
+  let stablePasses = 0;
+  let lastLayoutKey = '';
 
   function revealAfterStableLayout(): void {
-    if (revealed || !fitContentEl) return;
+    if (revealed || !fitContentEl || !fontsReady) return;
+    if (stablePasses < 2) return;
     revealed = true;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -179,6 +183,22 @@ function startContactInsetFit(): void {
       '--contact-links-top-px',
       `${topPad + introH + rowGap}px`,
     );
+
+    const layoutKey = [
+      Math.round(panelEdge),
+      Math.round(desiredFontPx * 1000) / 1000,
+      Math.round(neededWidth),
+      Math.round(neededHeight),
+      Math.round(topPad),
+      Math.round(rowGap),
+      Math.round(introH),
+    ].join('|');
+    if (layoutKey === lastLayoutKey) {
+      stablePasses += 1;
+    } else {
+      stablePasses = 0;
+      lastLayoutKey = layoutKey;
+    }
     revealAfterStableLayout();
   }
 
@@ -215,7 +235,20 @@ function startContactInsetFit(): void {
 
   const fonts = document.fonts;
   if (fonts && typeof fonts.ready !== 'undefined') {
-    fonts.ready.then(() => schedule()).catch(() => {});
+    fonts.ready
+      .then(() => {
+        fontsReady = true;
+        schedule();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(schedule);
+        });
+      })
+      .catch(() => {
+        fontsReady = true;
+        schedule();
+      });
+  } else {
+    fontsReady = true;
   }
   window.addEventListener('load', schedule, { passive: true });
   window.setTimeout(

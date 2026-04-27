@@ -5,11 +5,22 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    /* Reveal idle = 50/50; Foundations expands upward (column - portrait side) with portrait */
-    --profile-tile-text-inset-anchor-x: 10%;
-    --profile-tile-text-inset-far-x: 25%;
+    /* Edge-anchored controls: independent Y offsets in % of the big square */
+    --profile-why-y: 24%;
+    --profile-what-y: 72%;
+    --profile-portrait-y: 24%;
+    --profile-foundations-y: 72%;
+    --profile-why-width: 25%;
+    --profile-why-height: 25%;
+    --profile-what-width: 28%;
+    --profile-what-height: 28%;
+    --profile-foundations-width: 30%;
+    --profile-foundations-height:30%;
+    --profile-portrait-size: 24%;
+    --profile-portrait-frame-padding: 11%;
+    --profile-tile-text-inset-anchor-x: 25%;
+    --profile-tile-text-inset-far-x: 10%;
     --panel-padding-top: 10%;
-    --profile-portrait-width-vs-tile: calc(100% - (4 * var(--panel-padding-top, 10%)));
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1;

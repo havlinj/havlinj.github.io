@@ -10,13 +10,7 @@ export const FALLBACK_WRITING_POOL_OPACITY = 0.94;
 export const WRITING_POOL_ENTRIES: WritingPoolEntry[] = [
   [
     '/assets/pages/writing/pool/joschka-silzle-90pi4AI8MwA_dichrom.png',
-    0.8,
-    0,
-    0,
-  ],
-  [
-    '/assets/pages/writing/pool/k8-4-jjSmhXytw-unsplash_dichrom.png',
-    0.96,
+    0.9,
     0,
     0,
   ],
@@ -28,21 +22,9 @@ export const WRITING_POOL_ENTRIES: WritingPoolEntry[] = [
   ],
   [
     '/assets/pages/writing/pool/samuel-regan-asante-POCZmzEPxNc-unsplash_dichrom.png',
-    0.94,
+    0.8,
     0,
     0,
-  ],
-  [
-    '/assets/pages/writing/pool/thomas-kinto-3WvTJrQBb38-unsplash_dichrom.png',
-    1,
-    0,
-    60,
-  ],
-  [
-    '/assets/pages/writing/pool/thomas-kinto-fBTQhWKEf20-unsplash_dichrom.png',
-    0.94,
-    0,
-    5,
   ],
 ];
 

@@ -30,19 +30,33 @@ article.has-buttons-panel {
  */
 .profile-section {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 0;
+  display: block;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-  /* Grid is 2x2 exact squares: total height = content width */
+  /* Main canvas: same square logic as hero */
   height: 100cqw;
+  overflow: hidden;
   --profile-tile-text-inset-anchor-x: 10%;
   --profile-tile-text-inset-far-x: 6%;
   --profile-top-label-strip-ratio: 80.5;
   --profile-tile-text-inset-x: var(--profile-tile-text-inset-anchor-x);
   --profile-photo-frame-size: 0px;
+  --profile-why-width: 25%;
+  --profile-why-height: 25%;
+  --profile-what-width: 25%;
+  --profile-what-height: 25%;
+  --profile-foundations-width: 25%;
+  --profile-foundations-height: 25%;
+  --profile-why-y: 24%;
+  --profile-what-y: 72%;
+  --profile-portrait-y: 24%;
+  --profile-foundations-y: 72%;
+  --profile-portrait-size: 25%;
+  --profile-portrait-frame-padding: 7%;
+  --profile-hero-optical-offset: var(--hero-optical-offset, 0.1em);
+  --profile-hero-bg-brightness: var(--hero-bg-brightness, 0.88);
+  --profile-hero-bg-saturate: var(--hero-bg-saturate, 1.12);
+  --profile-hero-bg-image-opacity: var(--hero-bg-image-opacity, 0.85);
   /* Step values (one place to edit). @media maps the active one → --profile-shared-edge-frame-ratio.
    * Keep in sync: e2e/profile-seam-ratios.ts (no --_ prefix: avoids var/inherit quirks in some engines). */
   --profile-shared-edge-ratio-base: 0.77;
@@ -60,6 +74,36 @@ article.has-buttons-panel {
   /* Film grain: keep low — high opacity + overlay reads as mud/banding on weak paths. */
   --profile-grain-opacity: 0.12;
   --profile-grain-blend-mode: soft-light;
+}
+
+.profile-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -15%;
+  bottom: 0;
+  left: -20%;
+  background-image: url('/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(var(--profile-hero-bg-brightness))
+    saturate(var(--profile-hero-bg-saturate));
+  opacity: var(--profile-hero-bg-image-opacity);
+  transform: translate3d(0, 0, 0) scale(1.1);
+  transform-origin: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.profile-section::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--profile-hero-optical-offset);
+  background: var(--hero-highlight-bg, var(--color-page-bg));
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Breakpoint px values: keep aligned with e2e/profile-seam-ratios.ts PROFILE_SEAM_MEDIA_MIN_WIDTHS */
@@ -88,51 +132,65 @@ article.has-buttons-panel {
 }
 
 .profile-section > a[href='/why'] {
-  grid-column: 1;
-  grid-row: 1;
+  position: absolute;
+  left: var(--profile-hero-optical-offset);
+  width: min(var(--profile-why-width), 100%);
+  height: min(var(--profile-why-height), 100%);
+  top: clamp(
+    0%,
+    calc(var(--profile-why-y) - (var(--profile-why-height) / 2)),
+    calc(100% - var(--profile-why-height))
+  );
+  z-index: 3;
 }
 
 .profile-section > a[href='/what-i-do'] {
-  grid-column: 1;
-  grid-row: 2;
+  position: absolute;
+  left: var(--profile-hero-optical-offset);
+  width: min(var(--profile-what-width), 100%);
+  height: min(var(--profile-what-height), 100%);
+  top: clamp(
+    0%,
+    calc(var(--profile-what-y) - (var(--profile-what-height) / 2)),
+    calc(100% - var(--profile-what-height))
+  );
+  z-index: 3;
 }
 
 /* --- Right column (static portrait + static Foundations half) --- */
 .profile-right-column {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  position: relative;
-  min-height: 0;
-  min-width: 0;
-  --profile-photo-gutter-x: var(
-    --profile-inner-gutter-x,
-    var(
-      --profile-inner-gutter,
-      var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
-    )
-  );
-  --profile-portrait-content-side: calc(
-    50% - (2 * var(--profile-photo-gutter-x))
-  );
-  --profile-portrait-shell-width: calc(
-    var(--profile-portrait-content-side) + (2 * var(--profile-photo-frame-size))
-  );
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .profile-right-column .profile-photo-frame {
   position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none; /* Clicks should always reach Foundations tile */
+  right: 0;
+  width: min(var(--profile-portrait-size), 100%);
+  height: min(var(--profile-portrait-size), 100%);
+  top: clamp(
+    0%,
+    calc(var(--profile-portrait-y) - (var(--profile-portrait-size) / 2)),
+    calc(100% - var(--profile-portrait-size))
+  );
+  z-index: 4;
+  pointer-events: none;
 }
 
 .profile-right-column .prof-tile--foundations {
   position: absolute;
-  left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 1;
-  height: 50%;
+  width: min(var(--profile-foundations-width), 100%);
+  height: min(var(--profile-foundations-height), 100%);
+  top: clamp(
+    0%,
+    calc(var(--profile-foundations-y) - (var(--profile-foundations-height) / 2)),
+    calc(100% - var(--profile-foundations-height))
+  );
+  z-index: 3;
+  pointer-events: auto;
   border-left-width: var(--profile-stitched-seam-thickness);
 }
 
@@ -153,7 +211,7 @@ article .profile-section:last-child {
   height: 100%;
   min-width: 0;
   overflow: hidden;
-  background: var(--color-page-bg);
+  background: rgba(17, 17, 17, 0.1);
 }
 
 /* Profile: grain overlay on photo + media/image tiles */
@@ -290,33 +348,15 @@ article .profile-section:last-child {
  * Size is controlled by --profile-portrait-width-vs-tile where 70% = one base tile side.
  */
 .profile-photo-shell {
-  --profile-photo-gutter-x: var(
-    --profile-inner-gutter-x,
-    var(
-      --profile-inner-gutter,
-      var(--portrait-gap-left, var(--portrait-gap-bottom, 0))
-    )
-  );
-  --profile-photo-overhang-y: 1px;
   position: absolute;
-  top: var(--profile-photo-center-y, 25%);
-  left: var(--profile-photo-center-x, 50%);
-  right: auto;
-  bottom: auto;
-  /* tile side - 2 * (label distance from bottom edge) */
-  width: min(100%, var(--profile-portrait-width-vs-tile, 100%));
-  height: auto;
-  aspect-ratio: 1;
-  max-height: 100%;
+  inset: 0;
   overflow: hidden;
-  background: #111;
-  transform: translate(-50%, -50%);
+  background: var(--color-page-bg);
 }
 
 .profile-photo-box {
   position: absolute;
-  inset: var(--profile-photo-frame-size) var(--profile-photo-frame-size)
-    var(--profile-stitched-seam-thickness) var(--profile-photo-frame-size);
+  inset: var(--profile-portrait-frame-padding);
   overflow: hidden;
   background: var(--color-page-bg);
 }
@@ -345,18 +385,17 @@ article .profile-section:last-child {
 
 .profile-section > a[href='/why'] .page-button__inner {
   align-items: flex-end;
-  /* Profile tiles are half-width; multiply to keep % relative to the big box side. */
-  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
+  padding-block-end: var(--panel-padding-top, 10%);
 }
 
 .profile-section > a[href='/what-i-do'] .page-button__inner {
   align-items: flex-end;
-  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
+  padding-block-end: var(--panel-padding-top, 10%);
 }
 
 .profile-section .prof-tile--foundations .page-button__inner {
   align-items: flex-end;
-  padding-block-end: calc(var(--panel-padding-top, 10%) * 2);
+  padding-block-end: var(--panel-padding-top, 10%);
 }
 
 .prof-tile .page-button__inner {
@@ -510,9 +549,9 @@ article .profile-section:last-child {
 /* Left-anchored label strip: tile edge + fixed width (Why + What I do). */
 .profile-section > a[href='/why'] .page-button__text::before,
 .profile-section > a[href='/what-i-do'] .page-button__text::before {
-  left: calc(-1 * (10cqi + var(--profile-photo-frame-size, 0px)));
-  right: auto;
-  width: calc(var(--profile-top-label-strip-ratio, 80.5) * 1cqi);
+  left: -1000px;
+  right: calc(-1 * var(--profile-label-strip-tail-extra, 0.5em));
+  width: auto;
   -webkit-clip-path: none;
   clip-path: none;
 }
