@@ -40,6 +40,7 @@ article.has-buttons-panel {
   --profile-tile-text-inset-far-x: 6%;
   --profile-top-label-strip-ratio: 80.5;
   --profile-tile-text-inset-x: var(--profile-tile-text-inset-anchor-x);
+  --profile-reveal-text-inset-x: 10%;
   --profile-photo-frame-size: 0px;
   --profile-why-width: 25%;
   --profile-why-height: 25%;
@@ -135,7 +136,7 @@ article.has-buttons-panel {
   }
 }
 
-.profile-section > a[href='/why'] {
+.profile-section > a[href='/why-this'] {
   position: absolute;
   left: var(--profile-hero-optical-offset);
   width: min(var(--profile-why-width), 100%);
@@ -419,11 +420,11 @@ article .profile-section:last-child {
   container-name: profile-tile;
 }
 
-.profile-section > a[href='/why'].prof-tile {
+.profile-section > a[href='/why-this'].prof-tile {
   border-bottom-width: var(--profile-stitched-seam-thickness);
 }
 
-.profile-section > a[href='/why'] .page-button__inner {
+.profile-section > a[href='/why-this'] .page-button__inner {
   align-items: flex-end;
   padding-block-end: var(--panel-padding-top, 10%);
 }
@@ -569,7 +570,7 @@ article .profile-section:last-child {
   }
 }
 
-.profile-section > a[href='/why'] .page-button__text,
+.profile-section > a[href='/why-this'] .page-button__text,
 .profile-section > a[href='/what-i-do'] .page-button__text {
   --profile-label-strip-left: calc(
     var(--profile-tile-text-inset-anchor-x) + var(--profile-photo-frame-size) +
@@ -587,7 +588,7 @@ article .profile-section:last-child {
 }
 
 /* Left-anchored label strip: tile edge + fixed width (Why + What I do). */
-.profile-section > a[href='/why'] .page-button__text::before,
+.profile-section > a[href='/why-this'] .page-button__text::before,
 .profile-section > a[href='/what-i-do'] .page-button__text::before {
   left: -1000px;
   right: calc(-1 * var(--profile-label-strip-tail-extra, 0.5em));
@@ -656,7 +657,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile__reveal {
-  --profile-reveal-clip-safe-right: 2px;
+  --profile-reveal-clip-safe-right: 0px;
   /*
    * Empirical compositor/raster compensation for the right edge of "?"
    * under aggressive zoom. Keep small and tune only if clipping returns.
@@ -670,10 +671,12 @@ article .profile-section:last-child {
   align-items: stretch;
   justify-content: center;
   padding-block: 1.2rem;
-  padding-inline-start: var(--profile-tile-text-inset-x);
+  padding-inline-start: var(
+    --profile-reveal-text-inset-x
+  );
   /* Right inset factor: sync with REVEAL_RIGHT_MARGIN_RATIO_MIN in src/utils/profile-reveal-constants.ts */
   padding-inline-end: calc(
-    var(--profile-tile-text-inset-x) * 1.18 +
+    var(--profile-reveal-text-inset-x) * 1.02 +
       var(--profile-reveal-clip-safe-right) +
       var(--profile-reveal-right-edge-comp)
   );
@@ -852,8 +855,9 @@ article .profile-section:last-child {
   font-size: calc(1.68em * var(--profile-reveal-text-scale, 1));
   line-height: 1.18;
   font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -861,43 +865,17 @@ article .profile-section:last-child {
   font-size: calc(1.46em * var(--profile-reveal-text-scale, 1));
   line-height: 1.24;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  font-style: normal;
+  letter-spacing: 0.01em;
   opacity: 0.72;
   /* Same column as line-1 so type-fit can reserve one width for both rows. */
   max-width: 100%;
-  text-transform: uppercase;
-}
-
-.prof-tile__reveal .tile-state-secondary .writing {
-  display: inline-block;
   text-transform: none;
-  /* IMPORTANT: this em multiplies .line-1 (parent), so keep it only slightly above 1 to preserve proportions. */
-  font-size: 1.025em;
-  line-height: 1.18;
-  letter-spacing: 0.005em;
-  font-weight: 700;
-}
-
-.prof-tile__reveal .tile-state-secondary .writing::before {
-  content: '';
-  display: inline-block;
-  width: var(--profile-reveal-writing-gap);
-}
-
-.prof-tile__reveal .tile-state-secondary .question-mark {
-  display: inline-flex;
-  align-items: baseline;
-  margin-left: 0.12em;
-  font-size: 1em;
 }
 
 @media (max-width: 360px) {
   .prof-tile__reveal .tile-state-secondary .line-1 {
     letter-spacing: 0.06em;
-  }
-
-  .prof-tile__reveal .tile-state-secondary .question-mark {
-    margin-left: 0.08em;
   }
 }
 

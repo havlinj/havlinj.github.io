@@ -5,7 +5,7 @@ export const DEFAULT_REVEAL_TIMEOUT_MS = 7000;
 export const REVEAL_FADE_MS = 180;
 export const REVEAL_PAUSE_MS = 50;
 /** Conservative padding vs `clientWidth` / `clientHeight` (overflow-based fit). */
-export const REVEAL_OVERFLOW_H_PAD_PX = 10;
+export const REVEAL_OVERFLOW_H_PAD_PX = 6;
 export const REVEAL_OVERFLOW_V_PAD_PX = 4;
 /**
  * Last-glyph slack vs the stanza’s right padding edge. `scrollWidth` can match `clientWidth`
@@ -19,7 +19,7 @@ export const TYPE_FIT_EVENT = 'profileTileTypeFit';
 export const SELECTORS = {
   profileSection: '.profile-section',
   pageTitle: 'article h1.page-title',
-  whyTile: 'a.prof-tile[href="/why"]',
+  whyTile: 'a.prof-tile[href="/why-this"]',
   whatIDoTile: 'a.prof-tile[href="/what-i-do"]',
   pageButtonInner: '.page-button__inner',
   pageButtonText: '.page-button__text',

@@ -152,7 +152,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await openFoundationsReveal(tile);
     await expect(page).toHaveURL(/\/profile\/?$/);
     await expect(tile.locator('.prof-tile__reveal')).toContainText(
-      /Tried\s*Writing/i,
+      /Writing\s*might\s*be\s*the\s*better\s*place\s*to\s*look/i,
     );
   });
 
@@ -298,8 +298,10 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     );
     expect(layout.copyClass).toContain('tile-state-secondary');
     expect(layout.copyTextAlign).toBe('left');
-    expect(layout.primaryText).toMatch(/Tried\s*Writing\?/i);
-    expect(layout.secondaryText).toMatch(/Or\s*this\s*might\s*be\s*enough/i);
+    expect(layout.primaryText).toMatch(
+      /Writing\s*might\s*be\s*the\s*better\s*place\s*to\s*look/i,
+    );
+    expect(layout.secondaryText).toMatch(/Still,\s*step\s*in\s*here\.?/i);
     expect(layout.primaryPx).toBeGreaterThanOrEqual(0);
     expect(layout.secondaryPx).toBeGreaterThanOrEqual(0);
     if (layout.primaryPx > 0) {
@@ -390,7 +392,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     for (const width of PROFILE_SEAM_VIEWPORT_WIDTHS) {
       await page.setViewportSize({ width, height: 900 });
       /*
-       * Chromium can leave `border-bottom-width` on the Why tile stale after a viewport
+       * Chromium can leave `border-bottom-width` on the Why this tile stale after a viewport
        * resize even when inherited `--profile-*` vars on `.profile-section` already match
        * the new @media step — `getComputedStyle` shows an updated ratio but an old used
        * border. Reload when already on /profile so each width is a fresh style resolve.
@@ -402,10 +404,10 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       const { framePx, stitchedPx, innerW } = await page.evaluate(() => {
         const section = document.querySelector('.profile-section');
         const why = document.querySelector(
-          'a.prof-tile[href="/why"]',
+          'a.prof-tile[href="/why-this"]',
         ) as HTMLElement | null;
         if (!(section instanceof HTMLElement) || !why) {
-          throw new Error('missing profile Why tile or section');
+          throw new Error('missing profile Why this tile or section');
         }
         const frame = Number.parseFloat(
           getComputedStyle(section)
@@ -448,7 +450,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         sectionCs.getPropertyValue('--profile-photo-frame-size').trim(),
       );
       const whyTile = document.querySelector(
-        'a.prof-tile[href="/why"]',
+        'a.prof-tile[href="/why-this"]',
       ) as HTMLElement | null;
       const stitchedVar = whyTile
         ? Number.parseFloat(getComputedStyle(whyTile).borderBottomWidth) || 0
@@ -477,7 +479,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
       expect(tile.borderTop).toBeCloseTo(info.frameVar, 1);
       expect(tile.borderRight).toBeCloseTo(info.frameVar, 1);
       const bottomExpect =
-        tile.href === '/why' ? info.stitchedVar : info.frameVar;
+        tile.href === '/why-this' ? info.stitchedVar : info.frameVar;
       const leftExpect = tile.isFoundations ? info.stitchedVar : info.frameVar;
       expect(tile.borderBottom).toBeCloseTo(bottomExpect, 1);
       expect(tile.borderLeft).toBeCloseTo(leftExpect, 1);

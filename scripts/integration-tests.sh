@@ -104,9 +104,9 @@ echo "Running parallel-safe tests (excluding @serial)..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial"
 echo ""
-echo "Running serial-sensitive why tests with one worker..."
+echo "Running serial-sensitive why-this tests with one worker..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-route.spec.ts --workers=1
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-this-route.spec.ts --workers=1
 echo ""
 echo "Running serial-sensitive mobile profile tests with one worker..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi

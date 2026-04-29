@@ -12,7 +12,7 @@ All Unsplash media listed below are used according to the
   - Source: [Unsplash](https://unsplash.com/photos/oZ61KFUQsus)
   - Edits: dichromatic treatment, noise, grid effect
 
-- **Profile tile image (Why)**
+- **Profile tile image (Why this)**
   - Author: [Tommy](https://unsplash.com/@tommyluvi)
   - Source: [Unsplash](https://unsplash.com/photos/RCA--h6cmcU)
   - Edits: dichromatic treatment, noise

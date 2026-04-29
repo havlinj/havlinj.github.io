@@ -73,12 +73,12 @@ async function whyClipPosterImgPathname(page: Page): Promise<string> {
     });
 }
 
-test.describe('/why page @serial', () => {
+test.describe('/why-this page @serial', () => {
   test.beforeEach(async ({ page }) => {
     await gotoWhyWhenReady(page);
   });
 
-  test('reveals Why content and emits no runtime page errors on init', async ({
+  test('reveals Why this content and emits no runtime page errors on init', async ({
     page,
   }) => {
     const pageErrors: string[] = [];
@@ -86,7 +86,7 @@ test.describe('/why page @serial', () => {
       pageErrors.push(error.message);
     });
 
-    // beforeEach already navigated here; avoid an immediate second /why load in dev —
+    // beforeEach already navigated here; avoid an immediate second /why-this load in dev —
     // Vite can race on dynamic dep chunks (e.g. audit-*.js) and surface a spurious pageerror.
 
     await expect(
@@ -126,7 +126,7 @@ test.describe('/why page @serial', () => {
     expect(pageErrors, `Runtime errors: ${pageErrors.join(' | ')}`).toEqual([]);
   });
 
-  test('WHY_FIT_REFERENCE_LINE matches longest line among /why copy', async ({
+  test('WHY_FIT_REFERENCE_LINE matches longest line among /why-this copy', async ({
     page,
   }) => {
     const { maxLen, longest, refPresent } = await page.evaluate(() => {
@@ -158,9 +158,9 @@ test.describe('/why page @serial', () => {
     expect(longest).toBe(WHY_FIT_REFERENCE_LINE);
   });
 
-  test('shows Why title, lead copy, and loop video asset', async ({ page }) => {
+  test('shows Why this title, lead copy, and loop video asset', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Why', level: 1 }),
+      page.getByRole('heading', { name: 'Why this', level: 1 }),
     ).toBeVisible();
     await expect(page.locator('.why-page p.why-lead')).toHaveText(
       "I'm a software engineer.",

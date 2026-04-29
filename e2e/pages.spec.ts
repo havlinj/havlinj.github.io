@@ -11,10 +11,10 @@ import {
 } from './helpers';
 
 // ---------------------------------------------------------------------------
-// Profile page (/profile, /why)
+// Profile page (/profile, /why-this)
 // ---------------------------------------------------------------------------
 
-test.describe('Profile page (/profile, /why)', () => {
+test.describe('Profile page (/profile, /why-this)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/profile');
   });
@@ -29,9 +29,9 @@ test.describe('Profile page (/profile, /why)', () => {
     await expectNavLinkActive(page, 'Profile');
   });
 
-  test('has portrait, Why, What I do, Foundations links', async ({ page }) => {
+  test('has portrait, Why this, What I do, Foundations links', async ({ page }) => {
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Why this' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'What I do' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
@@ -40,7 +40,7 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(page.locator('article.has-buttons-panel')).toBeVisible();
     await expect(page.locator('.profile-section')).toBeVisible();
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Why' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Why this' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'What I do' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Foundations' })).toBeVisible();
   });
@@ -115,13 +115,13 @@ test.describe('Profile page (/profile, /why)', () => {
     await expect(footerHome).toHaveText('Home');
   });
 
-  test('profile tiles are positioned as Why TL, Portrait TR, What I do BL, Foundations BR', async ({
+  test('profile tiles are positioned as Why this TL, Portrait TR, What I do BL, Foundations BR', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
     const profileSection = page.locator('.profile-section');
     await expect(profileSection).toBeVisible();
-    const why = profileSection.getByRole('link', { name: 'Why' });
+    const why = profileSection.getByRole('link', { name: 'Why this' });
     const whatIDo = profileSection.getByRole('link', { name: 'What I do' });
     const foundations = profileSection.getByRole('link', {
       name: 'Foundations',
@@ -142,8 +142,8 @@ test.describe('Profile page (/profile, /why)', () => {
     expect(portraitBox.y).toBeLessThan(perBox.y);
   });
 
-  test('Why (/why) has active Profile in navbar', async ({ page }) => {
-    await page.goto('/why');
+  test('Why this (/why-this) has active Profile in navbar', async ({ page }) => {
+    await page.goto('/why-this');
     await expect(page.locator('.site-header')).toBeVisible();
     await expectNavLinkActive(page, 'Profile');
   });

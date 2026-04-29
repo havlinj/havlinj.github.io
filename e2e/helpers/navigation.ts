@@ -24,8 +24,8 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
 }
 
 /**
- * Why page: wait until why-box-scroll layout has applied (ready class or pad var).
- * Use after `reload()` on /why — avoids a redundant full `goto`.
+ * Why this page: wait until why-box-scroll layout has applied (ready class or pad var).
+ * Use after `reload()` on /why-this — avoids a redundant full `goto`.
  */
 export async function awaitWhyLayoutReady(page: Page): Promise<void> {
   await page.locator('.why-page .why-scroll').first().waitFor({
@@ -63,9 +63,9 @@ export async function awaitWhyLayoutReady(page: Page): Promise<void> {
   }
 }
 
-/** Navigate to /why and wait for layout script (see `awaitWhyLayoutReady`). */
+/** Navigate to /why-this and wait for layout script (see `awaitWhyLayoutReady`). */
 export async function gotoWhyWhenReady(page: Page): Promise<void> {
-  await page.goto('/why', { waitUntil: 'domcontentloaded' });
+  await page.goto('/why-this', { waitUntil: 'domcontentloaded' });
   await awaitWhyLayoutReady(page);
 }
 

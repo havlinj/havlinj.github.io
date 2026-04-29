@@ -21,7 +21,7 @@ const { Content } = await render(page);
 
 const PROFILE_SECTION_SLUGS = new Set([
   'profile',
-  'why',
+  'why-this',
   'what-i-do',
   'foundations',
 ]);
@@ -33,7 +33,7 @@ const activeSection = PROFILE_SECTION_SLUGS.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
 const isProfile = slug === 'profile';
-const isWhy = slug === 'why';
+const isWhy = slug === 'why-this';
 /** Same 1px rule under H1 as Contact (special-typography.css --page-title-rule-gap) */
 const hasPageTitleRule =
   slug === 'credits' || slug === 'what-i-do' || slug === 'foundations';

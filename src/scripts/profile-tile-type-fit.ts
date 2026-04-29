@@ -25,7 +25,7 @@ function signalTypeFitReady(): void {
 
 function readLayoutKey(): string {
   const section = document.querySelector('.profile-section');
-  const why = document.querySelector(".profile-section > a[href='/why']");
+  const why = document.querySelector(".profile-section > a[href='/why-this']");
   const what = document.querySelector(
     ".profile-section > a[href='/what-i-do']",
   );

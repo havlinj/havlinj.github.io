@@ -3,10 +3,10 @@
  * Keep `padding-inline-end` calc in profile.css (`* N` on `--profile-tile-text-inset-x`) in sync with
  * {@link REVEAL_RIGHT_MARGIN_RATIO_MIN}.
  */
-export const REVEAL_RIGHT_MARGIN_RATIO_MIN = 1.18;
+export const REVEAL_RIGHT_MARGIN_RATIO_MIN = 1.02;
 
 /** JS fit: right margin must exceed `left * ratio` by at least this (px). */
-export const REVEAL_RIGHT_RENDER_PAD_PX = 5;
+export const REVEAL_RIGHT_RENDER_PAD_PX = 1;
 
 /** JS fit: `rightMargin + epsilon >= left * ratio + pad`. */
 export const REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX = 0.5;

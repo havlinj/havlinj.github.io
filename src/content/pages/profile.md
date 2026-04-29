@@ -8,32 +8,30 @@ title: 'Profile'
     /* Edge-anchored controls: independent Y offsets in % of the big square */
     /* Shared vertical reference from the bottom edge of the big box */
     --profile-groups-reference-from-bottom: 0%;
-    --profile-why-offset-from-reference: 60%;
-    --profile-what-offset-from-reference: 7%;
+    --profile-why-offset-from-reference: 59%;
+    --profile-what-offset-from-reference: 6%;
     --profile-foundations-offset-from-reference: 9.5%;
-    --profile-portrait-y: 23%;
-    --profile-why-group-shift-y: 0%;
-    --profile-what-group-shift-y: 0%;
-    --profile-foundations-group-shift-y: 0%;
-    --profile-why-width: 46%;
-    --profile-why-height: 30%;
+    --profile-portrait-y: 22%;
+    --profile-why-width: 41%;
+    --profile-why-height: 32%;
     --profile-what-width: 45%;
-    --profile-what-height: 48%;
+    --profile-what-height: 45%;
     --profile-foundations-width: 36%;
-    --profile-foundations-height:33%;
+    --profile-foundations-height:38%;
     --profile-portrait-size: 29%;
     --profile-portrait-frame-padding: 3%;
     --profile-portrait-frame-padding-left-multiplier: 1.2;
     --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 25%;
     --profile-tile-text-inset-far-x: 10%;
+    --profile-reveal-text-inset-x: 8%;
     --panel-padding-top: 10%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1.12;
     --portrait-brightness: 1.08;
     --portrait-contrast: 1;
-    --portrait-opacity: 0.86;
+    --portrait-opacity: 0.92;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;
@@ -60,11 +58,11 @@ title: 'Profile'
     --profile-tile-4-brightness: 1;
     --profile-tile-4-contrast: 1;
     --profile-tile-4-opacity: 1;
-    --profile-reveal-text-scale: 1.35;
+    --profile-reveal-text-scale: 1.5;
   "
 >
   <a
-    href="/why"
+    href="/why-this"
     class="profile-tile profile-image-tile page-button prof-tile"
     style="
       --tile-bg: var(--profile-tile-1-bg);
@@ -77,13 +75,13 @@ title: 'Profile'
       --tile-contrast: var(--profile-tile-1-contrast);
       --tile-image-opacity: var(--profile-tile-1-opacity);
     "
-    aria-label="Why"
+    aria-label="Why this"
   >
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
-      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Why</span></span>
-      <span class="page-button__text">Why</span>
+      <span class="page-button__glow-wrap" aria-hidden="true"><span class="page-button__glow">Why this</span></span>
+      <span class="page-button__text">Why this</span>
     </span>
   </a>
   <a
@@ -172,11 +170,8 @@ title: 'Profile'
     <span class="prof-tile__reveal" aria-hidden="true">
       <span class="tile-state-secondary">
         <span class="tile-state-secondary__inner">
-        <span class="line-1"
-          >Tried<span class="writing">Writing</span
-          ><span class="question-mark">?</span></span
-        >
-        <span class="line-2">Or this might <br />be enough</span>
+        <span class="line-1">Writing might be<br>the better place to look</span>
+        <span class="line-2">Still, step in here</span>
         </span>
       </span>
     </span>
