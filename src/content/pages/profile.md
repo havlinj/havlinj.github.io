@@ -11,19 +11,19 @@ title: 'Profile'
     --profile-why-offset-from-reference: 60%;
     --profile-what-offset-from-reference: 6%;
     --profile-foundations-offset-from-reference: 9.5%;
-    --profile-portrait-y: 27%;
+    --profile-portrait-y: 26%;
     --profile-why-width: 41%;
     --profile-why-height: 34%;
     --profile-what-width: 47%;
     --profile-what-height: 45%;
-    --profile-foundations-width: 44%;
-    --profile-foundations-height:38%;
-    --profile-portrait-size: 34.5%;
-    --profile-portrait-frame-padding: 4%;
+    --profile-foundations-width: 40%;
+    --profile-foundations-height:30%;
+    --profile-portrait-size: 31%;
+    --profile-portrait-frame-padding: 3%;
     --profile-why-frame-padding: 4.3%;
     --profile-what-frame-padding: 3%;
-    --profile-foundations-frame-padding: 3.4%;
-    --profile-portrait-frame-padding-left-multiplier: 1.8;
+    --profile-foundations-frame-padding: 3%;
+    --profile-portrait-frame-padding-left-multiplier: 1.1;
     --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 22%;
     --profile-tile-text-inset-far-x: 17%;
@@ -40,7 +40,7 @@ title: 'Profile'
     --profile-tile-1-pos-y: 60%;
     --profile-tile-1-pan-x: 0%;
     --profile-tile-1-pan-y: 0%;
-    --profile-tile-1-zoom: 1;
+    --profile-tile-1-zoom: 0.5;
     --profile-tile-1-brightness: 1;
     --profile-tile-1-contrast: 1.2;
     --profile-tile-1-opacity: 0.9;
@@ -52,14 +52,14 @@ title: 'Profile'
     --profile-tile-3-brightness: 1.1;
     --profile-tile-3-contrast: 1;
     --profile-tile-3-opacity: 0.8;
-    --profile-tile-4-bg: url('/assets/pages/profile/kevin-shi-gWerWoydZtc-unsplashdichrom.png');
+    --profile-tile-4-bg: url('/assets/pages/profile/alejandro-barba-XJ9vxmAmFss-unsplashdichrom.png');
     --profile-tile-4-pos-x: 50%;
-    --profile-tile-4-pos-y: 60%;
+    --profile-tile-4-pos-y: 50%;
     --profile-tile-4-pan-x: 0%;
-    --profile-tile-4-pan-y: 0%;
-    --profile-tile-4-zoom: 1;
-    --profile-tile-4-brightness: 1;
-    --profile-tile-4-contrast: 1;
+    --profile-tile-4-pan-y: 2%;
+    --profile-tile-4-zoom: 0.6;
+    --profile-tile-4-brightness: 0.9;
+    --profile-tile-4-contrast: 1.2;
     --profile-tile-4-opacity: 1;
     --profile-reveal-text-scale: 1.5;
   "
@@ -80,7 +80,11 @@ title: 'Profile'
     "
     aria-label="Why this"
   >
-    <span class="profile-media-surface" aria-hidden="true"></span>
+    <span class="profile-media-surface" aria-hidden="true">
+      <span class="profile-media-surface__layer" aria-hidden="true">
+        <span class="profile-media-surface__paint" aria-hidden="true"></span>
+      </span>
+    </span>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
@@ -169,7 +173,11 @@ title: 'Profile'
       "
       aria-label="Foundations"
     >
-    <span class="profile-media-surface" aria-hidden="true"></span>
+    <span class="profile-media-surface" aria-hidden="true">
+      <span class="profile-media-surface__layer" aria-hidden="true">
+        <span class="profile-media-surface__paint" aria-hidden="true"></span>
+      </span>
+    </span>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">

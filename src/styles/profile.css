@@ -8,6 +8,10 @@
  *   --profile-stitched-seam-thickness (breakpoints below must match TS constants).
  * - Type fit (JS): --profile-tile-label-font-size, --profile-reveal-font-size,
  *   --foundations-reveal-uniform-scale (Foundations reveal stanza).
+ * - Image tile media: --tile-bg-size-w / --tile-bg-size-h, --tile-bg-overscan (__layer);
+ *   pan/zoom on .profile-media-surface__paint (__layer = filter only, avoids filter+transform bug).
+ * - Portrait: --profile-portrait-frame-padding on top/bottom (% of CB height). Left uses
+ *   calc(padding% * --profile-portrait-frame-padding-left-multiplier) (width %; reliable).
  * - Right column geometry is static in CSS (portrait top-right + Foundations bottom half).
  */
 
@@ -60,11 +64,6 @@ article.has-buttons-panel {
   --profile-what-frame-padding: var(--profile-portrait-frame-padding);
   --profile-foundations-frame-padding: var(--profile-portrait-frame-padding);
   --profile-portrait-frame-padding-left-multiplier: 1;
-  --profile-portrait-media-inset-block: var(--profile-portrait-frame-padding);
-  --profile-portrait-media-inset-side: calc(
-    var(--profile-portrait-frame-padding) *
-      var(--profile-portrait-frame-padding-left-multiplier)
-  );
   --profile-tile-frame-padding: var(--profile-portrait-frame-padding);
   --profile-tile-frame-padding-side-multiplier: var(
     --profile-portrait-frame-padding-left-multiplier
@@ -91,6 +90,10 @@ article.has-buttons-panel {
   /* Film grain: keep low — high opacity + overlay reads as mud/banding on weak paths. */
   --profile-grain-opacity: 0.12;
   --profile-grain-blend-mode: soft-light;
+  /* Image tiles: modest oversize vs cover + overscan for pan; tune per page on .profile-section. */
+  --tile-bg-size-w: auto;
+  --tile-bg-size-h: 168%;
+  --tile-bg-overscan: -65%;
 }
 
 .profile-section::before {
@@ -268,10 +271,10 @@ article .profile-section:last-child {
   right: var(--profile-tile-media-inset-right, 0px);
   bottom: var(--profile-tile-media-inset-bottom, 0px);
   left: var(--profile-tile-media-inset-left, 0px);
-  z-index: 1;
+  /* Stay under the tile border + label stack; pan/zoom live on inner __layer for image tiles. */
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  isolation: isolate;
 }
 
 /*
@@ -366,19 +369,37 @@ article .profile-section:last-child {
   pointer-events: none;
 }
 
-.profile-image-tile .profile-media-surface {
-  background-image: var(--tile-bg, none);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
+/*
+ * Image tiles: outer surface clips. __layer = overscan box + filter only (no transform).
+ * __paint = background + translate/scale — avoids filter+transform on one node (broken pan in
+ * Chromium-family compositing). Pan % is relative to __paint’s own box (fill of __layer).
+ */
+.profile-image-tile .profile-media-surface__layer {
+  position: absolute;
+  inset: var(--tile-bg-overscan, -65%);
+  pointer-events: none;
   filter: brightness(var(--tile-brightness, 1))
     contrast(var(--tile-contrast, 1));
-  transform: translate(var(--tile-pan-x, 0%), var(--tile-pan-y, 0%))
+}
+
+.profile-image-tile .profile-media-surface__paint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: var(--color-page-bg);
+  background-image: var(--tile-bg, none);
+  background-repeat: no-repeat;
+  background-size: var(--tile-bg-size-w, auto) var(--tile-bg-size-h, 168%);
+  background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
+  transform: translateX(var(--tile-pan-x, 0%)) translateY(var(--tile-pan-y, 0%))
     scale(var(--tile-zoom, 1));
   opacity: var(--tile-image-opacity, 1);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
+  pointer-events: none;
 }
 
 .profile-gif-tile__media {
@@ -422,10 +443,15 @@ article .profile-section:last-child {
   inset: 0;
   overflow: hidden;
   background: var(--color-page-bg);
-  --profile-tile-media-inset-top: var(--profile-portrait-media-inset-block);
+  /* top/bottom: % of shell height. */
+  --profile-tile-media-inset-top: var(--profile-portrait-frame-padding, 7%);
   --profile-tile-media-inset-right: 0px;
-  --profile-tile-media-inset-bottom: var(--profile-portrait-media-inset-block);
-  --profile-tile-media-inset-left: var(--profile-portrait-media-inset-side);
+  --profile-tile-media-inset-bottom: var(--profile-portrait-frame-padding, 7%);
+  /* Left: % of shell width × multiplier (single --profile-portrait-frame-padding token). */
+  --profile-tile-media-inset-left: calc(
+    var(--profile-portrait-frame-padding, 7%) *
+      var(--profile-portrait-frame-padding-left-multiplier)
+  );
 }
 
 /* Top-right: panel tile */
@@ -749,21 +775,20 @@ article .profile-section:last-child {
 }
 
 /*
- * Tile photo + grain sit on the anchor (::before / ::after). While .page-button__bg fades out
- * for reveal, those layers would otherwise show through → image “blink”. Same during
- * is-reveal-opening when bg is forced opacity:0 but hover hasn’t repainted yet.
+ * Tile photo + grain: grain stays on ::after. Photo is .profile-media-surface. While
+ * .page-button__bg fades out for reveal, hide media + grain so nothing flashes through.
  */
-.profile-image-tile.prof-tile--foundations::before,
-.profile-image-tile.prof-tile--foundations::after {
+.profile-image-tile.prof-tile--foundations::after,
+.profile-image-tile.prof-tile--foundations .profile-media-surface {
   transition: opacity 0.18s ease;
 }
 
-.profile-image-tile.prof-tile--foundations.is-revealed::before,
 .profile-image-tile.prof-tile--foundations.is-revealed::after,
-.profile-image-tile.prof-tile--foundations.is-reveal-fading-out::before,
 .profile-image-tile.prof-tile--foundations.is-reveal-fading-out::after,
-.profile-image-tile.prof-tile--foundations.is-reveal-opening::before,
-.profile-image-tile.prof-tile--foundations.is-reveal-opening::after {
+.profile-image-tile.prof-tile--foundations.is-reveal-opening::after,
+.profile-image-tile.prof-tile--foundations.is-revealed .profile-media-surface,
+.profile-image-tile.prof-tile--foundations.is-reveal-fading-out .profile-media-surface,
+.profile-image-tile.prof-tile--foundations.is-reveal-opening .profile-media-surface {
   opacity: 0;
   /* Hide immediately when entering reveal choreography; fade back in when returning to state1 */
   transition: opacity 0s linear;
