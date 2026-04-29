@@ -16,11 +16,11 @@ title: 'Profile'
     --profile-why-height: 32%;
     --profile-what-width: 45%;
     --profile-what-height: 45%;
-    --profile-foundations-width: 36%;
+    --profile-foundations-width: 42%;
     --profile-foundations-height:38%;
     --profile-portrait-size: 29%;
     --profile-portrait-frame-padding: 3%;
-    --profile-portrait-frame-padding-left-multiplier: 1.2;
+    --profile-portrait-frame-padding-left-multiplier: 1.8;
     --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 25%;
     --profile-tile-text-inset-far-x: 10%;

@@ -57,6 +57,10 @@ article.has-buttons-panel {
   --profile-portrait-size: 25%;
   --profile-portrait-frame-padding: 7%;
   --profile-portrait-frame-padding-left-multiplier: 1;
+  --profile-tile-frame-padding: var(--profile-portrait-frame-padding);
+  --profile-tile-frame-padding-side-multiplier: var(
+    --profile-portrait-frame-padding-left-multiplier
+  );
   --profile-portrait-frame-anchor-extension: 0%;
   --profile-hero-optical-offset: var(--hero-optical-offset, 0.1em);
   --profile-hero-bg-brightness: var(--hero-bg-brightness, 0.88);
@@ -285,10 +289,13 @@ article .profile-section:last-child {
 /* What I do: poster + video stack (sync behaviour with why-clip-media.ts + WhyContent). */
 .profile-gif-tile__stack {
   position: absolute;
-  inset: -1px;
+  top: calc(-1px + var(--profile-tile-media-inset-top, 0px));
+  right: calc(-1px + var(--profile-tile-media-inset-right, 0px));
+  bottom: calc(-1px + var(--profile-tile-media-inset-bottom, 0px));
+  left: calc(-1px + var(--profile-tile-media-inset-left, 0px));
   z-index: 1;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
+  width: auto;
+  height: auto;
   overflow: hidden;
   pointer-events: none;
 }
@@ -330,7 +337,10 @@ article .profile-section:last-child {
   content: '';
   position: absolute;
   /* Prevent occasional 1px dark seams from subpixel transforms/compositing */
-  inset: -1px;
+  top: calc(-1px + var(--profile-tile-media-inset-top, 0px));
+  right: calc(-1px + var(--profile-tile-media-inset-right, 0px));
+  bottom: calc(-1px + var(--profile-tile-media-inset-bottom, 0px));
+  left: calc(-1px + var(--profile-tile-media-inset-left, 0px));
   background-image: var(--tile-bg, none);
   background-repeat: no-repeat;
   background-size: cover;
@@ -387,17 +397,19 @@ article .profile-section:last-child {
 }
 
 .profile-photo-box {
+  --profile-portrait-frame-padding-left-extra: calc(
+    var(--profile-portrait-frame-padding) *
+      (var(--profile-portrait-frame-padding-left-multiplier, 1) - 1)
+  );
+  --profile-portrait-frame-padding-left: calc(
+    var(--profile-portrait-frame-padding) +
+      var(--profile-portrait-frame-padding-left-extra)
+  );
   position: absolute;
   top: var(--profile-portrait-frame-padding);
   bottom: var(--profile-portrait-frame-padding);
-  left: calc(
-    var(--profile-portrait-frame-padding) *
-      var(--profile-portrait-frame-padding-left-multiplier)
-  );
-  right: auto;
-  height: calc(100% - (2 * var(--profile-portrait-frame-padding)));
-  width: auto;
-  aspect-ratio: 1 / 1;
+  left: var(--profile-portrait-frame-padding-left);
+  right: 0;
   overflow: hidden;
   background: var(--color-page-bg);
 }
@@ -418,10 +430,21 @@ article .profile-section:last-child {
   /* cqi/cqw for font caps = this tile’s width (grid cell) */
   container-type: inline-size;
   container-name: profile-tile;
+  --profile-tile-media-inset-top: 0px;
+  --profile-tile-media-inset-right: 0px;
+  --profile-tile-media-inset-bottom: 0px;
+  --profile-tile-media-inset-left: 0px;
 }
 
 .profile-section > a[href='/why-this'].prof-tile {
   border-bottom-width: var(--profile-stitched-seam-thickness);
+  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-right: calc(
+    var(--profile-tile-frame-padding) *
+      var(--profile-tile-frame-padding-side-multiplier)
+  );
+  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-left: 0px;
 }
 
 .profile-section > a[href='/why-this'] .page-button__inner {
@@ -434,9 +457,29 @@ article .profile-section:last-child {
   padding-block-end: var(--panel-padding-top, 10%);
 }
 
+.profile-section > a[href='/what-i-do'].prof-tile {
+  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-right: calc(
+    var(--profile-tile-frame-padding) *
+      var(--profile-tile-frame-padding-side-multiplier)
+  );
+  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-left: 0px;
+}
+
 .profile-section .prof-tile--foundations .page-button__inner {
   align-items: flex-end;
   padding-block-end: var(--panel-padding-top, 10%);
+}
+
+.profile-section .prof-tile--foundations.prof-tile {
+  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-right: 0px;
+  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-left: calc(
+    var(--profile-tile-frame-padding) *
+      var(--profile-tile-frame-padding-side-multiplier)
+  );
 }
 
 .prof-tile .page-button__inner {
