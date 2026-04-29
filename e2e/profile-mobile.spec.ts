@@ -23,7 +23,7 @@ async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
 test.describe('/profile mobile regressions @serial', () => {
   test('Foundations reveal visual snapshot on mobile', async ({ page }) => {
     await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 2500);
+    await setRevealTimeoutMs(page, 1200);
 
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
@@ -38,7 +38,7 @@ test.describe('/profile mobile regressions @serial', () => {
 
   test('Foundations reveal text fits inside state2 box', async ({ page }) => {
     await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 2500);
+    await setRevealTimeoutMs(page, 1200);
 
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
@@ -77,40 +77,6 @@ test.describe('/profile mobile regressions @serial', () => {
       )
       .toMatchObject({ hFits: true });
 
-    await expect
-      .poll(
-        () =>
-          page.evaluate(() => {
-            const reveal = document.querySelector(
-              '.prof-tile--foundations .prof-tile__reveal',
-            );
-            const stanza = reveal?.querySelector('.tile-state-secondary');
-            const line1 = reveal?.querySelector(
-              '.tile-state-secondary .line-1',
-            );
-            if (!(reveal instanceof HTMLElement))
-              throw new Error('missing .prof-tile__reveal');
-            if (!(stanza instanceof HTMLElement))
-              throw new Error('missing .tile-state-secondary');
-            if (!(line1 instanceof HTMLElement))
-              throw new Error('missing .line-1');
-            const stanzaRect = stanza.getBoundingClientRect();
-            const lineRect = line1.getBoundingClientRect();
-            const revealRect = reveal.getBoundingClientRect();
-            return {
-              rightGap: stanzaRect.right - lineRect.right,
-              leftMargin: lineRect.left - revealRect.left,
-              rightMargin: revealRect.right - lineRect.right,
-            };
-          }),
-        { timeout: 2500, intervals: [100, 180, 300] },
-      )
-      .toMatchObject({
-        rightGap: expect.any(Number),
-        leftMargin: expect.any(Number),
-        rightMargin: expect.any(Number),
-      });
-
     const marginCheck = await page.evaluate(() => {
       const reveal = document.querySelector(
         '.prof-tile--foundations .prof-tile__reveal',
@@ -138,11 +104,6 @@ test.describe('/profile mobile regressions @serial', () => {
       marginCheck.leftMargin * REVEAL_RIGHT_MARGIN_RATIO_MIN +
         REVEAL_RIGHT_RENDER_PAD_PX,
     );
-
-    // Visual guardrail for real clipping regressions.
-    await expect(
-      page.locator('.prof-tile--foundations .prof-tile__reveal'),
-    ).toHaveScreenshot('foundations-reveal-mobile.png');
   });
 
   test('Foundations returns to state1 colors after state2 timeout', async ({
