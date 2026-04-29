@@ -18,38 +18,23 @@ All Unsplash media listed below are used according to the
   - Edits: dichromatic treatment, noise
 
 - **Profile tile image (Foundations)**
-  - Author: [Evgeniy Sholokh](https://unsplash.com/@xovom)
-  - Source: [Unsplash](https://unsplash.com/photos/5Xf2hLm6yj8)
+  - Author: [Kevin Shi](https://unsplash.com/@kevinshi)
+  - Source: [Unsplash](https://unsplash.com/photos/gWerWoydZtc)
   - Edits: dichromatic treatment, noise
 
-- **Writing page panel image**
-  - Author: [Joschka Silzle](https://unsplash.com/@joschka_silzle)
-  - Source: [Unsplash](https://unsplash.com/photos/90pi4AI8MwA)
-  - Edits: dichromatic treatment
-
-- **Writing pool image**
-  - Author: [K8](https://unsplash.com/id/@_k8_)
-  - Source: [Unsplash](https://unsplash.com/photos/jjSmhXytw)
+- **Profile page background image**
+  - Author: [Evgeni Tcherkasski](https://unsplash.com/@evgenit)
+  - Source: [Unsplash](https://unsplash.com/photos/oH31ggeurFc)
   - Edits: dichromatic treatment, noise
 
-- **Writing pool image**
-  - Author: [Nguyen Hiep](https://unsplash.com/@hieptltb97)
-  - Source: [Unsplash](https://unsplash.com/photos/mvYyxn02rjk)
+- **Writing page background image**
+  - Author: [Weichao Deng](https://unsplash.com/@weichao_deng)
+  - Source: [Unsplash](https://unsplash.com/photos/k0JQkPtfN3s)
   - Edits: dichromatic treatment, noise
 
-- **Writing pool image**
-  - Author: [Samuel Regan-Asante](https://unsplash.com/@reganography)
-  - Source: [Unsplash](https://unsplash.com/photos/POCZmzEPxNc)
-  - Edits: dichromatic treatment, noise
-
-- **Writing pool image**
-  - Author: [Thomas Kinto](https://unsplash.com/@thomaskinto)
-  - Source: [Unsplash](https://unsplash.com/photos/3WvTJrQBb38)
-  - Edits: dichromatic treatment, noise
-
-- **Writing pool image**
-  - Author: [Thomas Kinto](https://unsplash.com/@thomaskinto)
-  - Source: [Unsplash](https://unsplash.com/photos/fBTQhWKEf20)
+- **Contact page background image**
+  - Author: [Guillaume Didelet](https://unsplash.com/@guillaumedidelet)
+  - Source: [Unsplash](https://unsplash.com/photos/ivuU1X9ULVk)
   - Edits: dichromatic treatment, noise
 
 ### Videos

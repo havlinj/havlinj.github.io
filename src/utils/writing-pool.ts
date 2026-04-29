@@ -7,25 +7,13 @@ export type WritingPoolEntry = readonly [
 
 export const FALLBACK_WRITING_POOL_OPACITY = 0.94;
 
-export const WRITING_POOL_ENTRIES: WritingPoolEntry[] = [
-  [
-    '/assets/pages/writing/pool/joschka-silzle-90pi4AI8MwA_dichrom.png',
-    0.9,
-    0,
-    0,
-  ],
-  [
-    '/assets/pages/writing/pool/nguy-n-hi-p-mvYyxn02rjk-unsplash_dichrom.png',
-    0.94,
-    0,
-    0,
-  ],
-  [
-    '/assets/pages/writing/pool/samuel-regan-asante-POCZmzEPxNc-unsplash_dichrom.png',
-    0.8,
-    0,
-    0,
-  ],
+// TODO(refactor-writing-bg): Single fixed writing background for now.
+// Keep this marker until pool rotation is intentionally reintroduced.
+export const WRITING_FIXED_ENTRY: WritingPoolEntry = [
+  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplashdichrom.png',
+  0.94,
+  0,
+  0,
 ];
 
 export type WritingPoolResolvedEntry = {
@@ -34,19 +22,6 @@ export type WritingPoolResolvedEntry = {
   nudgeX: number;
   nudgeY: number;
 };
-
-export type WritingPoolStep = {
-  entry: WritingPoolResolvedEntry;
-  currentIndex: number;
-  nextIndex: number;
-};
-
-export function readNonNegativeInt(
-  rawValue: string | null | undefined,
-): number {
-  const parsed = Number.parseInt(rawValue ?? '0', 10);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-}
 
 function safeNumber(value: unknown, fallback: number): number {
   const parsed = Number(value);
@@ -64,22 +39,6 @@ export function resolveWritingPoolEntry(
     opacity: safeNumber(opacity, FALLBACK_WRITING_POOL_OPACITY),
     nudgeX: safeNumber(nudgeX, 0),
     nudgeY: safeNumber(nudgeY, 0),
-  };
-}
-
-export function getWritingPoolStep(
-  entries: unknown[],
-  rawIndex: string | null | undefined,
-): WritingPoolStep | null {
-  if (!Array.isArray(entries) || entries.length === 0) return null;
-  const currentIndex = readNonNegativeInt(rawIndex) % entries.length;
-  const nextIndex = (currentIndex + 1) % entries.length;
-  const resolved = resolveWritingPoolEntry(entries[currentIndex]);
-  if (!resolved) return null;
-  return {
-    entry: resolved,
-    currentIndex,
-    nextIndex,
   };
 }
 

@@ -6,27 +6,34 @@ title: 'Profile'
   class="profile-section profile-section--loading"
   style="
     /* Edge-anchored controls: independent Y offsets in % of the big square */
-    --profile-why-y: 24%;
-    --profile-what-y: 72%;
-    --profile-portrait-y: 24%;
-    --profile-foundations-y: 72%;
-    --profile-why-width: 25%;
-    --profile-why-height: 25%;
-    --profile-what-width: 28%;
-    --profile-what-height: 28%;
-    --profile-foundations-width: 30%;
-    --profile-foundations-height:30%;
-    --profile-portrait-size: 24%;
-    --profile-portrait-frame-padding: 11%;
+    /* Shared vertical reference from the bottom edge of the big box */
+    --profile-groups-reference-from-bottom: 0%;
+    --profile-why-offset-from-reference: 60%;
+    --profile-what-offset-from-reference: 7%;
+    --profile-foundations-offset-from-reference: 9.5%;
+    --profile-portrait-y: 23%;
+    --profile-why-group-shift-y: 0%;
+    --profile-what-group-shift-y: 0%;
+    --profile-foundations-group-shift-y: 0%;
+    --profile-why-width: 46%;
+    --profile-why-height: 30%;
+    --profile-what-width: 45%;
+    --profile-what-height: 48%;
+    --profile-foundations-width: 36%;
+    --profile-foundations-height:33%;
+    --profile-portrait-size: 29%;
+    --profile-portrait-frame-padding: 3%;
+    --profile-portrait-frame-padding-left-multiplier: 1.2;
+    --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 25%;
     --profile-tile-text-inset-far-x: 10%;
     --panel-padding-top: 10%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
-    --portrait-zoom: 1;
+    --portrait-zoom: 1.12;
     --portrait-brightness: 1.08;
     --portrait-contrast: 1;
-    --portrait-opacity: 0.95;
+    --portrait-opacity: 0.86;
     --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
     --profile-tile-1-pos-x: 50%;
     --profile-tile-1-pos-y: 60%;
@@ -44,15 +51,15 @@ title: 'Profile'
     --profile-tile-3-brightness: 1.1;
     --profile-tile-3-contrast: 1;
     --profile-tile-3-opacity: 0.8;
-    --profile-tile-4-bg: url('/assets/pages/profile/evgeniy-sholokh-5Xf2hLm6yj8-unsplash_dichrom.png');
+    --profile-tile-4-bg: url('/assets/pages/profile/kevin-shi-gWerWoydZtc-unsplashdichrom.png');
     --profile-tile-4-pos-x: 50%;
     --profile-tile-4-pos-y: 60%;
     --profile-tile-4-pan-x: 0%;
     --profile-tile-4-pan-y: 0%;
     --profile-tile-4-zoom: 1;
-    --profile-tile-4-brightness: 1.15;
+    --profile-tile-4-brightness: 1;
     --profile-tile-4-contrast: 1;
-    --profile-tile-4-opacity: 0.9;
+    --profile-tile-4-opacity: 1;
     --profile-reveal-text-scale: 1.35;
   "
 >

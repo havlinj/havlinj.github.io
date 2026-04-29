@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
 import {
   FALLBACK_WRITING_POOL_OPACITY,
-  WRITING_POOL_ENTRIES,
+  WRITING_FIXED_ENTRY,
   resolveWritingPoolEntry,
   toPanelBgPosition,
 } from '../utils/writing-pool';
@@ -12,8 +12,7 @@ import {
 const posts = await getCollection('blog');
 const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
-const writingPoolEntries = WRITING_POOL_ENTRIES;
-const defaultEntry = resolveWritingPoolEntry(writingPoolEntries[0]);
+const defaultEntry = resolveWritingPoolEntry(WRITING_FIXED_ENTRY);
 const defaultWritingBgUrl = defaultEntry?.url ?? 'none';
 const defaultWritingBgOpacity =
   defaultEntry?.opacity ?? FALLBACK_WRITING_POOL_OPACITY;
@@ -124,14 +123,12 @@ function formatWritingListDate(d: Date): string {
       }
     </style>
   </noscript>
-  <script is:inline define:vars={{ writingPoolEntries }}>
+  <script is:inline>
     (() => {
       const SELECTORS = {
         writingArticle: 'article.writing-page',
         writingGroups: '.writing-page .writing-groups',
       };
-      const STORAGE_KEY = 'writing-bg-index';
-      const writingArticle = document.querySelector(SELECTORS.writingArticle);
       const writingGroups = document.querySelector(SELECTORS.writingGroups);
 
       let buttonsRevealed = false;
@@ -150,69 +147,6 @@ function formatWritingListDate(d: Date): string {
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       fontsReady.finally(() => revealWritingButtons());
       window.setTimeout(revealWritingButtons, 2500);
-
-      if (!writingArticle) return;
-      if (!Array.isArray(writingPoolEntries) || writingPoolEntries.length === 0)
-        return;
-
-      const step = getWritingPoolStep(
-        writingPoolEntries,
-        window.localStorage.getItem(STORAGE_KEY),
-      );
-      if (!step) return;
-
-      window.localStorage.setItem(STORAGE_KEY, String(step.nextIndex));
-      writingArticle.style.setProperty(
-        '--panel-bg',
-        `url('${step.entry.url}')`,
-      );
-      writingArticle.style.setProperty(
-        '--panel-bg-layer-opacity',
-        String(step.entry.opacity),
-      );
-      writingArticle.style.setProperty(
-        '--panel-bg-pos-x',
-        toPanelBgPosition(step.entry.nudgeX),
-      );
-      writingArticle.style.setProperty(
-        '--panel-bg-pos-y',
-        toPanelBgPosition(step.entry.nudgeY),
-      );
-
-      function readNonNegativeInt(rawValue) {
-        const parsed = Number.parseInt(rawValue ?? '0', 10);
-        return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-      }
-
-      function getWritingPoolStep(entries, rawIndex) {
-        if (!Array.isArray(entries) || entries.length === 0) return null;
-        const currentIndex = readNonNegativeInt(rawIndex) % entries.length;
-        const nextIndex = (currentIndex + 1) % entries.length;
-        const entry = resolveWritingPoolEntry(entries[currentIndex]);
-        if (!entry) return null;
-        return { entry, currentIndex, nextIndex };
-      }
-
-      function resolveWritingPoolEntry(value) {
-        if (!Array.isArray(value) || value.length < 4) return null;
-        const [url, opacity, nudgeX, nudgeY] = value;
-        if (typeof url !== 'string' || url.length === 0) return null;
-        return {
-          url,
-          opacity: safeNumber(opacity, 0.94),
-          nudgeX: safeNumber(nudgeX, 0),
-          nudgeY: safeNumber(nudgeY, 0),
-        };
-      }
-
-      function safeNumber(value, fallback) {
-        const parsed = Number(value);
-        return Number.isFinite(parsed) ? parsed : fallback;
-      }
-
-      function toPanelBgPosition(value) {
-        return `calc(50% + ${value}px)`;
-      }
     })();
   </script>
 </Layout>
