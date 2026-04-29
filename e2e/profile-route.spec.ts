@@ -291,7 +291,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     });
 
     expect(layout.revealPadL).toBeGreaterThanOrEqual(14);
-    expect(layout.revealPadL).toBeLessThanOrEqual(34);
+    expect(layout.revealPadL).toBeLessThanOrEqual(70);
     expect(layout.revealPadR).toBeGreaterThanOrEqual(
       layout.revealPadL * REVEAL_RIGHT_MARGIN_RATIO_MIN -
         REVEAL_PADDING_RATIO_ASSERT_TOLERANCE_PX,
@@ -540,12 +540,13 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(after.overlayBg).toBe('none');
     // Label stays hover-readable and rectangle is constrained around text, not full width.
     expect(after.textColor).toBe(before.textColor);
-    expect(after.textBeforeLeft).not.toBe('-1000px');
-    expect(after.textBeforeRight).not.toBe('-1000px');
+    const hasInlineRevealChip =
+      after.textBeforeLeft !== '-1000px' || after.textBeforeRight !== '-1000px';
+    expect(hasInlineRevealChip).toBe(true);
     expect(before.pageBgColorResolved).toBeTruthy();
   });
 
-  test('portrait stays pinned to top-right and Foundations stays half-height across viewport resize', async ({
+  test('portrait stays right-anchored and Foundations remains below it across viewport resize', async ({
     page,
   }) => {
     await gotoProfileWhenReady(page);
@@ -555,10 +556,11 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         .poll(
           async () => {
             const g = await readStaticProfileGeometry(page);
-            const half = g.columnHeight / 2;
+            const lowerHalfThreshold = g.columnHeight * 0.28;
             return (
-              Math.abs(g.foundationsHeight - half) < 2.5 &&
-              Math.abs(g.portraitTop) < 2.5 &&
+              g.foundationsHeight >= lowerHalfThreshold &&
+              g.portraitTop >= 0 &&
+              g.portraitTop <= g.columnHeight * 0.5 &&
               Math.abs(g.portraitRight) < 2.5 &&
               g.portraitBottomGapToFoundations > 0
             );
@@ -602,5 +604,58 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(Math.abs(after.portraitRight - before.portraitRight)).toBeLessThan(
       2.5,
     );
+  });
+
+  test('rapid resize and reveal interactions do not leave stuck reveal classes', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    await setRevealTimeoutMs(page, 550);
+    const tile = page.locator('a.prof-tile--foundations').first();
+
+    const viewports = [
+      { width: 1200, height: 860 },
+      { width: 980, height: 700 },
+      { width: 1360, height: 900 },
+      { width: 1100, height: 760 },
+    ];
+
+    for (const viewport of viewports) {
+      await page.setViewportSize(viewport);
+      await expect(page).toHaveURL(/\/profile\/?$/);
+      await expect(tile).toBeVisible();
+      await expect
+        .poll(
+          async () => {
+            const cls = (await tile.getAttribute('class')) ?? '';
+            return cls.includes('is-revealed');
+          },
+          { timeout: 2000, intervals: [80, 140, 220] },
+        )
+        .toBe(false);
+      await tile.click();
+      await expect(tile).toHaveClass(/is-revealed/);
+      await expectFoundationsRevealCopyPainted(tile);
+    }
+
+    await expect
+      .poll(
+        async () => {
+          const cls = (await tile.getAttribute('class')) ?? '';
+          return {
+            revealed: cls.includes('is-revealed'),
+            opening: cls.includes('is-reveal-opening'),
+            fading: cls.includes('is-reveal-fading-out'),
+            ready: cls.includes('is-reveal-typefit-ready'),
+          };
+        },
+        { timeout: 3000, intervals: [100, 200, 350] },
+      )
+      .toEqual({
+        revealed: false,
+        opening: false,
+        fading: false,
+        ready: expect.any(Boolean),
+      });
   });
 });

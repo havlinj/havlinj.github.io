@@ -51,9 +51,10 @@ function readWritingButtonMetrics() {
 
 async function hasWritingFallbackRuleInSource() {
   const css = await readFile('src/styles/writing.css', 'utf-8');
-  const hasDefaultItalic = /\.writing-page\s+\.page-button__text\s*\{[\s\S]*?font-style:\s*italic\s*;/m.test(
-    css,
-  );
+  const hasDefaultItalic =
+    /\.writing-page\s+\.page-button__text\s*\{[\s\S]*?font-style:\s*italic\s*;/m.test(
+      css,
+    );
   const hasObliqueEnhancement =
     /@supports\s*\(\s*font-style:\s*oblique\s+7deg\s*\)\s*\{[\s\S]*?\.writing-page\s+\.page-button__text\s*\{[\s\S]*?font-style:\s*oblique\s+7deg\s*;/m.test(
       css,

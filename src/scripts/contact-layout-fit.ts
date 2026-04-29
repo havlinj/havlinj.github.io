@@ -100,7 +100,10 @@ function startContactInsetFit(): void {
 
   function readWritingRowGapPx(panelTopPadPx: number): number {
     const raw = getComputedStyle(panelEl).getPropertyValue('--writing-row-gap');
-    return resolveLengthPx(raw, CONTACT_LAYOUT.defaultBoxGapPx || panelTopPadPx);
+    return resolveLengthPx(
+      raw,
+      CONTACT_LAYOUT.defaultBoxGapPx || panelTopPadPx,
+    );
   }
 
   function measureRectOuterSize(rectEl: HTMLElement): { w: number; h: number } {

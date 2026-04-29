@@ -294,7 +294,7 @@ test.describe('Writing page (/writing)', () => {
     await expect(bg).toHaveCSS('background-color', RGB_INK);
   });
 
-  test('writing background rotates across visits using localStorage index', async ({
+  test('writing background stays fixed across visits without localStorage rotation', async ({
     page,
   }) => {
     await page.evaluate(() => {
@@ -323,11 +323,57 @@ test.describe('Writing page (/writing)', () => {
 
     expect(firstBg).toMatch(/url\(.+\)/);
     expect(secondBg).toMatch(/url\(.+\)/);
-    // When pool has at least 2 images, background should advance.
-    expect(secondBg).not.toBe(firstBg);
-    expect(firstIndex).not.toBeNull();
-    expect(secondIndex).not.toBeNull();
-    expect(firstIndex).not.toBe(secondIndex);
+    expect(secondBg).toBe(firstBg);
+    expect(firstIndex).toBeNull();
+    expect(secondIndex).toBeNull();
+  });
+
+  test('writing never writes rotation state to web storage', async ({
+    page,
+  }) => {
+    const readKeys = async () =>
+      page.evaluate(() => ({
+        local: Object.keys(window.localStorage),
+        session: Object.keys(window.sessionStorage),
+      }));
+
+    const before = await readKeys();
+    await page.goto('/writing');
+    const afterFirstVisit = await readKeys();
+    await page.reload();
+    const afterReload = await readKeys();
+
+    const hasWritingBgKey = (keys: string[]) =>
+      keys.some((key) => key.includes('writing-bg-index'));
+
+    expect(hasWritingBgKey(before.local)).toBe(false);
+    expect(hasWritingBgKey(before.session)).toBe(false);
+    expect(hasWritingBgKey(afterFirstVisit.local)).toBe(false);
+    expect(hasWritingBgKey(afterFirstVisit.session)).toBe(false);
+    expect(hasWritingBgKey(afterReload.local)).toBe(false);
+    expect(hasWritingBgKey(afterReload.session)).toBe(false);
+  });
+
+  test('writing remains usable when background image request fails', async ({
+    page,
+  }) => {
+    await page.route(
+      '**/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplashdichrom.png',
+      async (route) => {
+        await route.fulfill({ status: 404, body: '' });
+      },
+    );
+
+    await page.goto('/writing');
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole('heading', { name: 'Writing', level: 1 }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.post-list a.page-button').first(),
+    ).toBeVisible();
   });
 });
 
@@ -359,8 +405,10 @@ test.describe('Credits page (/credits)', () => {
     ).toBeVisible();
     await expect(page.getByText('AltumCode')).toBeVisible();
     await expect(page.getByText('Tommy')).toBeVisible();
-    await expect(page.getByText('Evgeniy Sholokh')).toBeVisible();
-    await expect(page.getByText('Joschka Silzle')).toBeVisible();
+    await expect(page.getByText('Kevin Shi')).toBeVisible();
+    await expect(page.getByText('Evgeni Tcherkasski')).toBeVisible();
+    await expect(page.getByText('Weichao Deng')).toBeVisible();
+    await expect(page.getByText('Guillaume Didelet')).toBeVisible();
     await expect(page.getByText('Raddy')).toBeVisible();
     await expect(page.getByText('Nicola Narraci')).toBeVisible();
   });
@@ -405,16 +453,16 @@ test.describe('Contact page (/contact)', () => {
 
   test('landing shows intro on panel and links to form', async ({ page }) => {
     await page.goto('/contact');
-    await expect(
-      page.locator('.contact-page__fit-content--visible'),
-    ).toBeAttached();
+    await expect(page.locator('.contact-page__fit-content')).toBeAttached();
     await expect(
       page.locator('.contact-page__inset-rect--intro'),
     ).toBeVisible();
     await expect(page.locator('.contact-page__intro').first()).toBeVisible();
-    await expect(page.getByText('Glad you stopped by.')).toBeVisible();
+    await expect(page.getByText('Thanks for stopping by.')).toBeVisible();
     await expect(
-      page.getByText('Open to engineering opportunities.'),
+      page.getByText(
+        'I’m open to engineering roles, architecture projects, and collaborations.',
+      ),
     ).toBeVisible();
 
     const formLink = page.getByRole('link', { name: /Direct contact/i });
@@ -439,9 +487,7 @@ test.describe('Contact page (/contact)', () => {
     for (const viewport of viewports) {
       await page.setViewportSize(viewport);
       await page.goto('/contact');
-      await expect(
-        page.locator('.contact-page__fit-content--visible'),
-      ).toBeAttached();
+      await expect(page.locator('.contact-page__fit-content')).toBeAttached();
       await expect(
         page.locator('.contact-page__inset-rect--intro'),
       ).toBeVisible();

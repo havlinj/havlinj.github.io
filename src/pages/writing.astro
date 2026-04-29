@@ -2,24 +2,20 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
-import {
-  FALLBACK_WRITING_POOL_OPACITY,
-  WRITING_FIXED_ENTRY,
-  resolveWritingPoolEntry,
-  toPanelBgPosition,
-} from '../utils/writing-pool';
 
 const posts = await getCollection('blog');
 const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
-const defaultEntry = resolveWritingPoolEntry(WRITING_FIXED_ENTRY);
-const defaultWritingBgUrl = defaultEntry?.url ?? 'none';
-const defaultWritingBgOpacity =
-  defaultEntry?.opacity ?? FALLBACK_WRITING_POOL_OPACITY;
-const defaultWritingBgNudgeX = defaultEntry?.nudgeX ?? 0;
-const defaultWritingBgNudgeY = defaultEntry?.nudgeY ?? 0;
-const defaultWritingBg =
-  defaultWritingBgUrl === 'none' ? 'none' : `url('${defaultWritingBgUrl}')`;
+const defaultWritingBgUrl =
+  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplashdichrom.png';
+const defaultWritingBgOpacity = 0.94;
+const defaultWritingBgNudgeX = 0;
+const defaultWritingBgNudgeY = 0;
+const defaultWritingBg = `url('${defaultWritingBgUrl}')`;
+
+function toPanelBgPosition(value: number): string {
+  return `calc(50% + ${value}px)`;
+}
 
 function formatWritingListDate(d: Date): string {
   return d.toLocaleDateString('en-GB', {

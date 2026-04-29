@@ -26,7 +26,9 @@ function signalTypeFitReady(): void {
 function readLayoutKey(): string {
   const section = document.querySelector('.profile-section');
   const why = document.querySelector(".profile-section > a[href='/why']");
-  const what = document.querySelector(".profile-section > a[href='/what-i-do']");
+  const what = document.querySelector(
+    ".profile-section > a[href='/what-i-do']",
+  );
   const foundations = document.querySelector(
     '.profile-section .prof-tile--foundations',
   );
@@ -43,7 +45,9 @@ function readLayoutKey(): string {
   };
 
   const rootStyle = document.documentElement.style;
-  const labelSize = rootStyle.getPropertyValue('--profile-tile-label-font-size');
+  const labelSize = rootStyle.getPropertyValue(
+    '--profile-tile-label-font-size',
+  );
   const revealSize = rootStyle.getPropertyValue('--profile-reveal-font-size');
 
   return [

@@ -151,7 +151,10 @@
   font-size: var(--contact-fluid-font);
   gap: 0.62em;
   padding: var(--contact-link-pad-block, 0.2em)
-    calc(var(--contact-link-pad-inline, 0.95rem) + var(--contact-link-tail-pad, 0.55rem))
+    calc(
+      var(--contact-link-pad-inline, 0.95rem) +
+        var(--contact-link-tail-pad, 0.55rem)
+    )
     var(--contact-link-pad-block, 0.2em) var(--contact-link-pad-inline, 0.95rem);
   background-color: var(--color-page-bg);
   text-decoration: none;
