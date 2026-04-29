@@ -18,8 +18,11 @@ title: 'Profile'
     --profile-what-height: 45%;
     --profile-foundations-width: 42%;
     --profile-foundations-height:38%;
-    --profile-portrait-size: 29%;
-    --profile-portrait-frame-padding: 3%;
+    --profile-portrait-size: 31%;
+    --profile-portrait-frame-padding: 3.7%;
+    --profile-why-frame-padding: 3.4%;
+    --profile-what-frame-padding: 3%;
+    --profile-foundations-frame-padding: 3.2%;
     --profile-portrait-frame-padding-left-multiplier: 1.8;
     --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 25%;
@@ -77,6 +80,7 @@ title: 'Profile'
     "
     aria-label="Why this"
   >
+    <span class="profile-media-surface" aria-hidden="true"></span>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">
@@ -99,7 +103,8 @@ title: 'Profile'
     "
     aria-label="What I do"
   >
-    <div class="profile-gif-tile__stack">
+    <div class="profile-media-surface" aria-hidden="true">
+      <div class="profile-gif-tile__stack">
       <picture class="profile-gif-tile-poster" aria-hidden="true">
         <!-- sync: WHY_CLIP_VIEWPORT_MOBILE_MQ in src/constants/why-layout.ts -->
         <source
@@ -124,6 +129,7 @@ title: 'Profile'
         preload="metadata"
         aria-hidden="true"
       ></video>
+      </div>
     </div>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
@@ -136,12 +142,14 @@ title: 'Profile'
     <div class="profile-tile profile-photo-frame">
       <div class="profile-photo-shell">
         <div class="profile-photo-box">
-          <img
-            src="/assets/pages/profile/portrait_bayer16_style.png"
-            alt="Jan Havlín"
-            fetchpriority="high"
-            decoding="async"
-          />
+          <div class="profile-media-surface">
+            <img
+              src="/assets/pages/profile/portrait_bayer16_style.png"
+              alt="Jan Havlín"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -161,6 +169,7 @@ title: 'Profile'
       "
       aria-label="Foundations"
     >
+    <span class="profile-media-surface" aria-hidden="true"></span>
     <span class="page-button__bg" aria-hidden="true"></span>
     <span class="page-button__overlay" aria-hidden="true"></span>
     <span class="page-button__inner">

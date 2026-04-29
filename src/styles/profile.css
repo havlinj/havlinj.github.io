@@ -56,7 +56,15 @@ article.has-buttons-panel {
   --profile-foundations-y: 72%;
   --profile-portrait-size: 25%;
   --profile-portrait-frame-padding: 7%;
+  --profile-why-frame-padding: var(--profile-portrait-frame-padding);
+  --profile-what-frame-padding: var(--profile-portrait-frame-padding);
+  --profile-foundations-frame-padding: var(--profile-portrait-frame-padding);
   --profile-portrait-frame-padding-left-multiplier: 1;
+  --profile-portrait-media-inset-block: var(--profile-portrait-frame-padding);
+  --profile-portrait-media-inset-side: calc(
+    var(--profile-portrait-frame-padding) *
+      var(--profile-portrait-frame-padding-left-multiplier)
+  );
   --profile-tile-frame-padding: var(--profile-portrait-frame-padding);
   --profile-tile-frame-padding-side-multiplier: var(
     --profile-portrait-frame-padding-left-multiplier
@@ -247,16 +255,38 @@ article .profile-section:last-child {
   height: 100%;
   min-width: 0;
   overflow: hidden;
-  background: rgba(17, 17, 17, 0.1);
+  background: var(--color-page-bg);
 }
 
-/* Profile: grain overlay on photo + media/image tiles */
+/*
+ * Shared media frame: inset is always against the parent padding box (.prof-tile or .profile-photo-box).
+ * Vars --profile-tile-media-inset-* are authored on each parent (portrait uses block/side; tiles subtract border where needed).
+ */
+.profile-media-surface {
+  position: absolute;
+  top: var(--profile-tile-media-inset-top, 0px);
+  right: var(--profile-tile-media-inset-right, 0px);
+  bottom: var(--profile-tile-media-inset-bottom, 0px);
+  left: var(--profile-tile-media-inset-left, 0px);
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+/*
+ * Grain stays on the tile/frame (not inside the transformed media surface) so pan/zoom
+ * does not drag the noise pattern with the image.
+ */
 .profile-photo-box::after,
 .profile-image-tile::after,
 .profile-gif-tile::after {
   content: '';
   position: absolute;
-  inset: 0;
+  top: var(--profile-tile-media-inset-top, 0px);
+  right: var(--profile-tile-media-inset-right, 0px);
+  bottom: var(--profile-tile-media-inset-bottom, 0px);
+  left: var(--profile-tile-media-inset-left, 0px);
   z-index: 2;
   pointer-events: none;
   opacity: var(--profile-grain-opacity, 0.16);
@@ -286,16 +316,19 @@ article .profile-section:last-child {
   z-index: 2;
 }
 
+/* Keep media visible: solid bg fill is handled by tile/frame itself, not by button bg layer. */
+.profile-image-tile.prof-tile .page-button__bg,
+.profile-gif-tile.prof-tile .page-button__bg {
+  background-color: transparent;
+}
+
 /* What I do: poster + video stack (sync behaviour with why-clip-media.ts + WhyContent). */
 .profile-gif-tile__stack {
   position: absolute;
-  top: calc(-1px + var(--profile-tile-media-inset-top, 0px));
-  right: calc(-1px + var(--profile-tile-media-inset-right, 0px));
-  bottom: calc(-1px + var(--profile-tile-media-inset-bottom, 0px));
-  left: calc(-1px + var(--profile-tile-media-inset-left, 0px));
-  z-index: 1;
-  width: auto;
-  height: auto;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
@@ -333,31 +366,19 @@ article .profile-section:last-child {
   pointer-events: none;
 }
 
-.profile-image-tile::before {
-  content: '';
-  position: absolute;
-  /* Prevent occasional 1px dark seams from subpixel transforms/compositing */
-  top: calc(-1px + var(--profile-tile-media-inset-top, 0px));
-  right: calc(-1px + var(--profile-tile-media-inset-right, 0px));
-  bottom: calc(-1px + var(--profile-tile-media-inset-bottom, 0px));
-  left: calc(-1px + var(--profile-tile-media-inset-left, 0px));
+.profile-image-tile .profile-media-surface {
   background-image: var(--tile-bg, none);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
   filter: brightness(var(--tile-brightness, 1))
     contrast(var(--tile-contrast, 1));
-  /*
-   * Fine pan controls for zoomed tile images.
-   * Useful when background-position is already near an edge and you need subtle extra nudge.
-   */
   transform: translate(var(--tile-pan-x, 0%), var(--tile-pan-y, 0%))
     scale(var(--tile-zoom, 1));
   opacity: var(--tile-image-opacity, 1);
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform;
-  pointer-events: none;
 }
 
 .profile-gif-tile__media {
@@ -397,21 +418,14 @@ article .profile-section:last-child {
 }
 
 .profile-photo-box {
-  --profile-portrait-frame-padding-left-extra: calc(
-    var(--profile-portrait-frame-padding) *
-      (var(--profile-portrait-frame-padding-left-multiplier, 1) - 1)
-  );
-  --profile-portrait-frame-padding-left: calc(
-    var(--profile-portrait-frame-padding) +
-      var(--profile-portrait-frame-padding-left-extra)
-  );
   position: absolute;
-  top: var(--profile-portrait-frame-padding);
-  bottom: var(--profile-portrait-frame-padding);
-  left: var(--profile-portrait-frame-padding-left);
-  right: 0;
+  inset: 0;
   overflow: hidden;
   background: var(--color-page-bg);
+  --profile-tile-media-inset-top: var(--profile-portrait-media-inset-block);
+  --profile-tile-media-inset-right: 0px;
+  --profile-tile-media-inset-bottom: var(--profile-portrait-media-inset-block);
+  --profile-tile-media-inset-left: var(--profile-portrait-media-inset-side);
 }
 
 /* Top-right: panel tile */
@@ -430,20 +444,61 @@ article .profile-section:last-child {
   /* cqi/cqw for font caps = this tile’s width (grid cell) */
   container-type: inline-size;
   container-name: profile-tile;
-  --profile-tile-media-inset-top: 0px;
-  --profile-tile-media-inset-right: 0px;
-  --profile-tile-media-inset-bottom: 0px;
-  --profile-tile-media-inset-left: 0px;
+  --profile-tile-border-top: var(--profile-photo-frame-size);
+  --profile-tile-border-right: var(--profile-photo-frame-size);
+  --profile-tile-border-bottom: var(--profile-photo-frame-size);
+  --profile-tile-border-left: var(--profile-photo-frame-size);
+  --profile-tile-frame-padding-block: var(--profile-portrait-frame-padding);
+  --profile-tile-frame-padding-side: calc(
+    var(--profile-tile-frame-padding-block) *
+      var(--profile-portrait-frame-padding-left-multiplier)
+  );
+  /*
+   * Make tile media gutters match portrait proportions from OUTER edge:
+   * tile inset = portrait target inset - tile border on that edge.
+   */
+  --profile-tile-media-inset-top: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+  );
+  --profile-tile-media-inset-right: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
+  );
+  --profile-tile-media-inset-bottom: max(
+    0px,
+    calc(
+      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+    )
+  );
+  --profile-tile-media-inset-left: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-left))
+  );
 }
 
 .profile-section > a[href='/why-this'].prof-tile {
-  border-bottom-width: var(--profile-stitched-seam-thickness);
-  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
-  --profile-tile-media-inset-right: calc(
-    var(--profile-tile-frame-padding) *
-      var(--profile-tile-frame-padding-side-multiplier)
+  --profile-tile-frame-padding-block: var(--profile-why-frame-padding);
+  --profile-tile-frame-padding-side: calc(
+    var(--profile-tile-frame-padding-block) *
+      var(--profile-portrait-frame-padding-left-multiplier)
   );
-  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
+  border-bottom-width: var(--profile-stitched-seam-thickness);
+  --profile-tile-border-bottom: var(--profile-stitched-seam-thickness);
+  --profile-tile-media-inset-top: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+  );
+  --profile-tile-media-inset-right: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
+  );
+  --profile-tile-media-inset-bottom: max(
+    0px,
+    calc(
+      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+    )
+  );
   --profile-tile-media-inset-left: 0px;
 }
 
@@ -458,12 +513,25 @@ article .profile-section:last-child {
 }
 
 .profile-section > a[href='/what-i-do'].prof-tile {
-  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
-  --profile-tile-media-inset-right: calc(
-    var(--profile-tile-frame-padding) *
-      var(--profile-tile-frame-padding-side-multiplier)
+  --profile-tile-frame-padding-block: var(--profile-what-frame-padding);
+  --profile-tile-frame-padding-side: calc(
+    var(--profile-tile-frame-padding-block) *
+      var(--profile-portrait-frame-padding-left-multiplier)
   );
-  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
+  --profile-tile-media-inset-top: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+  );
+  --profile-tile-media-inset-right: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
+  );
+  --profile-tile-media-inset-bottom: max(
+    0px,
+    calc(
+      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+    )
+  );
   --profile-tile-media-inset-left: 0px;
 }
 
@@ -473,12 +541,26 @@ article .profile-section:last-child {
 }
 
 .profile-section .prof-tile--foundations.prof-tile {
-  --profile-tile-media-inset-top: var(--profile-tile-frame-padding);
+  --profile-tile-frame-padding-block: var(--profile-foundations-frame-padding);
+  --profile-tile-frame-padding-side: calc(
+    var(--profile-tile-frame-padding-block) *
+      var(--profile-portrait-frame-padding-left-multiplier)
+  );
+  --profile-tile-border-left: var(--profile-stitched-seam-thickness);
+  --profile-tile-media-inset-top: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+  );
   --profile-tile-media-inset-right: 0px;
-  --profile-tile-media-inset-bottom: var(--profile-tile-frame-padding);
-  --profile-tile-media-inset-left: calc(
-    var(--profile-tile-frame-padding) *
-      var(--profile-tile-frame-padding-side-multiplier)
+  --profile-tile-media-inset-bottom: max(
+    0px,
+    calc(
+      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+    )
+  );
+  --profile-tile-media-inset-left: max(
+    0px,
+    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-left))
   );
 }
 
@@ -499,7 +581,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile .page-button__bg {
-  background-color: rgba(17, 17, 17, 0.1);
+  background-color: var(--color-page-bg);
 }
 
 .prof-tile .page-button__overlay {
@@ -577,13 +659,23 @@ article .profile-section:last-child {
 }
 
 .prof-tile--foundations:not(.is-revealed):focus-visible .page-button__bg {
-  background-color: rgba(17, 17, 17, 0.1);
+  background-color: var(--color-page-bg);
+}
+
+.profile-image-tile.prof-tile:not(.is-revealed):focus-visible .page-button__bg,
+.profile-gif-tile.prof-tile:not(.is-revealed):focus-visible .page-button__bg {
+  background-color: transparent;
 }
 
 /* Hover invert only when the primary input can hover (not touch — avoids sticky :hover after Foundations reveal closes). */
 @media (hover: hover) {
   .prof-tile:not(.is-revealed):hover .page-button__bg {
-    background-color: rgba(17, 17, 17, 0.1);
+    background-color: var(--color-page-bg);
+  }
+
+  .profile-image-tile.prof-tile:not(.is-revealed):hover .page-button__bg,
+  .profile-gif-tile.prof-tile:not(.is-revealed):hover .page-button__bg {
+    background-color: transparent;
   }
 
   .prof-tile:not(.is-revealed):hover .page-button__overlay {
@@ -922,7 +1014,7 @@ article .profile-section:last-child {
   }
 }
 
-.profile-photo-box img {
+.profile-photo-box .profile-media-surface img {
   position: absolute;
   inset: -1px;
   display: block;
@@ -936,6 +1028,7 @@ article .profile-section:last-child {
   /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
   transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
   transform-origin: bottom center;
+  z-index: 0;
 }
 
 @keyframes profile-foundations-reveal-tile-breathe {
