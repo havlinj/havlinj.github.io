@@ -56,12 +56,6 @@ function startContactInsetFit(): void {
     });
   }
 
-  function getZoomScale(): number {
-    const vv = window.visualViewport;
-    const raw = vv?.scale;
-    return Number.isFinite(raw) && raw && raw > 0 ? raw : 1;
-  }
-
   function applyFontAndPanelMetrics(fontPx: number, panelEdge: number): void {
     panelEl.style.setProperty('--contact-panel-edge', `${panelEdge}px`);
     panelEl.style.setProperty('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
@@ -143,16 +137,18 @@ function startContactInsetFit(): void {
   }
 
   function computeDesiredFontPx(panelEdge: number): number {
-    const zoomScale = getZoomScale();
-    const baselinePanelEdge = panelEdge * zoomScale;
-    const fontToEdgeRatio =
-      CONTACT_LAYOUT.baselineFontPx / Math.max(1, baselinePanelEdge);
+    const baselineEdge = Math.max(1, CONTACT_LAYOUT.smallPanelEdgePx);
+    const fontToEdgeRatio = CONTACT_LAYOUT.baselineFontPx / baselineEdge;
     const baseFontPx = panelEdge * fontToEdgeRatio;
     const smallPanelScale =
       panelEdge <= CONTACT_LAYOUT.smallPanelEdgePx
         ? CONTACT_LAYOUT.smallPanelFontScale
         : 1;
-    return Math.max(1, baseFontPx * smallPanelScale);
+    const scaledFontPx = baseFontPx * smallPanelScale;
+    return Math.min(
+      CONTACT_LAYOUT.maxFontPx,
+      Math.max(CONTACT_LAYOUT.minFontPx, scaledFontPx),
+    );
   }
 
   function flush(): void {
@@ -160,7 +156,15 @@ function startContactInsetFit(): void {
       1,
       Math.min(panelEl.clientWidth, panelEl.clientHeight),
     );
-    let desiredFontPx = computeDesiredFontPx(panelEdge);
+    // CSS-first: keep current computed size as baseline and let JS only nudge it.
+    const cssFontPx = parseFloat(getComputedStyle(panelEl).fontSize);
+    let desiredFontPx = Number.isFinite(cssFontPx)
+      ? cssFontPx
+      : computeDesiredFontPx(panelEdge);
+    desiredFontPx = Math.min(
+      CONTACT_LAYOUT.maxFontPx,
+      Math.max(CONTACT_LAYOUT.minFontPx, desiredFontPx),
+    );
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
     let measured = measureNeededContent();
@@ -174,7 +178,7 @@ function startContactInsetFit(): void {
       pass < CONTACT_LAYOUT.maxFitPasses
     ) {
       const scale = Math.min(availW / neededWidth, availH / neededHeight, 1);
-      desiredFontPx = Math.max(1, desiredFontPx * scale);
+      desiredFontPx = Math.max(CONTACT_LAYOUT.minFontPx, desiredFontPx * scale);
       applyFontAndPanelMetrics(desiredFontPx, panelEdge);
       measured = measureNeededContent();
       ({ neededWidth, neededHeight, topPad, rowGap, introH } = measured);

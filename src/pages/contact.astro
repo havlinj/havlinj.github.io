@@ -25,10 +25,10 @@ const panelBg = `url('/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unspla
       '--panel-padding-top': '10%',
       '--panel-padding-left': '10%',
       '--panel-padding-bottom': '24%',
-      '--writing-row-gap': '2cqi',
-      '--contact-link-row-min-h': '2.2em',
-      '--contact-link-row-max-h': '2.85em',
-      '--contact-link-row-gap': '1.1cqi',
+      '--writing-row-gap': 'var(--panel-row-gap)',
+      '--contact-link-row-min-h': 'var(--panel-row-min-h)',
+      '--contact-link-row-max-h': 'var(--panel-row-max-h)',
+      '--contact-link-row-gap': 'var(--panel-row-gap)',
       '--contact-link-pad-inline': '0.95em',
       '--contact-link-tail-pad': '1.5em',
       '--contact-link-pad-block': '0.2em',
@@ -48,7 +48,7 @@ const panelBg = `url('/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unspla
             </p>
             <p class="contact-page__intro">
               <span class="contact-page__intro-line1"
-                >I’m open to engineering roles, architecture projects, and
+                >I’m open to engineering roles, architecture projects,<br />and
                 collaborations.<br />Feel free to reach out.</span
               >
             </p>

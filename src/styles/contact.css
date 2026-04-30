@@ -15,6 +15,12 @@
   gap: 0;
 }
 
+.contact-page .page-buttons-zone,
+.contact-page .page-buttons-panel {
+  width: 100%;
+  max-width: 100%;
+}
+
 .contact-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
   background-color: var(--color-page-bg);
@@ -22,7 +28,11 @@
   --contact-stack-top-px: 16px;
   --contact-intro-top-px: 16px;
   --contact-links-top-px: 120px;
-  --contact-fluid-font: 1rem;
+  --contact-fluid-font: clamp(
+    var(--panel-fluid-font-min),
+    calc(var(--panel-fluid-font-preferred) + 0.03rem),
+    var(--panel-fluid-font-max)
+  );
 }
 
 .contact-page .page-buttons-panel::before {
@@ -109,6 +119,10 @@
   letter-spacing: 0.02em;
   color: rgba(17, 17, 17, 0.96);
   white-space: nowrap;
+  max-width: none;
+  hyphens: none;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .contact-page__intro--lead {
@@ -123,15 +137,18 @@
   display: inline-block;
   padding-right: var(--contact-intro-line-tail-pad, 0.6em);
   opacity: 0.98;
-  line-height: 1.65;
+  line-height: 1.62;
   white-space: nowrap;
+  hyphens: none;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .contact-page__links {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--writing-row-gap, 2cqi);
+  gap: max(0.45rem, var(--contact-link-row-gap, var(--panel-row-gap)));
   inline-size: fit-content;
   max-inline-size: min(100%, calc(100% - var(--panel-padding-left, 2rem)));
 }
@@ -143,8 +160,8 @@
   inline-size: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
-  min-height: var(--contact-link-row-min-h, 2.2em);
-  max-height: var(--contact-link-row-max-h, 2.85em);
+  min-height: var(--contact-link-row-min-h, var(--panel-row-min-h));
+  max-height: var(--contact-link-row-max-h, var(--panel-row-max-h));
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
@@ -171,6 +188,9 @@
 .contact-page .contact-extra-link .contact-extra-link__text {
   font-size: inherit;
   min-width: 0;
+  line-height: 1.24;
+  letter-spacing: 0.022em;
+  font-weight: 500;
 }
 
 .contact-page .contact-extra-link__icon:not(.contact-extra-link__icon--bubble) {
