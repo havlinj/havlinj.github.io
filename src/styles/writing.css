@@ -110,22 +110,13 @@ ul.post-list > li::before {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.98em;
-  /* Keep a reliable slanted style on iOS; upgrade to angled oblique when supported/rendered. */
-  font-style: italic;
-  font-synthesis: style;
   line-height: var(--writing-title-lh);
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: rgba(17, 17, 17, 0.99);
   padding: 0.2em;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@supports (font-style: oblique 7deg) {
-  .writing-page .page-button__text {
-    font-style: oblique 7deg;
-  }
 }
 
 .writing-page .page-button__date {

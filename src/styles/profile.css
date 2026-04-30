@@ -10,8 +10,10 @@
  *   --foundations-reveal-uniform-scale (Foundations reveal stanza).
  * - Image tile media: --tile-bg-size-w / --tile-bg-size-h, --tile-bg-overscan (__layer);
  *   pan/zoom on .profile-media-surface__paint (__layer = filter only, avoids filter+transform bug).
- * - Portrait: --profile-portrait-frame-padding on top/bottom (% of CB height). Left uses
- *   calc(padding% * --profile-portrait-frame-padding-left-multiplier) (width %; reliable).
+ * - Frame gutters: author --profile-what-frame-padding + --profile-what-frame-padding-left-multiplier
+ *   (% on What I do tile only). profile-frame-gutters.ts measures used px on that tile’s
+ *   .profile-media-surface → --profile-frame-gutter-block-px / --profile-frame-gutter-side-px;
+ *   portrait, Why, Foundations reuse those lengths (no % on those surfaces).
  * - Right column geometry is static in CSS (portrait top-right + Foundations bottom half).
  */
 
@@ -59,15 +61,10 @@ article.has-buttons-panel {
   --profile-portrait-y: 24%;
   --profile-foundations-y: 72%;
   --profile-portrait-size: 25%;
-  --profile-portrait-frame-padding: 7%;
-  --profile-why-frame-padding: var(--profile-portrait-frame-padding);
-  --profile-what-frame-padding: var(--profile-portrait-frame-padding);
-  --profile-foundations-frame-padding: var(--profile-portrait-frame-padding);
-  --profile-portrait-frame-padding-left-multiplier: 1;
-  --profile-tile-frame-padding: var(--profile-portrait-frame-padding);
-  --profile-tile-frame-padding-side-multiplier: var(
-    --profile-portrait-frame-padding-left-multiplier
-  );
+  --profile-what-frame-padding: 7%;
+  --profile-what-frame-padding-left-multiplier: 1;
+  --profile-background-pan-x: 0%;
+  --profile-background-pan-y: 0%;
   --profile-portrait-frame-anchor-extension: 0%;
   --profile-hero-optical-offset: var(--hero-optical-offset, 0.1em);
   --profile-hero-bg-brightness: var(--hero-bg-brightness, 0.88);
@@ -90,7 +87,7 @@ article.has-buttons-panel {
   /* Film grain: keep low — high opacity + overlay reads as mud/banding on weak paths. */
   --profile-grain-opacity: 0.12;
   --profile-grain-blend-mode: soft-light;
-  /* Image tiles: modest oversize vs cover + overscan for pan; tune per page on .profile-section. */
+  /* Image tiles: oversize vs cover + overscan for pan; tune per page on .profile-section. */
   --tile-bg-size-w: auto;
   --tile-bg-size-h: 168%;
   --tile-bg-overscan: -65%;
@@ -110,7 +107,12 @@ article.has-buttons-panel {
   filter: brightness(var(--profile-hero-bg-brightness))
     saturate(var(--profile-hero-bg-saturate));
   opacity: var(--profile-hero-bg-image-opacity);
-  transform: translate3d(0, 0, 0) scale(1.1);
+  transform: translate3d(
+      var(--profile-background-pan-x),
+      var(--profile-background-pan-y),
+      0
+    )
+    scale(1.1);
   transform-origin: center;
   z-index: 0;
   pointer-events: none;
@@ -443,14 +445,22 @@ article .profile-section:last-child {
   inset: 0;
   overflow: hidden;
   background: var(--color-page-bg);
-  /* top/bottom: % of shell height. */
-  --profile-tile-media-inset-top: var(--profile-portrait-frame-padding, 7%);
+  /* Px from JS (measured What I do); fallback matches What % until sync runs. */
+  --profile-tile-media-inset-top: var(
+    --profile-frame-gutter-block-px,
+    var(--profile-what-frame-padding)
+  );
   --profile-tile-media-inset-right: 0px;
-  --profile-tile-media-inset-bottom: var(--profile-portrait-frame-padding, 7%);
-  /* Left: % of shell width × multiplier (single --profile-portrait-frame-padding token). */
-  --profile-tile-media-inset-left: calc(
-    var(--profile-portrait-frame-padding, 7%) *
-      var(--profile-portrait-frame-padding-left-multiplier)
+  --profile-tile-media-inset-bottom: var(
+    --profile-frame-gutter-block-px,
+    var(--profile-what-frame-padding)
+  );
+  --profile-tile-media-inset-left: var(
+    --profile-frame-gutter-side-px,
+    calc(
+      var(--profile-what-frame-padding) *
+        var(--profile-what-frame-padding-left-multiplier)
+    )
   );
 }
 
@@ -474,55 +484,35 @@ article .profile-section:last-child {
   --profile-tile-border-right: var(--profile-photo-frame-size);
   --profile-tile-border-bottom: var(--profile-photo-frame-size);
   --profile-tile-border-left: var(--profile-photo-frame-size);
-  --profile-tile-frame-padding-block: var(--profile-portrait-frame-padding);
-  --profile-tile-frame-padding-side: calc(
-    var(--profile-tile-frame-padding-block) *
-      var(--profile-portrait-frame-padding-left-multiplier)
-  );
-  /*
-   * Make tile media gutters match portrait proportions from OUTER edge:
-   * tile inset = portrait target inset - tile border on that edge.
-   */
-  --profile-tile-media-inset-top: max(
-    0px,
-    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
-  );
-  --profile-tile-media-inset-right: max(
-    0px,
-    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
-  );
-  --profile-tile-media-inset-bottom: max(
-    0px,
-    calc(
-      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
-    )
-  );
-  --profile-tile-media-inset-left: max(
-    0px,
-    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-left))
-  );
 }
 
 .profile-section > a[href='/why-this'].prof-tile {
-  --profile-tile-frame-padding-block: var(--profile-why-frame-padding);
-  --profile-tile-frame-padding-side: calc(
-    var(--profile-tile-frame-padding-block) *
-      var(--profile-portrait-frame-padding-left-multiplier)
-  );
   border-bottom-width: var(--profile-stitched-seam-thickness);
   --profile-tile-border-bottom: var(--profile-stitched-seam-thickness);
   --profile-tile-media-inset-top: max(
     0px,
-    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+    calc(
+      var(--profile-frame-gutter-block-px, var(--profile-what-frame-padding)) -
+        var(--profile-tile-border-top)
+    )
   );
   --profile-tile-media-inset-right: max(
     0px,
-    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
+    calc(
+      var(
+          --profile-frame-gutter-side-px,
+          calc(
+            var(--profile-what-frame-padding) *
+              var(--profile-what-frame-padding-left-multiplier)
+          )
+        ) - var(--profile-tile-border-right)
+    )
   );
   --profile-tile-media-inset-bottom: max(
     0px,
     calc(
-      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+      var(--profile-frame-gutter-block-px, var(--profile-what-frame-padding)) -
+        var(--profile-tile-border-bottom)
     )
   );
   --profile-tile-media-inset-left: 0px;
@@ -539,10 +529,11 @@ article .profile-section:last-child {
 }
 
 .profile-section > a[href='/what-i-do'].prof-tile {
+  /* Reference: % + multiplier; JS reads resolved px and sets --profile-frame-gutter-* for other tiles. */
   --profile-tile-frame-padding-block: var(--profile-what-frame-padding);
   --profile-tile-frame-padding-side: calc(
     var(--profile-tile-frame-padding-block) *
-      var(--profile-portrait-frame-padding-left-multiplier)
+      var(--profile-what-frame-padding-left-multiplier)
   );
   --profile-tile-media-inset-top: max(
     0px,
@@ -567,26 +558,33 @@ article .profile-section:last-child {
 }
 
 .profile-section .prof-tile--foundations.prof-tile {
-  --profile-tile-frame-padding-block: var(--profile-foundations-frame-padding);
-  --profile-tile-frame-padding-side: calc(
-    var(--profile-tile-frame-padding-block) *
-      var(--profile-portrait-frame-padding-left-multiplier)
-  );
   --profile-tile-border-left: var(--profile-stitched-seam-thickness);
   --profile-tile-media-inset-top: max(
     0px,
-    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+    calc(
+      var(--profile-frame-gutter-block-px, var(--profile-what-frame-padding)) -
+        var(--profile-tile-border-top)
+    )
   );
   --profile-tile-media-inset-right: 0px;
   --profile-tile-media-inset-bottom: max(
     0px,
     calc(
-      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+      var(--profile-frame-gutter-block-px, var(--profile-what-frame-padding)) -
+        var(--profile-tile-border-bottom)
     )
   );
   --profile-tile-media-inset-left: max(
     0px,
-    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-left))
+    calc(
+      var(
+          --profile-frame-gutter-side-px,
+          calc(
+            var(--profile-what-frame-padding) *
+              var(--profile-what-frame-padding-left-multiplier)
+          )
+        ) - var(--profile-tile-border-left)
+    )
   );
 }
 
@@ -635,7 +633,7 @@ article .profile-section:last-child {
   );
   font-weight: 700;
   line-height: 1.15;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.025em;
   text-transform: none;
   max-width: 100%;
   white-space: nowrap;

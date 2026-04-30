@@ -8,7 +8,9 @@
  */
 
 import { wireProfileGifTileMedia } from './profile-gif-tile-video';
-import { TYPE_FIT_EVENT } from './profile-tile-type-fit-constants';
+import { syncProfileFrameGuttersFromWhatTile } from './profile-frame-gutters';
+import { queryElement } from './profile-fit-dom';
+import { TYPE_FIT_EVENT, SELECTORS } from './profile-tile-type-fit-constants';
 import {
   wireFoundationsRevealResize,
   wireResize,
@@ -108,6 +110,13 @@ async function start(): Promise<void> {
    * is already visible (seams at Why/What I do and What I do/Foundations).
    */
   wireFoundationsReveal();
+  const sectionEarly = queryElement(
+    document,
+    SELECTORS.profileSection,
+    HTMLElement,
+  );
+  if (sectionEarly) syncProfileFrameGuttersFromWhatTile(sectionEarly);
+
   runInitialFitUntilStable(() => {
     signalTypeFitReady();
     wireResize();

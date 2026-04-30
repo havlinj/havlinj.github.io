@@ -19,16 +19,16 @@ title: 'Profile'
     --profile-foundations-width: 40%;
     --profile-foundations-height:30%;
     --profile-portrait-size: 31%;
-    --profile-portrait-frame-padding: 3%;
-    --profile-why-frame-padding: 4.3%;
-    --profile-what-frame-padding: 3%;
-    --profile-foundations-frame-padding: 3%;
-    --profile-portrait-frame-padding-left-multiplier: 1.1;
+    /* Frame gutters: % only on What I do; JS → --profile-frame-gutter-*-px for portrait + other tiles. */
+    --profile-what-frame-padding: 4%;
+    --profile-what-frame-padding-left-multiplier: 1.16;
     --profile-portrait-frame-anchor-extension:2%;
     --profile-tile-text-inset-anchor-x: 22%;
     --profile-tile-text-inset-far-x: 17%;
     --profile-reveal-text-inset-x: 8%;
-    --panel-padding-top: 12%;
+    --panel-padding-top: 10%;
+    --profile-background-pan-x: 15%;
+    --profile-background-pan-y: 0%;
     --portrait-pos-x: 40%;
     --portrait-pos-y: 62%;
     --portrait-zoom: 1.12;
@@ -52,15 +52,15 @@ title: 'Profile'
     --profile-tile-3-brightness: 1.1;
     --profile-tile-3-contrast: 1;
     --profile-tile-3-opacity: 0.8;
-    --profile-tile-4-bg: url('/assets/pages/profile/alejandro-barba-XJ9vxmAmFss-unsplashdichrom.png');
+    --profile-tile-4-bg: url('/assets/pages/profile/uve-sanchez-9DRX_cW48RQ-unsplashdichrom.png');
     --profile-tile-4-pos-x: 50%;
-    --profile-tile-4-pos-y: 50%;
+    --profile-tile-4-pos-y: 80%;
     --profile-tile-4-pan-x: 0%;
-    --profile-tile-4-pan-y: 2%;
-    --profile-tile-4-zoom: 0.6;
-    --profile-tile-4-brightness: 0.9;
-    --profile-tile-4-contrast: 1.2;
-    --profile-tile-4-opacity: 1;
+    --profile-tile-4-pan-y: 0%;
+    --profile-tile-4-zoom: 0.5;
+    --profile-tile-4-brightness: 1;
+    --profile-tile-4-contrast: 1;
+    --profile-tile-4-opacity: 0.95;
     --profile-reveal-text-scale: 1.5;
   "
 >

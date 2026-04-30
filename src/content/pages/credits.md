@@ -18,8 +18,8 @@ All Unsplash media listed below are used according to the
   - Edits: dichromatic treatment, noise
 
 - **Profile tile image (Foundations)**
-  - Author: [Kevin Shi](https://unsplash.com/@kevinshi)
-  - Source: [Unsplash](https://unsplash.com/photos/gWerWoydZtc)
+  - Author: [Uve Sanchez](https://unsplash.com/@uvesanchez)
+  - Source: [Unsplash](https://unsplash.com/photos/9DRX_cW48RQ)
   - Edits: dichromatic treatment, noise
 
 - **Profile page background image**
