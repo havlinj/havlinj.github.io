@@ -28,10 +28,10 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
     "@fontsource/inter": "^5.2.8",
-    "astro": "^6.1.8"
+    "astro": "^6.2.1"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.8",
+    "@astrojs/check": "^0.9.9",
     "@axe-core/playwright": "^4.11.1",
     "@eslint/eslintrc": "^3.3.4",
     "@playwright/test": "^1.49.0",
