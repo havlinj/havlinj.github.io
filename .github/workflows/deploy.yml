@@ -66,9 +66,11 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
-      # ESLint & Prettier come from devDependencies above. Playwright needs browser binaries + system deps.
+      # Playwright must match npm ci: browsers are not in node_modules. Install every browser flavor
+      # used in playwright.config (desktop + mobile Chromium, mobile WebKit). Chromium-only breaks
+      # mobile-webkit and any webkit-only specs after a dependency bump.
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
         working-directory: ${{ env.BUILD_PATH }}
       - name: Verify lint, format and test tooling
         run: |
