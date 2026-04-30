@@ -39,19 +39,24 @@ function startContactInsetFit(): void {
       : 0.1;
   let raf = 0;
   let revealed = false;
-  let fontsReady = false;
   let stablePasses = 0;
   let lastLayoutKey = '';
 
-  function revealAfterStableLayout(): void {
-    if (revealed || !fitContentEl || !fontsReady) return;
-    if (stablePasses < 2) return;
+  function forceReveal(): void {
+    if (revealed || !fitContentEl) return;
     revealed = true;
+    fitContentEl.classList.remove(CONTACT_CLASSES.fitPending);
+    fitContentEl.classList.add(CONTACT_CLASSES.fitVisible);
+    fitContentEl.removeAttribute('aria-busy');
+  }
+
+  function revealAfterStableLayout(): void {
+    if (revealed || !fitContentEl) return;
+    // Reveal right after first measured layout pass; keep refinement async.
+    forceReveal();
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        fitContentEl.classList.remove(CONTACT_CLASSES.fitPending);
-        fitContentEl.classList.add(CONTACT_CLASSES.fitVisible);
-        fitContentEl.removeAttribute('aria-busy');
+        schedule();
       });
     });
   }
@@ -244,24 +249,20 @@ function startContactInsetFit(): void {
   if (fonts && typeof fonts.ready !== 'undefined') {
     fonts.ready
       .then(() => {
-        fontsReady = true;
         schedule();
         requestAnimationFrame(() => {
           requestAnimationFrame(schedule);
         });
       })
       .catch(() => {
-        fontsReady = true;
         schedule();
       });
-  } else {
-    fontsReady = true;
   }
   window.addEventListener('load', schedule, { passive: true });
-  window.setTimeout(
-    () => revealAfterStableLayout(),
-    CONTACT_LAYOUT.revealFallbackMs,
-  );
+  window.setTimeout(() => {
+    // Hard fallback: never leave the content hidden if layout stabilization stalls.
+    forceReveal();
+  }, CONTACT_LAYOUT.revealFallbackMs);
 
   schedule();
   requestAnimationFrame(() => {
