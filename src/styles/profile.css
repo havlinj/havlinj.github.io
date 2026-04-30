@@ -850,7 +850,7 @@ article .profile-section:last-child {
   background: #111;
   color: var(--color-page-bg);
   /* Set only from profile-tile-type-fit.ts (inline). Single rem fallback if JS is off — no clamp/cqi (narrow viewports could overshoot). */
-  font-size: var(--profile-reveal-font-size, 0.65rem);
+  font-size: var(--profile-reveal-font-size, 0.75rem);
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;

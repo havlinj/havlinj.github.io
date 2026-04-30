@@ -1,7 +1,7 @@
 .site-footer {
   padding: 2.5rem 0 2rem;
   /* Footer copy: smaller on mobile, scales up smoothly, caps at current size. */
-  font-size: clamp(0.65rem, 0.55rem + 0.5vw, 0.8rem);
+  font-size: clamp(0.75rem, 0.62rem + 0.45vw, 0.8rem);
   color: #111;
 }
 
