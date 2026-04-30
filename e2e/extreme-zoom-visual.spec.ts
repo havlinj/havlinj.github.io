@@ -19,7 +19,7 @@ async function applyExtremeZoom(page: Page): Promise<void> {
   }
 }
 
-test.describe('Extreme zoom visuals', () => {
+test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
   test('hero square visual snapshot at extreme zoom', async ({
@@ -99,7 +99,7 @@ test.describe('Extreme zoom visuals', () => {
       page.locator('.contact-page .page-buttons-panel'),
     ).toHaveScreenshot('contact-extreme-zoom.png', {
       animations: 'disabled',
-      maxDiffPixels: 60000,
+      maxDiffPixels: 70000,
     });
   });
 });

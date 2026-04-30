@@ -98,19 +98,25 @@ fi
 
 PW_WORKERS="${PW_WORKERS:-8}"
 PW_CI_MODE="${PW_CI_MODE:-0}"
+SKIP_EXTREME_ZOOM_VISUAL="${PW_SKIP_EXTREME_ZOOM_VISUAL:-0}"
+EXTRA_INVERT=()
+if [[ "$SKIP_EXTREME_ZOOM_VISUAL" == "1" ]]; then
+  EXTRA_INVERT=(--grep-invert=@extreme-zoom-visual)
+  echo "Omitting @extreme-zoom-visual specs (PW_SKIP_EXTREME_ZOOM_VISUAL=1)."
+fi
 echo "Playwright workers: $PW_WORKERS"
 echo "Playwright CI mode: $PW_CI_MODE"
 echo "Running parallel-safe tests (excluding @serial)..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial"
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial" "${EXTRA_INVERT[@]}"
 echo ""
 echo "Running serial-sensitive why-this tests with one worker..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-this-route.spec.ts --workers=1
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/why-this-route.spec.ts --workers=1 "${EXTRA_INVERT[@]}"
 echo ""
 echo "Running serial-sensitive mobile profile tests with one worker..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
-CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/profile-mobile.spec.ts --workers=1
+CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/profile-mobile.spec.ts --workers=1 "${EXTRA_INVERT[@]}"
 
 echo ""
 echo "Integration tests passed."

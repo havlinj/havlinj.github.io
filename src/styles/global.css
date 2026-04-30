@@ -41,7 +41,7 @@
   /* Hero photo: avoid heavy saturate() defaults (uneven on some color paths). */
   --hero-bg-brightness: 0.88;
   --hero-bg-saturate: 1.12;
-  --hero-bg-image-opacity: 0.85;
+  --hero-bg-image-opacity: 0.86;
   /*
    * Image pipeline defaults (profile tiles, portrait, dark panel bg layer).
    * Slightly below 1 ≈ former “legacy” mild pass — one consistent baseline for all users.

@@ -85,7 +85,7 @@ article.has-buttons-panel {
     2 * var(--profile-shared-edge-thickness) - var(--profile-photo-frame-size)
   );
   /* Film grain: keep low — high opacity + overlay reads as mud/banding on weak paths. */
-  --profile-grain-opacity: 0.12;
+  --profile-grain-opacity: 0.11;
   --profile-grain-blend-mode: soft-light;
   /* Image tiles: oversize vs cover + overscan for pan; tune per page on .profile-section. */
   --tile-bg-size-w: auto;
@@ -1032,7 +1032,7 @@ article .profile-section:last-child {
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0.01em;
-  opacity: 0.72;
+  opacity: 0.74;
   /* Same column as line-1 so type-fit can reserve one width for both rows. */
   max-width: 100%;
   text-transform: none;

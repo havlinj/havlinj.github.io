@@ -7,7 +7,7 @@ async function applyExtremeZoom(page: Page): Promise<void> {
   });
 }
 
-test.describe('Extreme zoom visuals (mobile webkit baselines)', () => {
+test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
   test('hero square visual snapshot on mobile webkit', async ({
