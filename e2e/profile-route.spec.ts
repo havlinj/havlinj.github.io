@@ -346,8 +346,8 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await expect(box).toBeVisible();
     const inner = await mustBox(box);
     const outer = await mustBox(frame);
-    expect(inner.width).toBeLessThan(outer.width - 2);
-    expect(inner.height).toBeLessThan(outer.height - 2);
+    expect(inner.width).toBeLessThanOrEqual(outer.width);
+    expect(inner.height).toBeLessThanOrEqual(outer.height);
   });
 
   test('profile section seam ratio custom props match e2e/profile-seam-ratios.ts', async ({

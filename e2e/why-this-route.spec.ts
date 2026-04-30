@@ -158,7 +158,9 @@ test.describe('/why-this page @serial', () => {
     expect(longest).toBe(WHY_FIT_REFERENCE_LINE);
   });
 
-  test('shows Why this title, lead copy, and loop video asset', async ({ page }) => {
+  test('shows Why this title, lead copy, and loop video asset', async ({
+    page,
+  }) => {
     await expect(
       page.getByRole('heading', { name: 'Why this', level: 1 }),
     ).toBeVisible();

@@ -9,7 +9,9 @@ export const PROFILE_FRAME_GUTTER_SIDE_PX = '--profile-frame-gutter-side-px';
  * Resolve authored % gutters on the What I do tile, read used px from layout, then publish
  * the same lengths for all other profile media frames (no % on those surfaces).
  */
-export function syncProfileFrameGuttersFromWhatTile(section: HTMLElement): void {
+export function syncProfileFrameGuttersFromWhatTile(
+  section: HTMLElement,
+): void {
   const what = queryElement(section, SELECTORS.whatIDoTile, HTMLElement);
   const surface = what?.querySelector<HTMLElement>('.profile-media-surface');
   if (!what || !surface) return;

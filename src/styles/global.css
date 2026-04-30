@@ -282,7 +282,13 @@ a:hover {
   .content {
     padding-top: 1.5rem;
     /* Keep near-desktop width; shrink side insets only as needed on very small viewports. */
-    padding-right: max(env(safe-area-inset-right), var(--content-side-pad-compact));
-    padding-left: max(env(safe-area-inset-left), var(--content-side-pad-compact));
+    padding-right: max(
+      env(safe-area-inset-right),
+      var(--content-side-pad-compact)
+    );
+    padding-left: max(
+      env(safe-area-inset-left),
+      var(--content-side-pad-compact)
+    );
   }
 }

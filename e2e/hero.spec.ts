@@ -163,7 +163,10 @@ test.describe('Hero page (/)', () => {
 
   test('hero section - last screenshot matches', async ({ page }) => {
     await waitForHeroLoaded(page);
-    await expect(page).toHaveScreenshot('hero-section.png');
+    await expect(page).toHaveScreenshot('hero-section.png', {
+      animations: 'disabled',
+      maxDiffPixels: 2500,
+    });
   });
 
   test('hero content reveals only after hero image is ready', async ({

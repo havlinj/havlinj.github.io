@@ -8,7 +8,7 @@ async function gotoWritingReady(page: import('@playwright/test').Page) {
 }
 
 test.describe('Writing typography on Safari/WebKit', () => {
-  test('mobile WebKit keeps slanted title style (not normal)', async ({
+  test('mobile WebKit keeps normal title style', async ({
     page,
     browserName,
   }) => {
@@ -23,9 +23,6 @@ test.describe('Writing typography on Safari/WebKit', () => {
       .first()
       .evaluate((el) => getComputedStyle(el).fontStyle);
 
-    expect(fontStyle).not.toBe('normal');
-    expect(fontStyle.includes('italic') || fontStyle.includes('oblique')).toBe(
-      true,
-    );
+    expect(fontStyle).toBe('normal');
   });
 });

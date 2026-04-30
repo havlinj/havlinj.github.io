@@ -171,12 +171,12 @@ const navItems = [
         var storedBaselineRaw = null;
         try {
           storedBaselineRaw = window.sessionStorage.getItem(BASELINE_KEY);
-        } catch (_) {}
+        } catch {}
         var storedBaseline = null;
         if (storedBaselineRaw) {
           try {
             storedBaseline = JSON.parse(storedBaselineRaw);
-          } catch (_) {
+          } catch {
             storedBaseline = null;
           }
         }
@@ -208,7 +208,7 @@ const navItems = [
                 innerWidth: baselineInnerWidth,
               }),
             );
-          } catch (_) {}
+          } catch {}
         }
         var mainContent = document.querySelector('main.content');
         var lastExceeded = null;
@@ -242,25 +242,41 @@ const navItems = [
         }
 
         updateZoomGuard('init');
-        window.addEventListener('resize', function () {
-          updateZoomGuard('window.resize');
-        }, { passive: true });
-        window.addEventListener('orientationchange', function () {
-          updateZoomGuard('orientationchange');
-        }, {
-          passive: true,
-        });
+        window.addEventListener(
+          'resize',
+          function () {
+            updateZoomGuard('window.resize');
+          },
+          { passive: true },
+        );
+        window.addEventListener(
+          'orientationchange',
+          function () {
+            updateZoomGuard('orientationchange');
+          },
+          {
+            passive: true,
+          },
+        );
         if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', function () {
-            updateZoomGuard('visualViewport.resize');
-          }, {
-            passive: true,
-          });
-          window.visualViewport.addEventListener('scroll', function () {
-            updateZoomGuard('visualViewport.scroll');
-          }, {
-            passive: true,
-          });
+          window.visualViewport.addEventListener(
+            'resize',
+            function () {
+              updateZoomGuard('visualViewport.resize');
+            },
+            {
+              passive: true,
+            },
+          );
+          window.visualViewport.addEventListener(
+            'scroll',
+            function () {
+              updateZoomGuard('visualViewport.scroll');
+            },
+            {
+              passive: true,
+            },
+          );
         }
         function loopZoomGuard() {
           updateZoomGuard('raf');

@@ -505,7 +505,8 @@ article .profile-section:last-child {
             var(--profile-what-frame-padding) *
               var(--profile-what-frame-padding-left-multiplier)
           )
-        ) - var(--profile-tile-border-right)
+        ) -
+        var(--profile-tile-border-right)
     )
   );
   --profile-tile-media-inset-bottom: max(
@@ -537,16 +538,21 @@ article .profile-section:last-child {
   );
   --profile-tile-media-inset-top: max(
     0px,
-    calc(var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top))
+    calc(
+      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-top)
+    )
   );
   --profile-tile-media-inset-right: max(
     0px,
-    calc(var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right))
+    calc(
+      var(--profile-tile-frame-padding-side) - var(--profile-tile-border-right)
+    )
   );
   --profile-tile-media-inset-bottom: max(
     0px,
     calc(
-      var(--profile-tile-frame-padding-block) - var(--profile-tile-border-bottom)
+      var(--profile-tile-frame-padding-block) -
+        var(--profile-tile-border-bottom)
     )
   );
   --profile-tile-media-inset-left: 0px;
@@ -583,7 +589,8 @@ article .profile-section:last-child {
             var(--profile-what-frame-padding) *
               var(--profile-what-frame-padding-left-multiplier)
           )
-        ) - var(--profile-tile-border-left)
+        ) -
+        var(--profile-tile-border-left)
     )
   );
 }
@@ -785,8 +792,10 @@ article .profile-section:last-child {
 .profile-image-tile.prof-tile--foundations.is-reveal-fading-out::after,
 .profile-image-tile.prof-tile--foundations.is-reveal-opening::after,
 .profile-image-tile.prof-tile--foundations.is-revealed .profile-media-surface,
-.profile-image-tile.prof-tile--foundations.is-reveal-fading-out .profile-media-surface,
-.profile-image-tile.prof-tile--foundations.is-reveal-opening .profile-media-surface {
+.profile-image-tile.prof-tile--foundations.is-reveal-fading-out
+  .profile-media-surface,
+.profile-image-tile.prof-tile--foundations.is-reveal-opening
+  .profile-media-surface {
   opacity: 0;
   /* Hide immediately when entering reveal choreography; fade back in when returning to state1 */
   transition: opacity 0s linear;
@@ -829,9 +838,7 @@ article .profile-section:last-child {
   align-items: stretch;
   justify-content: center;
   padding-block: 1.2rem;
-  padding-inline-start: var(
-    --profile-reveal-text-inset-x
-  );
+  padding-inline-start: var(--profile-reveal-text-inset-x);
   /* Right inset factor: sync with REVEAL_RIGHT_MARGIN_RATIO_MIN in src/utils/profile-reveal-constants.ts */
   padding-inline-end: calc(
     var(--profile-reveal-text-inset-x) * 1.02 +

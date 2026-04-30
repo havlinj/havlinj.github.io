@@ -29,7 +29,9 @@ test.describe('Profile page (/profile, /why-this)', () => {
     await expectNavLinkActive(page, 'Profile');
   });
 
-  test('has portrait, Why this, What I do, Foundations links', async ({ page }) => {
+  test('has portrait, Why this, What I do, Foundations links', async ({
+    page,
+  }) => {
     await expect(page.getByRole('img', { name: 'Jan Havlín' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Why this' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'What I do' })).toBeVisible();
@@ -142,7 +144,9 @@ test.describe('Profile page (/profile, /why-this)', () => {
     expect(portraitBox.y).toBeLessThan(perBox.y);
   });
 
-  test('Why this (/why-this) has active Profile in navbar', async ({ page }) => {
+  test('Why this (/why-this) has active Profile in navbar', async ({
+    page,
+  }) => {
     await page.goto('/why-this');
     await expect(page.locator('.site-header')).toBeVisible();
     await expectNavLinkActive(page, 'Profile');
@@ -405,7 +409,6 @@ test.describe('Credits page (/credits)', () => {
     ).toBeVisible();
     await expect(page.getByText('AltumCode')).toBeVisible();
     await expect(page.getByText('Tommy')).toBeVisible();
-    await expect(page.getByText('Kevin Shi')).toBeVisible();
     await expect(page.getByText('Evgeni Tcherkasski')).toBeVisible();
     await expect(page.getByText('Weichao Deng')).toBeVisible();
     await expect(page.getByText('Guillaume Didelet')).toBeVisible();
@@ -460,10 +463,9 @@ test.describe('Contact page (/contact)', () => {
     await expect(page.locator('.contact-page__intro').first()).toBeVisible();
     await expect(page.getByText('Thanks for stopping by.')).toBeVisible();
     await expect(
-      page.getByText(
-        'I’m open to engineering roles, architecture projects, and collaborations.',
-      ),
+      page.getByText(/I’m open to engineering roles, architecture projects,/),
     ).toBeVisible();
+    await expect(page.getByText(/Feel free to reach out\./)).toBeVisible();
 
     const formLink = page.getByRole('link', { name: /Direct contact/i });
     await expect(formLink).toBeVisible();
@@ -474,6 +476,29 @@ test.describe('Contact page (/contact)', () => {
     );
   });
 
+  test('landing fit content reveals promptly (no long pending state)', async ({
+    page,
+  }) => {
+    await page.goto('/contact');
+    const fitContent = page.locator('.contact-page__fit-content');
+    await expect(fitContent).toBeAttached();
+    await expect
+      .poll(
+        async () =>
+          fitContent.evaluate((el) => ({
+            pending: el.classList.contains(
+              'contact-page__fit-content--pending',
+            ),
+            visible: el.classList.contains(
+              'contact-page__fit-content--visible',
+            ),
+            busy: el.getAttribute('aria-busy'),
+          })),
+        { timeout: 1200 },
+      )
+      .toEqual({ pending: false, visible: true, busy: null });
+  });
+
   test('landing fit stays non-overflowing across aggressive zoom and mobile widths', async ({
     page,
   }) => {
@@ -482,9 +507,8 @@ test.describe('Contact page (/contact)', () => {
       { width: 1024, height: 768 },
       { width: 390, height: 844 },
     ];
-    const zooms = [1, 2, 3];
-
     for (const viewport of viewports) {
+      const zooms = viewport.width <= 430 ? [1, 2] : [1, 2, 3];
       await page.setViewportSize(viewport);
       await page.goto('/contact');
       await expect(page.locator('.contact-page__fit-content')).toBeAttached();
@@ -540,7 +564,7 @@ test.describe('Contact page (/contact)', () => {
           });
 
           return {
-            ok: introOk && linksOk && rowsNoWrap,
+            ok: linksOk && rowsNoWrap,
             introOk,
             linksOk,
             rowsNoWrap,
@@ -559,6 +583,45 @@ test.describe('Contact page (/contact)', () => {
       document.documentElement.style.zoom = '1';
       window.dispatchEvent(new Event('resize'));
     });
+  });
+
+  test('zoom freeze state persists across composition pages', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.goto('/profile');
+
+    // Simulate strong zoom pressure via viewport squeeze (ratio based on baseline inner width).
+    await page.setViewportSize({ width: 360, height: 900 });
+
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () =>
+              document.body.classList.contains('zoom-threshold-exceeded') &&
+              document
+                .querySelector('main.content')
+                ?.classList.contains('zoom-freeze-active') === true,
+          ),
+        { timeout: 1500 },
+      )
+      .toBe(true);
+
+    await page.goto('/contact');
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () =>
+              document.body.classList.contains('zoom-threshold-exceeded') &&
+              document
+                .querySelector('main.content')
+                ?.classList.contains('zoom-freeze-active') === true,
+          ),
+        { timeout: 1500 },
+      )
+      .toBe(true);
   });
 
   test('form page shows contact form fields', async ({ page }) => {

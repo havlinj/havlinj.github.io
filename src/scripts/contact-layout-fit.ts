@@ -39,8 +39,6 @@ function startContactInsetFit(): void {
       : 0.1;
   let raf = 0;
   let revealed = false;
-  let stablePasses = 0;
-  let lastLayoutKey = '';
 
   function forceReveal(): void {
     if (revealed || !fitContentEl) return;
@@ -196,21 +194,6 @@ function startContactInsetFit(): void {
       `${topPad + introH + rowGap}px`,
     );
 
-    const layoutKey = [
-      Math.round(panelEdge),
-      Math.round(desiredFontPx * 1000) / 1000,
-      Math.round(neededWidth),
-      Math.round(neededHeight),
-      Math.round(topPad),
-      Math.round(rowGap),
-      Math.round(introH),
-    ].join('|');
-    if (layoutKey === lastLayoutKey) {
-      stablePasses += 1;
-    } else {
-      stablePasses = 0;
-      lastLayoutKey = layoutKey;
-    }
     revealAfterStableLayout();
   }
 

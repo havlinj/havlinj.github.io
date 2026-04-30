@@ -69,8 +69,16 @@ ul.post-list > li::before {
 
 /* Writing index row height tied to panel size (cqi), with rem guardrails for extremes. */
 .writing-page .page-button {
-  min-height: clamp(var(--panel-row-min-h), var(--writing-row-min-h, 5.8cqi), 2.35rem);
-  max-height: clamp(2.2rem, var(--writing-row-max-h, 6.8cqi), var(--panel-row-max-h));
+  min-height: clamp(
+    var(--panel-row-min-h),
+    var(--writing-row-min-h, 5.8cqi),
+    2.35rem
+  );
+  max-height: clamp(
+    2.2rem,
+    var(--writing-row-max-h, 6.8cqi),
+    var(--panel-row-max-h)
+  );
 }
 
 /* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).

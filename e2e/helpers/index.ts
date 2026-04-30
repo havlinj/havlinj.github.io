@@ -8,7 +8,7 @@ export {
 export { expectFoundationsRevealCopyPainted } from './profile-foundations-reveal';
 export { countRevealRasterSignature } from './foundations-reveal-raster';
 export { waitTwoFrames } from './raf';
-export { mustBox } from './geometry';
+export { mustBox, readSquareContainment } from './geometry';
 export {
   fillContactFormWithValidData,
   installTurnstileResetCounter,
