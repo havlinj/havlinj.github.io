@@ -28,11 +28,23 @@
   --contact-stack-top-px: 16px;
   --contact-intro-top-px: 16px;
   --contact-links-top-px: 120px;
+  /* Multiplies JS/CSS --contact-fluid-font on intro + link rows (icons use em). */
+  --contact-font-scale: 1;
   --contact-fluid-font: clamp(
     var(--panel-fluid-font-min),
     calc(var(--panel-fluid-font-preferred) + 0.03rem),
     var(--panel-fluid-font-max)
   );
+}
+
+@media (max-width: 36rem) {
+  .contact-page .page-buttons-panel {
+    --contact-font-scale: 0.95;
+    /* Slightly stronger Y nudge than article inline (0.2); same calc as ::before bg-position. */
+    --panel-bg-nudge-y: 0.25;
+    /* Article default 1.1 — extra zoom on small viewports (background-size on ::before). */
+    --panel-bg-zoom: 1;
+  }
 }
 
 .contact-page .page-buttons-panel::before {
@@ -72,7 +84,7 @@
   left: auto;
   right: 0;
   box-sizing: border-box;
-  font-size: var(--contact-fluid-font);
+  font-size: calc(var(--contact-fluid-font) * var(--contact-font-scale));
   width: max-content;
   max-width: calc(100% - var(--panel-padding-left, 2rem));
   min-width: 0;
@@ -89,10 +101,16 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 1.05em;
+  /* Same rhythm as panel button stacks; never looser than ~half an em. */
+  gap: max(0.5em, var(--panel-row-gap));
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
-  padding: 1rem 0.8rem calc(1rem - 0.35em) 0.8rem;
+  /* Tight vertical footprint (more background visible); scales like --content-side-pad-compact. */
+  --contact-intro-pad-x: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
+  --contact-intro-pad-top: clamp(0.5rem, 0.42rem + 1.1vw, 0.94rem);
+  --contact-intro-pad-bottom: clamp(0.36rem, 0.32rem + 0.75vw, 0.68rem);
+  padding: var(--contact-intro-pad-top) var(--contact-intro-pad-x)
+    var(--contact-intro-pad-bottom);
 }
 
 .contact-page__inset-rect--links {
@@ -113,35 +131,29 @@
 .contact-page__intro {
   margin: 0;
   padding: 0;
-  font-size: var(--contact-fluid-font);
   font-weight: 500;
-  line-height: 1.55;
+  line-height: 1.44;
   letter-spacing: 0.012em;
   color: rgba(17, 17, 17, 0.96);
-  white-space: nowrap;
-  max-width: none;
+  white-space: normal;
+  max-width: 100%;
+  min-width: 0;
   hyphens: none;
-  word-break: keep-all;
-  overflow-wrap: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .contact-page__intro--lead {
-  line-height: 1.48;
+  line-height: 1.36;
   letter-spacing: -0.02em;
   font-weight: 600;
   opacity: 0.95;
-  font-size: calc(var(--contact-fluid-font) * 1.08);
+  /* Slight lift vs body; em tracks scaled inset font-size. */
+  font-size: 1.045em;
 }
 
-.contact-page__intro-line1 {
-  display: inline-block;
-  padding-right: var(--contact-intro-line-tail-pad, 0.6em);
-  opacity: 0.98;
-  line-height: 1.62;
+.contact-page .contact-page__intro-phrase {
   white-space: nowrap;
-  hyphens: none;
-  word-break: keep-all;
-  overflow-wrap: normal;
 }
 
 .contact-page__links {
@@ -165,7 +177,7 @@
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
-  font-size: var(--contact-fluid-font);
+  font-size: inherit;
   gap: 0.62em;
   padding: var(--contact-link-pad-block, 0.2em)
     calc(

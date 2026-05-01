@@ -457,15 +457,18 @@ test.describe('Contact page (/contact)', () => {
   test('landing shows intro on panel and links to form', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.contact-page__fit-content')).toBeAttached();
-    await expect(
-      page.locator('.contact-page__inset-rect--intro'),
-    ).toBeVisible();
-    await expect(page.locator('.contact-page__intro').first()).toBeVisible();
-    await expect(page.getByText('Thanks for stopping by.')).toBeVisible();
-    await expect(
-      page.getByText(/I’m open to engineering roles, architecture projects,/),
-    ).toBeVisible();
-    await expect(page.getByText(/Feel free to reach out\./)).toBeVisible();
+    const introRect = page.locator('.contact-page__inset-rect--intro');
+    await expect(introRect).toBeVisible();
+    const introPs = introRect.locator('.contact-page__intro');
+    await expect(introPs).toHaveCount(2);
+    await expect(introPs.nth(0)).toHaveText('Thanks for stopping by.');
+    await expect(introPs.nth(0)).toHaveClass(/contact-page__intro--lead/);
+    const bodyPhrases = introPs.nth(1).locator('.contact-page__intro-phrase');
+    await expect(bodyPhrases).toHaveCount(2);
+    await expect(bodyPhrases.nth(0)).toHaveText(
+      'Roles, projects, collaborations —',
+    );
+    await expect(bodyPhrases.nth(1)).toHaveText('reach out anytime.');
 
     const formLink = page.getByRole('link', { name: /Direct contact/i });
     await expect(formLink).toBeVisible();
@@ -551,23 +554,19 @@ test.describe('Contact page (/contact)', () => {
             links.scrollWidth <= links.clientWidth + tol &&
             links.scrollHeight <= links.clientHeight + tol;
 
-          const introText = Array.from(
-            intro.querySelectorAll('.contact-page__intro'),
-          ) as HTMLElement[];
           const linkRows = Array.from(
             links.querySelectorAll('.contact-extra-link'),
           ) as HTMLElement[];
-          const allRows = [...introText, ...linkRows];
-          const rowsNoWrap = allRows.every((el) => {
+          const linkRowsNoWrap = linkRows.every((el) => {
             const cs = getComputedStyle(el);
             return cs.whiteSpace === 'nowrap';
           });
 
           return {
-            ok: linksOk && rowsNoWrap,
+            ok: linksOk && linkRowsNoWrap,
             introOk,
             linksOk,
-            rowsNoWrap,
+            linkRowsNoWrap,
             zoom: getComputedStyle(document.documentElement).zoom || 'n/a',
           };
         });
