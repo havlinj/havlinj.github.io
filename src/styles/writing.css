@@ -63,6 +63,18 @@ ul.post-list > li::before {
 }
 
 /*
+ * Narrow phones: at 1:1 display scale the pool PNG (Bayer-ish raster) can beat against the
+ * device pixel grid and show a harsh checker/map. A hair over-scale forces resampling without
+ * a visible crop change (panel overflow clips; transform-origin center).
+ */
+@media (max-width: 36rem) {
+  .writing-page .page-buttons-panel::before {
+    transform: translate3d(0, 0, 0) scale(1.006);
+    transform-origin: center center;
+  }
+}
+
+/*
  * Pool photo strength: `--panel-bg-*` + `--panel-bg-layer-opacity` on `article.writing-page`
  * (writing.astro). Uses default `.page-buttons-panel::before` filter stack from page-buttons.css.
  */
