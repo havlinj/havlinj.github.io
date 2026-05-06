@@ -34,7 +34,7 @@ export const WHY_CLIP_PLAYBACK_RATE = 1;
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
 
 /** CTA chevron blink: peak path opacity (clamped strictly below 1 in `AnimatedArrow`). */
-export const WHY_CTA_ARROW_PEAK_OPACITY = 0.47;
+export const WHY_CTA_ARROW_PEAK_OPACITY = 0.45;
 
 /**
  * CTA blink: minimum path opacity at the dimmest point (never 0 — arrow stays faintly visible).

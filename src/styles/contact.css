@@ -35,6 +35,12 @@
     calc(var(--panel-fluid-font-preferred) + 0.03rem),
     var(--panel-fluid-font-max)
   );
+  --contact-links-font-scale: 0.9;
+  --contact-links-width: 38%;
+  /* Extra vertical separation: roughly one button row + two row gaps. */
+  --contact-links-extra-gap: calc(
+    var(--panel-row-max-h) + (2 * var(--contact-link-row-gap, var(--panel-row-gap)))
+  );
 }
 
 @media (max-width: 36rem) {
@@ -106,15 +112,16 @@
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
   /* Tight vertical footprint (more background visible); scales like --content-side-pad-compact. */
-  --contact-intro-pad-x: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
-  --contact-intro-pad-top: clamp(0.5rem, 0.42rem + 1.1vw, 0.94rem);
-  --contact-intro-pad-bottom: clamp(0.36rem, 0.32rem + 0.75vw, 0.68rem);
-  padding: var(--contact-intro-pad-top) var(--contact-intro-pad-x)
-    var(--contact-intro-pad-bottom);
+  --contact-intro-pad-left: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
+  --contact-intro-pad-right: clamp(0.9rem, 0.72rem + 2.15vw, 1.24rem);
+  --contact-intro-pad-top: clamp(0.6rem, 0.5rem + 1.2vw, 1.04rem);
+  --contact-intro-pad-bottom: clamp(0.82rem, 0.62rem + 1.85vw, 1.3rem);
+  padding: var(--contact-intro-pad-top) var(--contact-intro-pad-right)
+    var(--contact-intro-pad-bottom) var(--contact-intro-pad-left);
 }
 
 .contact-page__inset-rect--links {
-  top: var(--contact-links-top-px);
+  top: calc(var(--contact-links-top-px) + var(--contact-links-extra-gap));
   left: auto;
   right: 0;
   inset-inline-start: auto;
@@ -122,8 +129,13 @@
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  inline-size: fit-content;
-  max-inline-size: min(100%, calc(100% - var(--panel-padding-left, 2rem)));
+  font-size: calc(
+    var(--contact-fluid-font) * var(--contact-font-scale) *
+      var(--contact-links-font-scale)
+  );
+  inline-size: var(--contact-links-width);
+  width: var(--contact-links-width);
+  max-inline-size: var(--contact-links-width);
   padding: 0;
   background: transparent;
 }
@@ -161,8 +173,9 @@
   flex-direction: column;
   align-items: stretch;
   gap: max(0.45rem, var(--contact-link-row-gap, var(--panel-row-gap)));
-  inline-size: fit-content;
-  max-inline-size: min(100%, calc(100% - var(--panel-padding-left, 2rem)));
+  inline-size: 100%;
+  width: 100%;
+  max-inline-size: 100%;
 }
 
 .contact-page .contact-extra-link {
@@ -172,8 +185,17 @@
   inline-size: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
-  min-height: var(--contact-link-row-min-h, var(--panel-row-min-h));
-  max-height: var(--contact-link-row-max-h, var(--panel-row-max-h));
+  /* Match Writing row-height resizing rules (cqi-driven with rem guardrails). */
+  min-height: clamp(
+    var(--panel-row-min-h),
+    var(--contact-link-row-min-h, 5.8cqi),
+    2.35rem
+  );
+  max-height: clamp(
+    2.2rem,
+    var(--contact-link-row-max-h, 6.8cqi),
+    var(--panel-row-max-h)
+  );
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);
