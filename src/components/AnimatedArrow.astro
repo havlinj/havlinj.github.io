@@ -39,8 +39,9 @@ interface Props {
   /**
    * `segmented` — stacked trapezoids + optional texture (default).
    * `solid-blink` — one filled chevron, same outer outline; fill `--arrow-color`; opacity blinks (see `duration`).
+   * `solid-outline-blink` — one continuous chevron outline, no fill; stroke blinks by opacity.
    */
-  variant?: 'segmented' | 'solid-blink';
+  variant?: 'segmented' | 'solid-blink' | 'solid-outline-blink';
   /**
    * `solid-blink` only: opacity at the bright part of the blink (always clamped below 1).
    */
@@ -124,9 +125,10 @@ const responsiveClampMaxPx = (() => {
 })();
 
 const variant =
-  props.variant === 'solid-blink'
+  props.variant === 'solid-blink' || props.variant === 'solid-outline-blink'
     ? ('solid-blink' as const)
     : ('segmented' as const);
+const isOutlineBlink = props.variant === 'solid-outline-blink';
 
 const color = props.color ?? '#111';
 const durationSec = Number(props.duration);
@@ -223,7 +225,11 @@ const rootStyle = [
 
 const dirClass = direction === 'down' ? 'animated-arrow--down' : '';
 const variantRootClass =
-  variant === 'solid-blink' ? 'animated-arrow-root--solid-blink' : '';
+  variant === 'solid-blink'
+    ? isOutlineBlink
+      ? 'animated-arrow-root--solid-outline-blink'
+      : 'animated-arrow-root--solid-blink'
+    : '';
 const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
 ---
 
@@ -254,9 +260,12 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     {
       variant === 'solid-blink' ? (
         <path
-          class="animated-arrow__solid"
+          class={isOutlineBlink ? 'animated-arrow__solid-outline' : 'animated-arrow__solid'}
           d={SOLID_CHEVRON_PATH}
-          fill="var(--arrow-color)"
+          fill={isOutlineBlink ? 'none' : 'var(--arrow-color)'}
+          stroke={isOutlineBlink ? 'var(--arrow-color)' : undefined}
+          stroke-width={isOutlineBlink ? '4' : undefined}
+          stroke-linejoin={isOutlineBlink ? 'round' : undefined}
         />
       ) : (
         <>

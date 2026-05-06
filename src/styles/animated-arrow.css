@@ -142,6 +142,14 @@
   transform-box: fill-box;
 }
 
+.animated-arrow-root--solid-outline-blink .animated-arrow__solid-outline {
+  fill: none;
+  stroke: var(--arrow-color);
+  animation: animated-arrow-blink var(--arrow-blink-duration, 1.45s) ease-in-out
+    infinite;
+  transform-box: fill-box;
+}
+
 @keyframes animated-arrow-blink {
   0%,
   100% {

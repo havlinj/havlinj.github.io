@@ -37,13 +37,13 @@ export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
  * Solid CTA chevron blink: peak path opacity (clamped strictly below 1 in `AnimatedArrow`).
  * Tune down if the page-bg fill reads too bright on `#111`. Passed as `solidBlinkPeakOpacity` from `WhyContent.astro`.
  */
-export const WHY_CTA_ARROW_PEAK_OPACITY = 0.26;
+export const WHY_CTA_ARROW_PEAK_OPACITY = 0.47;
 
 /**
  * Solid CTA blink: minimum path opacity at the dimmest point (never 0 — arrow stays faintly visible).
  * Must stay below `WHY_CTA_ARROW_PEAK_OPACITY`; `AnimatedArrow` clamps if needed.
  */
-export const WHY_CTA_ARROW_FLOOR_OPACITY = 0.1;
+export const WHY_CTA_ARROW_FLOOR_OPACITY = 0.05;
 
 /**
  * JS fallback when computed padding-right is missing (≈ 3rem at 16px root).

@@ -653,31 +653,7 @@
  * Wash with the same panel color so the feather chromatically matches --why-box-bg.
  */
 .why-page .why-clip-frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  background:
-    radial-gradient(
-      120% 100% at 100% 0%,
-      var(--why-box-bg) 0%,
-      color-mix(in srgb, var(--why-box-bg) 45%, transparent) 38%,
-      transparent 58%
-    ),
-    radial-gradient(
-      120% 100% at 0% 100%,
-      var(--why-box-bg) 0%,
-      color-mix(in srgb, var(--why-box-bg) 45%, transparent) 38%,
-      transparent 58%
-    ),
-    radial-gradient(
-      115% 95% at 100% 100%,
-      var(--why-box-bg) 0%,
-      color-mix(in srgb, var(--why-box-bg) 40%, transparent) 36%,
-      transparent 56%
-    );
+  content: none;
 }
 
 .why-page .why-clip-frame::after {
@@ -687,9 +663,9 @@
   z-index: 2;
   pointer-events: none;
   border-radius: inherit;
-  /* Same hue as panel — never pure black (rgba(0,0,0)) or the edge reads wrong vs #111. */
+  /* Keep only the top horizontal veil over the clip. */
   background: linear-gradient(
-    to top,
+    to bottom,
     var(--why-box-bg) 0%,
     color-mix(in srgb, var(--why-box-bg) 52%, transparent) 10%,
     color-mix(in srgb, var(--why-box-bg) 22%, transparent) 20%,
@@ -726,73 +702,3 @@
   pointer-events: none;
 }
 
-.why-page .why-clip-poster img,
-.why-page .why-clip {
-  /* Dissolve corners: top-right + bottom-left.
-     This version uses diagonal fades along the two diagonals. */
-  -webkit-mask-image:
-    linear-gradient(
-      to bottom left,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 10%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 26%,
-      rgba(0, 0, 0, 0.6) 32%,
-      rgba(0, 0, 0, 1) 38%
-    ),
-    linear-gradient(
-      to top right,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 10%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 26%,
-      rgba(0, 0, 0, 0.6) 32%,
-      rgba(0, 0, 0, 1) 38%
-    ),
-    /* Extra dissolve near bottom-right corner:
-       gradient runs from right-bottom towards left-top, but stays short. */
-    linear-gradient(
-        325deg,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0) 12%,
-        rgba(0, 0, 0, 0.12) 18%,
-        rgba(0, 0, 0, 0.26) 24%,
-        rgba(0, 0, 0, 0.6) 30%,
-        rgba(0, 0, 0, 1) 36%
-      );
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  -webkit-mask-composite: intersect;
-
-  mask-image:
-    linear-gradient(
-      to bottom left,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 10%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 26%,
-      rgba(0, 0, 0, 0.6) 32%,
-      rgba(0, 0, 0, 1) 38%
-    ),
-    linear-gradient(
-      to top right,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 10%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 26%,
-      rgba(0, 0, 0, 0.6) 32%,
-      rgba(0, 0, 0, 1) 38%
-    ),
-    linear-gradient(
-      325deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0) 12%,
-      rgba(0, 0, 0, 0.12) 18%,
-      rgba(0, 0, 0, 0.26) 24%,
-      rgba(0, 0, 0, 0.6) 30%,
-      rgba(0, 0, 0, 1) 36%
-    );
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
-  mask-composite: intersect;
-}
