@@ -576,8 +576,8 @@
 /* --- 5) Clip column (shares --why-line-* / --why-gif-* with revolver) --- */
 .why-page .why-clip-holder {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
+  right: auto;
   /*
    * Same inset as text from the scroll padding box (inner panel edge), not from .why-content:
    * .why-scroll has padding-top (clamp em + vw), subtracted in JS as --why-scroll-pad-top.
@@ -588,21 +588,21 @@
       (var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px))
   );
   z-index: 0;
-  width: 100%;
+  width: min(100%, 48ch);
   max-width: 48ch;
   padding-left: 0;
   padding-right: 0;
   margin: 0;
   box-sizing: border-box;
 
-  transform: translateX(var(--why-gif-align-x, var(--why-base-inset)))
+  transform: translateX(-50%)
     translateY(calc(var(--why-gif-y, 0px) + var(--why-gif-nudge-y, 0px)))
     scale(calc(var(--why-gif-base-scale, 1) * var(--why-line-scale, 1)));
   /*
    * Keep clip top anchor stable against panel top inset even when scaled down on compact screens.
    * Center-origin scaling introduced a visible top gap drift under zoom-like mobile conditions.
    */
-  transform-origin: left top;
+  transform-origin: center top;
   /* --why-gif-opacity: revolver/CTA from why-box-scroll.ts; --why-gif-base-opacity: WhyContent / why-layout */
   opacity: calc(var(--why-gif-opacity, 1) * var(--why-gif-base-opacity, 1));
   transition: none;
@@ -705,6 +705,7 @@
   height: 100%;
   display: block;
   object-fit: cover;
+  object-position: 50% 50%;
   pointer-events: none;
 }
 
@@ -716,6 +717,12 @@
   height: 100%;
   display: block;
   object-fit: cover;
+  object-position: 50% 50%;
+  transform: scale(1.4);
+  filter: contrast(1) brightness(1) saturate(1);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  image-rendering: auto;
   pointer-events: none;
 }
 

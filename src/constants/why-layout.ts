@@ -3,23 +3,16 @@
  * CSS that cannot read TS should duplicate with a “sync:” comment to this file.
  */
 
-/** Viewport: mobile clip assets (picture + video src in `why-clip-media.ts`). */
-export const WHY_CLIP_VIEWPORT_MOBILE_MQ = '(max-width: 767px)';
+/** Shared /why clip asset for desktop + mobile. */
+export const WHY_CLIP_VIDEO =
+  '/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_inversed_clean.mp4';
 
-export const WHY_CLIP_VIDEO_MOBILE =
-  '/assets/pages/profile/why/mobile/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom_mobile.mp4';
-
-export const WHY_CLIP_VIDEO_DESKTOP =
-  '/assets/pages/profile/why/desktop/nicola_narraci_15717076_1280_720_30fps_pexels_reverse_loop_dichrom.mp4';
-
-export const WHY_CLIP_POSTER_MOBILE =
-  '/assets/pages/profile/why/mobile/fallback_mobile.jpg';
-
-export const WHY_CLIP_POSTER_DESKTOP =
-  '/assets/pages/profile/why/desktop/fallback_desktop.jpg';
+/** Shared /why clip fallback image for poster and errors. */
+export const WHY_CLIP_FALLBACK_IMAGE =
+  '/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_fallback_image_desktop.jpg';
 
 /** Horizontal CTA anchor: fraction of `.why-box` width from the left (arrow center; CSS uses translateX(-50%)). */
-export const WHY_CTA_BOX_WIDTH_FRAC = 0.488;
+export const WHY_CTA_BOX_WIDTH_FRAC = 0.5;
 
 /**
  * GIF band from scroll inner edge (custom property on `.why-wrapper`).
@@ -32,24 +25,10 @@ export const WHY_GIF_TOP_INSET = '2.11em';
  * Multiplier for GIF opacity (0–1). Final opacity = scroll-script factor × this.
  * Set on `.why-wrapper` as `--why-gif-base-opacity`; sync `why.css` `.why-clip-holder`.
  */
-export const WHY_GIF_BASE_OPACITY = 0.7;
+export const WHY_GIF_BASE_OPACITY = 1;
 
-/**
- * Background clip `playbackRate` oscillates in time only (not tied to scroll / wheel).
- * Tuning (if the effect feels invisible): (1) shorten `SINE_PERIOD_MS` — long periods mean
- * glacial change; (2) widen `SINE_HIGH − SINE_LOW` — e.g. 0.35→1.15 reads clearly on motion;
- * (3) try `WAVE: 'triangle'` — linear sweep through speeds vs smooth sine dwell near extrema.
- * Phase: `phase = 2π * tSec / (SINE_PERIOD_MS/1000) + SINE_PHASE_RAD`, `tSec = performance.now()/1000`.
- */
-export const WHY_CLIP_PLAYBACK_SINE_LOW = 0.32;
-export const WHY_CLIP_PLAYBACK_SINE_HIGH = 1.12;
-/** Duration of one full wave cycle (milliseconds). */
-export const WHY_CLIP_PLAYBACK_SINE_PERIOD_MS = 5200;
-/** Added to wave phase (radians). */
-export const WHY_CLIP_PLAYBACK_SINE_PHASE_RAD = 0;
-
-/** `sine` — smooth; `triangle` — constant rate of change through LOW↔HIGH (often easier to notice). */
-export const WHY_CLIP_PLAYBACK_WAVE: 'sine' | 'triangle' = 'triangle';
+/** Constant playback speed for /why background clip. */
+export const WHY_CLIP_PLAYBACK_RATE = 1;
 
 /** Scroll-hint arrow: `AnimatedArrow` `containerCqw` (width vs `.why-box`). */
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;

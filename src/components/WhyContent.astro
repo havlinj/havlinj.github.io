@@ -1,9 +1,8 @@
 ---
 import AnimatedArrow from './AnimatedArrow.astro';
 import {
-  WHY_CLIP_POSTER_DESKTOP,
-  WHY_CLIP_POSTER_MOBILE,
-  WHY_CLIP_VIEWPORT_MOBILE_MQ,
+  WHY_CLIP_FALLBACK_IMAGE,
+  WHY_CLIP_VIDEO,
   WHY_CTA_ARROW_FLOOR_OPACITY,
   WHY_CTA_ARROW_PEAK_OPACITY,
   WHY_CTA_BOX_WIDTH_FRAC,
@@ -49,19 +48,6 @@ import '../styles/why.css';
         <div class="why-clip-holder" aria-hidden="true">
           <div class="why-clip-frame">
             <div class="why-clip-stack">
-              <picture class="why-clip-poster" aria-hidden="true">
-                <source
-                  media={WHY_CLIP_VIEWPORT_MOBILE_MQ}
-                  srcset={WHY_CLIP_POSTER_MOBILE}
-                />
-                <img
-                  src={WHY_CLIP_POSTER_DESKTOP}
-                  alt=""
-                  decoding="async"
-                  width="1280"
-                  height="720"
-                />
-              </picture>
               <video
                 class="why-clip"
                 autoplay
@@ -70,6 +56,8 @@ import '../styles/why.css';
                 playsinline
                 preload="metadata"
                 aria-hidden="true"
+                src={WHY_CLIP_VIDEO}
+                poster={WHY_CLIP_FALLBACK_IMAGE}
               >
               </video>
             </div>

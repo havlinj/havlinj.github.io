@@ -1,8 +1,8 @@
 import {
+  PROFILE_GIF_TILE_VIEWPORT_MOBILE_MQ,
   PROFILE_GIF_TILE_VIDEO_DESKTOP,
   PROFILE_GIF_TILE_VIDEO_MOBILE,
 } from '../constants/profile-media';
-import { WHY_CLIP_VIEWPORT_MOBILE_MQ } from '../constants/why-layout';
 import { pathnameOfMediaSrc } from '../utils/why-clip-media-logic';
 
 const MIN_RATE = 0.0625;
@@ -54,7 +54,7 @@ export function wireProfileGifTileMedia(root: ParentNode = document): void {
     return;
   }
 
-  const mobileMq = window.matchMedia(WHY_CLIP_VIEWPORT_MOBILE_MQ);
+  const mobileMq = window.matchMedia(PROFILE_GIF_TILE_VIEWPORT_MOBILE_MQ);
 
   for (const stack of stacks) {
     const rawClip = stack.querySelector('video.profile-gif-tile__media');
@@ -106,7 +106,7 @@ export function wireProfileGifTileMedia(root: ParentNode = document): void {
 }
 
 function wireSingleVideoWithoutPoster(clipVideo: HTMLVideoElement): void {
-  const mobileMq = window.matchMedia(WHY_CLIP_VIEWPORT_MOBILE_MQ);
+  const mobileMq = window.matchMedia(PROFILE_GIF_TILE_VIEWPORT_MOBILE_MQ);
 
   function applySrc(): void {
     const next = profileGifTileVideoPathForViewport(mobileMq);

@@ -1,26 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  WHY_CLIP_VIDEO_DESKTOP,
-  WHY_CLIP_VIDEO_MOBILE,
-} from '../../src/constants/why-layout';
-import {
-  clipVideoPathForViewport,
-  pathnameOfMediaSrc,
-} from '../../src/utils/why-clip-media-logic';
-
-describe('clipVideoPathForViewport', () => {
-  it('returns mobile path when mq.matches', () => {
-    expect(clipVideoPathForViewport({ matches: true })).toBe(
-      WHY_CLIP_VIDEO_MOBILE,
-    );
-  });
-
-  it('returns desktop path when mq does not match', () => {
-    expect(clipVideoPathForViewport({ matches: false })).toBe(
-      WHY_CLIP_VIDEO_DESKTOP,
-    );
-  });
-});
+import { pathnameOfMediaSrc } from '../../src/utils/why-clip-media-logic';
 
 describe('pathnameOfMediaSrc', () => {
   it('prefers currentSrc over src', () => {

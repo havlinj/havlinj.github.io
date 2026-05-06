@@ -110,7 +110,7 @@ title: 'Profile'
     <div class="profile-media-surface" aria-hidden="true">
       <div class="profile-gif-tile__stack">
       <picture class="profile-gif-tile-poster" aria-hidden="true">
-        <!-- sync: WHY_CLIP_VIEWPORT_MOBILE_MQ in src/constants/why-layout.ts -->
+        <!-- sync: PROFILE_GIF_TILE_VIEWPORT_MOBILE_MQ in src/constants/profile-media.ts -->
         <source
           media="(max-width: 767px)"
           srcset="/assets/pages/profile/what-i-do/fallback_mobile.jpg"

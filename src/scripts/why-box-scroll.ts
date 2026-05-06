@@ -2,11 +2,7 @@ import './why-clip-media';
 import { WHY_FIT_REFERENCE_LINE } from '../constants/why-fit-reference';
 import {
   WHY_BODY_MAX_INSET_REM,
-  WHY_CLIP_PLAYBACK_SINE_HIGH,
-  WHY_CLIP_PLAYBACK_SINE_LOW,
-  WHY_CLIP_PLAYBACK_SINE_PERIOD_MS,
-  WHY_CLIP_PLAYBACK_SINE_PHASE_RAD,
-  WHY_CLIP_PLAYBACK_WAVE,
+  WHY_CLIP_PLAYBACK_RATE,
   WHY_TEXT_RIGHT_GUTTER_REM,
 } from '../constants/why-layout';
 import { clamp } from '../utils/why-scroll-math';
@@ -61,63 +57,16 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   const gifEl = scrollEl.querySelector('.why-clip-holder');
   const introTopBandEl = boxEl.querySelector('.why-intro-top-band');
   const clipVideo = scrollEl.querySelector('video.why-clip');
-  const clipPlaybackMid =
-    (WHY_CLIP_PLAYBACK_SINE_LOW + WHY_CLIP_PLAYBACK_SINE_HIGH) / 2;
   if (clipVideo instanceof HTMLVideoElement) {
-    clipVideo.playbackRate = clipPlaybackMid;
-  }
-
-  let clipSineRaf = 0;
-  function stopClipPlaybackSineLoop() {
-    if (clipSineRaf) {
-      cancelAnimationFrame(clipSineRaf);
-      clipSineRaf = 0;
-    }
-  }
-  function tickClipPlaybackSine() {
-    clipSineRaf = 0;
-    if (!(clipVideo instanceof HTMLVideoElement)) return;
-    if (whyScrollPrefersReducedMotion()) {
-      clipVideo.playbackRate = clipPlaybackMid;
-      return;
-    }
-    const periodSec = Math.max(1e-3, WHY_CLIP_PLAYBACK_SINE_PERIOD_MS / 1000);
-    const tSec = performance.now() * 0.001;
-    const phase =
-      (tSec * (Math.PI * 2)) / periodSec + WHY_CLIP_PLAYBACK_SINE_PHASE_RAD;
-    let wave;
-    if (WHY_CLIP_PLAYBACK_WAVE === 'triangle') {
-      const twoPi = Math.PI * 2;
-      let p = phase % twoPi;
-      if (p < 0) p += twoPi;
-      wave = p < Math.PI ? p / Math.PI : 2 - p / Math.PI;
-    } else {
-      wave = (Math.sin(phase) + 1) * 0.5;
-    }
-    const rate =
-      WHY_CLIP_PLAYBACK_SINE_LOW +
-      wave * (WHY_CLIP_PLAYBACK_SINE_HIGH - WHY_CLIP_PLAYBACK_SINE_LOW);
-    clipVideo.playbackRate = clamp(rate, 0.08, 4);
-    clipSineRaf = requestAnimationFrame(tickClipPlaybackSine);
-  }
-  function startClipPlaybackSineLoop() {
-    if (!(clipVideo instanceof HTMLVideoElement)) return;
-    if (whyScrollPrefersReducedMotion()) {
-      clipVideo.playbackRate = clipPlaybackMid;
-      return;
-    }
-    if (clipSineRaf) return;
-    clipSineRaf = requestAnimationFrame(tickClipPlaybackSine);
+    clipVideo.playbackRate = WHY_CLIP_PLAYBACK_RATE;
   }
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      stopClipPlaybackSineLoop();
-      if (clipVideo instanceof HTMLVideoElement) {
-        clipVideo.playbackRate = clipPlaybackMid;
-      }
-    } else {
-      startClipPlaybackSineLoop();
+    if (
+      document.visibilityState === 'visible' &&
+      clipVideo instanceof HTMLVideoElement
+    ) {
+      clipVideo.playbackRate = WHY_CLIP_PLAYBACK_RATE;
     }
   });
 
@@ -667,8 +616,11 @@ import { createWhyScrollVeils } from './why-scroll-veils';
   }
 
   function init() {
-    if (document.visibilityState === 'visible') {
-      startClipPlaybackSineLoop();
+    if (
+      document.visibilityState === 'visible' &&
+      clipVideo instanceof HTMLVideoElement
+    ) {
+      clipVideo.playbackRate = WHY_CLIP_PLAYBACK_RATE;
     }
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
     fontsReady.finally(() => afterTwoFrames(revealAfterStableLayout));
