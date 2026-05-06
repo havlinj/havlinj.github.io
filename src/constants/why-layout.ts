@@ -5,7 +5,7 @@
 
 /** Shared /why clip asset for desktop + mobile. */
 export const WHY_CLIP_VIDEO =
-  '/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_inversed_clean.mp4';
+  '/assets/pages/profile/why/deconjpa_12374260_1920_1440_60fps_pexels_inversed_pingpong_smoothered.mp4';
 
 /** Shared /why clip fallback image for poster and errors. */
 export const WHY_CLIP_FALLBACK_IMAGE =
@@ -34,13 +34,13 @@ export const WHY_CLIP_PLAYBACK_RATE = 1;
 export const WHY_SCROLL_CTA_CONTAINER_CQW = 9;
 
 /** CTA chevron blink: peak path opacity (clamped strictly below 1 in `AnimatedArrow`). */
-export const WHY_CTA_ARROW_PEAK_OPACITY = 0.45;
+export const WHY_CTA_ARROW_PEAK_OPACITY = 0.47;
 
 /**
  * CTA blink: minimum path opacity at the dimmest point (never 0 — arrow stays faintly visible).
  * Must stay below `WHY_CTA_ARROW_PEAK_OPACITY`; `AnimatedArrow` clamps if needed.
  */
-export const WHY_CTA_ARROW_FLOOR_OPACITY = 0.05;
+export const WHY_CTA_ARROW_FLOOR_OPACITY = 0.08;
 
 /**
  * JS fallback when computed padding-right is missing (≈ 3rem at 16px root).

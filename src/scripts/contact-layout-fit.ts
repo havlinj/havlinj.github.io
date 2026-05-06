@@ -31,6 +31,7 @@ function startContactInsetFit(): void {
   const fitContentEl = fitContent instanceof HTMLElement ? fitContent : null;
   const introRectEl = introRect;
   const linksRectEl = linksRect;
+  const cssVarCache = new Map<string, string>();
 
   const padFrac =
     Number.isFinite(CONTACT_LAYOUT.insetPanelPadFrac) &&
@@ -39,6 +40,12 @@ function startContactInsetFit(): void {
       : 0.1;
   let raf = 0;
   let revealed = false;
+
+  function setPanelVar(name: string, value: string): void {
+    if (cssVarCache.get(name) === value) return;
+    cssVarCache.set(name, value);
+    panelEl.style.setProperty(name, value);
+  }
 
   function forceReveal(): void {
     if (revealed || !fitContentEl) return;
@@ -60,11 +67,11 @@ function startContactInsetFit(): void {
   }
 
   function applyFontAndPanelMetrics(fontPx: number, panelEdge: number): void {
-    panelEl.style.setProperty('--contact-panel-edge', `${panelEdge}px`);
-    panelEl.style.setProperty('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
+    setPanelVar('--contact-panel-edge', `${panelEdge}px`);
+    setPanelVar('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
 
     const insetPadPx = panelEl.clientWidth * padFrac * 0.5;
-    panelEl.style.setProperty(
+    setPanelVar(
       '--contact-stack-top-px',
       `${Math.round(insetPadPx)}px`,
     );
@@ -118,6 +125,7 @@ function startContactInsetFit(): void {
   function measureNeededContent(): NeededContent {
     const topPad = Math.round(readPanelTopPadPx());
     const leftPad = Math.round(readPanelLeftPadPx());
+    // Keep original fit behavior so intro box geometry remains stable.
     const rowGap = readWritingRowGapPx(topPad);
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
@@ -188,10 +196,10 @@ function startContactInsetFit(): void {
       pass += 1;
     }
 
-    panelEl.style.setProperty('--contact-intro-top-px', `${topPad}px`);
-    panelEl.style.setProperty(
+    setPanelVar('--contact-intro-top-px', `${topPad}px`);
+    setPanelVar(
       '--contact-links-top-px',
-      `${topPad + introH + rowGap}px`,
+      `${topPad + introH + introH}px`,
     );
 
     revealAfterStableLayout();
@@ -213,9 +221,6 @@ function startContactInsetFit(): void {
   window.addEventListener('resize', schedule, { passive: true });
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', schedule, {
-      passive: true,
-    });
-    window.visualViewport.addEventListener('scroll', schedule, {
       passive: true,
     });
   }

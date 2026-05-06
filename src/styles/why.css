@@ -663,7 +663,7 @@
   display: block;
   object-fit: cover;
   object-position: 50% 50%;
-  transform: scale(1.4);
+  transform: scale(1.55);
   filter: contrast(1) brightness(1) saturate(1);
   backface-visibility: hidden;
   transform-style: preserve-3d;

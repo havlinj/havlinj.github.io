@@ -37,10 +37,6 @@
   );
   --contact-links-font-scale: 0.9;
   --contact-links-width: 38%;
-  /* Extra vertical separation: roughly one button row + two row gaps. */
-  --contact-links-extra-gap: calc(
-    var(--panel-row-max-h) + (2 * var(--contact-link-row-gap, var(--panel-row-gap)))
-  );
 }
 
 @media (max-width: 36rem) {
@@ -121,7 +117,7 @@
 }
 
 .contact-page__inset-rect--links {
-  top: calc(var(--contact-links-top-px) + var(--contact-links-extra-gap));
+  top: var(--contact-links-top-px);
   left: auto;
   right: 0;
   inset-inline-start: auto;
@@ -188,13 +184,13 @@
   /* Match Writing row-height resizing rules (cqi-driven with rem guardrails). */
   min-height: clamp(
     var(--panel-row-min-h),
-    var(--contact-link-row-min-h, 5.8cqi),
-    2.35rem
+    var(--contact-link-row-min-h, 6.8cqi),
+    3.05rem
   );
   max-height: clamp(
-    2.2rem,
-    var(--contact-link-row-max-h, 6.8cqi),
-    var(--panel-row-max-h)
+    2.7rem,
+    var(--contact-link-row-max-h, 7.8cqi),
+    3.25rem
   );
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
