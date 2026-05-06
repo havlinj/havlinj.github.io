@@ -48,6 +48,6 @@ All Pexels media listed below are used according to the
   - Edits: dichromatic treatment; desktop/mobile MP4 + static poster frames (`public/assets/pages/profile/what-i-do/`)
 
 - **Why section background video**
-  - Author: [Nicola Narraci](https://www.pexels.com/@nicola-narraci/)
-  - Source: [Pexels](https://www.pexels.com/video/15717076/)
-  - Edits: reverse loop, dichromatic treatment
+  - Author: [deconjpa](https://www.pexels.com/@deconjpa/)
+  - Source: [Pexels](https://www.pexels.com/video/12374259/)
+  - Edits: inverted look, clean master export (`public/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_inversed_clean.mp4`)
