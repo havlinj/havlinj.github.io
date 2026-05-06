@@ -1,7 +1,8 @@
 ---
 import '../styles/animated-arrow.css';
 /**
- * Chevron CTA: default segmented stack (+ optional texture), or `solid-blink` (one path, fill only).
+ * Chevron CTA: default segmented stack (+ optional texture), `solid-blink` (fill),
+ * or `solid-outline-blink` (outline).
  * The root `<span>` keeps `--arrow-shape-opacity` off the SVG for segmented mode so #111 panels
  * behind the arrow (e.g. /why) don’t wash out.
  *
@@ -42,13 +43,9 @@ interface Props {
    * `solid-outline-blink` — one continuous chevron outline, no fill; stroke blinks by opacity.
    */
   variant?: 'segmented' | 'solid-blink' | 'solid-outline-blink';
-  /**
-   * `solid-blink` only: opacity at the bright part of the blink (always clamped below 1).
-   */
+  /** Solid blink variants only: opacity at the bright part (always clamped below 1). */
   solidBlinkPeakOpacity?: number;
-  /**
-   * `solid-blink` only: opacity at the dimmest part of the blink (default never fully off).
-   */
+  /** Solid blink variants only: opacity at the dimmest part (default never fully off). */
   solidBlinkFloorOpacity?: number;
 }
 
@@ -124,15 +121,14 @@ const responsiveClampMaxPx = (() => {
   return Math.min(200, Math.max(12, Math.round(n)));
 })();
 
-const variant =
-  props.variant === 'solid-blink' || props.variant === 'solid-outline-blink'
-    ? ('solid-blink' as const)
-    : ('segmented' as const);
-const isOutlineBlink = props.variant === 'solid-outline-blink';
+type ArrowVariant = 'segmented' | 'solid-blink' | 'solid-outline-blink';
+const variant: ArrowVariant = props.variant ?? 'segmented';
+const isSolidBlinkVariant =
+  variant === 'solid-blink' || variant === 'solid-outline-blink';
 
 const color = props.color ?? '#111';
 const durationSec = Number(props.duration);
-const durationDefault = variant === 'solid-blink' ? 1.45 : 2.6;
+const durationDefault = isSolidBlinkVariant ? 1.45 : 2.6;
 const duration =
   Number.isFinite(durationSec) && durationSec > 0
     ? durationSec
@@ -198,10 +194,10 @@ function responsiveSvgStyle(
   return `width: ${width}; height: auto; aspect-ratio: 220 / 170`;
 }
 
-const shapeOpacity = variant === 'solid-blink' ? 1 : opacity;
+const shapeOpacity = isSolidBlinkVariant ? 1 : opacity;
 
 const solidBlinkOpacityVars = (() => {
-  if (variant !== 'solid-blink') return '';
+  if (!isSolidBlinkVariant) return '';
   const peakN = Number(props.solidBlinkPeakOpacity);
   const peakRaw = Number.isFinite(peakN) ? peakN : 0.62;
   const peak = Math.min(0.985, Math.max(0.06, peakRaw >= 1 ? 0.985 : peakRaw));
@@ -217,7 +213,7 @@ const rootStyle = [
   `--arrow-shape-opacity: ${shapeOpacity}`,
   `--arrow-color: ${color}`,
   `--arrow-duration: ${duration}s`,
-  variant === 'solid-blink' ? `--arrow-blink-duration: ${duration}s` : '',
+  isSolidBlinkVariant ? `--arrow-blink-duration: ${duration}s` : '',
   solidBlinkOpacityVars,
 ]
   .filter(Boolean)
@@ -225,8 +221,8 @@ const rootStyle = [
 
 const dirClass = direction === 'down' ? 'animated-arrow--down' : '';
 const variantRootClass =
-  variant === 'solid-blink'
-    ? isOutlineBlink
+  isSolidBlinkVariant
+    ? variant === 'solid-outline-blink'
       ? 'animated-arrow-root--solid-outline-blink'
       : 'animated-arrow-root--solid-blink'
     : '';
@@ -258,14 +254,14 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     aria-hidden="true"
   >
     {
-      variant === 'solid-blink' ? (
+      isSolidBlinkVariant ? (
         <path
-          class={isOutlineBlink ? 'animated-arrow__solid-outline' : 'animated-arrow__solid'}
+          class={variant === 'solid-outline-blink' ? 'animated-arrow__solid-outline' : 'animated-arrow__solid'}
           d={SOLID_CHEVRON_PATH}
-          fill={isOutlineBlink ? 'none' : 'var(--arrow-color)'}
-          stroke={isOutlineBlink ? 'var(--arrow-color)' : undefined}
-          stroke-width={isOutlineBlink ? '4' : undefined}
-          stroke-linejoin={isOutlineBlink ? 'round' : undefined}
+          fill={variant === 'solid-outline-blink' ? 'none' : 'var(--arrow-color)'}
+          stroke={variant === 'solid-outline-blink' ? 'var(--arrow-color)' : undefined}
+          stroke-width={variant === 'solid-outline-blink' ? '4' : undefined}
+          stroke-linejoin={variant === 'solid-outline-blink' ? 'round' : undefined}
         />
       ) : (
         <>

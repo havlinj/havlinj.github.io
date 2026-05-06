@@ -631,27 +631,7 @@
   border-radius: inherit;
 }
 
-.why-page .why-clip-poster {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  margin: 0;
-  max-width: none;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  transition: opacity 220ms ease;
-}
-
-.why-page .why-clip-poster.is-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/*
- * Corners: mask alpha alone blends bright video with #111 and can read as a rim.
- * Wash with the same panel color so the feather chromatically matches --why-box-bg.
- */
+/* Corner wash/masks were removed; keep only the top horizontal clip veil. */
 .why-page .why-clip-frame::before {
   content: none;
 }
@@ -672,17 +652,6 @@
     color-mix(in srgb, var(--why-box-bg) 6%, transparent) 32%,
     transparent 48%
   );
-}
-
-.why-page .why-clip-poster img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: 50% 50%;
-  pointer-events: none;
 }
 
 .why-page .why-clip {

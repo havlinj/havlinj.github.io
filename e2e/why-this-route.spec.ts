@@ -204,7 +204,7 @@ test.describe('/why-this page @serial', () => {
     );
   });
 
-  test('scroll CTA arrow is solid fill with blink animation', async ({
+  test('scroll CTA arrow is outline-only with blink animation', async ({
     page,
   }) => {
     const data = await page.evaluate(() => {
@@ -214,13 +214,13 @@ test.describe('/why-this page @serial', () => {
       const svg = document.querySelector(
         '.why-page .why-scroll-cta svg.animated-arrow',
       );
-      const solid = svg?.querySelector('path.animated-arrow__solid');
+      const outline = svg?.querySelector('path.animated-arrow__solid-outline');
       if (!(root instanceof HTMLElement) || !(svg instanceof SVGElement)) {
         return null;
       }
-      if (!(solid instanceof SVGPathElement)) return null;
+      if (!(outline instanceof SVGPathElement)) return null;
 
-      const cs = getComputedStyle(solid);
+      const cs = getComputedStyle(outline);
       const peakVar = root.style
         .getPropertyValue('--arrow-blink-peak-opacity')
         .trim();
@@ -229,12 +229,14 @@ test.describe('/why-this page @serial', () => {
         .trim();
       return {
         rootHasSolidVariant: root.classList.contains(
-          'animated-arrow-root--solid-blink',
+          'animated-arrow-root--solid-outline-blink',
         ),
         patternCount: svg.querySelectorAll('defs pattern').length,
         segCount: svg.querySelectorAll('polygon.seg').length,
         animationName: cs.animationName,
         fill: cs.fill,
+        stroke: cs.stroke,
+        strokeWidth: cs.strokeWidth,
         peakVar,
         floorVar,
       };
@@ -247,7 +249,9 @@ test.describe('/why-this page @serial', () => {
     expect(data!.animationName.split(',').map((s) => s.trim())).toContain(
       'animated-arrow-blink',
     );
-    expect(data!.fill).toMatch(/rgb\(\s*224\s*,\s*247\s*,\s*250\s*\)/i);
+    expect(data!.fill).toMatch(/none/i);
+    expect(data!.stroke).toMatch(/rgb\(\s*224\s*,\s*247\s*,\s*250\s*\)/i);
+    expect(parseFloat(data!.strokeWidth)).toBeCloseTo(4, 5);
     expect(parseFloat(data!.peakVar)).toBeCloseTo(
       WHY_CTA_ARROW_PEAK_OPACITY,
       5,
@@ -323,15 +327,21 @@ test.describe('/why-this page @serial', () => {
     );
   });
 
-  test('Clip corner overlays use box-bg gradient (not an empty stack)', async ({
+  test('Clip uses only top horizontal overlay gradient', async ({
     page,
   }) => {
-    const afterBg = await page.evaluate(() => {
+    const data = await page.evaluate(() => {
       const frame = document.querySelector('.why-page .why-clip-frame');
-      if (!frame) return '';
-      return getComputedStyle(frame, '::after').backgroundImage;
+      if (!frame) return null;
+      return {
+        beforeContent: getComputedStyle(frame, '::before').content,
+        afterBg: getComputedStyle(frame, '::after').backgroundImage,
+      };
     });
-    expect(afterBg).toMatch(/linear-gradient/i);
+    expect(data).not.toBeNull();
+    expect(data!.beforeContent).toBe('none');
+    expect(data!.afterBg).toMatch(/linear-gradient/i);
+    expect(data!.afterBg).not.toMatch(/radial-gradient/i);
   });
 
   test('scroll phases: start-cover at top, CTA fades after hint band, end-cover near bottom', async ({
