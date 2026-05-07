@@ -1,11 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function applyExtremeZoom(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    document.documentElement.style.zoom = '3';
-    window.dispatchEvent(new Event('resize'));
-  });
-}
+import { test, expect } from '@playwright/test';
+import { applyExtremeZoom } from './helpers';
 
 test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });

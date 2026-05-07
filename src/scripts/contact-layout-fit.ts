@@ -8,7 +8,6 @@ type NeededContent = {
   neededWidth: number;
   neededHeight: number;
   topPad: number;
-  rowGap: number;
   introH: number;
 };
 
@@ -139,7 +138,6 @@ function startContactInsetFit(): void {
       neededWidth,
       neededHeight,
       topPad,
-      rowGap,
       introH: intro.h,
     };
   }

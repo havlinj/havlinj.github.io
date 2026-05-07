@@ -1,23 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function applyExtremeZoom(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      await page.evaluate(() => {
-        document.documentElement.style.zoom = '3';
-        window.dispatchEvent(new Event('resize'));
-      });
-      return;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      const retryable =
-        message.includes('Execution context was destroyed') ||
-        message.includes('Cannot find context with specified id');
-      if (!retryable || attempt === 2) throw error;
-      await page.waitForLoadState('domcontentloaded');
-    }
-  }
-}
+import { test, expect } from '@playwright/test';
+import { applyExtremeZoom } from './helpers';
 
 test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
@@ -32,7 +14,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     );
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/');
-    await applyExtremeZoom(page);
+    await applyExtremeZoom(page, { attempts: 3 });
     await page.waitForTimeout(80);
     await expect(page.locator('.hero')).toHaveScreenshot(
       'hero-extreme-zoom.png',
@@ -56,7 +38,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     await expect(
       page.locator('.writing-groups.writing-groups--visible'),
     ).toBeVisible();
-    await applyExtremeZoom(page);
+    await applyExtremeZoom(page, { attempts: 3 });
     await page.waitForTimeout(80);
     await expect(
       page.locator('.writing-page .page-buttons-panel'),
@@ -93,7 +75,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
         { timeout: 6000 },
       )
       .toBe(true);
-    await applyExtremeZoom(page);
+    await applyExtremeZoom(page, { attempts: 3 });
     await page.waitForTimeout(80);
     await expect(
       page.locator('.contact-page .page-buttons-panel'),

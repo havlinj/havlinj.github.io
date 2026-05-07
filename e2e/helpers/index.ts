@@ -9,6 +9,7 @@ export { expectFoundationsRevealCopyPainted } from './profile-foundations-reveal
 export { countRevealRasterSignature } from './foundations-reveal-raster';
 export { waitTwoFrames } from './raf';
 export { mustBox, readSquareContainment } from './geometry';
+export { applyExtremeZoom } from './zoom';
 export {
   fillContactFormWithValidData,
   installTurnstileResetCounter,
