@@ -63,13 +63,30 @@ ul.post-list > li::before {
 }
 
 /*
- * Narrow phones: at 1:1 display scale the pool PNG (Bayer-ish raster) can beat against the
- * device pixel grid and show a harsh checker/map. A hair over-scale forces resampling without
- * a visible crop change (panel overflow clips; transform-origin center).
+ * Mobile anti-moire preset (writing only):
+ * avoid exact 1:1 pixel alignment of Bayer-like texture with device pixel grid.
+ * We use a stable tiny over-scale + tiny position nudge so sampling lands off the worst bands.
  */
+.writing-page {
+  --writing-bg-antimoire-scale: 1;
+  --writing-bg-antimoire-shift-x: 0px;
+  --writing-bg-antimoire-shift-y: 0px;
+}
+
 @media (max-width: 36rem) {
+  .writing-page {
+    --writing-bg-antimoire-scale: 1.012;
+    --writing-bg-antimoire-shift-x: 0.35px;
+    --writing-bg-antimoire-shift-y: -0.2px;
+  }
+
   .writing-page .page-buttons-panel::before {
-    transform: translate3d(0, 0, 0) scale(1.006);
+    transform: translate3d(
+        var(--writing-bg-antimoire-shift-x),
+        var(--writing-bg-antimoire-shift-y),
+        0
+      )
+      scale(var(--writing-bg-antimoire-scale));
     transform-origin: center center;
   }
 }

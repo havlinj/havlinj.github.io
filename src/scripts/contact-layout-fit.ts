@@ -83,29 +83,6 @@ function startContactInsetFit(): void {
     return Number.isFinite(paddingLeftPx) ? paddingLeftPx : 0;
   }
 
-  function resolveLengthPx(rawValue: string, fallbackPx: number): number {
-    const token = rawValue.trim();
-    if (!token) return fallbackPx;
-    const probe = document.createElement('div');
-    probe.style.position = 'absolute';
-    probe.style.visibility = 'hidden';
-    probe.style.pointerEvents = 'none';
-    probe.style.width = '0';
-    probe.style.height = token;
-    panelEl.appendChild(probe);
-    const px = parseFloat(getComputedStyle(probe).height);
-    probe.remove();
-    return Number.isFinite(px) ? px : fallbackPx;
-  }
-
-  function readWritingRowGapPx(panelTopPadPx: number): number {
-    const raw = getComputedStyle(panelEl).getPropertyValue('--writing-row-gap');
-    return resolveLengthPx(
-      raw,
-      CONTACT_LAYOUT.defaultBoxGapPx || panelTopPadPx,
-    );
-  }
-
   function measureRectOuterSize(rectEl: HTMLElement): { w: number; h: number } {
     const cs = getComputedStyle(rectEl);
     const ml = parseFloat(cs.marginLeft) || 0;
@@ -121,8 +98,6 @@ function startContactInsetFit(): void {
   function measureNeededContent(): NeededContent {
     const topPad = Math.round(readPanelTopPadPx());
     const leftPad = Math.round(readPanelLeftPadPx());
-    // Keep original fit behavior so intro box geometry remains stable.
-    const rowGap = readWritingRowGapPx(topPad);
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
     const neededWidth =
@@ -130,7 +105,7 @@ function startContactInsetFit(): void {
     const neededHeight =
       topPad +
       intro.h +
-      rowGap +
+      intro.h +
       links.h +
       topPad +
       CONTACT_LAYOUT.fitSafetyYPx;

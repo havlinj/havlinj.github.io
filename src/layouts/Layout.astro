@@ -198,6 +198,7 @@ const navItems = [
 
         function shouldResetBaseline(baseline) {
           if (!hasValidBaseline(baseline)) return true;
+          var innerWidthNow = window.innerWidth || 0;
           var sameDpr =
             Math.abs((window.devicePixelRatio || 1) - baseline.dpr) <=
             SCALE_DRIFT_EPSILON;
@@ -208,24 +209,31 @@ const navItems = [
           var sameVvScale =
             Math.abs(vvNow - baseline.vvScale) <= SCALE_DRIFT_EPSILON;
           var widthDrift =
-            Math.abs((window.innerWidth || 0) - baseline.innerWidth) /
+            Math.abs(innerWidthNow - baseline.innerWidth) /
             Math.max(1, baseline.innerWidth);
-          var widthExpanded = (window.innerWidth || 0) > baseline.innerWidth * 1.1;
+          var widthExpanded = innerWidthNow > baseline.innerWidth * 1.1;
           var scaleDropped =
             (window.devicePixelRatio || 1) < baseline.dpr * 0.9 ||
             vvNow < baseline.vvScale * 0.9;
+          var likelyNarrowViewportZoomContext = innerWidthNow <= 520;
+          var staleWidthOnlyDrift =
+            sameDpr && sameVvScale && widthDrift > WIDTH_DRIFT_RESET_RATIO;
 
           // Stale baseline guard:
           // if scale baselines still look "same", but viewport width drifted a lot,
-          // this is likely a stale session baseline (not real pinch zoom).
+          // this may be stale session baseline. Keep narrow/mobile-like viewports
+          // exempt so freeze can persist across composition pages at aggressive zoom.
           return (
-            (sameDpr && sameVvScale && widthDrift > WIDTH_DRIFT_RESET_RATIO) ||
+            (staleWidthOnlyDrift && !likelyNarrowViewportZoomContext) ||
             widthExpanded ||
             scaleDropped
           );
         }
 
-        if (!hasValidBaseline(storedBaseline) || shouldResetBaseline(storedBaseline)) {
+        if (
+          !hasValidBaseline(storedBaseline) ||
+          shouldResetBaseline(storedBaseline)
+        ) {
           storedBaseline = {
             dpr: currentDpr,
             vvScale: currentVvScale,
@@ -275,7 +283,10 @@ const navItems = [
           var ratio = getZoomRatio();
           var exceeded = shouldKeepFreeze(ratio);
           if (exceeded) {
-            var targetFreezeScale = Math.max(0.1, Math.min(1, MAX_SAFE_ZOOM / ratio));
+            var targetFreezeScale = Math.max(
+              0.1,
+              Math.min(1, MAX_SAFE_ZOOM / ratio),
+            );
             if (
               !freezeActive ||
               Math.abs(targetFreezeScale - freezeScale) >=

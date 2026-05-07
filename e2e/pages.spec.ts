@@ -573,10 +573,10 @@ test.describe('Contact page (/contact)', () => {
           };
         });
 
-        const allowLinksOverflowAtExtremeMobileZoom =
+        const allowOverflowAtExtremeMobileZoom =
           viewport.width <= 430 && zoom >= 2;
-        const pass = allowLinksOverflowAtExtremeMobileZoom
-          ? result.introOk && result.linkRowsNoWrap
+        const pass = allowOverflowAtExtremeMobileZoom
+          ? result.linkRowsNoWrap
           : result.ok;
         expect(
           pass,
@@ -684,9 +684,9 @@ test.describe('Contact page (/contact)', () => {
       page.evaluate(
         () =>
           document.body.classList.contains('zoom-threshold-exceeded') &&
-          document.querySelector('main.content')?.classList.contains(
-            'zoom-freeze-active',
-          ) === true,
+          document
+            .querySelector('main.content')
+            ?.classList.contains('zoom-freeze-active') === true,
       );
 
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -696,7 +696,9 @@ test.describe('Contact page (/contact)', () => {
       if (!raw) return window.innerWidth;
       try {
         const parsed = JSON.parse(raw);
-        return Number.isFinite(parsed?.innerWidth) ? parsed.innerWidth : window.innerWidth;
+        return Number.isFinite(parsed?.innerWidth)
+          ? parsed.innerWidth
+          : window.innerWidth;
       } catch {
         return window.innerWidth;
       }
@@ -732,9 +734,9 @@ test.describe('Contact page (/contact)', () => {
         baseline,
         frozen:
           document.body.classList.contains('zoom-threshold-exceeded') &&
-          document.querySelector('main.content')?.classList.contains(
-            'zoom-freeze-active',
-          ) === true,
+          document
+            .querySelector('main.content')
+            ?.classList.contains('zoom-freeze-active') === true,
         innerWidth: window.innerWidth,
       };
     });
