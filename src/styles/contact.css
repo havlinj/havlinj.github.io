@@ -111,7 +111,7 @@
   --contact-intro-pad-left: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
   --contact-intro-pad-right: clamp(0.9rem, 0.72rem + 2.15vw, 1.24rem);
   --contact-intro-pad-top: clamp(0.6rem, 0.5rem + 1.2vw, 1.04rem);
-  --contact-intro-pad-bottom: clamp(0.82rem, 0.62rem + 1.85vw, 1.3rem);
+  --contact-intro-pad-bottom: clamp(0.74rem, 0.56rem + 1.65vw, 1.18rem);
   padding: var(--contact-intro-pad-top) var(--contact-intro-pad-right)
     var(--contact-intro-pad-bottom) var(--contact-intro-pad-left);
 }
@@ -187,11 +187,7 @@
     var(--contact-link-row-min-h, 6.8cqi),
     3.05rem
   );
-  max-height: clamp(
-    2.7rem,
-    var(--contact-link-row-max-h, 7.8cqi),
-    3.25rem
-  );
+  max-height: clamp(2.7rem, var(--contact-link-row-max-h, 7.8cqi), 3.25rem);
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
   color: rgba(17, 17, 17, 0.96);

@@ -71,10 +71,7 @@ function startContactInsetFit(): void {
     setPanelVar('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
 
     const insetPadPx = panelEl.clientWidth * padFrac * 0.5;
-    setPanelVar(
-      '--contact-stack-top-px',
-      `${Math.round(insetPadPx)}px`,
-    );
+    setPanelVar('--contact-stack-top-px', `${Math.round(insetPadPx)}px`);
   }
 
   function readPanelTopPadPx(): number {
@@ -179,7 +176,7 @@ function startContactInsetFit(): void {
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
     let measured = measureNeededContent();
-    let { neededWidth, neededHeight, topPad, rowGap, introH } = measured;
+    let { neededWidth, neededHeight, topPad, introH } = measured;
 
     const availW = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
     const availH = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
@@ -192,15 +189,12 @@ function startContactInsetFit(): void {
       desiredFontPx = Math.max(CONTACT_LAYOUT.minFontPx, desiredFontPx * scale);
       applyFontAndPanelMetrics(desiredFontPx, panelEdge);
       measured = measureNeededContent();
-      ({ neededWidth, neededHeight, topPad, rowGap, introH } = measured);
+      ({ neededWidth, neededHeight, topPad, introH } = measured);
       pass += 1;
     }
 
     setPanelVar('--contact-intro-top-px', `${topPad}px`);
-    setPanelVar(
-      '--contact-links-top-px',
-      `${topPad + introH + introH}px`,
-    );
+    setPanelVar('--contact-links-top-px', `${topPad + introH + introH}px`);
 
     revealAfterStableLayout();
   }

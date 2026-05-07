@@ -62,7 +62,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
       page.locator('.writing-page .page-buttons-panel'),
     ).toHaveScreenshot('writing-extreme-zoom.png', {
       animations: 'disabled',
-      maxDiffPixels: 65000,
+      maxDiffPixels: 7000,
     });
   });
 
@@ -99,7 +99,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
       page.locator('.contact-page .page-buttons-panel'),
     ).toHaveScreenshot('contact-extreme-zoom.png', {
       animations: 'disabled',
-      maxDiffPixels: 70000,
+      maxDiffPixels: 5000,
     });
   });
 });

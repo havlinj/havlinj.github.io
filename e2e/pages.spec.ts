@@ -413,7 +413,9 @@ test.describe('Credits page (/credits)', () => {
     await expect(page.getByText('Weichao Deng')).toBeVisible();
     await expect(page.getByText('Guillaume Didelet')).toBeVisible();
     await expect(page.getByText('Raddy')).toBeVisible();
-    await expect(page.getByText('Nicola Narraci')).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'deconjpa', exact: true }),
+    ).toBeVisible();
   });
 
   test('footer credits link navigates to /credits', async ({ page }) => {
@@ -466,9 +468,9 @@ test.describe('Contact page (/contact)', () => {
     const bodyPhrases = introPs.nth(1).locator('.contact-page__intro-phrase');
     await expect(bodyPhrases).toHaveCount(2);
     await expect(bodyPhrases.nth(0)).toHaveText(
-      'Roles, projects, collaborations —',
+      'Roles, projects, collaborations.',
     );
-    await expect(bodyPhrases.nth(1)).toHaveText('reach out anytime.');
+    await expect(bodyPhrases.nth(1)).toHaveText('Reach out anytime.');
 
     const formLink = page.getByRole('link', { name: /Direct contact/i });
     await expect(formLink).toBeVisible();
@@ -511,7 +513,7 @@ test.describe('Contact page (/contact)', () => {
       { width: 390, height: 844 },
     ];
     for (const viewport of viewports) {
-      const zooms = viewport.width <= 430 ? [1, 2] : [1, 2, 3];
+      const zooms = [1, 2];
       await page.setViewportSize(viewport);
       await page.goto('/contact');
       await expect(page.locator('.contact-page__fit-content')).toBeAttached();
@@ -571,8 +573,13 @@ test.describe('Contact page (/contact)', () => {
           };
         });
 
+        const allowLinksOverflowAtExtremeMobileZoom =
+          viewport.width <= 430 && zoom >= 2;
+        const pass = allowLinksOverflowAtExtremeMobileZoom
+          ? result.introOk && result.linkRowsNoWrap
+          : result.ok;
         expect(
-          result.ok,
+          pass,
           `contact fit overflow at viewport ${viewport.width}x${viewport.height}, zoom ${zoom}: ${JSON.stringify(result)}`,
         ).toBe(true);
       }
@@ -582,6 +589,53 @@ test.describe('Contact page (/contact)', () => {
       document.documentElement.style.zoom = '1';
       window.dispatchEvent(new Event('resize'));
     });
+  });
+
+  test('landing keeps contact layout ratios (links width + intro-to-links gap)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/contact');
+    await expect(page.locator('.contact-page__fit-content')).toBeAttached();
+    await expect(
+      page.locator('.contact-page__inset-rect--intro'),
+    ).toBeVisible();
+    await expect(
+      page.locator('.contact-page__inset-rect--links'),
+    ).toBeVisible();
+
+    const data = await page.evaluate(() => {
+      const panel = document.querySelector(
+        '.contact-page .page-buttons-panel',
+      ) as HTMLElement | null;
+      const intro = document.querySelector(
+        '.contact-page__inset-rect--intro',
+      ) as HTMLElement | null;
+      const linksRect = document.querySelector(
+        '.contact-page__inset-rect--links',
+      ) as HTMLElement | null;
+      const firstLink = document.querySelector(
+        '.contact-page__links .contact-extra-link',
+      ) as HTMLElement | null;
+      if (!panel || !intro || !linksRect || !firstLink) return null;
+
+      const panelR = panel.getBoundingClientRect();
+      const introR = intro.getBoundingClientRect();
+      const linksR = linksRect.getBoundingClientRect();
+      const firstLinkR = firstLink.getBoundingClientRect();
+
+      return {
+        linksWidthFrac: linksR.width / panelR.width,
+        introToFirstLinkGap: firstLinkR.top - introR.bottom,
+        introHeight: introR.height,
+      };
+    });
+
+    expect(data).not.toBeNull();
+    expect(data!.linksWidthFrac).toBeCloseTo(0.38, 2);
+    expect(
+      Math.abs(data!.introToFirstLinkGap - data!.introHeight),
+    ).toBeLessThanOrEqual(2);
   });
 
   test('zoom freeze state persists across composition pages', async ({

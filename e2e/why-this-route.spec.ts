@@ -150,9 +150,7 @@ test.describe('/why-this page @serial', () => {
     const clip = page.locator('.why-page video.why-clip');
     await expect(clip).toBeVisible();
     await expect(clip).toHaveJSProperty('loop', true);
-    await expect
-      .poll(() => whyClipVideoPathname(page))
-      .toBe(WHY_CLIP_VIDEO);
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO);
     await expect(page.locator('.why-page picture.why-clip-poster')).toHaveCount(
       0,
     );
@@ -161,21 +159,15 @@ test.describe('/why-this page @serial', () => {
   test('Why clip keeps same video source across viewport widths', async ({
     page,
   }) => {
-    await expect
-      .poll(() => whyClipVideoPathname(page))
-      .toBe(WHY_CLIP_VIDEO);
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO);
 
     await page.setViewportSize({ width: 390, height: 844 });
 
-    await expect
-      .poll(() => whyClipVideoPathname(page))
-      .toBe(WHY_CLIP_VIDEO);
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO);
 
     await page.setViewportSize({ width: 1280, height: 720 });
 
-    await expect
-      .poll(() => whyClipVideoPathname(page))
-      .toBe(WHY_CLIP_VIDEO);
+    await expect.poll(() => whyClipVideoPathname(page)).toBe(WHY_CLIP_VIDEO);
   });
 
   test('Clip frame and box use panel background #111', async ({ page }) => {
@@ -327,9 +319,7 @@ test.describe('/why-this page @serial', () => {
     );
   });
 
-  test('Clip uses only top horizontal overlay gradient', async ({
-    page,
-  }) => {
+  test('Clip uses only top horizontal overlay gradient', async ({ page }) => {
     const data = await page.evaluate(() => {
       const frame = document.querySelector('.why-page .why-clip-frame');
       if (!frame) return null;

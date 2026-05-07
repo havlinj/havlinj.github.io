@@ -22,7 +22,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
       'hero-mobile-webkit.png',
       {
         animations: 'disabled',
-        maxDiffPixels: 12000,
+        maxDiffPixels: 7000,
       },
     );
   });
@@ -42,7 +42,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
       page.locator('.writing-page .page-buttons-panel'),
     ).toHaveScreenshot('writing-mobile-webkit.png', {
       animations: 'disabled',
-      maxDiffPixels: 10000,
+      maxDiffPixels: 7000,
     });
   });
 
@@ -75,7 +75,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
       page.locator('.contact-page .page-buttons-panel'),
     ).toHaveScreenshot('contact-mobile-webkit.png', {
       animations: 'disabled',
-      maxDiffPixels: 12000,
+      maxDiffPixels: 7000,
     });
   });
 });

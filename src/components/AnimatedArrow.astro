@@ -220,12 +220,11 @@ const rootStyle = [
   .join('; ');
 
 const dirClass = direction === 'down' ? 'animated-arrow--down' : '';
-const variantRootClass =
-  isSolidBlinkVariant
-    ? variant === 'solid-outline-blink'
-      ? 'animated-arrow-root--solid-outline-blink'
-      : 'animated-arrow-root--solid-blink'
-    : '';
+const variantRootClass = isSolidBlinkVariant
+  ? variant === 'solid-outline-blink'
+    ? 'animated-arrow-root--solid-outline-blink'
+    : 'animated-arrow-root--solid-blink'
+  : '';
 const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
 ---
 
@@ -256,12 +255,22 @@ const fixedHeight = (effectiveSizePx * VIEWBOX_H) / VIEWBOX_W;
     {
       isSolidBlinkVariant ? (
         <path
-          class={variant === 'solid-outline-blink' ? 'animated-arrow__solid-outline' : 'animated-arrow__solid'}
+          class={
+            variant === 'solid-outline-blink'
+              ? 'animated-arrow__solid-outline'
+              : 'animated-arrow__solid'
+          }
           d={SOLID_CHEVRON_PATH}
-          fill={variant === 'solid-outline-blink' ? 'none' : 'var(--arrow-color)'}
-          stroke={variant === 'solid-outline-blink' ? 'var(--arrow-color)' : undefined}
+          fill={
+            variant === 'solid-outline-blink' ? 'none' : 'var(--arrow-color)'
+          }
+          stroke={
+            variant === 'solid-outline-blink' ? 'var(--arrow-color)' : undefined
+          }
           stroke-width={variant === 'solid-outline-blink' ? '4' : undefined}
-          stroke-linejoin={variant === 'solid-outline-blink' ? 'round' : undefined}
+          stroke-linejoin={
+            variant === 'solid-outline-blink' ? 'round' : undefined
+          }
         />
       ) : (
         <>
