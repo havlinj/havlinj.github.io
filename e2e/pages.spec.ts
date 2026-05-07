@@ -677,6 +677,72 @@ test.describe('Contact page (/contact)', () => {
       .toBe(true);
   });
 
+  test('zoom freeze exits when viewport returns to safe range', async ({
+    page,
+  }) => {
+    const isFrozen = () =>
+      page.evaluate(
+        () =>
+          document.body.classList.contains('zoom-threshold-exceeded') &&
+          document.querySelector('main.content')?.classList.contains(
+            'zoom-freeze-active',
+          ) === true,
+      );
+
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.goto('/profile');
+    const baselineWidth = await page.evaluate(() => {
+      const raw = window.sessionStorage.getItem('zoomFreezeBaselineV2');
+      if (!raw) return window.innerWidth;
+      try {
+        const parsed = JSON.parse(raw);
+        return Number.isFinite(parsed?.innerWidth) ? parsed.innerWidth : window.innerWidth;
+      } catch {
+        return window.innerWidth;
+      }
+    });
+
+    // Enter freeze zone (well above guard threshold).
+    await page.setViewportSize({ width: 360, height: 900 });
+    await expect.poll(isFrozen, { timeout: 1500 }).toBe(true);
+
+    // Exit once viewport is safely below guard pressure.
+    const safeWidth = Math.max(700, Math.ceil(baselineWidth / 1.8));
+    await page.setViewportSize({ width: safeWidth, height: 900 });
+    await expect.poll(isFrozen, { timeout: 1500 }).toBe(false);
+  });
+
+  test('zoom guard does not freeze from stale stored baseline alone', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.goto('/contact');
+    await page.evaluate(() => {
+      window.sessionStorage.setItem(
+        'zoomFreezeBaselineV2',
+        JSON.stringify({ dpr: 1, vvScale: 1, innerWidth: 3000 }),
+      );
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    const state = await page.evaluate(() => {
+      const baselineRaw = window.sessionStorage.getItem('zoomFreezeBaselineV2');
+      const baseline = baselineRaw ? JSON.parse(baselineRaw) : null;
+      return {
+        baseline,
+        frozen:
+          document.body.classList.contains('zoom-threshold-exceeded') &&
+          document.querySelector('main.content')?.classList.contains(
+            'zoom-freeze-active',
+          ) === true,
+        innerWidth: window.innerWidth,
+      };
+    });
+
+    expect(state.baseline).not.toBeNull();
+    expect(state.frozen).toBe(false);
+  });
+
   test('form page shows contact form fields', async ({ page }) => {
     await page.goto('/contact/form');
 
