@@ -98,6 +98,10 @@ jobs:
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
+        env:
+          # Optional: repo secret PUBLIC_LAYOUT_DEBUG_TOKEN enables ?layoutDebug=<token> on Pages builds.
+          # Leave unset for zero client-visible debug capability on production.
+          PUBLIC_LAYOUT_DEBUG_TOKEN: ${{ secrets.PUBLIC_LAYOUT_DEBUG_TOKEN }}
       - name: Verify sitemap output
         run: |
           test -f dist/sitemap-index.xml
