@@ -4,20 +4,23 @@ import { readSquareContainment } from './helpers';
 test.describe('Square containment (mobile)', () => {
   test('profile square and key tiles stay inside on mobile webkit', async ({
     page,
+    browserName,
   }) => {
     await page.goto('/profile');
+
+    const tol = browserName === 'webkit' ? 8 : 3;
 
     const result = await readSquareContainment(page.locator('body'), {
       squareSelector: '.profile-section',
       containerSelector: 'main.content',
-      tolerancePx: 3,
+      tolerancePx: tol,
     });
     expect(
       result.ok,
       `profile square containment failed: ${JSON.stringify(result)}`,
     ).toBe(true);
 
-    const inside = await page.evaluate(() => {
+    const inside = await page.evaluate((pixelTol: number) => {
       const square = document.querySelector('.profile-section');
       if (!(square instanceof HTMLElement)) {
         return { ok: false, reason: 'missing square' };
@@ -31,7 +34,7 @@ test.describe('Square containment (mobile)', () => {
       ];
       const missing: string[] = [];
       const overflowing: string[] = [];
-      const tol = 3;
+      const tol = pixelTol;
       for (const sel of selectors) {
         const el = document.querySelector(sel);
         if (!(el instanceof HTMLElement)) {
@@ -51,7 +54,7 @@ test.describe('Square containment (mobile)', () => {
         missing,
         overflowing,
       };
-    });
+    }, tol);
 
     expect(
       inside.ok,

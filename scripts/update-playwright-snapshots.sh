@@ -4,13 +4,17 @@
 #
 # Usage:
 #   ./scripts/update-playwright-snapshots.sh
-#       → default screenshot set: hero, profile, Credits main, and mobile Foundations reveal
+#       → default screenshot set: hero, profile, Credits main, extreme-zoom (desktop chromium),
+#         mobile Foundations reveal; PW_SERVER_MODE=preview (matches CI / integration-tests.sh).
 #   ./scripts/update-playwright-snapshots.sh e2e/foo.spec.ts
 #   ./scripts/update-playwright-snapshots.sh --update-snapshots e2e/
 #       → any extra args are passed to: playwright test --update-snapshots <args...>
 #
 # PW_SERVER_MODE defaults to preview so baselines match scripts/integration-tests.sh and CI
 # (playwright.config otherwise uses astro dev, which renders differently from build + preview).
+#
+# Mobile WebKit extreme-zoom PNGs (optional, same preview requirement):
+#   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts --project=mobile-webkit --update-snapshots
 
 set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -26,6 +30,9 @@ else
     --grep 'last screenshot matches' \
     --update-snapshots
   npx playwright test e2e/credits.spec.ts \
+    --project=desktop-chromium \
+    --update-snapshots
+  npx playwright test e2e/extreme-zoom-visual.spec.ts \
     --project=desktop-chromium \
     --update-snapshots
   exec npx playwright test e2e/profile-mobile.spec.ts \

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Linux WebKit (mobile-webkit): Playwright's MiniBrowser links libwoff2dec. If launch fails with
+# "libwoff2dec.so.1.0.2: cannot open shared object file", install OS deps — same as CI:
+#   sudo npx playwright install-deps webkit
+# On Debian/Ubuntu you can instead: sudo apt install libwoff1
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOCK_DIR="/tmp/documents-web-integration-tests.lock"

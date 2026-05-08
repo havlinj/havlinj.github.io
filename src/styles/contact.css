@@ -35,17 +35,32 @@
     calc(var(--panel-fluid-font-preferred) + 0.03rem),
     var(--panel-fluid-font-max)
   );
-  --contact-links-font-scale: 0.9;
+  --contact-links-font-scale: 0.95;
   --contact-links-width: 38%;
+  /* Floored by JS from panel edge; static fallback for noscript. */
+  --contact-link-tail-min-px: 13px;
 }
 
 @media (max-width: 36rem) {
   .contact-page .page-buttons-panel {
-    --contact-font-scale: 0.95;
+    /*
+     * One knob: intro block + link rows share fluid font × this (icons track em).
+     * sync: /why revolver body inherits `.why-scroll` — why.css `--why-copy-font-size`
+     *   = clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale)
+     * Keep contact base (after JS --contact-fluid-font) in the same ballpark as that band;
+     * why can still dip lower via FONT_MIN (~0.52) when the reference line is tight.
+     */
+    --contact-font-scale: 0.91;
     /* Slightly stronger Y nudge than article inline (0.2); same calc as ::before bg-position. */
     --panel-bg-nudge-y: 0.25;
     /* Article default 1.1 — extra zoom on small viewports (background-size on ::before). */
     --panel-bg-zoom: 1;
+  }
+}
+
+@media (max-width: 22rem) {
+  .contact-page .page-buttons-panel {
+    --contact-font-scale: 0.82;
   }
 }
 
@@ -103,8 +118,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Same rhythm as panel button stacks; never looser than ~half an em. */
-  gap: max(0.5em, var(--panel-row-gap));
+  /* Lead ↔ body: typographic step (decoupled from button row-gap). */
+  gap: clamp(0.5em, 0.4rem + 1.1vw, 0.6em);
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
   /* Tight vertical footprint (more background visible); scales like --content-side-pad-compact. */
@@ -140,8 +155,9 @@
   margin: 0;
   padding: 0;
   font-weight: 500;
-  line-height: 1.44;
-  letter-spacing: 0.012em;
+  line-height: 1.46;
+  /* Align with site prose (e.g. /why body ~ -0.01em); Inter reads cleaner slightly tightened at 500. */
+  letter-spacing: -0.006em;
   color: rgba(17, 17, 17, 0.96);
   white-space: normal;
   max-width: 100%;
@@ -152,16 +168,23 @@
 }
 
 .contact-page__intro--lead {
-  line-height: 1.36;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  opacity: 0.95;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  opacity: 0.98;
   /* Slight lift vs body; em tracks scaled inset font-size. */
-  font-size: 1.045em;
+  font-size: 1em;
 }
 
-.contact-page .contact-page__intro-phrase {
-  white-space: nowrap;
+.contact-page__intro--deck {
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* Softer than button-row CTAs: same sentence, lighter texture. */
+.contact-page__intro-reach {
+  font-weight: 400;
+  letter-spacing: 0.004em;
 }
 
 .contact-page__links {
@@ -193,10 +216,14 @@
   color: rgba(17, 17, 17, 0.96);
   font-size: inherit;
   gap: 0.62em;
+  /* Tail padding wins vs %-column squeeze: never smaller than --contact-link-tail-min-px. */
   padding: var(--contact-link-pad-block, 0.2em)
-    calc(
-      var(--contact-link-pad-inline, 0.95rem) +
-        var(--contact-link-tail-pad, 0.55rem)
+    max(
+      var(--contact-link-tail-min-px, 13px),
+      calc(
+        var(--contact-link-pad-inline, 0.95rem) +
+          var(--contact-link-tail-pad, 0.55rem)
+      )
     )
     var(--contact-link-pad-block, 0.2em) var(--contact-link-pad-inline, 0.95rem);
   background-color: var(--color-page-bg);
@@ -215,7 +242,8 @@
   font-size: inherit;
   min-width: 0;
   line-height: 1.24;
-  letter-spacing: 0.022em;
+  letter-spacing: 0.01em;
+  opacity: 0.98;
   font-weight: 500;
 }
 

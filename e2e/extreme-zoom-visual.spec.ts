@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { applyExtremeZoom } from './helpers';
 
+/*
+ * PNG baselines must match CI / integration-tests.sh: render via astro preview, not dev.
+ * Regenerate (desktop chromium):
+ *   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual.spec.ts --project=desktop-chromium --update-snapshots
+ * Or run ./scripts/update-playwright-snapshots.sh (defaults PW_SERVER_MODE=preview and updates these among others).
+ */
 test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 

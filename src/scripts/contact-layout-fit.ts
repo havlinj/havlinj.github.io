@@ -9,7 +9,29 @@ type NeededContent = {
   neededHeight: number;
   topPad: number;
   introH: number;
+  introLinksGapPx: number;
 };
+
+function computeIntroLinksGapPx(
+  introOuterH: number,
+  panelEdge: number,
+): number {
+  const minG = CONTACT_LAYOUT.introLinksGapMinPx;
+  const fromIntro = introOuterH * CONTACT_LAYOUT.introLinksGapIntroHeightRatio;
+  const fromPanel = panelEdge * CONTACT_LAYOUT.introLinksGapPanelRatio;
+  return Math.round(Math.max(minG, Math.min(fromIntro, fromPanel)));
+}
+
+function computeMinFontPx(panelEdge: number): number {
+  const lo = CONTACT_LAYOUT.minFontEdgeLo;
+  const hi = CONTACT_LAYOUT.minFontEdgeHi;
+  const a = CONTACT_LAYOUT.minFontPxSmall;
+  const b = CONTACT_LAYOUT.minFontPx;
+  const edge = Math.max(1, panelEdge);
+  if (edge >= hi) return b;
+  if (edge <= lo) return a;
+  return a + ((b - a) * (edge - lo)) / (hi - lo);
+}
 
 function startContactInsetFit(): void {
   const panel = document.querySelector(CONTACT_SELECTORS.panel);
@@ -68,6 +90,15 @@ function startContactInsetFit(): void {
   function applyFontAndPanelMetrics(fontPx: number, panelEdge: number): void {
     setPanelVar('--contact-panel-edge', `${panelEdge}px`);
     setPanelVar('--contact-fluid-font', `${fontPx.toFixed(3)}px`);
+    setPanelVar(
+      '--contact-link-tail-min-px',
+      `${Math.round(
+        Math.max(
+          CONTACT_LAYOUT.linkTailMinPx,
+          panelEdge * CONTACT_LAYOUT.linkTailMinPanelRatio,
+        ),
+      )}px`,
+    );
 
     const insetPadPx = panelEl.clientWidth * padFrac * 0.5;
     setPanelVar('--contact-stack-top-px', `${Math.round(insetPadPx)}px`);
@@ -95,17 +126,18 @@ function startContactInsetFit(): void {
     };
   }
 
-  function measureNeededContent(): NeededContent {
+  function measureNeededContent(panelEdge: number): NeededContent {
     const topPad = Math.round(readPanelTopPadPx());
     const leftPad = Math.round(readPanelLeftPadPx());
     const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
+    const introLinksGapPx = computeIntroLinksGapPx(intro.h, panelEdge);
     const neededWidth =
       Math.max(intro.w, links.w) + leftPad + CONTACT_LAYOUT.fitSafetyXPx;
     const neededHeight =
       topPad +
       intro.h +
-      intro.h +
+      introLinksGapPx +
       links.h +
       topPad +
       CONTACT_LAYOUT.fitSafetyYPx;
@@ -114,22 +146,25 @@ function startContactInsetFit(): void {
       neededHeight,
       topPad,
       introH: intro.h,
+      introLinksGapPx,
     };
   }
 
   function computeDesiredFontPx(panelEdge: number): number {
-    const baselineEdge = Math.max(1, CONTACT_LAYOUT.smallPanelEdgePx);
-    const fontToEdgeRatio = CONTACT_LAYOUT.baselineFontPx / baselineEdge;
-    const baseFontPx = panelEdge * fontToEdgeRatio;
-    const smallPanelScale =
-      panelEdge <= CONTACT_LAYOUT.smallPanelEdgePx
-        ? CONTACT_LAYOUT.smallPanelFontScale
-        : 1;
-    const scaledFontPx = baseFontPx * smallPanelScale;
-    return Math.min(
-      CONTACT_LAYOUT.maxFontPx,
-      Math.max(CONTACT_LAYOUT.minFontPx, scaledFontPx),
-    );
+    const refEdge = Math.max(1, CONTACT_LAYOUT.fontBaselineReferenceEdgePx);
+    const fontToEdgeRatio = CONTACT_LAYOUT.baselineFontPx / refEdge;
+    let scaledFontPx = panelEdge * fontToEdgeRatio;
+    if (panelEdge <= CONTACT_LAYOUT.smallPanelEdgePx) {
+      scaledFontPx *= CONTACT_LAYOUT.smallPanelFontScale;
+    }
+    if (panelEdge <= CONTACT_LAYOUT.tinyPanelEdgePx) {
+      scaledFontPx *= CONTACT_LAYOUT.tinyPanelFontExtraScale;
+    }
+    if (panelEdge <= CONTACT_LAYOUT.microPanelEdgePx) {
+      scaledFontPx *= CONTACT_LAYOUT.microPanelFontExtraScale;
+    }
+    const minPx = computeMinFontPx(panelEdge);
+    return Math.min(CONTACT_LAYOUT.maxFontPx, Math.max(minPx, scaledFontPx));
   }
 
   function flush(): void {
@@ -137,19 +172,26 @@ function startContactInsetFit(): void {
       1,
       Math.min(panelEl.clientWidth, panelEl.clientHeight),
     );
-    // CSS-first: keep current computed size as baseline and let JS only nudge it.
+    // Wide panels: inherit computed size so JS mostly refines overflow. Narrow squares otherwise
+    // stick at root ~16px and ignore our curve — typography reads oversized on phones.
     const cssFontPx = parseFloat(getComputedStyle(panelEl).fontSize);
-    let desiredFontPx = Number.isFinite(cssFontPx)
-      ? cssFontPx
-      : computeDesiredFontPx(panelEdge);
+    const curvePx = computeDesiredFontPx(panelEdge);
+    let desiredFontPx =
+      panelEdge <= CONTACT_LAYOUT.curveFontBaselineEdgePx
+        ? curvePx
+        : Number.isFinite(cssFontPx) && cssFontPx > 0
+          ? cssFontPx
+          : curvePx;
+    const minFontPx = computeMinFontPx(panelEdge);
     desiredFontPx = Math.min(
       CONTACT_LAYOUT.maxFontPx,
-      Math.max(CONTACT_LAYOUT.minFontPx, desiredFontPx),
+      Math.max(minFontPx, desiredFontPx),
     );
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-    let measured = measureNeededContent();
-    let { neededWidth, neededHeight, topPad, introH } = measured;
+    let measured = measureNeededContent(panelEdge);
+    let { neededWidth, neededHeight, topPad, introH, introLinksGapPx } =
+      measured;
 
     const availW = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
     const availH = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
@@ -159,15 +201,19 @@ function startContactInsetFit(): void {
       pass < CONTACT_LAYOUT.maxFitPasses
     ) {
       const scale = Math.min(availW / neededWidth, availH / neededHeight, 1);
-      desiredFontPx = Math.max(CONTACT_LAYOUT.minFontPx, desiredFontPx * scale);
+      desiredFontPx = Math.max(minFontPx, desiredFontPx * scale);
       applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-      measured = measureNeededContent();
-      ({ neededWidth, neededHeight, topPad, introH } = measured);
+      measured = measureNeededContent(panelEdge);
+      ({ neededWidth, neededHeight, topPad, introH, introLinksGapPx } =
+        measured);
       pass += 1;
     }
 
     setPanelVar('--contact-intro-top-px', `${topPad}px`);
-    setPanelVar('--contact-links-top-px', `${topPad + introH + introH}px`);
+    setPanelVar(
+      '--contact-links-top-px',
+      `${topPad + introH + introLinksGapPx}px`,
+    );
 
     revealAfterStableLayout();
   }

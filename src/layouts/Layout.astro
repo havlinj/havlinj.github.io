@@ -166,6 +166,10 @@ const navItems = [
         var BASELINE_KEY = 'zoomFreezeBaselineV2';
         var WIDTH_DRIFT_RESET_RATIO = 0.22;
         var SCALE_DRIFT_EPSILON = 0.05;
+        /* Reset when DPR jumps between sessions (e.g. desktop dpr=1 baseline vs phone dpr=3). */
+        var DPR_BASELINE_MISMATCH_RATIO = 1.12;
+        /* Stored innerWidth clearly desktop while current layout is phone-sized. */
+        var DESKTOP_BASELINE_INNER_WIDTH_MIN = 640;
         var currentDpr = window.devicePixelRatio || 1;
         var currentVvScale =
           window.visualViewport && window.visualViewport.scale
@@ -219,6 +223,16 @@ const navItems = [
           var staleWidthOnlyDrift =
             sameDpr && sameVvScale && widthDrift > WIDTH_DRIFT_RESET_RATIO;
 
+          var dprNow = window.devicePixelRatio || 1;
+          var dprBaselineMismatch =
+            Math.max(dprNow, baseline.dpr) / Math.min(dprNow, baseline.dpr) >
+            DPR_BASELINE_MISMATCH_RATIO;
+
+          var narrowButBaselineLooksDesktop =
+            likelyNarrowViewportZoomContext &&
+            baseline.innerWidth >= DESKTOP_BASELINE_INNER_WIDTH_MIN &&
+            baseline.innerWidth > innerWidthNow * 1.25;
+
           // Stale baseline guard:
           // if scale baselines still look "same", but viewport width drifted a lot,
           // this may be stale session baseline. Keep narrow/mobile-like viewports
@@ -226,7 +240,9 @@ const navItems = [
           return (
             (staleWidthOnlyDrift && !likelyNarrowViewportZoomContext) ||
             widthExpanded ||
-            scaleDropped
+            scaleDropped ||
+            dprBaselineMismatch ||
+            narrowButBaselineLooksDesktop
           );
         }
 
