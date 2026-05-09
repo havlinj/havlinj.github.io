@@ -64,11 +64,37 @@
   }
 }
 
+/*
+ * Contact panel BG: responsive `<picture>` (contact.astro), not `::before`.
+ * Zoom matches legacy `background-size: calc(zoom * 100%) auto`: oversized img centered via inset math (no transform).
+ */
 .contact-page .page-buttons-panel::before {
-  background-color: var(--color-page-bg);
-  background-image: var(--panel-bg, none);
-  background-repeat: no-repeat;
-  background-position: calc(
+  content: none;
+}
+
+.contact-page .page-buttons-panel__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.contact-page .page-buttons-panel__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.contact-page .page-buttons-panel__media img {
+  position: absolute;
+  display: block;
+  left: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  top: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  width: calc(100% * var(--panel-bg-zoom, 1));
+  height: calc(100% * var(--panel-bg-zoom, 1));
+  object-fit: cover;
+  object-position: calc(
       var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
         var(--contact-panel-edge, 320px)
     )
@@ -76,8 +102,16 @@
       var(--panel-bg-pos-y, 50%) + var(--panel-bg-nudge-y, 0) *
         var(--contact-panel-edge, 320px)
     );
-  background-size: calc(var(--panel-bg-zoom, 1) * 100%) auto;
+  image-rendering: auto;
+  filter: saturate(var(--panel-bg-saturation, 1))
+    brightness(var(--panel-bg-brightness, 1))
+    contrast(var(--panel-bg-contrast, 1));
   opacity: var(--panel-bg-layer-opacity, 1);
+}
+
+.contact-page .contact-page__fit-content {
+  position: relative;
+  z-index: 1;
 }
 
 .contact-page .page-buttons-panel::after {

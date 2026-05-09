@@ -4,7 +4,15 @@ import '../styles/contact.css';
 
 const title = 'Contact — Jan Havlín';
 
-const panelBg = `url('/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplashdichrom.png')`;
+const contactBgStem =
+  '/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom';
+const contactBgResponsive = {
+  w720: { href: `${contactBgStem}_720.png`, w: 1620 },
+  w1080: { href: `${contactBgStem}_1080.png`, w: 2160 },
+  w1440: { href: `${contactBgStem}_1440.png`, w: 2736 },
+  w1920: { href: `${contactBgStem}_1920.png`, w: 3360 },
+  w2400: { href: `${contactBgStem}_2400.png`, w: 3840 },
+} as const;
 ---
 
 <Layout title={title} activeSection="contact">
@@ -12,7 +20,6 @@ const panelBg = `url('/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unspla
     class="contact-page"
     style={{
       '--page-title-margin-bottom': '1.35rem',
-      '--panel-bg': panelBg,
       '--panel-bg-pos-x': '50%',
       '--panel-bg-pos-y': '50%',
       '--panel-bg-layer-opacity': '0.8',
@@ -37,6 +44,25 @@ const panelBg = `url('/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unspla
     <h1 class="page-title">Contact</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
+        <div class="page-buttons-panel__media" aria-hidden="true">
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset={`${contactBgResponsive.w720.href} ${contactBgResponsive.w720.w}w, ${contactBgResponsive.w1080.href} ${contactBgResponsive.w1080.w}w`}
+              sizes="100vw"
+            />
+            <img
+              src={contactBgResponsive.w1440.href}
+              srcset={`${contactBgResponsive.w1080.href} ${contactBgResponsive.w1080.w}w, ${contactBgResponsive.w1440.href} ${contactBgResponsive.w1440.w}w, ${contactBgResponsive.w1920.href} ${contactBgResponsive.w1920.w}w, ${contactBgResponsive.w2400.href} ${contactBgResponsive.w2400.w}w`}
+              sizes="100vw"
+              width="2736"
+              height="4104"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
+            />
+          </picture>
+        </div>
         <div
           class="contact-page__fit-content contact-page__fit-content--pending"
           aria-busy="true"

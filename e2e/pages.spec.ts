@@ -373,7 +373,7 @@ test.describe('Writing page (/writing)', () => {
     page,
   }) => {
     await page.route(
-      '**/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplashdichrom.png',
+      '**/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom_*.png',
       async (route) => {
         await route.fulfill({ status: 404, body: '' });
       },
