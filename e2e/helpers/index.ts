@@ -15,3 +15,8 @@ export {
   installTurnstileResetCounter,
   readTurnstileResetCount,
 } from './contact';
+export {
+  declareResponsivePanelBgMatrix,
+  type ResponsivePanelBgCase,
+  type ResponsivePanelBgMatrixConfig,
+} from './responsive-panel-bg-matrix';
