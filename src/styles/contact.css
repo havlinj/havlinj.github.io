@@ -109,10 +109,12 @@
   opacity: var(--panel-bg-layer-opacity, 1);
 }
 
-.contact-page .contact-page__fit-content {
-  position: relative;
-  z-index: 1;
-}
+/*
+ * Do not set position on `.contact-page__fit-content`: inset rects use `position: absolute`
+ * and must use `.page-buttons-panel` as containing block (same inset math as Writing buttons).
+ * A positioned wrapper would shrink-wrap (absolute children out of flow) and break top/left margins.
+ * Z-order: `.contact-page__inset-rect` uses z-index: 2 above `.page-buttons-panel__media` (0).
+ */
 
 .contact-page .page-buttons-panel::after {
   content: none;
