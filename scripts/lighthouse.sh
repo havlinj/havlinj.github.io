@@ -13,7 +13,7 @@ REPORT_JSON="${REPORT_DIR}/home.json"
 SKIP_BUILD="${LIGHTHOUSE_SKIP_BUILD:-0}"
 SKIP_PREVIEW="${LIGHTHOUSE_SKIP_PREVIEW:-0}"
 
-# Default thresholds: stricter, but still realistic for CI variability.
+# Default thresholds: stricter locally; GitHub Actions sets LH_MAX_LCP_MS in deploy.yml (noisy runners).
 MIN_PERF_SCORE="${LH_MIN_PERF_SCORE:-0.85}"
 MAX_LCP_MS="${LH_MAX_LCP_MS:-3000}"
 MAX_CLS="${LH_MAX_CLS:-0.10}"

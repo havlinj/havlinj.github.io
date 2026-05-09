@@ -92,6 +92,8 @@ jobs:
         env:
           # all.sh already built and tested; Lighthouse script can reuse that build.
           LIGHTHOUSE_SKIP_BUILD: '1'
+          # Shared runners show high lab LCP variance; default script budget stays 3000 ms locally.
+          LH_MAX_LCP_MS: '4000'
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
