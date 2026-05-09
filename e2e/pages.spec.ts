@@ -301,32 +301,43 @@ test.describe('Writing page (/writing)', () => {
   test('writing background stays fixed across visits without localStorage rotation', async ({
     page,
   }) => {
+    const readWritingPanelBgUrl = () =>
+      page.evaluate(() => {
+        const img = document.querySelector(
+          '.writing-page .page-buttons-panel__media img',
+        ) as HTMLImageElement | null;
+        return img?.currentSrc ?? img?.getAttribute('src') ?? '';
+      });
+
     await page.evaluate(() => {
       window.localStorage.removeItem('writing-bg-index');
     });
     await page.reload();
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10000 });
 
-    const firstBg = await page.evaluate(() => {
-      const article = document.querySelector('article.writing-page');
-      if (!article) return '';
-      return getComputedStyle(article).getPropertyValue('--panel-bg').trim();
-    });
+    const firstBg = await readWritingPanelBgUrl();
     const firstIndex = await page.evaluate(() =>
       window.localStorage.getItem('writing-bg-index'),
     );
 
     await page.goto('/writing');
-    const secondBg = await page.evaluate(() => {
-      const article = document.querySelector('article.writing-page');
-      if (!article) return '';
-      return getComputedStyle(article).getPropertyValue('--panel-bg').trim();
-    });
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10000 });
+
+    const secondBg = await readWritingPanelBgUrl();
     const secondIndex = await page.evaluate(() =>
       window.localStorage.getItem('writing-bg-index'),
     );
 
-    expect(firstBg).toMatch(/url\(.+\)/);
-    expect(secondBg).toMatch(/url\(.+\)/);
+    expect(firstBg).toMatch(
+      /weichao-deng-k0JQkPtfN3s-unsplash_dichrom_\d+\.png(\?|$)/,
+    );
+    expect(secondBg).toMatch(
+      /weichao-deng-k0JQkPtfN3s-unsplash_dichrom_\d+\.png(\?|$)/,
+    );
     expect(secondBg).toBe(firstBg);
     expect(firstIndex).toBeNull();
     expect(secondIndex).toBeNull();

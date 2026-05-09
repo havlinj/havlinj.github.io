@@ -6,12 +6,31 @@ import { splitAndSortWritingPosts } from '../utils/writing-posts';
 const posts = await getCollection('blog');
 const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
-const defaultWritingBgUrl =
-  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplashdichrom.png';
+/**
+ * Responsive Bayer PNGs (`*_720.png`, `*_1080.png`, …).
+ *
+ * The numeric suffix in the filename is NOT the bitmap width in pixels. It is the *intended
+ * display width* (~CSS px) the asset was authored for. Files are oversampled (e.g. target × ~2.25)
+ * so the browser downsamples a high-res Bayer grid → smoother pattern, less moiré.
+ *
+ * HTML `srcset` `w` descriptors MUST be each image’s *intrinsic pixel width* (what `identify`
+ * reports). Do not use the filename number there — wrong descriptor breaks resource selection.
+ *
+ * Paths + intrinsic widths (must match files under `public/assets/pages/writing`).
+ */
+const writingBgStem =
+  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom';
+const writingBgResponsive = {
+  w720: { href: `${writingBgStem}_720.png`, w: 1620 },
+  w1080: { href: `${writingBgStem}_1080.png`, w: 2160 },
+  w1440: { href: `${writingBgStem}_1440.png`, w: 2736 },
+  w1920: { href: `${writingBgStem}_1920.png`, w: 3360 },
+  w2400: { href: `${writingBgStem}_2400.png`, w: 3840 },
+} as const;
+
 const defaultWritingBgOpacity = 0.94;
 const defaultWritingBgNudgeX = 0;
 const defaultWritingBgNudgeY = 0;
-const defaultWritingBg = `url('${defaultWritingBgUrl}')`;
 
 function toPanelBgPosition(value: number): string {
   return `calc(50% + ${value}px)`;
@@ -31,7 +50,6 @@ function formatWritingListDate(d: Date): string {
     class="writing-page"
     style={{
       '--page-title-margin-bottom': '1.35rem',
-      '--panel-bg': defaultWritingBg,
       '--panel-bg-pos-x': toPanelBgPosition(defaultWritingBgNudgeX),
       '--panel-bg-pos-y': toPanelBgPosition(defaultWritingBgNudgeY),
       /* Softer pool photos over page wash (reverted from tile-only filter — read closer to intent). */
@@ -54,6 +72,25 @@ function formatWritingListDate(d: Date): string {
     <h1 class="page-title">Writing</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
+        <div class="page-buttons-panel__media" aria-hidden="true">
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset={`${writingBgResponsive.w720.href} ${writingBgResponsive.w720.w}w, ${writingBgResponsive.w1080.href} ${writingBgResponsive.w1080.w}w`}
+              sizes="100vw"
+            />
+            <img
+              src={writingBgResponsive.w1440.href}
+              srcset={`${writingBgResponsive.w1080.href} ${writingBgResponsive.w1080.w}w, ${writingBgResponsive.w1440.href} ${writingBgResponsive.w1440.w}w, ${writingBgResponsive.w1920.href} ${writingBgResponsive.w1920.w}w, ${writingBgResponsive.w2400.href} ${writingBgResponsive.w2400.w}w`}
+              sizes="100vw"
+              width="2736"
+              height="2204"
+              alt=""
+              decoding="async"
+              fetchpriority="high"
+            />
+          </picture>
+        </div>
         <div class="writing-groups writing-groups--pending" aria-busy="true">
           {
             featuredPosts.length > 0 && (
