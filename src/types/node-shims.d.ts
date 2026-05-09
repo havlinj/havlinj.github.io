@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 declare module 'node:fs/promises' {
   export interface DirEntryLike {
     name: string;

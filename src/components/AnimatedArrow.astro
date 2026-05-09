@@ -9,7 +9,7 @@ import '../styles/animated-arrow.css';
  * Sizing: `fixed` — `size` px; `responsive` — clamp(rem+vw) capped by `size` (scales faster than layout at zoom).
  * `container` — `width: N cqw` on a `container-type: size` ancestor (arrow tracks that box; tame page zoom).
  */
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars -- Astro `Props` → `Astro.props`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Astro `Props` → `Astro.props`
 interface Props {
   size?: number;
   sizeMode?: 'fixed' | 'responsive' | 'container';

@@ -15,7 +15,6 @@ export type WhyScrollLayoutMetrics = {
   padBottom: number;
 };
 
-/* eslint-disable no-unused-vars -- type-only callback signature */
 export type WhyScrollLayoutConfig = {
   scrollEl: HTMLElement;
   boxEl: HTMLElement;
@@ -28,7 +27,6 @@ export type WhyScrollLayoutConfig = {
   T: Record<string, number>;
   bumpSettleFrames: (minFrames: number) => void;
 };
-/* eslint-enable no-unused-vars */
 
 export function createWhyScrollLayout(config: WhyScrollLayoutConfig) {
   const {

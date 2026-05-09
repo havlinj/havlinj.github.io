@@ -23,7 +23,16 @@ export default [
   {
     rules: {
       semi: ['error', 'always'],
-      'no-unused-vars': 'warn',
+      /* Core rule mis-reports names in TS type positions (e.g. callback params). */
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 ];

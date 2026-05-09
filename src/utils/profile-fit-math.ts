@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars -- function type argument name is descriptive only
 export type FontMeasure = (fontSizePx: number) => number;
 
 export function fitFontSize(

@@ -7,7 +7,6 @@ declare module 'pngjs' {
     height: number;
     data: Buffer;
     static sync: {
-      // eslint-disable-next-line no-unused-vars -- ambient API shape (param is not “used” in .d.ts)
       read(buffer: Buffer): PNG;
     };
   }

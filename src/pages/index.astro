@@ -2,8 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import '../styles/hero.css';
 
-const heroBgStem =
-  '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom';
+const heroBgStem = '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom';
 const heroBgResponsive = {
   w720: { href: `${heroBgStem}_720.png`, w: 1620 },
   w1080: { href: `${heroBgStem}_1080.png`, w: 2160 },
@@ -15,11 +14,7 @@ const heroBgResponsive = {
 
 <Layout title="Jan Havlín">
   <Fragment slot="head">
-    <link
-      rel="preload"
-      href={heroBgResponsive.w1440.href}
-      as="image"
-    />
+    <link rel="preload" href={heroBgResponsive.w1440.href} as="image" />
   </Fragment>
   <nav class="hero-header" aria-label="Main navigation">
     <div class="hero-header__inner">

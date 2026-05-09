@@ -33,7 +33,10 @@ export type ResponsivePanelBgMatrixConfig = {
   skipSuiteReason?: string;
 };
 
-async function readResponsiveImgUrl(page: Page, imgSelector: string): Promise<string> {
+async function readResponsiveImgUrl(
+  page: Page,
+  imgSelector: string,
+): Promise<string> {
   const locator = page.locator(imgSelector).first();
   await expect(locator).toBeAttached({ timeout: 15_000 });
   await expect
