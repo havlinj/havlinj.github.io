@@ -129,7 +129,7 @@ test.describe('Hero page (/)', () => {
   test('preloads hero background image', async ({ page }) => {
     await expect(
       page.locator(
-        'link[rel="preload"][as="image"][href="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom.png"]',
+        'link[rel="preload"][as="image"][href="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom_1440.png"]',
       ),
     ).toHaveCount(1);
   });

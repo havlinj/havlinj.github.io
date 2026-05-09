@@ -4,8 +4,7 @@
  * Regenerate expectations after changing `<picture>` breakpoints, `sizes`, or intrinsic widths:
  *   PW_SERVER_MODE=preview npx playwright test e2e/responsive-panel-bg-matrix.spec.ts --project=desktop-chromium
  *
- * Four “main” surfaces (home hero + profile/contact panels) share this helper; ship markup first,
- * then flip `skipSuiteReason` off and swap `urlMatcher` stems to match each page’s filenames.
+ * Home hero + Writing + Contact matrices run here; Profile remains deferred until `<picture>` ships.
  */
 import { expect } from '@playwright/test';
 import {
@@ -15,6 +14,7 @@ import {
 
 const WRITING_BG_STEM = 'weichao-deng-k0JQkPtfN3s-unsplash_dichrom';
 const CONTACT_BG_STEM = 'guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom';
+const HERO_BG_STEM = 'altumcode-oZ61KFUQsus-unsplash_dichrom';
 
 /** Same breakpoints as Writing `<picture>` — intrinsic `w` descriptors align across panel pages. */
 const SHARED_PANEL_BG_TIERS = [
@@ -51,9 +51,10 @@ declareResponsivePanelBgMatrix({
   suiteTitle: 'Home (/) responsive hero background tiers',
   path: '/',
   imgSelector: '.hero-bg__image',
-  skipSuiteReason:
-    'Hero still uses a single `<img>` without `srcset`; enable when oversampled tiers land.',
-  cases: [],
+  waitForReady: async (page) => {
+    await expect(page.locator('section.hero')).toBeVisible();
+  },
+  cases: tierCasesForUrlStem(HERO_BG_STEM),
 });
 
 declareResponsivePanelBgMatrix({

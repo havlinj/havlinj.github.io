@@ -1,13 +1,23 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import '../styles/hero.css';
+
+const heroBgStem =
+  '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom';
+const heroBgResponsive = {
+  w720: { href: `${heroBgStem}_720.png`, w: 1620 },
+  w1080: { href: `${heroBgStem}_1080.png`, w: 2160 },
+  w1440: { href: `${heroBgStem}_1440.png`, w: 2736 },
+  w1920: { href: `${heroBgStem}_1920.png`, w: 3360 },
+  w2400: { href: `${heroBgStem}_2400.png`, w: 3840 },
+} as const;
 ---
 
 <Layout title="Jan Havlín">
   <Fragment slot="head">
     <link
       rel="preload"
-      href="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom.png"
+      href={heroBgResponsive.w1440.href}
       as="image"
     />
   </Fragment>
@@ -31,13 +41,24 @@ import '../styles/hero.css';
       <div class="hero-top-edge" aria-hidden="true"></div>
       <figure class="hero-figure">
         <div class="hero-bg" aria-hidden="true">
-          <img
-            src="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom.png"
-            alt="Hero background"
-            class="hero-bg__image"
-            fetchpriority="high"
-            decoding="async"
-          />
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset={`${heroBgResponsive.w720.href} ${heroBgResponsive.w720.w}w, ${heroBgResponsive.w1080.href} ${heroBgResponsive.w1080.w}w`}
+              sizes="100vw"
+            />
+            <img
+              src={heroBgResponsive.w1440.href}
+              srcset={`${heroBgResponsive.w1080.href} ${heroBgResponsive.w1080.w}w, ${heroBgResponsive.w1440.href} ${heroBgResponsive.w1440.w}w, ${heroBgResponsive.w1920.href} ${heroBgResponsive.w1920.w}w, ${heroBgResponsive.w2400.href} ${heroBgResponsive.w2400.w}w`}
+              sizes="100vw"
+              width="2736"
+              height="3420"
+              alt="Hero background"
+              class="hero-bg__image"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
         </div>
       </figure>
 
