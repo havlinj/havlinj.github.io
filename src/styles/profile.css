@@ -91,31 +91,50 @@ article.has-buttons-panel {
   --tile-bg-size-w: auto;
   --tile-bg-size-h: 168%;
   --tile-bg-overscan: -65%;
+  /* Matches legacy ::before scale(1.1); applied via width/height only (see .profile-section__media img). */
+  --profile-bg-zoom: 1.1;
 }
 
+/* Large canvas BG: responsive Bayer PNG via `<picture>` (profile.md), not ::before. */
 .profile-section::before {
-  content: '';
+  content: none;
+}
+
+.profile-section__media {
   position: absolute;
   top: 0;
   right: -15%;
   bottom: 0;
   left: -20%;
-  background-image: url('/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplashdichrom.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.profile-section__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.profile-section__media img {
+  position: absolute;
+  display: block;
+  left: calc((1 - var(--profile-bg-zoom, 1.1)) * 50%);
+  top: calc((1 - var(--profile-bg-zoom, 1.1)) * 50%);
+  width: calc(100% * var(--profile-bg-zoom, 1.1));
+  height: calc(100% * var(--profile-bg-zoom, 1.1));
+  object-fit: cover;
+  object-position: center;
+  image-rendering: auto;
+  transform: translate3d(
+    var(--profile-background-pan-x, 0%),
+    var(--profile-background-pan-y, 0%),
+    0
+  );
   filter: brightness(var(--profile-hero-bg-brightness))
     saturate(var(--profile-hero-bg-saturate));
   opacity: var(--profile-hero-bg-image-opacity);
-  transform: translate3d(
-      var(--profile-background-pan-x),
-      var(--profile-background-pan-y),
-      0
-    )
-    scale(1.1);
-  transform-origin: center;
-  z-index: 0;
-  pointer-events: none;
 }
 
 .profile-section::after {

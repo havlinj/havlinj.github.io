@@ -64,6 +64,25 @@ title: 'Profile'
     --profile-reveal-text-scale: 1.5;
   "
 >
+  <div class="profile-section__media" aria-hidden="true">
+    <picture>
+      <source
+        media="(max-width: 767px)"
+        srcset="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_720.png 1620w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1080.png 2160w"
+        sizes="100vw"
+      />
+      <img
+        src="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1440.png"
+        srcset="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1080.png 2160w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1440.png 2736w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1920.png 3360w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_2400.png 3840w"
+        sizes="100vw"
+        width="2736"
+        height="4082"
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+      />
+    </picture>
+  </div>
   <a
     href="/why-this"
     class="profile-tile profile-image-tile page-button prof-tile"

@@ -15,6 +15,7 @@ import {
 const WRITING_BG_STEM = 'weichao-deng-k0JQkPtfN3s-unsplash_dichrom';
 const CONTACT_BG_STEM = 'guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom';
 const HERO_BG_STEM = 'altumcode-oZ61KFUQsus-unsplash_dichrom';
+const PROFILE_BG_STEM = 'evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom';
 
 /** Same breakpoints as Writing `<picture>` — intrinsic `w` descriptors align across panel pages. */
 const SHARED_PANEL_BG_TIERS = [
@@ -58,12 +59,15 @@ declareResponsivePanelBgMatrix({
 });
 
 declareResponsivePanelBgMatrix({
-  suiteTitle: 'Profile (/profile) responsive panel background tiers',
+  suiteTitle: 'Profile (/profile) responsive canvas background tiers',
   path: '/profile',
-  imgSelector: '.profile-section .page-buttons-panel__media img',
-  skipSuiteReason:
-    'Panel still uses CSS `--panel-bg`; enable when `<picture>` matches Writing.',
-  cases: [],
+  imgSelector: '.profile-section__media img',
+  waitForReady: async (page) => {
+    await expect(
+      page.locator('.profile-section:not(.profile-section--loading)'),
+    ).toBeVisible({ timeout: 15_000 });
+  },
+  cases: tierCasesForUrlStem(PROFILE_BG_STEM),
 });
 
 declareResponsivePanelBgMatrix({

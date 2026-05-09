@@ -260,6 +260,11 @@ a:hover {
     opacity: 1 !important;
   }
 
+  .profile-section__media img {
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
   .profile-photo-box::after,
   .profile-image-tile::after,
   .profile-gif-tile::after,
