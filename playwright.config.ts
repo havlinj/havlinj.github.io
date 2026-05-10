@@ -1,9 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const serverMode = process.env.PW_SERVER_MODE === 'preview' ? 'preview' : 'dev';
+// Preview boots run `astro build && astro preview`; when a wrapper script
+// (integration-tests.sh, update-playwright-snapshots.sh) has already built
+// the site for this invocation, set PW_SKIP_BUILD=1 to reuse dist/ so each
+// Playwright run just spins up `astro preview` and fits the 15 s budget.
+const skipBuild = process.env.PW_SKIP_BUILD === '1';
+const previewCommand = 'npm run preview -- --host 127.0.0.1 --port 4321';
 const webServerCommand =
   serverMode === 'preview'
-    ? 'npm run build && npm run preview -- --host 127.0.0.1 --port 4321'
+    ? skipBuild
+      ? previewCommand
+      : `npm run build && ${previewCommand}`
     : 'npm run dev';
 
 export default defineConfig({

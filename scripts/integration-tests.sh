@@ -111,6 +111,14 @@ if [[ "$SKIP_EXTREME_ZOOM_VISUAL" == "1" ]]; then
 fi
 echo "Playwright workers: $PW_WORKERS"
 echo "Playwright CI mode: $PW_CI_MODE"
+
+# Build once for all three preview-mode Playwright runs below. Without this the
+# webServer command (`astro build && astro preview`) reruns the build on every
+# invocation and easily exceeds Playwright's 15 s webServer.timeout.
+echo "Building site once for preview-mode webServer reuse..."
+npm run build
+export PW_SKIP_BUILD=1
+
 echo "Running parallel-safe tests (excluding @serial)..."
 if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- --workers="$PW_WORKERS" --grep-invert="@serial" "${EXTRA_INVERT[@]}"
