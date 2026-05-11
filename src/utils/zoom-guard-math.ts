@@ -6,6 +6,26 @@ export const ZOOM_GUARD_WARM_CANCEL_RATIO = 1.05;
 /** Document scrollWidth vs innerWidth — overflow self-heal when unfrozen. */
 export const ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD = 1.22;
 
+/**
+ * Tampered or impossible sessionStorage baseline (e.g. innerWidth: 3000 on a ~900px window).
+ * Must not drive getZoomRatio() into false freeze; reset baseline from current view instead.
+ * Sync with e2e: `zoom guard does not freeze from stale stored baseline alone`.
+ */
+export const ZOOM_GUARD_ABSURD_BASELINE_INNER_WIDTH_MIN = 2600;
+export const ZOOM_GUARD_ABSURD_BASELINE_WIDTH_FACTOR = 2.2;
+
+export function isAbsurdStoredBaselineInnerWidth(
+  baselineInnerWidth: number,
+  innerWidthNow: number,
+): boolean {
+  return (
+    baselineInnerWidth >= ZOOM_GUARD_ABSURD_BASELINE_INNER_WIDTH_MIN &&
+    baselineInnerWidth >
+      innerWidthNow * ZOOM_GUARD_ABSURD_BASELINE_WIDTH_FACTOR &&
+    innerWidthNow >= 400
+  );
+}
+
 export type ZoomRatioInput = {
   baselineDpr: number;
   baselineVvScale: number;
@@ -22,9 +42,7 @@ export function computeZoomRatio(m: ZoomRatioInput): number {
   const dprRatio = m.currentDpr / m.baselineDpr;
   const cw = m.currentInnerWidth || m.baselineInnerWidth || 1;
   const innerWidthRatio =
-    m.baselineInnerWidth > 0
-      ? m.baselineInnerWidth / Math.max(1, cw)
-      : 1;
+    m.baselineInnerWidth > 0 ? m.baselineInnerWidth / Math.max(1, cw) : 1;
   return Math.max(vvRatio, vvAbsoluteRatio, dprRatio, innerWidthRatio);
 }
 

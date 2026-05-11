@@ -7,6 +7,7 @@ import {
   computeOverflowHealScale,
   computeTargetFreezeScale,
   computeZoomRatio,
+  isAbsurdStoredBaselineInnerWidth,
   shouldCancelWarmStart,
   shouldKeepFreeze,
 } from '../../src/utils/zoom-guard-math';
@@ -98,14 +99,29 @@ describe('computeTargetFreezeScale', () => {
 
 describe('computeOverflowHealScale', () => {
   it('returns null when within threshold', () => {
-    expect(computeOverflowHealScale(800, 900, ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD)).toBe(
-      null,
-    );
+    expect(
+      computeOverflowHealScale(800, 900, ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD),
+    ).toBe(null);
   });
 
   it('returns width ratio when clearly overflowing', () => {
-    const s = computeOverflowHealScale(400, 800, ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD);
+    const s = computeOverflowHealScale(
+      400,
+      800,
+      ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD,
+    );
     expect(s).toBeCloseTo(0.5, 3);
+  });
+});
+
+describe('isAbsurdStoredBaselineInnerWidth', () => {
+  it('detects e2e stale baseline innerWidth 3000 at 900px window', () => {
+    expect(isAbsurdStoredBaselineInnerWidth(3000, 900)).toBe(true);
+  });
+
+  it('does not flag normal desktop baseline with aggressive resize', () => {
+    expect(isAbsurdStoredBaselineInnerWidth(1200, 400)).toBe(false);
+    expect(isAbsurdStoredBaselineInnerWidth(1920, 900)).toBe(false);
   });
 });
 

@@ -197,8 +197,7 @@ export async function assertCompositionLayout(
         inside.overflowing.every((sel) => contactInsetOverflowAllowed.has(sel))
       : inside.ok;
 
-  expect(
-    insideOk,
-    `${label}: inside layout ${JSON.stringify(inside)}`,
-  ).toBe(true);
+  expect(insideOk, `${label}: inside layout ${JSON.stringify(inside)}`).toBe(
+    true,
+  );
 }

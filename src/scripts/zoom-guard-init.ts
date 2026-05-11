@@ -6,6 +6,7 @@ import {
   computeOverflowHealScale,
   computeTargetFreezeScale,
   computeZoomRatio,
+  isAbsurdStoredBaselineInnerWidth,
   shouldCancelWarmStart,
   shouldKeepFreeze,
 } from '../utils/zoom-guard-math';
@@ -133,11 +134,17 @@ export function initZoomGuard(): void {
       baseline.innerWidth >= DESKTOP_BASELINE_INNER_WIDTH_MIN &&
       baseline.innerWidth > innerWidthNow * 1.25;
 
+    const absurdStoredInnerWidth = isAbsurdStoredBaselineInnerWidth(
+      baseline.innerWidth,
+      innerWidthNow,
+    );
+
     return (
       dprBaselineMismatch ||
       scaleDropped ||
       widthExpanded ||
-      narrowButBaselineLooksDesktop
+      narrowButBaselineLooksDesktop ||
+      absurdStoredInnerWidth
     );
   }
 
@@ -221,7 +228,10 @@ export function initZoomGuard(): void {
   let lastPersistedFreezeScale = freezeScale;
   let healLockFrames = 0;
 
-  function persistGuardState(nextActive: boolean, nextFreezeScale: number): void {
+  function persistGuardState(
+    nextActive: boolean,
+    nextFreezeScale: number,
+  ): void {
     if (
       nextActive === lastPersistedActive &&
       Math.abs(nextFreezeScale - lastPersistedFreezeScale) <
@@ -377,9 +387,19 @@ export function initZoomGuard(): void {
     const ratioNow = getZoomRatio();
     if (
       Date.now() >= warmStartUntil ||
-      shouldCancelWarmStart(ratioNow, MAX_SAFE_ZOOM, ZOOM_GUARD_WARM_CANCEL_RATIO)
+      shouldCancelWarmStart(
+        ratioNow,
+        MAX_SAFE_ZOOM,
+        ZOOM_GUARD_WARM_CANCEL_RATIO,
+      )
     ) {
-      if (shouldCancelWarmStart(ratioNow, MAX_SAFE_ZOOM, ZOOM_GUARD_WARM_CANCEL_RATIO)) {
+      if (
+        shouldCancelWarmStart(
+          ratioNow,
+          MAX_SAFE_ZOOM,
+          ZOOM_GUARD_WARM_CANCEL_RATIO,
+        )
+      ) {
         warmStartUntil = 0;
       }
       updateZoomGuard();
