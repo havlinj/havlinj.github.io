@@ -45,9 +45,9 @@ All Pexels media listed below are used according to the
 - **Profile tile video (What I do)**
   - Author: [Raddy](https://www.pexels.com/@raddy/)
   - Source: [Pexels](https://www.pexels.com/video/13522186/)
-  - Edits: dichromatic treatment; desktop/mobile MP4 + static poster frames (`public/assets/pages/profile/what-i-do/`)
+  - Edits: dichromatic colour grade; separate desktop and mobile encodes; JPEG poster frames until the clip loads.
 
-- **Why section background video**
+- **Why this page background video**
   - Author: [deconjpa](https://www.pexels.com/@deconjpa/)
   - Source: [Pexels](https://www.pexels.com/video/12374259/)
-  - Edits: inverted look, clean master export (`public/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_inversed_clean.mp4`)
+  - Edits: inverted look, ping-pong loop, static poster from the same clip for load and error fallback.
