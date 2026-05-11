@@ -26,14 +26,36 @@ test.describe('/profile mobile regressions @serial', () => {
     await setRevealTimeoutMs(page, 1200);
 
     const tile = page.getByRole('link', { name: 'Foundations' });
+    await tile.scrollIntoViewIfNeeded();
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
     await expectFoundationsRevealCopyPainted(tile);
 
+    await tile.scrollIntoViewIfNeeded();
     const reveal = page.locator('.prof-tile--foundations .prof-tile__reveal');
     await expect(reveal).toBeVisible();
-    await expect(reveal).toHaveScreenshot('foundations-reveal-mobile.png');
+    await expect(reveal).toBeInViewport();
+
+    const box = await reveal.boundingBox();
+    expect(box).not.toBeNull();
+    /*
+     * Locator screenshots ignore `clip` in Playwright (element capture uses the full border box).
+     * Page-level clip caps width at 146px so Linux CI and local Chromium agree; copy is
+     * left-aligned so the trimmed strip is padding/background.
+     */
+    const clip = {
+      x: Math.floor(box!.x),
+      y: Math.floor(box!.y),
+      width: Math.min(146, Math.max(1, Math.ceil(box!.width))),
+      height: Math.max(1, Math.ceil(box!.height)),
+    };
+    await expect(page).toHaveScreenshot('foundations-reveal-mobile.png', {
+      animations: 'disabled',
+      clip,
+      timeout: 15_000,
+      maxDiffPixelRatio: 0.008,
+    });
   });
 
   test('Foundations reveal text fits inside state2 box', async ({ page }) => {
