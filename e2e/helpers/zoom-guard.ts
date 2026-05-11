@@ -185,7 +185,7 @@ export async function assertCompositionLayout(
     },
   );
 
-  const vw = (await page.viewportSize())?.width ?? 9999;
+  const vw = page.viewportSize()?.width ?? 9999;
   const isExtremeMobileContact = c.name === 'contact' && vw <= 430;
   const contactInsetOverflowAllowed = new Set([
     '.contact-page__inset-rect--intro',

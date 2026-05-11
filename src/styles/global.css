@@ -22,8 +22,8 @@
   --content-width: 70ch;
   --content-side-pad: 2rem;
   --content-side-pad-compact: clamp(1.15rem, 6vw, 2rem);
-  /* Shared with profile tile labels (match h1.page-title optical size) */
-  --page-title-font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+  /* Fallback when not under `main.content` (see main block for real value). */
+  --page-title-font-size: clamp(1.9rem, 2.8vw, 2.12rem);
   --body-font-size: 1rem;
   --body-line-height: 1.65;
   --body-letter-spacing: 0.008em;
@@ -148,6 +148,13 @@ main,
   padding: 2rem var(--content-side-pad) 0;
   /* Enable cqw based on the content-body width */
   container-type: inline-size;
+  /*
+   * Page H1: fluid on narrow / laptop; tie preferred size to the content column (cqi)
+   * so ultra-wide viewports do not track full-window vw. Max lowered visibly vs legacy
+   * 2.5rem so Writing / Contact / Profile titles do not dominate at wide zoom.
+   * Shared with profile tile labels (see profile.css max term).
+   */
+  --page-title-font-size: clamp(1.9rem, min(2.7vw, 5.75cqi), 2.12rem);
 }
 
 /* Keep composition blocks naturally aligned to content/header width.

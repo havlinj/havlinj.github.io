@@ -230,6 +230,55 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     await resetDocZoom(page);
   });
 
+  test('rapid viewport alternation settles to frozen then unfrozen', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.goto('/writing');
+    await expect(
+      page.locator('.writing-page .writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 8000 });
+
+    for (let i = 0; i < 14; i += 1) {
+      await page.setViewportSize({
+        width: i % 2 === 0 ? 1100 : 360,
+        height: 900,
+      });
+    }
+
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 6000,
+      })
+      .toBe(true);
+
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 6000,
+      })
+      .toBe(false);
+    await resetDocZoom(page);
+  });
+
+  test('ctrl+wheel dispatches without error; guard snapshot readable', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 900 });
+    await page.goto('/profile');
+    await page.evaluate(() => {
+      window.dispatchEvent(
+        new WheelEvent('wheel', {
+          deltaY: 1,
+          ctrlKey: true,
+          bubbles: true,
+        }),
+      );
+    });
+    const snap = await readZoomGuardSnapshot(page);
+    expect(snap).toMatchObject({ frozen: expect.any(Boolean) });
+  });
+
   test('main content does not explode past viewport width (doc zoom 3, all composition)', async ({
     page,
   }) => {
