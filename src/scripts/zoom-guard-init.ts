@@ -96,17 +96,35 @@ export function initZoomGuard(): void {
     );
   }
 
-  function ratioFromBaseline(bd: number, bv: number, biw: number): number {
+  function currentVisualViewportScale(): number {
     const vv = window.visualViewport;
-    const vvScale = vv && vv.scale ? vv.scale : 0;
+    return vv && vv.scale ? vv.scale : 0;
+  }
+
+  function zoomRatioForBaseline(bd: number, bv: number, biw: number): number {
     return computeZoomRatio({
       baselineDpr: bd,
       baselineVvScale: bv,
       baselineInnerWidth: biw,
       currentDpr: window.devicePixelRatio || 1,
-      currentVvScale: vvScale,
+      currentVvScale: currentVisualViewportScale(),
       currentInnerWidth: window.innerWidth || biw || 1,
     });
+  }
+
+  function persistBaseline(baseline: Baseline): void {
+    try {
+      window.sessionStorage.setItem(
+        BASELINE_KEY,
+        JSON.stringify({
+          dpr: baseline.dpr,
+          vvScale: baseline.vvScale,
+          innerWidth: baseline.innerWidth,
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
   }
 
   function shouldResetBaseline(baseline: Baseline): boolean {
@@ -157,18 +175,7 @@ export function initZoomGuard(): void {
       vvScale: currentVvScale,
       innerWidth: currentInnerWidth,
     };
-    try {
-      window.sessionStorage.setItem(
-        BASELINE_KEY,
-        JSON.stringify({
-          dpr: storedBaseline.dpr,
-          vvScale: storedBaseline.vvScale,
-          innerWidth: storedBaseline.innerWidth,
-        }),
-      );
-    } catch {
-      /* ignore */
-    }
+    persistBaseline(storedBaseline);
   }
 
   const sb = storedBaseline as Baseline;
@@ -176,7 +183,7 @@ export function initZoomGuard(): void {
   let baselineVvScale = sb.vvScale;
   let baselineInnerWidth = sb.innerWidth;
 
-  const provisionalRatio = ratioFromBaseline(
+  const provisionalRatio = zoomRatioForBaseline(
     baselineDpr,
     baselineVvScale,
     baselineInnerWidth,
@@ -192,18 +199,7 @@ export function initZoomGuard(): void {
       vvScale: currentVvScale,
       innerWidth: currentInnerWidth,
     };
-    try {
-      window.sessionStorage.setItem(
-        BASELINE_KEY,
-        JSON.stringify({
-          dpr: storedBaseline.dpr,
-          vvScale: storedBaseline.vvScale,
-          innerWidth: storedBaseline.innerWidth,
-        }),
-      );
-    } catch {
-      /* ignore */
-    }
+    persistBaseline(storedBaseline);
     try {
       window.sessionStorage.removeItem(GUARD_STATE_KEY);
     } catch {
@@ -256,16 +252,11 @@ export function initZoomGuard(): void {
   }
 
   function getZoomRatio(): number {
-    const vv = window.visualViewport;
-    const vvScale = vv && vv.scale ? vv.scale : 0;
-    return computeZoomRatio({
+    return zoomRatioForBaseline(
       baselineDpr,
       baselineVvScale,
       baselineInnerWidth,
-      currentDpr: window.devicePixelRatio || 1,
-      currentVvScale: vvScale,
-      currentInnerWidth: window.innerWidth || baselineInnerWidth || 1,
-    });
+    );
   }
 
   function updateZoomGuard(): void {
@@ -345,7 +336,7 @@ export function initZoomGuard(): void {
     });
   }
 
-  const ratioAfterReconcile = ratioFromBaseline(
+  const ratioAfterReconcile = zoomRatioForBaseline(
     baselineDpr,
     baselineVvScale,
     baselineInnerWidth,
@@ -385,23 +376,13 @@ export function initZoomGuard(): void {
 
   function loopZoomGuard(): void {
     const ratioNow = getZoomRatio();
-    if (
-      Date.now() >= warmStartUntil ||
-      shouldCancelWarmStart(
-        ratioNow,
-        MAX_SAFE_ZOOM,
-        ZOOM_GUARD_WARM_CANCEL_RATIO,
-      )
-    ) {
-      if (
-        shouldCancelWarmStart(
-          ratioNow,
-          MAX_SAFE_ZOOM,
-          ZOOM_GUARD_WARM_CANCEL_RATIO,
-        )
-      ) {
-        warmStartUntil = 0;
-      }
+    const cancelWarm = shouldCancelWarmStart(
+      ratioNow,
+      MAX_SAFE_ZOOM,
+      ZOOM_GUARD_WARM_CANCEL_RATIO,
+    );
+    if (Date.now() >= warmStartUntil || cancelWarm) {
+      if (cancelWarm) warmStartUntil = 0;
       updateZoomGuard();
     }
     window.requestAnimationFrame(loopZoomGuard);
