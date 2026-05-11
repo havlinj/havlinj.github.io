@@ -164,6 +164,7 @@ const navItems = [
         if (!hasComposition) return;
 
         var BASELINE_KEY = 'zoomFreezeBaselineV2';
+        var GUARD_STATE_KEY = 'zoomFreezeGuardStateV2';
         var WIDTH_DRIFT_RESET_RATIO = 0.22;
         var SCALE_DRIFT_EPSILON = 0.05;
         /* Reset when DPR jumps between sessions (e.g. desktop dpr=1 baseline vs phone dpr=3). */
@@ -188,6 +189,31 @@ const navItems = [
             storedBaseline = null;
           }
         }
+
+        // If the user is currently in freeze-mode (persisted from before a reload),
+        // keep the same baseline on reload. Baseline reset heuristics can be fooled
+        // by the zoomed viewport (notably `innerWidth` shrinking), which then
+        // makes the page render as if it were at the raw zoom (e.g. 400%).
+        var storedGuardStateRawWarm = null;
+        var persistedGuardActiveWarm = false;
+        var persistedFreezeScaleWarm = 1;
+        try {
+          storedGuardStateRawWarm =
+            window.sessionStorage.getItem(GUARD_STATE_KEY) ?? null;
+        } catch {}
+        if (storedGuardStateRawWarm) {
+          try {
+            var parsedWarm = JSON.parse(storedGuardStateRawWarm);
+            if (parsedWarm && typeof parsedWarm.active === 'boolean') {
+              persistedGuardActiveWarm = parsedWarm.active;
+            }
+            if (parsedWarm && Number.isFinite(parsedWarm.freezeScale)) {
+              persistedFreezeScaleWarm = parsedWarm.freezeScale;
+            }
+          } catch {}
+        }
+        var shouldSkipBaselineResetWarm = persistedGuardActiveWarm === true;
+
         function hasValidBaseline(baseline) {
           return (
             baseline &&
@@ -200,55 +226,64 @@ const navItems = [
           );
         }
 
+        /** Same math as getZoomRatio below; inlined so we can validate before freeze UI applies. */
+        function ratioFromBaseline(bd, bv, biw) {
+          var vv = window.visualViewport;
+          var vvScale = vv && vv.scale ? vv.scale : 0;
+          var vvRatio = vvScale > 0 ? vvScale / bv : 1;
+          var vvAbsoluteRatio = vvScale > 0 ? vvScale : 1;
+          var dprRatio = (window.devicePixelRatio || 1) / bd;
+          var cw = window.innerWidth || biw || 1;
+          var innerWidthRatio =
+            biw > 0 ? biw / Math.max(1, cw) : 1;
+          return Math.max(vvRatio, vvAbsoluteRatio, dprRatio, innerWidthRatio);
+        }
+
         function shouldResetBaseline(baseline) {
           if (!hasValidBaseline(baseline)) return true;
+
           var innerWidthNow = window.innerWidth || 0;
-          var sameDpr =
-            Math.abs((window.devicePixelRatio || 1) - baseline.dpr) <=
-            SCALE_DRIFT_EPSILON;
+          var dprNow = window.devicePixelRatio || 1;
           var vvNow =
             window.visualViewport && window.visualViewport.scale
               ? window.visualViewport.scale
               : 1;
-          var sameVvScale =
-            Math.abs(vvNow - baseline.vvScale) <= SCALE_DRIFT_EPSILON;
-          var widthDrift =
-            Math.abs(innerWidthNow - baseline.innerWidth) /
-            Math.max(1, baseline.innerWidth);
-          var widthExpanded = innerWidthNow > baseline.innerWidth * 1.1;
-          var scaleDropped =
-            (window.devicePixelRatio || 1) < baseline.dpr * 0.9 ||
-            vvNow < baseline.vvScale * 0.9;
-          var likelyNarrowViewportZoomContext = innerWidthNow <= 520;
-          var staleWidthOnlyDrift =
-            sameDpr && sameVvScale && widthDrift > WIDTH_DRIFT_RESET_RATIO;
 
-          var dprNow = window.devicePixelRatio || 1;
+          // Hard resets for clearly different render contexts (device / orientation changes)
           var dprBaselineMismatch =
             Math.max(dprNow, baseline.dpr) / Math.min(dprNow, baseline.dpr) >
             DPR_BASELINE_MISMATCH_RATIO;
 
+          // If effective zoom dropped well below the original baseline,
+          // treat this as returning to a new "normal" neighborhood.
+          var scaleDropped =
+            dprNow < baseline.dpr * 0.9 || vvNow < baseline.vvScale * 0.9;
+
+          // Only width *expansion* should force a new baseline. Width shrink
+          // is often pure browser zoom — keep the original baseline so the
+          // freeze threshold remains stable across pages at that zoom.
+          var widthExpanded = innerWidthNow > baseline.innerWidth * 1.15;
+
+          // Mobile safety: if baseline clearly desktop-sized but we are in a
+          // very narrow viewport, discard it so freeze can re-derive from the
+          // current narrow layout neighborhood.
+          var likelyNarrowViewportZoomContext = innerWidthNow <= 520;
           var narrowButBaselineLooksDesktop =
             likelyNarrowViewportZoomContext &&
             baseline.innerWidth >= DESKTOP_BASELINE_INNER_WIDTH_MIN &&
             baseline.innerWidth > innerWidthNow * 1.25;
 
-          // Stale baseline guard:
-          // if scale baselines still look "same", but viewport width drifted a lot,
-          // this may be stale session baseline. Keep narrow/mobile-like viewports
-          // exempt so freeze can persist across composition pages at aggressive zoom.
           return (
-            (staleWidthOnlyDrift && !likelyNarrowViewportZoomContext) ||
-            widthExpanded ||
-            scaleDropped ||
             dprBaselineMismatch ||
+            scaleDropped ||
+            widthExpanded ||
             narrowButBaselineLooksDesktop
           );
         }
 
         if (
           !hasValidBaseline(storedBaseline) ||
-          shouldResetBaseline(storedBaseline)
+          (!shouldSkipBaselineResetWarm && shouldResetBaseline(storedBaseline))
         ) {
           storedBaseline = {
             dpr: currentDpr,
@@ -269,9 +304,86 @@ const navItems = [
         var baselineDpr = storedBaseline.dpr;
         var baselineVvScale = storedBaseline.vvScale;
         var baselineInnerWidth = storedBaseline.innerWidth;
+
+        /*
+         * Duplicated tab: sessionStorage is copied from the source tab, but this tab’s
+         * zoom / layout metrics may differ (e.g. freeze-on at 400% vs new tab at 100%).
+         * If persisted freeze does not match the real zoom ratio, drop persistence and
+         * re-baseline from the current view before any paint logic runs in the loop.
+         */
+        var provisionalRatio = ratioFromBaseline(
+          baselineDpr,
+          baselineVvScale,
+          baselineInnerWidth,
+        );
+        if (
+          persistedGuardActiveWarm &&
+          provisionalRatio <= MAX_SAFE_ZOOM - ZOOM_EXIT_HYSTERESIS
+        ) {
+          persistedGuardActiveWarm = false;
+          persistedFreezeScaleWarm = 1;
+          storedBaseline = {
+            dpr: currentDpr,
+            vvScale: currentVvScale,
+            innerWidth: currentInnerWidth,
+          };
+          try {
+            window.sessionStorage.setItem(
+              BASELINE_KEY,
+              JSON.stringify({
+                dpr: storedBaseline.dpr,
+                vvScale: storedBaseline.vvScale,
+                innerWidth: storedBaseline.innerWidth,
+              }),
+            );
+          } catch {}
+          try {
+            window.sessionStorage.removeItem(GUARD_STATE_KEY);
+          } catch {}
+          baselineDpr = storedBaseline.dpr;
+          baselineVvScale = storedBaseline.vvScale;
+          baselineInnerWidth = storedBaseline.innerWidth;
+        }
+
         var mainContent = document.querySelector('main.content');
-        var freezeActive = false;
-        var freezeScale = 1;
+        var freezeActive = persistedGuardActiveWarm;
+        var freezeScale = persistedFreezeScaleWarm;
+
+        body.classList.toggle('zoom-threshold-exceeded', freezeActive);
+        if (mainContent instanceof HTMLElement) {
+          mainContent.style.setProperty(
+            '--zoom-freeze-scale',
+            String(freezeScale),
+          );
+          mainContent.classList.toggle('zoom-freeze-active', freezeActive);
+        }
+
+        function persistGuardState(nextActive, nextFreezeScale) {
+          // SessionStorage writes are expensive; only persist on real changes.
+          if (
+            nextActive === lastPersistedActive &&
+            Math.abs(nextFreezeScale - lastPersistedFreezeScale) <
+              FREEZE_SCALE_UPDATE_EPSILON
+          ) {
+            return;
+          }
+          lastPersistedActive = nextActive;
+          lastPersistedFreezeScale = nextFreezeScale;
+          try {
+            window.sessionStorage.setItem(
+              GUARD_STATE_KEY,
+              JSON.stringify({
+                active: nextActive,
+                freezeScale: nextFreezeScale,
+                // helpful for future debugging; not used for decisions
+                ts: Date.now(),
+              }),
+            );
+          } catch {}
+        }
+
+        var lastPersistedActive = freezeActive;
+        var lastPersistedFreezeScale = freezeScale;
 
         function getZoomRatio() {
           var vv = window.visualViewport;
@@ -280,13 +392,16 @@ const navItems = [
           var vvAbsoluteRatio = vvScale > 0 ? vvScale : 1;
           var dprRatio = (window.devicePixelRatio || 1) / baselineDpr;
           var currentInnerWidth = window.innerWidth || baselineInnerWidth || 1;
-          var innerWidthDrift =
-            Math.abs(currentInnerWidth - baselineInnerWidth) /
-            Math.max(1, baselineInnerWidth);
+          // IMPORTANT:
+          // Keep this computation continuous.
+          // The previous gating (innerWidthDrift > 0.03) makes the ratio jump
+          // around the boundary zoom, so two pages can choose different freeze
+          // states for the “same” pinch/browser zoom moment.
           var innerWidthRatio =
-            baselineInnerWidth > 0 && innerWidthDrift > 0.03
-              ? baselineInnerWidth / currentInnerWidth
+            baselineInnerWidth > 0
+              ? baselineInnerWidth / Math.max(1, currentInnerWidth)
               : 1;
+
           return Math.max(vvRatio, vvAbsoluteRatio, dprRatio, innerWidthRatio);
         }
 
@@ -315,6 +430,7 @@ const navItems = [
             freezeScale = 1;
           }
           freezeActive = exceeded;
+          persistGuardState(freezeActive, freezeScale);
           body.classList.toggle('zoom-threshold-exceeded', freezeActive);
           if (mainContent instanceof HTMLElement) {
             mainContent.style.setProperty(
@@ -325,7 +441,22 @@ const navItems = [
           }
         }
 
-        updateZoomGuard('init');
+        // Warm-start: only when freeze is still credible for this tab’s metrics
+        // (reload / bfcache), not after we discarded stale duplicated-tab state.
+        var ratioAfterReconcile = ratioFromBaseline(
+          baselineDpr,
+          baselineVvScale,
+          baselineInnerWidth,
+        );
+        var warmStartDelayMs =
+          freezeActive &&
+          ratioAfterReconcile > MAX_SAFE_ZOOM - ZOOM_EXIT_HYSTERESIS
+            ? 180
+            : 0;
+        var warmStartUntil = Date.now() + warmStartDelayMs;
+        if (warmStartDelayMs === 0) {
+          updateZoomGuard('init');
+        }
         window.addEventListener(
           'resize',
           function () {
@@ -363,7 +494,9 @@ const navItems = [
           );
         }
         function loopZoomGuard() {
-          updateZoomGuard();
+          if (Date.now() >= warmStartUntil) {
+            updateZoomGuard();
+          }
           window.requestAnimationFrame(loopZoomGuard);
         }
         window.requestAnimationFrame(loopZoomGuard);

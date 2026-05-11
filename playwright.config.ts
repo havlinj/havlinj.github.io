@@ -55,8 +55,9 @@ export default defineConfig({
     // You can still opt into reuse when needed:
     //   PW_REUSE_SERVER=1 ./scripts/all.sh
     reuseExistingServer:
-      serverMode === 'dev' &&
-      (!process.env.CI || process.env.PW_REUSE_SERVER === '1'),
+      (serverMode === 'dev' &&
+        (!process.env.CI || process.env.PW_REUSE_SERVER === '1')) ||
+      (serverMode === 'preview' && process.env.PW_REUSE_SERVER === '1'),
     timeout: 15_000,
   },
 });

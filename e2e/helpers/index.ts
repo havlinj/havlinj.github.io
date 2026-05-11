@@ -11,6 +11,15 @@ export { waitTwoFrames } from './raf';
 export { mustBox, readSquareContainment } from './geometry';
 export { applyExtremeZoom } from './zoom';
 export {
+  ZOOM_COMPOSITION_CASES,
+  applyDocZoom,
+  assertCompositionLayout,
+  readZoomGuardSnapshot,
+  resetDocZoom,
+  waitContactFitVisible,
+  waitWritingGroupsVisible,
+} from './zoom-guard';
+export {
   fillContactFormWithValidData,
   installTurnstileResetCounter,
   readTurnstileResetCount,
