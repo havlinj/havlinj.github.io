@@ -207,7 +207,7 @@ title: 'Profile'
       <span class="tile-state-secondary">
         <span class="tile-state-secondary__inner">
         <span class="line-1">Writing might be<br>the better place to look</span>
-        <span class="line-2">Still, step in here</span>
+        <span class="line-2">Still worth reading</span>
         </span>
       </span>
     </span>

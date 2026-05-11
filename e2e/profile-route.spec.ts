@@ -301,7 +301,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(layout.primaryText).toMatch(
       /Writing\s*might\s*be\s*the\s*better\s*place\s*to\s*look/i,
     );
-    expect(layout.secondaryText).toMatch(/Still,\s*step\s*in\s*here\.?/i);
+    expect(layout.secondaryText).toMatch(/Still\s*worth\s*reading\.?/i);
     expect(layout.primaryPx).toBeGreaterThanOrEqual(0);
     expect(layout.secondaryPx).toBeGreaterThanOrEqual(0);
     if (layout.primaryPx > 0) {
