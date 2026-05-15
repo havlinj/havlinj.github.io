@@ -960,7 +960,8 @@ test.describe('Contact page (/contact)', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           ok: false,
-          error: 'Validation failed.',
+          code: 'turnstile_failed',
+          error: 'Verification failed. Please try again.',
           resetTurnstile: true,
         }),
       });
@@ -971,7 +972,13 @@ test.describe('Contact page (/contact)', () => {
     await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
 
-    await expect(page.locator('#status')).toHaveText('Validation failed.');
+    await expect(page.locator('#status')).toHaveText(
+      'Verification failed. Please try again.',
+    );
+    await expect(page.locator('#status')).toHaveAttribute(
+      'data-status-code',
+      'turnstile_failed',
+    );
     const resets = await readTurnstileResetCount(page);
     expect(resets).toBe(1);
   });
