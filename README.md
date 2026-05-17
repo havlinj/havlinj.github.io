@@ -4,20 +4,19 @@ Astro-based personal website focused on clean UX, deterministic behavior, and en
 
 This project serves as:
 
-- a self-defined professional space to present expertise on my own terms, without being constrained by generic social-network formats,
-- a first full-scope frontend + UX implementation in this portfolio,
-- an intentional bridge between backend engineering depth and visual/interaction craft.
+- an owned professional surface for articulating perspective and ideas in long form, independent of generic social-platform profiles,
+- the first of my projects where I owned frontend and UX end-to-end,
+- a deliberate integration of backend systems discipline with visual and interaction design.
 
-Context:
+Background:
 
-- For most of the past years (essentially since entering IT), the primary focus has been precise internal software architecture, domain-heavy backend logic, system robustness, and performance.
-- CLI development has been the main adjacent area.
-- The visual direction also draws on skills first shaped before entering IT through earlier art practice.
+- Since entering IT, work has centered on internal architecture, domain-centric backend systems, reliability, and performance; CLI tooling is a consistent adjacent practice.
+- Visual direction here also reflects formal art training from before IT, applied as a complementary craft rather than a separate track.
 
-Outcome:
+Scope and intent:
 
-- Bringing these tracks together here was an exploratory and genuinely rewarding experience that broadened perspective across adjacent software disciplines.
-- Frontend is still not the intended primary specialization; the long-term center of gravity remains high-quality backend engineering for thoughtful, resilient systems.
+- Delivering this site strengthened fluency across the full product stack without changing where depth is invested long term.
+- Primary specialization remains backend engineering for resilient, thoughtfully designed systems; frontend and UX work here demonstrate adjacent competence, not a pivot in focus.
 
 ## Highlights
 
