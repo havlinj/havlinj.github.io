@@ -1,17 +1,10 @@
-/**
- * Contact form status codes. Keep in sync with contact_worker/worker/contact-errors.js.
- */
-export const CONTACT_ERROR_CODES = [
-  'missing_fields',
-  'name_too_long',
-  'invalid_email',
-  'message_length',
-  'spam_urls',
-  'turnstile_missing',
-  'turnstile_unavailable',
-  'turnstile_failed',
-  'send_failed',
-] as const;
+import {
+  CONTACT_ERROR_CODES as SHARED_CONTACT_ERROR_CODES,
+  CONTACT_ERROR_MESSAGES as SHARED_CONTACT_ERROR_MESSAGES,
+} from '../../shared/contact-api-errors.mjs';
+
+/** API error codes (shared/contact-api-errors.mjs ↔ contact_worker). */
+export const CONTACT_ERROR_CODES = SHARED_CONTACT_ERROR_CODES;
 
 export type ContactErrorCode = (typeof CONTACT_ERROR_CODES)[number];
 
@@ -26,17 +19,8 @@ export type ContactUiStatusCode = (typeof CONTACT_UI_STATUS_CODES)[number];
 
 export type ContactStatusCode = ContactErrorCode | ContactUiStatusCode;
 
-export const CONTACT_ERROR_MESSAGES: Record<ContactErrorCode, string> = {
-  missing_fields: 'Please fill in all fields.',
-  name_too_long: 'Name is too long.',
-  invalid_email: 'Invalid email address.',
-  message_length: 'Message must be between 10 and 5000 characters.',
-  spam_urls: 'Your message looks like spam.',
-  turnstile_missing: 'Please complete the verification.',
-  turnstile_unavailable: 'Verification unavailable. Please try again.',
-  turnstile_failed: 'Verification failed. Please try again.',
-  send_failed: 'Failed to send message.',
-};
+export const CONTACT_ERROR_MESSAGES: Record<ContactErrorCode, string> =
+  SHARED_CONTACT_ERROR_MESSAGES;
 
 export const CONTACT_UI_MESSAGES: Record<ContactUiStatusCode, string> = {
   sending: 'Sending...',

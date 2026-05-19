@@ -1,0 +1,7 @@
+services:
+  semgrep:
+    image: semgrep/semgrep
+    working_dir: /src
+    entrypoint: ['semgrep']
+    volumes:
+      - .:/src:ro

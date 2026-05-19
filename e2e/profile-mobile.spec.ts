@@ -50,7 +50,9 @@ async function readFoundationsRevealClip(page: Page): Promise<{
 }
 
 test.describe('/profile mobile regressions @serial', () => {
-  test('syncs frame gutters from What I do tile on mobile', async ({ page }) => {
+  test('syncs frame gutters from What I do tile on mobile', async ({
+    page,
+  }) => {
     await gotoProfileWhenReady(page);
     const gutters = await readProfileFrameGutterSnapshot(page);
     expectProfileFrameGuttersSynced(gutters);

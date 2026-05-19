@@ -1,14 +1,14 @@
 
 #!/usr/bin/env bash
 
-# === scripts/lint-and-format.sh ===
+# === scripts/web/lint-and-format.sh ===
 
 # Exit script on any error
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-ROOT_DIR="$SCRIPT_DIR/.."
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"

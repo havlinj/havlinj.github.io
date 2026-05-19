@@ -7,7 +7,7 @@ set -euo pipefail
 # On Debian/Ubuntu you can instead: sudo apt install libwoff1
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 LOCK_DIR="/tmp/documents-web-integration-tests.lock"
 PORT=4321
 
@@ -73,8 +73,8 @@ cd "$ROOT_DIR"
 # - if :4321 is free, let Playwright start its own dev server
 #
 # Manual override:
-#   PW_REUSE_SERVER=1 ./scripts/integration-tests.sh   # always reuse existing
-#   PW_REUSE_SERVER=0 ./scripts/integration-tests.sh   # never reuse
+#   PW_REUSE_SERVER=1 ./scripts/web/integration-tests.sh   # always reuse existing
+#   PW_REUSE_SERVER=0 ./scripts/web/integration-tests.sh   # never reuse
 # Default to fresh server per run for stability (cleaner runtime environment).
 REUSE_MODE="${PW_REUSE_SERVER:-0}"
 REUSE_FLAG="0"

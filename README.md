@@ -48,11 +48,15 @@ Scope and intent:
 ## What You Can Audit In This Repo
 
 - **Test strategy and reliability tooling**
-  - `scripts/integration-tests.sh`
+  - `scripts/web/integration-tests.sh`
   - `e2e/`
   - `tests/unit/`
+  - `scripts/web/` — site pipeline (`all.sh`, lint, unit, Playwright, Lighthouse)
+  - `scripts/contact_worker/` — worker pipeline (`all.sh`, semgrep)
+  - `contact_worker/` — Cloudflare contact API
+  - `shared/contact-api-errors.mjs` (API error codes for site + worker)
 - **Performance and accessibility quality bars**
-  - `scripts/lighthouse.sh`
+  - `scripts/web/lighthouse.sh`
   - `e2e/perf-a11y.spec.ts`
 - **Content model and ordering logic**
   - `src/content.config.ts`
@@ -64,7 +68,9 @@ Scope and intent:
 ## Development Process (Overview)
 
 - **Local quality flow**
-  - A consolidated local gate exists for clean -> lint/sanity -> unit -> integration.
+  - Site-only gate: `bash scripts/web/all.sh` (or `npm run all:web`).
+  - Worker-only gate: `bash scripts/contact_worker/all.sh` (or `npm run all:contact-worker`).
+  - Full monorepo gate: `bash scripts/all.sh`.
   - Lint/sanity includes linting, formatting, and Astro structural/type checks.
 - **Test orchestration strategy**
   - Integration tests are intentionally split between parallel-safe and serial-sensitive subsets.

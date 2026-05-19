@@ -24,7 +24,9 @@ export async function readProfileFrameGutterSnapshot(
     const surface = what?.querySelector('.profile-media-surface');
     const photoBox = document.querySelector('.profile-photo-box');
     if (!(section instanceof HTMLElement)) {
-      throw new Error('readProfileFrameGutterSnapshot: missing .profile-section');
+      throw new Error(
+        'readProfileFrameGutterSnapshot: missing .profile-section',
+      );
     }
     if (!(surface instanceof HTMLElement)) {
       throw new Error(
@@ -32,7 +34,9 @@ export async function readProfileFrameGutterSnapshot(
       );
     }
     if (!(photoBox instanceof HTMLElement)) {
-      throw new Error('readProfileFrameGutterSnapshot: missing .profile-photo-box');
+      throw new Error(
+        'readProfileFrameGutterSnapshot: missing .profile-photo-box',
+      );
     }
 
     const cs = getComputedStyle(surface);
@@ -78,7 +82,10 @@ export function expectProfileFrameGuttersSynced(
 ): void {
   const tol = PROFILE_FRAME_GUTTER_SYNC_TOLERANCE_PX;
   expect(snapshot.expectedBlockPx, 'What tile block gutter').toBeGreaterThan(0);
-  expect(snapshot.sectionBlockPx, 'section --profile-frame-gutter-block-px').toBeGreaterThan(0);
+  expect(
+    snapshot.sectionBlockPx,
+    'section --profile-frame-gutter-block-px',
+  ).toBeGreaterThan(0);
   expect(
     Math.abs(snapshot.sectionBlockPx - snapshot.expectedBlockPx),
     'block gutter must match measured What tile surface',

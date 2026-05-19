@@ -1,0 +1,17 @@
+name = "contact-worker"
+main = "worker/index.js"
+compatibility_date = "2026-03-11"
+
+# Sender must exist on the domain (Email Routing custom address).
+# Recipient is fixed by the send_email binding below.
+[vars]
+CONTACT_FROM = "noreply@janhavlin.com"
+CONTACT_TO = "hello@janhavlin.com"
+
+workers_dev = true
+preview_urls = true
+compatibility_flags = ["nodejs_compat"]
+
+[[send_email]]
+name = "CONTACT_EMAIL"
+destination_address = "hello@janhavlin.com"

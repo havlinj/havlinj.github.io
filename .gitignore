@@ -31,3 +31,7 @@ test-results/
 
 # Lighthouse
 lighthouse-report/
+
+# Contact worker (nested package)
+contact_worker/node_modules/
+contact_worker/.wrangler/

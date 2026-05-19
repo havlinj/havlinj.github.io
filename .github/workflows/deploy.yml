@@ -29,9 +29,21 @@ env:
   # BUILD_PATH: subfolder
 
 jobs:
+  contact-worker-semgrep:
+    name: Contact worker Semgrep
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Scan contact worker
+        run: semgrep scan --config p/javascript --error contact_worker/worker/
+
   build:
     name: Build
     runs-on: ubuntu-latest
+    needs: contact-worker-semgrep
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -81,6 +93,9 @@ jobs:
           npx prettier --version
           npx playwright --version
         working-directory: ${{ env.BUILD_PATH }}
+      - name: Install contact worker dependencies
+        run: npm ci
+        working-directory: contact_worker
       - name: Lint, format and test
         run: bash ./scripts/all.sh
         working-directory: ${{ env.BUILD_PATH }}
@@ -90,7 +105,7 @@ jobs:
           # In CI we start from a fresh checkout, so skip all.sh pre-clean for speed.
           ALL_SH_CLEAN: '0'
       - name: Lighthouse budget (homepage)
-        run: bash ./scripts/lighthouse.sh
+        run: bash ./scripts/web/lighthouse.sh
         working-directory: ${{ env.BUILD_PATH }}
         env:
           # all.sh already built and tested; Lighthouse script can reuse that build.

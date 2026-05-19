@@ -169,7 +169,6 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
         .getPropertyValue('--foundations-reveal-uniform-scale')
         .trim();
       const scale = scaleRaw ? Number.parseFloat(scaleRaw) : 1;
-      const stanzaRect = stanza.getBoundingClientRect();
       const innerRect = inner.getBoundingClientRect();
       return {
         scale,
