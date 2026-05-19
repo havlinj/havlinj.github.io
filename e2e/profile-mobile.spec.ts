@@ -7,7 +7,9 @@ import {
 } from '../src/utils/profile-reveal-constants';
 import {
   expectFoundationsRevealCopyPainted,
+  expectProfileFrameGuttersSynced,
   gotoProfileWhenReady,
+  readProfileFrameGutterSnapshot,
 } from './helpers';
 
 async function setRevealTimeoutMs(page: Page, ms: number): Promise<void> {
@@ -48,6 +50,12 @@ async function readFoundationsRevealClip(page: Page): Promise<{
 }
 
 test.describe('/profile mobile regressions @serial', () => {
+  test('syncs frame gutters from What I do tile on mobile', async ({ page }) => {
+    await gotoProfileWhenReady(page);
+    const gutters = await readProfileFrameGutterSnapshot(page);
+    expectProfileFrameGuttersSynced(gutters);
+  });
+
   test('Foundations reveal visual snapshot on mobile', async ({ page }) => {
     await gotoProfileWhenReady(page);
     await setRevealTimeoutMs(page, 1200);

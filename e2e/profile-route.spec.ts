@@ -9,9 +9,11 @@ import {
 import {
   countRevealRasterSignature,
   expectFoundationsRevealCopyPainted,
+  expectProfileFrameGuttersSynced,
   gotoProfileWhenReady,
   mustBox,
   pathnameIsProfile,
+  readProfileFrameGutterSnapshot,
 } from './helpers';
 import {
   PROFILE_SEAM_VIEWPORT_WIDTHS,
@@ -105,6 +107,14 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     expect(parseFloat(raw)).toBeGreaterThan(0);
   });
 
+  test('syncs frame gutters from What I do tile to profile section', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const gutters = await readProfileFrameGutterSnapshot(page);
+    expectProfileFrameGuttersSynced(gutters);
+  });
+
   test('applies --profile-reveal-font-size on Foundations reveal after type fit', async ({
     page,
   }) => {
@@ -135,6 +145,49 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     // Zero would mean collapsed `em` copy (black tile, no readable text); see openFoundationsReveal().
     expect(revealPx).toBeGreaterThan(0);
     expect(revealPx).toBeLessThan(labelPx);
+  });
+
+  test('Foundations reveal uniform scale keeps copy inside stanza box', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const tile = page.getByRole('link', { name: 'Foundations' });
+    await openFoundationsReveal(tile);
+
+    const fit = await page.evaluate(() => {
+      const stanza = document.querySelector(
+        '.prof-tile--foundations .tile-state-secondary',
+      );
+      const inner = stanza?.querySelector('.tile-state-secondary__inner');
+      if (!(stanza instanceof HTMLElement)) {
+        throw new Error('missing .tile-state-secondary');
+      }
+      if (!(inner instanceof HTMLElement)) {
+        throw new Error('missing .tile-state-secondary__inner');
+      }
+      const scaleRaw = getComputedStyle(inner)
+        .getPropertyValue('--foundations-reveal-uniform-scale')
+        .trim();
+      const scale = scaleRaw ? Number.parseFloat(scaleRaw) : 1;
+      const stanzaRect = stanza.getBoundingClientRect();
+      const innerRect = inner.getBoundingClientRect();
+      return {
+        scale,
+        stanzaClientW: stanza.clientWidth,
+        stanzaClientH: stanza.clientHeight,
+        innerVisualW: innerRect.width,
+        innerVisualH: innerRect.height,
+        scrollOverflows:
+          stanza.scrollHeight > stanza.clientHeight + 1 ||
+          stanza.scrollWidth > stanza.clientWidth + 1,
+      };
+    });
+
+    expect(fit.scale).toBeGreaterThan(0);
+    expect(fit.scale).toBeLessThanOrEqual(1);
+    expect(fit.innerVisualW).toBeLessThanOrEqual(fit.stanzaClientW + 2);
+    expect(fit.innerVisualH).toBeLessThanOrEqual(fit.stanzaClientH + 2);
+    expect(fit.scrollOverflows).toBe(false);
   });
 
   test('Foundations tile targets /foundations and uses foundations modifier', async ({
