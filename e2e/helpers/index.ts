@@ -24,9 +24,15 @@ export {
   waitWritingGroupsVisible,
 } from './zoom-guard';
 export {
+  CONTACT_API_ERROR_RESETS_TURNSTILE,
+  CONTACT_ERROR_CODES,
+  CONTACT_ERROR_MESSAGES,
+  expectContactFormShowsApiError,
   fillContactFormWithValidData,
   installTurnstileResetCounter,
+  mockContactApiError,
   readTurnstileResetCount,
+  submitContactForm,
 } from './contact';
 export {
   declareResponsivePanelBgMatrix,
