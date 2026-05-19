@@ -4,8 +4,9 @@ import {
   CONTACT_SELECTORS,
 } from '../constants/contact-layout';
 import {
+  applyContactFitPasses,
   computeIntroLinksGapPx,
-  computeMinFontPx,
+  resolveContactFluidFontPx,
 } from '../utils/contact-layout-math';
 
 type NeededContent = {
@@ -133,23 +134,6 @@ function startContactInsetFit(): void {
     };
   }
 
-  function computeDesiredFontPx(panelEdge: number): number {
-    const refEdge = Math.max(1, CONTACT_LAYOUT.fontBaselineReferenceEdgePx);
-    const fontToEdgeRatio = CONTACT_LAYOUT.baselineFontPx / refEdge;
-    let scaledFontPx = panelEdge * fontToEdgeRatio;
-    if (panelEdge <= CONTACT_LAYOUT.smallPanelEdgePx) {
-      scaledFontPx *= CONTACT_LAYOUT.smallPanelFontScale;
-    }
-    if (panelEdge <= CONTACT_LAYOUT.tinyPanelEdgePx) {
-      scaledFontPx *= CONTACT_LAYOUT.tinyPanelFontExtraScale;
-    }
-    if (panelEdge <= CONTACT_LAYOUT.microPanelEdgePx) {
-      scaledFontPx *= CONTACT_LAYOUT.microPanelFontExtraScale;
-    }
-    const minPx = computeMinFontPx(panelEdge);
-    return Math.min(CONTACT_LAYOUT.maxFontPx, Math.max(minPx, scaledFontPx));
-  }
-
   function flush(): void {
     const panelEdge = Math.max(
       1,
@@ -158,39 +142,28 @@ function startContactInsetFit(): void {
     // Wide panels: inherit computed size so JS mostly refines overflow. Narrow squares otherwise
     // stick at root ~16px and ignore our curve — typography reads oversized on phones.
     const cssFontPx = parseFloat(getComputedStyle(panelEl).fontSize);
-    const curvePx = computeDesiredFontPx(panelEdge);
-    let desiredFontPx =
-      panelEdge <= CONTACT_LAYOUT.curveFontBaselineEdgePx
-        ? curvePx
-        : Number.isFinite(cssFontPx) && cssFontPx > 0
-          ? cssFontPx
-          : curvePx;
-    const minFontPx = computeMinFontPx(panelEdge);
-    desiredFontPx = Math.min(
-      CONTACT_LAYOUT.maxFontPx,
-      Math.max(minFontPx, desiredFontPx),
-    );
+    let desiredFontPx = resolveContactFluidFontPx(panelEdge, cssFontPx);
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-    let measured = measureNeededContent(panelEdge);
+    const measured = measureNeededContent(panelEdge);
     let { neededWidth, neededHeight, topPad, introH, introLinksGapPx } =
       measured;
 
-    const availW = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
-    const availH = panelEdge * CONTACT_LAYOUT.insetMaxRatio;
-    let pass = 0;
-    while (
-      (neededWidth > availW || neededHeight > availH) &&
-      pass < CONTACT_LAYOUT.maxFitPasses
-    ) {
-      const scale = Math.min(availW / neededWidth, availH / neededHeight, 1);
-      desiredFontPx = Math.max(minFontPx, desiredFontPx * scale);
-      applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-      measured = measureNeededContent(panelEdge);
-      ({ neededWidth, neededHeight, topPad, introH, introLinksGapPx } =
-        measured);
-      pass += 1;
-    }
+    ({ desiredFontPx, neededWidth, neededHeight } = applyContactFitPasses({
+      panelEdge,
+      desiredFontPx,
+      neededWidth,
+      neededHeight,
+      measureAtFont: (fontPx) => {
+        applyFontAndPanelMetrics(fontPx, panelEdge);
+        const m = measureNeededContent(panelEdge);
+        topPad = m.topPad;
+        introH = m.introH;
+        introLinksGapPx = m.introLinksGapPx;
+        return { neededWidth: m.neededWidth, neededHeight: m.neededHeight };
+      },
+    }));
+    applyFontAndPanelMetrics(desiredFontPx, panelEdge);
 
     setPanelVar('--contact-intro-top-px', `${topPad}px`);
     setPanelVar(

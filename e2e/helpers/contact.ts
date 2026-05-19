@@ -12,6 +12,27 @@ export const CONTACT_API_ERROR_RESETS_TURNSTILE: readonly ContactErrorCode[] = [
   'turnstile_failed',
 ];
 
+/** Hold `/api/contact` until `release()` — for asserting transient UI (e.g. sending). */
+export async function mockContactApiDelayedSuccess(
+  page: Page,
+): Promise<{ release: () => void }> {
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await page.route('**/api/contact', async (route) => {
+    await gate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+
+  return { release };
+}
+
 export async function mockContactApiError(
   page: Page,
   opts: {
@@ -55,7 +76,7 @@ export async function submitContactForm(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Send' }).click();
 }
 
-export { CONTACT_ERROR_CODES, CONTACT_ERROR_MESSAGES };
+export { CONTACT_ERROR_CODES, CONTACT_ERROR_MESSAGES, type ContactErrorCode };
 
 export async function fillContactFormWithValidData(page: Page): Promise<void> {
   await page.getByLabel('Name').fill('Jan Test');
