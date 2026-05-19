@@ -14,7 +14,14 @@ const heroBgResponsive = {
 
 <Layout title="Jan Havlín">
   <Fragment slot="head">
-    <link rel="preload" href={heroBgResponsive.w1440.href} as="image" />
+    {/* Match <picture> srcset so mobile LH/CI does not preload desktop-tier bytes. */}
+    <link
+      rel="preload"
+      as="image"
+      href={heroBgResponsive.w720.href}
+      imagesrcset={`${heroBgResponsive.w720.href} ${heroBgResponsive.w720.w}w, ${heroBgResponsive.w1080.href} ${heroBgResponsive.w1080.w}w`}
+      imagesizes="100vw"
+    />
   </Fragment>
   <nav class="hero-header" aria-label="Main navigation">
     <div class="hero-header__inner">
@@ -103,11 +110,13 @@ const heroBgResponsive = {
         heroImg.addEventListener('error', reveal, { once: true });
       }
 
-      function onLoad() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', revealHeroWhenImageReady, {
+          once: true,
+        });
+      } else {
         revealHeroWhenImageReady();
       }
-
-      window.addEventListener('load', onLoad);
     })();
   </script>
 </Layout>
