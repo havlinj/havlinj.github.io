@@ -126,12 +126,20 @@ test.describe('Hero page (/)', () => {
     await expect(figure.locator('img[alt="Hero background"]')).toBeVisible();
   });
 
-  test('preloads hero background image', async ({ page }) => {
-    await expect(
-      page.locator(
-        'link[rel="preload"][as="image"][href="/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom_1440.png"]',
-      ),
-    ).toHaveCount(1);
+  test('preloads hero background image with mobile-first srcset', async ({
+    page,
+  }) => {
+    const preload = page.locator('link[rel="preload"][as="image"]');
+    await expect(preload).toHaveCount(1);
+    await expect(preload).toHaveAttribute(
+      'href',
+      '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom_720.png',
+    );
+    await expect(preload).toHaveAttribute(
+      'imagesrcset',
+      /altumcode-oZ61KFUQsus-unsplash_dichrom_720\.png 1620w,.*_1080\.png 2160w/,
+    );
+    await expect(preload).toHaveAttribute('imagesizes', '100vw');
   });
 
   test('has hero-top-edge strip and no photo credit caption', async ({

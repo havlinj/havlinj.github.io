@@ -20,6 +20,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     );
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/');
+    await page.locator('section.hero.hero--ready').waitFor({ timeout: 15_000 });
     await applyExtremeZoom(page, { attempts: 3 });
     await page.waitForTimeout(80);
     await expect(page.locator('.hero')).toHaveScreenshot(

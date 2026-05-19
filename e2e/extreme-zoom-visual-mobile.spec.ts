@@ -15,6 +15,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
   }) => {
     test.skip(browserName !== 'webkit', 'Mobile-webkit baseline only.');
     await page.goto('/');
+    await page.locator('section.hero.hero--ready').waitFor({ timeout: 15_000 });
     await applyExtremeZoom(page);
     await page.waitForTimeout(80);
     await expect(page.locator('.hero')).toHaveScreenshot(
