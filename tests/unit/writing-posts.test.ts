@@ -67,7 +67,7 @@ describe('writing-posts', () => {
     expect(regularPosts.map((p) => p.id)).toEqual(['y', 'x']);
   });
 
-  it('dedupes same title and date (e.g. renamed slug + leftover file)', () => {
+  it('dedupes same title and date; tie-break by id ASC keeps the first slug', () => {
     const items = [
       post('reflection-on-building-systems', 'Same Title', '2025-06-01'),
       post('system-thinking-applied', 'Same Title', '2025-06-01'),
