@@ -56,6 +56,21 @@
     /* Article default 1.1 — extra zoom on small viewports (background-size on ::before). */
     --panel-bg-zoom: 1;
   }
+
+  /*
+   * Narrow panel: bump weight for readability (smaller --contact-fluid-font × scale).
+   * sync: CONTACT_PANEL_* in src/constants/contact-panel-typography.ts
+   */
+  .contact-page__intro,
+  .contact-page__intro--lead,
+  .contact-page__intro--deck,
+  .contact-page__intro-reach {
+    font-weight: 500;
+  }
+
+  .contact-page .contact-extra-link .contact-extra-link__text {
+    font-weight: 600;
+  }
 }
 
 @media (max-width: 22rem) {
@@ -190,9 +205,9 @@
 .contact-page__intro {
   margin: 0;
   padding: 0;
-  font-weight: 500;
+  /* Desktop: /why body band (400); narrow panel → 500 in @media (max-width: 36rem). */
+  font-weight: 400;
   line-height: 1.46;
-  /* Align with site prose (e.g. /why body ~ -0.01em); Inter reads cleaner slightly tightened at 500. */
   letter-spacing: -0.006em;
   color: rgba(17, 17, 17, 0.96);
   white-space: normal;
@@ -206,7 +221,7 @@
 .contact-page__intro--lead {
   line-height: 1.4;
   letter-spacing: -0.01em;
-  font-weight: 500;
+  font-weight: 400;
   opacity: 0.98;
   /* Slight lift vs body; em tracks scaled inset font-size. */
   font-size: 1em;
@@ -217,7 +232,7 @@
   font-weight: 400;
 }
 
-/* Softer than button-row CTAs: same sentence, lighter texture. */
+/* "Reach out." deck text */
 .contact-page__intro-reach {
   font-weight: 400;
   letter-spacing: 0.004em;
@@ -280,6 +295,7 @@
   line-height: 1.24;
   letter-spacing: 0.01em;
   opacity: 0.98;
+  /* Desktop: page-buttons row (500); narrow panel → 600 in @media (max-width: 36rem). */
   font-weight: 500;
 }
 

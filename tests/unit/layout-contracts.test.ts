@@ -29,6 +29,13 @@ import {
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../../src/utils/profile-reveal-constants';
 import { CONTACT_STATUS_LAYOUT } from '../../src/lib/contact-status';
+import {
+  CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP,
+  CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW,
+  CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_DESKTOP,
+  CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_NARROW,
+  CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH,
+} from '../../src/constants/contact-panel-typography';
 
 const repoRoot = path.join(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -134,6 +141,48 @@ describe('layout contracts: profile reveal (TS ↔ CSS calc)', () => {
     expect(REVEAL_RIGHT_RENDER_PAD_PX).toBe(1);
     expect(REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX).toBe(0.5);
     expect(REVEAL_PADDING_RATIO_ASSERT_TOLERANCE_PX).toBe(0.5);
+  });
+});
+
+describe('layout contracts: contact panel typography (constants ↔ contact.css)', () => {
+  const css = readRepoFile('src/styles/contact.css');
+
+  it('uses shared narrow breakpoint with --contact-font-scale', () => {
+    expect(css).toContain(
+      `@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`,
+    );
+  });
+
+  it('intro is 400 by default and 500 inside narrow media query', () => {
+    expect(css).toMatch(
+      new RegExp(
+        `\\.contact-page__intro\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP}`,
+      ),
+    );
+    const narrowBlock = css.slice(
+      css.indexOf(`@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`),
+    );
+    expect(narrowBlock).toContain('.contact-page__intro--lead');
+    expect(narrowBlock).toContain(
+      `font-weight: ${CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW}`,
+    );
+  });
+
+  it('panel link labels are 500 by default and 600 inside narrow media query', () => {
+    expect(css).toMatch(
+      new RegExp(
+        `\\.contact-page \\.contact-extra-link \\.contact-extra-link__text\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_DESKTOP}`,
+      ),
+    );
+    const narrowBlock = css.slice(
+      css.indexOf(`@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`),
+    );
+    expect(narrowBlock).toContain(
+      '.contact-page .contact-extra-link .contact-extra-link__text',
+    );
+    expect(narrowBlock).toContain(
+      `font-weight: ${CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_NARROW}`,
+    );
   });
 });
 
