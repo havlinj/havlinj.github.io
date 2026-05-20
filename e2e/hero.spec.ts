@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { LAYOUT_TOLERANCE } from './constants';
-import { mustBox } from './helpers';
+import {
+  hasAstroStylesheetBundle,
+  mustBox,
+  readStylesheetHrefs,
+} from './helpers';
 
 /** Wait for hero section and background image to be in the DOM. */
 async function waitForHeroLoaded(page: Page) {
@@ -16,6 +20,12 @@ test.describe('Hero page (/)', () => {
 
   test('has correct page title', async ({ page }) => {
     await expect(page).toHaveTitle('Jan Havlín');
+  });
+
+  test('does not load writing.css or profile.css bundles', async ({ page }) => {
+    const hrefs = await readStylesheetHrefs(page);
+    expect(hasAstroStylesheetBundle(hrefs, 'writing')).toBe(false);
+    expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(false);
   });
 
   test('hero-header nav has accessible label', async ({ page }) => {

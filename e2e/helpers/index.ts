@@ -39,3 +39,4 @@ export {
   type ResponsivePanelBgCase,
   type ResponsivePanelBgMatrixConfig,
 } from './responsive-panel-bg-matrix';
+export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';

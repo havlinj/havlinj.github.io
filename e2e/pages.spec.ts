@@ -5,8 +5,10 @@ import {
   expectNavLinkActive,
   fillContactFormWithValidData,
   gotoProfileWhenReady,
+  hasAstroStylesheetBundle,
   installTurnstileResetCounter,
   mustBox,
+  readStylesheetHrefs,
   readTurnstileResetCount,
 } from './helpers';
 
@@ -163,6 +165,12 @@ test.describe('Writing page (/writing)', () => {
     await expect(
       page.locator('.writing-groups.writing-groups--visible'),
     ).toBeVisible({ timeout: 10000 });
+  });
+
+  test('loads writing.css bundle and not profile.css', async ({ page }) => {
+    const hrefs = await readStylesheetHrefs(page);
+    expect(hasAstroStylesheetBundle(hrefs, 'writing')).toBe(true);
+    expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(false);
   });
 
   test('shows navbar with active Writing and article list', async ({

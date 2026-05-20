@@ -2,12 +2,17 @@
 import interLatin400Woff2 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
 import '../styles/global.css';
 import '../styles/special-typography.css';
-import '../styles/writing.css';
 import '../styles/site-header.css';
 import '../styles/footer.css';
 import '../styles/page-buttons.css';
+import profileStylesUrl from '../styles/profile.css?url';
 
-const { title, activeSection, showHeader = false } = Astro.props;
+const {
+  title,
+  activeSection,
+  showHeader = false,
+  profileStylesLast = false,
+} = Astro.props;
 const pageTitle = title || 'Astro Basics';
 const navItems = [
   { href: '/profile', label: 'Profile', section: 'profile' },
@@ -69,6 +74,7 @@ const navItems = [
         </div>
       </footer>
     </main>
+    {profileStylesLast && <link rel="stylesheet" href={profileStylesUrl} />}
     <script is:inline>
       (function () {
         'use strict';

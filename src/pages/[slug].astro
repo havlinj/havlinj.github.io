@@ -2,14 +2,15 @@
 import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import WhyContent from '../components/WhyContent.astro';
-import '../styles/profile.css';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
-  return pages.map((page) => ({
-    params: { slug: page.id.replace(/\.md$/, '') },
-    props: { page },
-  }));
+  return pages
+    .filter((page) => page.id.replace(/\.md$/, '') !== 'profile')
+    .map((page) => ({
+      params: { slug: page.id.replace(/\.md$/, '') },
+      props: { page },
+    }));
 }
 
 const { slug } = Astro.params;
@@ -32,7 +33,6 @@ const sectionBySlug: Record<string, string> = {
 const activeSection = PROFILE_SECTION_SLUGS.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
-const isProfile = slug === 'profile';
 const isWhy = slug === 'why-this';
 /** Same 1px rule under H1 as Contact (special-typography.css --page-title-rule-gap) */
 const hasPageTitleRule =
@@ -41,21 +41,13 @@ const hasPageTitleRule =
 
 <Layout title={page.data.title} activeSection={activeSection}>
   <article
-    class={[
-      isProfile && 'has-buttons-panel',
-      isWhy && 'why-page',
-      hasPageTitleRule && 'has-page-title-rule',
-    ]
+    class={[isWhy && 'why-page', hasPageTitleRule && 'has-page-title-rule']
       .filter(Boolean)
       .join(' ')}
   >
-    <h1
-      class="page-title"
-      style={isProfile ? { '--page-title-margin-bottom': '1.3rem' } : undefined}
-    >
+    <h1 class="page-title">
       {page.data.title}
     </h1>
     {isWhy ? <WhyContent /> : <Content />}
   </article>
-  {isProfile && <script>import '../scripts/profile-tile-type-fit.ts';</script>}
 </Layout>

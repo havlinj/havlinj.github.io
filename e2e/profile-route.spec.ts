@@ -11,8 +11,10 @@ import {
   expectFoundationsRevealCopyPainted,
   expectProfileFrameGuttersSynced,
   gotoProfileWhenReady,
+  hasAstroStylesheetBundle,
   mustBox,
   pathnameIsProfile,
+  readStylesheetHrefs,
   readProfileFrameGutterSnapshot,
 } from './helpers';
 import {
@@ -90,6 +92,14 @@ async function openFoundationsReveal(tile: ReturnType<Page['getByRole']>) {
 }
 
 test.describe('/profile — type fit, Foundations tile, reveal', () => {
+  test('loads profile.css bundle (dedicated profile.astro route)', async ({
+    page,
+  }) => {
+    await gotoProfileWhenReady(page);
+    const hrefs = await readStylesheetHrefs(page);
+    expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(true);
+  });
+
   test.use({
     viewport: { width: 1280, height: 900 },
   });

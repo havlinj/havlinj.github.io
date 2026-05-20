@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import '../styles/writing.css';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
 
 const posts = await getCollection('blog');

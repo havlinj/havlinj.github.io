@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { expectNavLinkActive } from './helpers';
+import {
+  expectNavLinkActive,
+  hasAstroStylesheetBundle,
+  readStylesheetHrefs,
+} from './helpers';
 
 test.describe('/foundations page', () => {
   test.beforeEach(async ({ page }) => {
@@ -32,5 +36,13 @@ test.describe('/foundations page', () => {
     await expect(page.locator('.why-box')).toHaveCount(0);
     await expect(page.locator('.why-wrapper')).toHaveCount(0);
     await expect(page.locator('.why-scroll-cta')).toHaveCount(0);
+  });
+
+  test('does not load profile.css bundle (route-level CSS split)', async ({
+    page,
+  }) => {
+    const hrefs = await readStylesheetHrefs(page);
+    expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(false);
+    expect(hasAstroStylesheetBundle(hrefs, 'writing')).toBe(false);
   });
 });
