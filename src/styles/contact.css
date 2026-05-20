@@ -97,7 +97,7 @@
 }
 
 /*
- * Contact panel BG: responsive `<picture>` (contact.astro), not `::before`.
+ * Contact panel BG: responsive `<picture>` (ResponsiveDichromPicture), not `::before`.
  * Zoom matches legacy `background-size: calc(zoom * 100%) auto`: oversized img centered via inset math (no transform).
  */
 .contact-page .page-buttons-panel::before {

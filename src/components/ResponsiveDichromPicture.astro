@@ -1,0 +1,51 @@
+---
+import {
+  dichromDesktopSrcset,
+  dichromMobileSrcset,
+  type DichromResponsiveSet,
+} from '../constants/dichrom-responsive';
+
+interface Props {
+  sources: DichromResponsiveSet;
+  width: number;
+  height: number;
+  alt?: string;
+  class?: string;
+  fetchpriority?: 'high' | 'low' | 'auto';
+  decoding?: 'async' | 'sync' | 'auto';
+  sizes?: string;
+  /** Matches panel pages: mobile `<source>` breakpoint. */
+  mobileMedia?: string;
+}
+
+const {
+  sources,
+  width,
+  height,
+  alt = '',
+  class: className,
+  fetchpriority,
+  decoding = 'async',
+  sizes = '100vw',
+  mobileMedia = '(max-width: 767px)',
+}: Props = Astro.props;
+---
+
+<picture>
+  <source
+    media={mobileMedia}
+    srcset={dichromMobileSrcset(sources)}
+    sizes={sizes}
+  />
+  <img
+    src={sources.w1440.href}
+    srcset={dichromDesktopSrcset(sources)}
+    sizes={sizes}
+    width={width}
+    height={height}
+    alt={alt}
+    class={className}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+  />
+</picture>

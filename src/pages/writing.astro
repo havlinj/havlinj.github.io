@@ -1,33 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import ResponsiveDichromPicture from '../components/ResponsiveDichromPicture.astro';
+import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import '../styles/writing.css';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
 
 const posts = await getCollection('blog');
 const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
 
-/**
- * Responsive Bayer PNGs (`*_720.png`, `*_1080.png`, …).
- *
- * The numeric suffix in the filename is NOT the bitmap width in pixels. It is the *intended
- * display width* (~CSS px) the asset was authored for. Files are oversampled (e.g. target × ~2.25)
- * so the browser downsamples a high-res Bayer grid → smoother pattern, less moiré.
- *
- * HTML `srcset` `w` descriptors MUST be each image’s *intrinsic pixel width* (what `identify`
- * reports). Do not use the filename number there — wrong descriptor breaks resource selection.
- *
- * Paths + intrinsic widths (must match files under `public/assets/pages/writing`).
- */
-const writingBgStem =
-  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom';
-const writingBgResponsive = {
-  w720: { href: `${writingBgStem}_720.png`, w: 1620 },
-  w1080: { href: `${writingBgStem}_1080.png`, w: 2160 },
-  w1440: { href: `${writingBgStem}_1440.png`, w: 2736 },
-  w1920: { href: `${writingBgStem}_1920.png`, w: 3360 },
-  w2400: { href: `${writingBgStem}_2400.png`, w: 3840 },
-} as const;
+const writingBg = buildDichromResponsive(
+  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
+);
 
 function formatWritingListDate(d: Date): string {
   return d.toLocaleDateString('en-GB', {
@@ -44,23 +28,12 @@ function formatWritingListDate(d: Date): string {
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">
         <div class="page-buttons-panel__media" aria-hidden="true">
-          <picture>
-            <source
-              media="(max-width: 767px)"
-              srcset={`${writingBgResponsive.w720.href} ${writingBgResponsive.w720.w}w, ${writingBgResponsive.w1080.href} ${writingBgResponsive.w1080.w}w`}
-              sizes="100vw"
-            />
-            <img
-              src={writingBgResponsive.w1440.href}
-              srcset={`${writingBgResponsive.w1080.href} ${writingBgResponsive.w1080.w}w, ${writingBgResponsive.w1440.href} ${writingBgResponsive.w1440.w}w, ${writingBgResponsive.w1920.href} ${writingBgResponsive.w1920.w}w, ${writingBgResponsive.w2400.href} ${writingBgResponsive.w2400.w}w`}
-              sizes="100vw"
-              width="2736"
-              height="2204"
-              alt=""
-              decoding="async"
-              fetchpriority="high"
-            />
-          </picture>
+          <ResponsiveDichromPicture
+            sources={writingBg}
+            width={2736}
+            height={2204}
+            fetchpriority="high"
+          />
         </div>
         <div class="writing-groups writing-groups--pending" aria-busy="true">
           {

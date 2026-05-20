@@ -79,7 +79,7 @@ ul.post-list > li::before {
 /*
  * Writing panel BG: responsive Bayer PNG via `<picture>` (writing.astro), not `::before`.
  * Filename suffixes (720, 1080, …) = intended CSS display width, not PNG pixel width; see comment
- * on `writingBgResponsive` in writing.astro. Srcset `w` values are intrinsic bitmap widths.
+ * on `buildDichromResponsive` in src/constants/dichrom-responsive.ts. Srcset `w` values are intrinsic bitmap widths.
  */
 .writing-page .page-buttons-panel::before {
   content: none;

@@ -1,0 +1,21 @@
+---
+import {
+  dichromMobileSrcset,
+  type DichromResponsiveSet,
+} from '../constants/dichrom-responsive';
+
+interface Props {
+  sources: DichromResponsiveSet;
+  imageSizes?: string;
+}
+
+const { sources, imageSizes = '100vw' }: Props = Astro.props;
+---
+
+<link
+  rel="preload"
+  as="image"
+  href={sources.w720.href}
+  imagesrcset={dichromMobileSrcset(sources)}
+  imagesizes={imageSizes}
+/>
