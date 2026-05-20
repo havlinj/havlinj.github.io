@@ -102,7 +102,7 @@ function mount(): void {
       line-height: 1.35;
       color: #e8f5f7;
       background: rgba(12, 18, 22, 0.92);
-      border-top: 1px solid rgba(224, 247, 250, 0.35);
+      border-top: 1px solid rgba(var(--color-page-bg-rgb), 0.35);
       -webkit-overflow-scrolling: touch;
     }
     [data-layout-debug] pre {
@@ -126,9 +126,9 @@ function mount(): void {
       cursor: pointer;
       padding: 4px 10px;
       border-radius: 4px;
-      border: 1px solid rgba(224, 247, 250, 0.45);
-      background: rgba(224, 247, 250, 0.12);
-      color: #e0f7fa;
+      border: 1px solid rgba(var(--color-page-bg-rgb), 0.45);
+      background: rgba(var(--color-page-bg-rgb), 0.12);
+      color: var(--color-page-bg);
     }
   `;
 

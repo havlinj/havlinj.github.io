@@ -1,5 +1,23 @@
 /* Writing index (post list) + blog article (.blog-post) */
 
+.writing-page {
+  --page-title-margin-bottom: 1.35rem;
+  --panel-bg-pos-x: calc(50% + 0px);
+  --panel-bg-pos-y: calc(50% + 0px);
+  --panel-bg-layer-opacity: 0.94;
+  --panel-bg-saturation: 0.97;
+  --panel-bg-brightness: 0.985;
+  --panel-bg-contrast: 0.97;
+  --panel-padding-top: 10%;
+  --panel-padding-left: 10%;
+  --panel-padding-bottom: 24%;
+  --writing-row-gap: 2cqi;
+  --writing-group-gap-mult: 3;
+  --writing-row-min-h: 5.8cqi;
+  --writing-row-max-h: 6.8cqi;
+  --writing-row-pad-block: 0.32cqi;
+}
+
 ul.post-list {
   list-style: none;
   padding: 0;
@@ -52,7 +70,7 @@ ul.post-list > li::before {
   );
 }
 
-/* Writing: square panel; wash behind pool photo (no #111 — only global page background). */
+/* Writing: square panel; wash behind pool photo (no ink panel — only global page background). */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
   background-color: var(--color-page-bg);
@@ -157,7 +175,7 @@ ul.post-list > li::before {
   font-size: 0.98em;
   line-height: var(--writing-title-lh);
   letter-spacing: 0.06em;
-  color: rgba(17, 17, 17, 0.99);
+  color: rgba(var(--color-ink-rgb), 0.99);
   padding: 0.2em;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
@@ -171,7 +189,7 @@ ul.post-list > li::before {
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0.02em;
-  color: rgba(17, 17, 17, 0.74);
+  color: rgba(var(--color-ink-rgb), 0.74);
   padding: 0.15em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -205,7 +223,7 @@ ul.post-list > li::before {
 
 .blog-post .article-meta {
   margin: 1rem 0;
-  color: #111;
+  color: var(--color-ink);
   font-weight: 400;
 }
 
@@ -281,5 +299,5 @@ ul.post-list > li::before {
   margin: 0.21em 0.8rem 0 0;
   padding: 0;
   font-weight: 600;
-  color: #111;
+  color: var(--color-ink);
 }

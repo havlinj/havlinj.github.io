@@ -1,0 +1,12 @@
+/* ===============================
+   DESIGN TOKENS — colors
+   sync: src/constants/colors.ts (hex + rgb for e2e)
+================================ */
+:root {
+  --color-ink: #111;
+  --color-page-bg: #e0f7fa;
+  --color-ink-rgb: 17, 17, 17;
+  --color-page-bg-rgb: 224, 247, 250;
+  --color-divider: rgba(var(--color-ink-rgb), 0.22);
+  --color-list-marker: rgba(var(--color-ink-rgb), 0.55);
+}

@@ -234,13 +234,13 @@ h1 + .hero-wrap {
   position: relative;
   display: inline-block;
   z-index: 1;
-  color: #111;
+  color: var(--color-ink);
   background-color: var(--hero-highlight-bg);
 }
 
-/* Tagline text: solid #111 on top, no shadow */
+/* Tagline text: solid var(--color-ink) on top, no shadow */
 .tagline__text {
   position: relative;
   z-index: 1;
-  color: #111;
+  color: var(--color-ink);
 }

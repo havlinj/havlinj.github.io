@@ -29,14 +29,6 @@ const writingBgResponsive = {
   w2400: { href: `${writingBgStem}_2400.png`, w: 3840 },
 } as const;
 
-const defaultWritingBgOpacity = 0.94;
-const defaultWritingBgNudgeX = 0;
-const defaultWritingBgNudgeY = 0;
-
-function toPanelBgPosition(value: number): string {
-  return `calc(50% + ${value}px)`;
-}
-
 function formatWritingListDate(d: Date): string {
   return d.toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -47,29 +39,7 @@ function formatWritingListDate(d: Date): string {
 ---
 
 <Layout title="Writing" activeSection="writing">
-  <article
-    class="writing-page"
-    style={{
-      '--page-title-margin-bottom': '1.35rem',
-      '--panel-bg-pos-x': toPanelBgPosition(defaultWritingBgNudgeX),
-      '--panel-bg-pos-y': toPanelBgPosition(defaultWritingBgNudgeY),
-      /* Softer pool photos over page wash (reverted from tile-only filter — read closer to intent). */
-      '--panel-bg-layer-opacity': String(defaultWritingBgOpacity),
-      /* Slightly below 1: pool shots often read loud on page wash; tune per asset if needed. */
-      '--panel-bg-saturation': '0.97',
-      '--panel-bg-brightness': '0.985',
-      '--panel-bg-contrast': '0.97',
-      // Gap under title: --page-title-margin-bottom above; optional extra: '--panel-margin-top': '0.5rem'
-      '--panel-padding-top': '10%',
-      '--panel-padding-left': '10%',
-      '--panel-padding-bottom': '24%',
-      '--writing-row-gap': '2cqi',
-      '--writing-group-gap-mult': '3',
-      '--writing-row-min-h': '5.8cqi',
-      '--writing-row-max-h': '6.8cqi',
-      '--writing-row-pad-block': '0.32cqi',
-    }}
-  >
+  <article class="writing-page">
     <h1 class="page-title">Writing</h1>
     <div class="page-buttons-zone">
       <div class="page-buttons-panel">

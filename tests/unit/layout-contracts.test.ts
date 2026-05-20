@@ -36,6 +36,7 @@ import {
   CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT,
   CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH,
 } from '../../src/constants/contact-panel-typography';
+import { COLOR_INK_HEX, COLOR_PAGE_BG_HEX } from '../../src/constants/colors';
 
 const repoRoot = path.join(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -204,5 +205,20 @@ describe('layout contracts: contact form status (CONTACT_STATUS_LAYOUT ↔ conta
     );
     expect(css).toContain('-webkit-line-clamp: 2');
     expect(CONTACT_STATUS_LAYOUT.statusMaxLines).toBe(2);
+  });
+});
+
+describe('layout contracts: theme colors (tokens.css ↔ colors.ts)', () => {
+  const tokens = readRepoFile('src/styles/tokens.css');
+
+  it('tokens.css defines ink and page-bg hex values', () => {
+    expect(cssCustomProp(tokens, '--color-ink')).toBe(COLOR_INK_HEX);
+    expect(cssCustomProp(tokens, '--color-page-bg')).toBe(COLOR_PAGE_BG_HEX);
+  });
+
+  it('global.css imports tokens and does not redefine page-bg hex', () => {
+    const global = readRepoFile('src/styles/global.css');
+    expect(global).toContain("@import './tokens.css'");
+    expect(global).not.toMatch(/--color-page-bg:\s*#/);
   });
 });

@@ -25,7 +25,7 @@
 
 /* --- 1) Shell: wrapper + panel box --- */
 .why-page .why-wrapper {
-  --why-box-bg: #111;
+  --why-box-bg: var(--color-ink);
   --why-box-fg: var(--color-page-bg);
   /*
    * In `em` (resolves on each `p`): tuned ≈ 2rem at ~1.09rem body (2/1.09), not literal 2em
@@ -192,7 +192,7 @@
     to bottom,
     var(--why-box-bg) 0%,
     var(--why-box-bg) 48%,
-    rgba(17, 17, 17, 0) 100%
+    rgba(var(--color-ink-rgb), 0) 100%
   );
 }
 
@@ -214,11 +214,11 @@
     to top,
     var(--why-box-bg) 0%,
     var(--why-box-bg) 62%,
-    rgba(17, 17, 17, 0.93) 69%,
-    rgba(17, 17, 17, 0.55) 80%,
-    rgba(17, 17, 17, 0.18) 90%,
-    rgba(17, 17, 17, 0.04) 96%,
-    rgba(17, 17, 17, 0) 100%
+    rgba(var(--color-ink-rgb), 0.93) 69%,
+    rgba(var(--color-ink-rgb), 0.55) 80%,
+    rgba(var(--color-ink-rgb), 0.18) 90%,
+    rgba(var(--color-ink-rgb), 0.04) 96%,
+    rgba(var(--color-ink-rgb), 0) 100%
   );
 }
 
@@ -244,13 +244,13 @@
     to top,
     var(--why-box-bg) 0%,
     var(--why-box-bg) 5%,
-    rgba(17, 17, 17, 0.97) 14%,
-    rgba(17, 17, 17, 0.9) 28%,
-    rgba(17, 17, 17, 0.72) 44%,
-    rgba(17, 17, 17, 0.48) 60%,
-    rgba(17, 17, 17, 0.26) 76%,
-    rgba(17, 17, 17, 0.1) 88%,
-    rgba(17, 17, 17, 0) 100%
+    rgba(var(--color-ink-rgb), 0.97) 14%,
+    rgba(var(--color-ink-rgb), 0.9) 28%,
+    rgba(var(--color-ink-rgb), 0.72) 44%,
+    rgba(var(--color-ink-rgb), 0.48) 60%,
+    rgba(var(--color-ink-rgb), 0.26) 76%,
+    rgba(var(--color-ink-rgb), 0.1) 88%,
+    rgba(var(--color-ink-rgb), 0) 100%
   );
 }
 
@@ -284,15 +284,27 @@
     to top,
     var(--why-box-bg) 0%,
     var(--why-box-bg) calc(28% + 16% * var(--why-intro-bottom-veil-hard, 0)),
-    rgba(17, 17, 17, calc(0.42 + 0.38 * var(--why-intro-bottom-veil-hard, 0)))
+    rgba(
+        var(--color-ink-rgb),
+        calc(0.42 + 0.38 * var(--why-intro-bottom-veil-hard, 0))
+      )
       40%,
-    rgba(17, 17, 17, calc(0.22 + 0.28 * var(--why-intro-bottom-veil-hard, 0)))
+    rgba(
+        var(--color-ink-rgb),
+        calc(0.22 + 0.28 * var(--why-intro-bottom-veil-hard, 0))
+      )
       54%,
-    rgba(17, 17, 17, calc(0.1 + 0.14 * var(--why-intro-bottom-veil-hard, 0)))
+    rgba(
+        var(--color-ink-rgb),
+        calc(0.1 + 0.14 * var(--why-intro-bottom-veil-hard, 0))
+      )
       68%,
-    rgba(17, 17, 17, calc(0.03 + 0.06 * var(--why-intro-bottom-veil-hard, 0)))
+    rgba(
+        var(--color-ink-rgb),
+        calc(0.03 + 0.06 * var(--why-intro-bottom-veil-hard, 0))
+      )
       82%,
-    rgba(17, 17, 17, 0) 100%
+    rgba(var(--color-ink-rgb), 0) 100%
   );
 }
 
@@ -320,12 +332,12 @@
   background: linear-gradient(
     to top,
     var(--why-box-bg) 0%,
-    rgba(17, 17, 17, 0.72) 16%,
-    rgba(17, 17, 17, 0.42) 34%,
-    rgba(17, 17, 17, 0.2) 52%,
-    rgba(17, 17, 17, 0.08) 72%,
-    rgba(17, 17, 17, 0.02) 88%,
-    rgba(17, 17, 17, 0) 100%
+    rgba(var(--color-ink-rgb), 0.72) 16%,
+    rgba(var(--color-ink-rgb), 0.42) 34%,
+    rgba(var(--color-ink-rgb), 0.2) 52%,
+    rgba(var(--color-ink-rgb), 0.08) 72%,
+    rgba(var(--color-ink-rgb), 0.02) 88%,
+    rgba(var(--color-ink-rgb), 0) 100%
   );
 }
 
@@ -366,12 +378,12 @@
     /* Denser through the mid band (between bottom feather and top solid). */
     linear-gradient(
       to top,
-      rgba(17, 17, 17, 0) 0%,
-      rgba(17, 17, 17, 0.36) 10%,
-      rgba(17, 17, 17, 0.7) 22%,
-      rgba(17, 17, 17, 0.9) 36%,
-      rgba(17, 17, 17, 0.98) 50%,
-      rgba(17, 17, 17, 0.99) 66%,
+      rgba(var(--color-ink-rgb), 0) 0%,
+      rgba(var(--color-ink-rgb), 0.36) 10%,
+      rgba(var(--color-ink-rgb), 0.7) 22%,
+      rgba(var(--color-ink-rgb), 0.9) 36%,
+      rgba(var(--color-ink-rgb), 0.98) 50%,
+      rgba(var(--color-ink-rgb), 0.99) 66%,
       var(--why-box-bg) 100%
     ),
     /*
@@ -380,13 +392,19 @@
      */
     linear-gradient(
         to top,
-        rgba(17, 17, 17, calc(1 * var(--why-end-top-veil-grow, 0))) 0%,
-        rgba(17, 17, 17, calc(0.97 * var(--why-end-top-veil-grow, 0))) 9%,
-        rgba(17, 17, 17, calc(0.9 * var(--why-end-top-veil-grow, 0))) 22%,
-        rgba(17, 17, 17, calc(0.74 * var(--why-end-top-veil-grow, 0))) 38%,
-        rgba(17, 17, 17, calc(0.48 * var(--why-end-top-veil-grow, 0))) 52%,
-        rgba(17, 17, 17, calc(0.22 * var(--why-end-top-veil-grow, 0))) 68%,
-        rgba(17, 17, 17, calc(0.06 * var(--why-end-top-veil-grow, 0))) 80%,
+        rgba(var(--color-ink-rgb), calc(1 * var(--why-end-top-veil-grow, 0))) 0%,
+        rgba(var(--color-ink-rgb), calc(0.97 * var(--why-end-top-veil-grow, 0)))
+          9%,
+        rgba(var(--color-ink-rgb), calc(0.9 * var(--why-end-top-veil-grow, 0)))
+          22%,
+        rgba(var(--color-ink-rgb), calc(0.74 * var(--why-end-top-veil-grow, 0)))
+          38%,
+        rgba(var(--color-ink-rgb), calc(0.48 * var(--why-end-top-veil-grow, 0)))
+          52%,
+        rgba(var(--color-ink-rgb), calc(0.22 * var(--why-end-top-veil-grow, 0)))
+          68%,
+        rgba(var(--color-ink-rgb), calc(0.06 * var(--why-end-top-veil-grow, 0)))
+          80%,
         transparent 92%
       );
   background-repeat: no-repeat;
@@ -401,11 +419,11 @@
   height: var(--why-start-cover-height, clamp(140px, 20.8vh, 218px));
   background: linear-gradient(
     to bottom,
-    rgba(17, 17, 17, 0) 0%,
-    rgba(17, 17, 17, 0.04) 4%,
-    rgba(17, 17, 17, 0.18) 10%,
-    rgba(17, 17, 17, 0.55) 20%,
-    rgba(17, 17, 17, 0.93) 31%,
+    rgba(var(--color-ink-rgb), 0) 0%,
+    rgba(var(--color-ink-rgb), 0.04) 4%,
+    rgba(var(--color-ink-rgb), 0.18) 10%,
+    rgba(var(--color-ink-rgb), 0.55) 20%,
+    rgba(var(--color-ink-rgb), 0.93) 31%,
     var(--why-box-bg) 38%,
     var(--why-box-bg) 100%
   );

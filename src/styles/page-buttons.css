@@ -24,7 +24,7 @@
     var(--panel-padding-left, 2rem);
   border: none;
   border-radius: 0;
-  background-color: #111;
+  background-color: var(--color-ink);
   box-sizing: border-box;
   overflow: hidden; /* clip background/grain layers */
 }
@@ -35,7 +35,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-color: #111;
+  background-color: var(--color-ink);
   background-image: var(--panel-bg, none);
   background-repeat: no-repeat;
   background-size: cover;
@@ -43,7 +43,7 @@
   filter: saturate(var(--panel-bg-saturation, 1))
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
-  /* Optional: <1 lets the #111 panel show through (Writing pool BG vs profile portrait). */
+  /* Optional: <1 lets the ink panel show through (Writing pool BG vs profile portrait). */
   opacity: var(--panel-bg-layer-opacity, 1);
   pointer-events: none;
 }
@@ -181,11 +181,11 @@
   display: none;
 }
 
-/* Visible text: solid #111 on top, slightly bolder; micro typography for readability */
+/* Visible text: solid ink on top, slightly bolder; micro typography for readability */
 .page-button__text {
   position: relative;
   z-index: 3;
-  color: #111;
+  color: var(--color-ink);
   font-size: clamp(
     var(--panel-fluid-font-min),
     var(--panel-fluid-font-preferred),
@@ -201,7 +201,7 @@
 /* Invert on keyboard focus */
 .page-button:focus-visible .page-button__bg,
 .page-button:focus-visible .page-button__overlay {
-  background-color: #111;
+  background-color: var(--color-ink);
 }
 
 .page-button:focus-visible .page-button__text {
@@ -212,7 +212,7 @@
 @media (hover: hover) {
   .page-button:hover .page-button__bg,
   .page-button:hover .page-button__overlay {
-    background-color: #111;
+    background-color: var(--color-ink);
   }
 
   .page-button:hover .page-button__text {

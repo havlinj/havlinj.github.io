@@ -22,6 +22,10 @@ article.has-buttons-panel {
   overflow: hidden;
 }
 
+article.has-buttons-panel > h1.page-title {
+  --page-title-margin-bottom: 1.3rem;
+}
+
 /*
  * Unified insets (inline on .profile-section):
  *   --profile-inner-gutter      -> base portrait horizontal inset (column width - 2x gutter)
@@ -321,10 +325,10 @@ article .profile-section:last-child {
 }
 
 .profile-tile--placeholder {
-  background: #111;
+  background: var(--color-ink);
 }
 
-/* Bottom tiles (user-supplied images later): fallback = #111 */
+/* Bottom tiles (user-supplied images later): fallback = var(--color-ink) */
 .profile-image-tile {
   position: relative;
   background-color: var(--color-page-bg);
@@ -495,7 +499,7 @@ article .profile-section:last-child {
   max-height: none;
   min-height: 0;
   box-sizing: border-box;
-  border: var(--profile-photo-frame-size) solid #111;
+  border: var(--profile-photo-frame-size) solid var(--color-ink);
   /* cqi/cqw for font caps = this tile’s width (grid cell) */
   container-type: inline-size;
   container-name: profile-tile;
@@ -637,9 +641,9 @@ article .profile-section:last-child {
 .prof-tile .page-button__overlay {
   background: linear-gradient(
     90deg,
-    rgba(17, 17, 17, 0.75) 0%,
-    rgba(17, 17, 17, 0.67) 20%,
-    rgba(17, 17, 17, 0.52) 50%
+    rgba(var(--color-ink-rgb), 0.75) 0%,
+    rgba(var(--color-ink-rgb), 0.67) 20%,
+    rgba(var(--color-ink-rgb), 0.52) 50%
   );
 }
 
@@ -651,7 +655,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile .page-button__text {
-  color: rgba(17, 17, 17, 1);
+  color: rgba(var(--color-ink-rgb), 1);
   /* Inherited from .profile-section (fit from "PROFESSIONAL" on /what-i-do tile) */
   font-size: var(
     --profile-tile-label-font-size,
@@ -699,7 +703,7 @@ article .profile-section:last-child {
 }
 
 .prof-tile:not(.is-revealed):focus-visible .page-button__text::before {
-  background-color: rgba(17, 17, 17, 1);
+  background-color: rgba(var(--color-ink-rgb), 1);
 }
 
 .prof-tile--foundations:not(.is-revealed):focus-visible
@@ -731,9 +735,9 @@ article .profile-section:last-child {
   .prof-tile:not(.is-revealed):hover .page-button__overlay {
     background: linear-gradient(
       90deg,
-      rgba(17, 17, 17, 0.75) 0%,
-      rgba(17, 17, 17, 0.67) 20%,
-      rgba(17, 17, 17, 0.52) 50%
+      rgba(var(--color-ink-rgb), 0.75) 0%,
+      rgba(var(--color-ink-rgb), 0.67) 20%,
+      rgba(var(--color-ink-rgb), 0.52) 50%
     );
   }
 
@@ -742,7 +746,7 @@ article .profile-section:last-child {
   }
 
   .prof-tile:not(.is-revealed):hover .page-button__text::before {
-    background-color: rgba(17, 17, 17, 1);
+    background-color: rgba(var(--color-ink-rgb), 1);
   }
 
   .prof-tile--foundations:not(.is-revealed):hover .page-button__text::before {
@@ -824,7 +828,7 @@ article .profile-section:last-child {
 .profile-image-tile.prof-tile--foundations.is-revealed,
 .profile-image-tile.prof-tile--foundations.is-reveal-fading-out,
 .profile-image-tile.prof-tile--foundations.is-reveal-opening {
-  background: #111;
+  background: var(--color-ink);
 }
 
 /* Foundations reveal layer: opacity/visibility transitions only during reveal states */
@@ -866,7 +870,7 @@ article .profile-section:last-child {
   );
   box-sizing: border-box;
   text-align: left;
-  background: #111;
+  background: var(--color-ink);
   color: var(--color-page-bg);
   /* Set only from profile-tile-type-fit.ts (inline). Single rem fallback if JS is off — no clamp/cqi (narrow viewports could overshoot). */
   font-size: var(--profile-reveal-font-size, 0.75rem);
@@ -898,7 +902,7 @@ article .profile-section:last-child {
 .prof-tile--foundations.is-revealed .prof-tile__reveal {
   opacity: 1;
   visibility: visible;
-  background-color: #111;
+  background-color: var(--color-ink);
   box-shadow: none;
   inset: 0;
   transition:
@@ -940,8 +944,8 @@ article .profile-section:last-child {
   )
   .tile-state-secondary {
   text-shadow:
-    0 0 0.6px rgba(224, 247, 250, 0.35),
-    0 0 10px rgba(224, 247, 250, 0.12);
+    0 0 0.6px rgba(var(--color-page-bg-rgb), 0.35),
+    0 0 10px rgba(var(--color-page-bg-rgb), 0.12);
 }
 
 /* Fade reveal text out before returning to the default tile */
@@ -1083,7 +1087,7 @@ article .profile-section:last-child {
 @keyframes profile-foundations-reveal-tile-breathe {
   0%,
   100% {
-    background-color: #111;
+    background-color: var(--color-ink);
   }
   50% {
     /* Slight lift toward page tone (≈ color-mix with --color-page-bg) */

@@ -126,7 +126,7 @@ const variant: ArrowVariant = props.variant ?? 'segmented';
 const isSolidBlinkVariant =
   variant === 'solid-blink' || variant === 'solid-outline-blink';
 
-const color = props.color ?? '#111';
+const color = props.color ?? 'var(--color-ink)';
 const durationSec = Number(props.duration);
 const durationDefault = isSolidBlinkVariant ? 1.45 : 2.6;
 const duration =

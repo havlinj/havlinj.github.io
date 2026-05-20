@@ -13,6 +13,26 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  --page-title-margin-bottom: 1.35rem;
+  --panel-bg-pos-x: 50%;
+  --panel-bg-pos-y: 50%;
+  --panel-bg-layer-opacity: 0.8;
+  --panel-bg-saturation: 0.97;
+  --panel-bg-brightness: 1;
+  --panel-bg-contrast: 0.97;
+  --panel-bg-zoom: 1.1;
+  --panel-bg-nudge-x: 0;
+  --panel-bg-nudge-y: 0.2;
+  --panel-padding-top: 10%;
+  --panel-padding-left: 10%;
+  --panel-padding-bottom: 24%;
+  --writing-row-gap: var(--panel-row-gap);
+  --contact-link-row-min-h: var(--panel-row-min-h);
+  --contact-link-row-max-h: var(--panel-row-max-h);
+  --contact-link-row-gap: var(--panel-row-gap);
+  --contact-link-pad-inline: 0.95em;
+  --contact-link-tail-pad: 1.5em;
+  --contact-link-pad-block: 0.46em;
 }
 
 .contact-page .page-buttons-zone,
@@ -206,7 +226,7 @@
   font-weight: 400;
   line-height: 1.46;
   letter-spacing: -0.006em;
-  color: rgba(17, 17, 17, 0.96);
+  color: rgba(var(--color-ink-rgb), 0.96);
   white-space: normal;
   max-width: 100%;
   min-width: 0;
@@ -261,7 +281,7 @@
   max-height: clamp(2.7rem, var(--contact-link-row-max-h, 7.8cqi), 3.25rem);
   --contact-link-icon-size: 1.12em;
   --contact-bubble-size-mul: 1;
-  color: rgba(17, 17, 17, 0.96);
+  color: rgba(var(--color-ink-rgb), 0.96);
   font-size: inherit;
   gap: 0.62em;
   /* Tail padding wins vs %-column squeeze: never smaller than --contact-link-tail-min-px. */
@@ -302,12 +322,12 @@
 
 .contact-page .contact-extra-link:hover {
   color: var(--color-page-bg);
-  background-color: #111;
+  background-color: var(--color-ink);
 }
 
 .contact-page .contact-extra-link:focus-visible {
   color: var(--color-page-bg);
-  background-color: #111;
+  background-color: var(--color-ink);
   outline: none;
 }
 
@@ -341,20 +361,20 @@
 .contact-form textarea,
 .contact-form button {
   font: inherit;
-  color: #111;
+  color: var(--color-ink);
 }
 
 .contact-form input,
 .contact-form textarea {
   padding: 0.6rem 0.7rem;
   border-radius: 0.25rem;
-  border: 1px solid #111;
+  border: 1px solid var(--color-ink);
   background-color: transparent;
 }
 
 .contact-form :is(input, textarea):is(:focus, :focus-visible) {
   outline: none;
-  border: 2px solid #111;
+  border: 2px solid var(--color-ink);
 }
 
 .contact-form textarea {
@@ -367,7 +387,7 @@
   max-height: var(--contact-send-max-height);
   padding: 0 1.4rem;
   border-radius: 0;
-  border: 1px solid #111;
+  border: 1px solid var(--color-ink);
   background-color: transparent;
   cursor: pointer;
   transition:
@@ -376,7 +396,7 @@
 }
 
 .contact-form button:hover {
-  background-color: #111;
+  background-color: var(--color-ink);
   color: var(--color-page-bg);
 }
 
@@ -411,7 +431,7 @@
 
 .contact-status--success,
 .contact-status--pending {
-  color: #111;
+  color: var(--color-ink);
   opacity: 0.78;
 }
 
