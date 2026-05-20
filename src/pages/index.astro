@@ -14,7 +14,9 @@ const heroBgResponsive = {
 
 <Layout title="Jan Havlín">
   <Fragment slot="head">
-    {/* Match <picture> srcset so mobile LH/CI does not preload desktop-tier bytes. */}
+    {
+      /* Match <picture> srcset so mobile LH/CI does not preload desktop-tier bytes. */
+    }
     <link
       rel="preload"
       as="image"
@@ -111,9 +113,13 @@ const heroBgResponsive = {
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', revealHeroWhenImageReady, {
-          once: true,
-        });
+        document.addEventListener(
+          'DOMContentLoaded',
+          revealHeroWhenImageReady,
+          {
+            once: true,
+          },
+        );
       } else {
         revealHeroWhenImageReady();
       }

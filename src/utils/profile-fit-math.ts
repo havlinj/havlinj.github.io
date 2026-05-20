@@ -38,3 +38,28 @@ export function baseWidthFromEffectiveScale(
     return measuredWidth;
   return measuredWidth / effectiveScale;
 }
+
+/** Inner copy box vs stanza (Foundations reveal uniform scale). */
+export function computeRevealCopyUniformScale(
+  innerW: number,
+  innerH: number,
+  stanzaClientW: number,
+  stanzaClientH: number,
+  padPx: number,
+): number {
+  if (innerW < 2 || innerH < 2) return 1;
+  const sw = Math.max(stanzaClientW - padPx, 1);
+  const sh = Math.max(stanzaClientH - padPx, 1);
+  return Math.min(1, sw / innerW, sh / innerH);
+}
+
+/** Hard cap by stanza box vs preferred cap (profile-tile-type-fit-reveal-fit). */
+export function computeFoundationsRevealMaxFontPx(
+  minPx: number,
+  stanzaClientW: number,
+  stanzaClientH: number,
+  preferredPx: number,
+): number {
+  const boxCapPx = Math.max(minPx, Math.min(stanzaClientW, stanzaClientH));
+  return Math.max(minPx, Math.min(boxCapPx, preferredPx));
+}

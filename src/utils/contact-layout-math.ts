@@ -89,3 +89,24 @@ export function applyContactFitPasses(params: {
   }
   return { desiredFontPx, neededWidth, neededHeight };
 }
+
+/** Inset pad fraction clamp (contact-layout-fit default branch 0.1). */
+export function clampContactInsetPanelPadFrac(raw: number): number {
+  if (Number.isFinite(raw) && raw > 0) return Math.min(0.5, raw);
+  return 0.1;
+}
+
+/** Outer size including margins (contact intro/links measurement). */
+export function outerRectSizeWithMarginsCeil(
+  scrollWidth: number,
+  scrollHeight: number,
+  marginLeft: number,
+  marginRight: number,
+  marginTop: number,
+  marginBottom: number,
+): { w: number; h: number } {
+  return {
+    w: Math.ceil(scrollWidth + marginLeft + marginRight),
+    h: Math.ceil(scrollHeight + marginTop + marginBottom),
+  };
+}

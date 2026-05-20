@@ -7,6 +7,13 @@ import {
 } from '../constants/why-layout';
 import { clamp } from '../utils/why-scroll-math';
 import {
+  advanceWhyFitFailStreak,
+  computeWhyFitOverflowPx,
+  nextRevolverIdleStreak,
+  resolveWhyRuntimeMinWidthLockPx,
+  revolverIdleAfterFrames,
+} from '../utils/why-fit-runtime-math';
+import {
   applyCtaAttachedVeil,
   applyCtaFade,
   applyCtaScale,
@@ -353,8 +360,7 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     scrollEl.style.setProperty('--why-font-scale', whyFontScale.toFixed(4));
     void scrollEl.offsetWidth;
     const probeW = fitProbe.getBoundingClientRect().width;
-    // Positive value means widest sentence is already clipping in available column width.
-    return probeW - (contentW + T.FIT_LOCK_SAFETY_PX);
+    return computeWhyFitOverflowPx(probeW, contentW, T.FIT_LOCK_SAFETY_PX);
   }
 
   function applyFontScaleStep() {
@@ -465,19 +471,16 @@ import { createWhyScrollVeils } from './why-scroll-veils';
     applyIntroTopBand(m);
     const overflowPx = measureFitOverflowPx();
     const fitAtLimit = overflowPx > 0;
-    if (fitAtLimit) fitFailStreak++;
-    else fitFailStreak = 0;
-    if (
-      runtimeLockedMinBoxWidth <= 0 &&
-      fitFailStreak >= T.FIT_FAIL_FRAMES &&
-      m.boxRect.width > 0
-    ) {
-      runtimeLockedMinBoxWidth =
-        Math.ceil(m.boxRect.width) + T.FIT_FAIL_LOCK_PADDING_PX;
-      const lockWidth = `${runtimeLockedMinBoxWidth}px`;
-      if (pageMainEl instanceof HTMLElement) {
-        pageMainEl.style.minWidth = lockWidth;
-      }
+    fitFailStreak = advanceWhyFitFailStreak(fitFailStreak, fitAtLimit);
+    runtimeLockedMinBoxWidth = resolveWhyRuntimeMinWidthLockPx({
+      currentLockPx: runtimeLockedMinBoxWidth,
+      failStreak: fitFailStreak,
+      failFramesThreshold: T.FIT_FAIL_FRAMES,
+      boxWidth: m.boxRect.width,
+      lockPaddingPx: T.FIT_FAIL_LOCK_PADDING_PX,
+    });
+    if (runtimeLockedMinBoxWidth > 0 && pageMainEl instanceof HTMLElement) {
+      pageMainEl.style.minWidth = `${runtimeLockedMinBoxWidth}px`;
     }
     const scrollSnapStep = Math.round(
       scrollEl.scrollTop / T.REVOLVER_SCROLL_SNAP_PX,
@@ -567,11 +570,16 @@ import { createWhyScrollVeils } from './why-scroll-veils';
       settleFrames === 0 &&
       fontScaleSettled &&
       !maxScrollChangedForRevolver;
-    if (rawRevolverIdle) revolverIdleStreak++;
-    else revolverIdleStreak = 0;
+    revolverIdleStreak = nextRevolverIdleStreak(
+      revolverIdleStreak,
+      rawRevolverIdle,
+    );
 
-    const revolverIdle =
-      hasAppliedRevolverOnce && revolverIdleStreak >= T.REVOLVER_IDLE_FRAMES;
+    const revolverIdle = revolverIdleAfterFrames(
+      hasAppliedRevolverOnce,
+      revolverIdleStreak,
+      T.REVOLVER_IDLE_FRAMES,
+    );
 
     if (!revolverIdle) {
       revolver.applyLineRevolver(

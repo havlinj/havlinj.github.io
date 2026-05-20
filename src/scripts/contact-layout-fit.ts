@@ -5,7 +5,9 @@ import {
 } from '../constants/contact-layout';
 import {
   applyContactFitPasses,
+  clampContactInsetPanelPadFrac,
   computeIntroLinksGapPx,
+  outerRectSizeWithMarginsCeil,
   resolveContactFluidFontPx,
 } from '../utils/contact-layout-math';
 
@@ -38,11 +40,9 @@ function startContactInsetFit(): void {
   const linksRectEl = linksRect;
   const cssVarCache = new Map<string, string>();
 
-  const padFrac =
-    Number.isFinite(CONTACT_LAYOUT.insetPanelPadFrac) &&
-    CONTACT_LAYOUT.insetPanelPadFrac > 0
-      ? Math.min(0.5, CONTACT_LAYOUT.insetPanelPadFrac)
-      : 0.1;
+  const padFrac = clampContactInsetPanelPadFrac(
+    CONTACT_LAYOUT.insetPanelPadFrac,
+  );
   let raf = 0;
   let revealed = false;
 
@@ -104,10 +104,14 @@ function startContactInsetFit(): void {
     const mr = parseFloat(cs.marginRight) || 0;
     const mt = parseFloat(cs.marginTop) || 0;
     const mb = parseFloat(cs.marginBottom) || 0;
-    return {
-      w: Math.ceil(rectEl.scrollWidth + ml + mr),
-      h: Math.ceil(rectEl.scrollHeight + mt + mb),
-    };
+    return outerRectSizeWithMarginsCeil(
+      rectEl.scrollWidth,
+      rectEl.scrollHeight,
+      ml,
+      mr,
+      mt,
+      mb,
+    );
   }
 
   function measureNeededContent(panelEdge: number): NeededContent {

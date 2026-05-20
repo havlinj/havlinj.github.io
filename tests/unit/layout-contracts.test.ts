@@ -28,6 +28,7 @@ import {
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
   REVEAL_RIGHT_RENDER_PAD_PX,
 } from '../../src/utils/profile-reveal-constants';
+import { CONTACT_STATUS_LAYOUT } from '../../src/lib/contact-status';
 
 const repoRoot = path.join(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -133,5 +134,32 @@ describe('layout contracts: profile reveal (TS ↔ CSS calc)', () => {
     expect(REVEAL_RIGHT_RENDER_PAD_PX).toBe(1);
     expect(REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX).toBe(0.5);
     expect(REVEAL_PADDING_RATIO_ASSERT_TOLERANCE_PX).toBe(0.5);
+  });
+});
+
+describe('layout contracts: contact form status (CONTACT_STATUS_LAYOUT ↔ contact.css)', () => {
+  it('.contact-form__actions custom props match CONTACT_STATUS_LAYOUT', () => {
+    const css = readRepoFile('src/styles/contact.css');
+    expect(css).toContain(
+      `--contact-send-max-height: ${CONTACT_STATUS_LAYOUT.sendButtonMaxHeightRem}rem`,
+    );
+    expect(css).toContain(
+      `--contact-status-pad-block: ${CONTACT_STATUS_LAYOUT.statusPadBlockRem}rem`,
+    );
+    expect(css).toContain(
+      `--contact-status-pad-inline: ${CONTACT_STATUS_LAYOUT.statusPadInlineRem}rem`,
+    );
+  });
+
+  it('.contact-status typography matches CONTACT_STATUS_LAYOUT', () => {
+    const css = readRepoFile('src/styles/contact.css');
+    expect(css).toContain(
+      `font-size: ${CONTACT_STATUS_LAYOUT.statusFontSizeRem}rem`,
+    );
+    expect(css).toContain(
+      `line-height: ${CONTACT_STATUS_LAYOUT.statusLineHeight}`,
+    );
+    expect(css).toContain('-webkit-line-clamp: 2');
+    expect(CONTACT_STATUS_LAYOUT.statusMaxLines).toBe(2);
   });
 });

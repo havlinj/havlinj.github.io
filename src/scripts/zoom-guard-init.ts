@@ -10,6 +10,12 @@ import {
   shouldCancelWarmStart,
   shouldKeepFreeze,
 } from '../utils/zoom-guard-math';
+import {
+  type ZoomFreezeBaselineV2,
+  hasValidZoomFreezeBaseline,
+  parseZoomFreezeBaselineJson,
+  parseZoomGuardStateJson,
+} from '../utils/zoom-guard-storage';
 
 const MAX_SAFE_ZOOM = ZOOM_GUARD_MAX_SAFE_ZOOM;
 const ZOOM_EXIT_HYSTERESIS = ZOOM_GUARD_EXIT_HYSTERESIS;
@@ -52,30 +58,21 @@ export function initZoomGuard(): void {
     storedBaselineRaw = null;
   }
 
-  type Baseline = { dpr: number; vvScale: number; innerWidth: number };
-  let storedBaseline: Baseline | null = null;
-  if (storedBaselineRaw) {
-    try {
-      storedBaseline = JSON.parse(storedBaselineRaw) as Baseline;
-    } catch {
-      storedBaseline = null;
-    }
-  }
+  type Baseline = ZoomFreezeBaselineV2;
+  let storedBaseline: Baseline | null =
+    parseZoomFreezeBaselineJson(storedBaselineRaw);
 
   let persistedGuardActiveWarm = false;
   let persistedFreezeScaleWarm = 1;
   try {
     const raw = window.sessionStorage.getItem(GUARD_STATE_KEY) ?? null;
-    if (raw) {
-      const parsed = JSON.parse(raw) as {
-        active?: boolean;
-        freezeScale?: number;
-      };
-      if (typeof parsed.active === 'boolean') {
-        persistedGuardActiveWarm = parsed.active;
+    const payload = parseZoomGuardStateJson(raw);
+    if (payload) {
+      if (typeof payload.active === 'boolean') {
+        persistedGuardActiveWarm = payload.active;
       }
-      if (Number.isFinite(parsed.freezeScale)) {
-        persistedFreezeScaleWarm = parsed.freezeScale as number;
+      if (typeof payload.freezeScale === 'number') {
+        persistedFreezeScaleWarm = payload.freezeScale;
       }
     }
   } catch {
@@ -84,51 +81,8 @@ export function initZoomGuard(): void {
 
   const shouldSkipBaselineResetWarm = persistedGuardActiveWarm === true;
 
-  function hasValidBaseline(baseline: Baseline | null): baseline is Baseline {
-    return (
-      !!baseline &&
-      Number.isFinite(baseline.dpr) &&
-      baseline.dpr > 0 &&
-      Number.isFinite(baseline.vvScale) &&
-      baseline.vvScale > 0 &&
-      Number.isFinite(baseline.innerWidth) &&
-      baseline.innerWidth > 0
-    );
-  }
-
-  function currentVisualViewportScale(): number {
-    const vv = window.visualViewport;
-    return vv && vv.scale ? vv.scale : 0;
-  }
-
-  function zoomRatioForBaseline(bd: number, bv: number, biw: number): number {
-    return computeZoomRatio({
-      baselineDpr: bd,
-      baselineVvScale: bv,
-      baselineInnerWidth: biw,
-      currentDpr: window.devicePixelRatio || 1,
-      currentVvScale: currentVisualViewportScale(),
-      currentInnerWidth: window.innerWidth || biw || 1,
-    });
-  }
-
-  function persistBaseline(baseline: Baseline): void {
-    try {
-      window.sessionStorage.setItem(
-        BASELINE_KEY,
-        JSON.stringify({
-          dpr: baseline.dpr,
-          vvScale: baseline.vvScale,
-          innerWidth: baseline.innerWidth,
-        }),
-      );
-    } catch {
-      /* ignore */
-    }
-  }
-
   function shouldResetBaseline(baseline: Baseline): boolean {
-    if (!hasValidBaseline(baseline)) return true;
+    if (!hasValidZoomFreezeBaseline(baseline)) return true;
 
     const innerWidthNow = window.innerWidth || 0;
     const dprNow = window.devicePixelRatio || 1;
@@ -166,8 +120,39 @@ export function initZoomGuard(): void {
     );
   }
 
+  function currentVisualViewportScale(): number {
+    const vv = window.visualViewport;
+    return vv && vv.scale ? vv.scale : 0;
+  }
+
+  function zoomRatioForBaseline(bd: number, bv: number, biw: number): number {
+    return computeZoomRatio({
+      baselineDpr: bd,
+      baselineVvScale: bv,
+      baselineInnerWidth: biw,
+      currentDpr: window.devicePixelRatio || 1,
+      currentVvScale: currentVisualViewportScale(),
+      currentInnerWidth: window.innerWidth || biw || 1,
+    });
+  }
+
+  function persistBaseline(baseline: Baseline): void {
+    try {
+      window.sessionStorage.setItem(
+        BASELINE_KEY,
+        JSON.stringify({
+          dpr: baseline.dpr,
+          vvScale: baseline.vvScale,
+          innerWidth: baseline.innerWidth,
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }
+
   if (
-    !hasValidBaseline(storedBaseline) ||
+    !hasValidZoomFreezeBaseline(storedBaseline) ||
     (!shouldSkipBaselineResetWarm && shouldResetBaseline(storedBaseline))
   ) {
     storedBaseline = {

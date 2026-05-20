@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { CONTACT_LAYOUT } from '../../src/constants/contact-layout';
 import {
   applyContactFitPasses,
+  clampContactInsetPanelPadFrac,
   computeDesiredFontPx,
   computeIntroLinksGapPx,
   computeMinFontPx,
+  outerRectSizeWithMarginsCeil,
   resolveContactFluidFontPx,
 } from '../../src/utils/contact-layout-math';
 
@@ -166,5 +168,26 @@ describe('applyContactFitPasses', () => {
     });
     expect(result.neededWidth).toBeGreaterThan(avail);
     expect(result.desiredFontPx).toBeLessThan(20);
+  });
+});
+
+describe('clampContactInsetPanelPadFrac', () => {
+  it('matches contact-layout default and cap', () => {
+    expect(
+      clampContactInsetPanelPadFrac(CONTACT_LAYOUT.insetPanelPadFrac),
+    ).toBe(0.1);
+    expect(clampContactInsetPanelPadFrac(0.3)).toBe(0.3);
+    expect(clampContactInsetPanelPadFrac(0.9)).toBe(0.5);
+    expect(clampContactInsetPanelPadFrac(Number.NaN)).toBe(0.1);
+    expect(clampContactInsetPanelPadFrac(0)).toBe(0.1);
+  });
+});
+
+describe('outerRectSizeWithMarginsCeil', () => {
+  it('ceil sum like contact measureRectOuterSize', () => {
+    expect(outerRectSizeWithMarginsCeil(100, 40, 1, 2, 3, 4)).toEqual({
+      w: 103,
+      h: 47,
+    });
   });
 });

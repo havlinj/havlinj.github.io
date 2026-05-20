@@ -1,4 +1,8 @@
-import { roundPx } from '../utils/profile-fit-math';
+import {
+  computeFoundationsRevealMaxFontPx,
+  computeRevealCopyUniformScale,
+  roundPx,
+} from '../utils/profile-fit-math';
 import {
   REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,
   REVEAL_RIGHT_MARGIN_RATIO_MIN,
@@ -36,6 +40,9 @@ function setRevealCopyUniformScale(
   inner.style.setProperty(FOUNDATIONS_REVEAL_UNIFORM_SCALE_VAR, String(scale));
 }
 
+/** Padding subtracted from stanza client box before uniform scale (historic constant). */
+const REVEAL_UNIFORM_SCALE_INSET_PAD_PX = 6;
+
 function applyRevealCopyUniformScale(
   stanza: HTMLElement,
   inner: HTMLElement | null,
@@ -46,10 +53,13 @@ function applyRevealCopyUniformScale(
   const iw = inner.offsetWidth;
   const ih = inner.offsetHeight;
   if (iw < 2 || ih < 2) return;
-  const pad = 6;
-  const sw = Math.max(stanza.clientWidth - pad, 1);
-  const sh = Math.max(stanza.clientHeight - pad, 1);
-  const s = Math.min(1, sw / iw, sh / ih);
+  const s = computeRevealCopyUniformScale(
+    iw,
+    ih,
+    stanza.clientWidth,
+    stanza.clientHeight,
+    REVEAL_UNIFORM_SCALE_INSET_PAD_PX,
+  );
   setRevealCopyUniformScale(inner, s);
 }
 
@@ -94,12 +104,12 @@ export function fitFoundationsReveal(reveal: HTMLElement): void {
     setRevealCopyUniformScale(copyInner, 1);
   }
 
-  // Hard cap by current rendered box: never allow a font larger than the box can physically host.
-  const boxCapPx = Math.max(
+  const maxPx = computeFoundationsRevealMaxFontPx(
     minPx,
-    Math.min(stanza.clientWidth, stanza.clientHeight),
+    stanza.clientWidth,
+    stanza.clientHeight,
+    preferredPx,
   );
-  const maxPx = Math.max(minPx, Math.min(boxCapPx, preferredPx));
 
   if (isRevealed && copyInner && tile && foundationsRevealFontLock.has(tile)) {
     setPxCustomProperty(

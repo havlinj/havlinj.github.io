@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   baseWidthFromEffectiveScale,
+  computeFoundationsRevealMaxFontPx,
+  computeRevealCopyUniformScale,
   fitFontSize,
   normalizePositiveScale,
   roundPx,
@@ -39,5 +41,15 @@ describe('profile-fit-math', () => {
     expect(baseWidthFromEffectiveScale(240, 2)).toBe(120);
     expect(baseWidthFromEffectiveScale(240, 0)).toBe(240);
     expect(baseWidthFromEffectiveScale(0, 2)).toBe(0);
+  });
+
+  it('computeRevealCopyUniformScale matches reveal-fit inset pad 6', () => {
+    expect(computeRevealCopyUniformScale(188, 50, 100, 60, 6)).toBe(0.5);
+    expect(computeRevealCopyUniformScale(10, 10, 100, 60, 6)).toBe(1);
+  });
+
+  it('computeFoundationsRevealMaxFontPx caps by stanza and preference', () => {
+    expect(computeFoundationsRevealMaxFontPx(12, 200, 80, 100)).toBe(80);
+    expect(computeFoundationsRevealMaxFontPx(12, 200, 300, 60)).toBe(60);
   });
 });
