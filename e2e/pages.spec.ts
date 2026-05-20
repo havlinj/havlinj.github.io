@@ -474,7 +474,7 @@ test.describe('Contact page (/contact)', () => {
     await expect(introRect).toBeVisible();
     const introPs = introRect.locator('.contact-page__intro');
     await expect(introPs).toHaveCount(2);
-    await expect(introPs.nth(0)).toHaveText('Glad you made it this far');
+    await expect(introPs.nth(0)).toHaveText('Glad you made it this far.');
     await expect(introPs.nth(0)).toHaveClass(/contact-page__intro--lead/);
     await expect(introPs.nth(1)).toHaveClass(/contact-page__intro--deck/);
     await expect(introPs.nth(1)).toHaveText(
@@ -484,7 +484,7 @@ test.describe('Contact page (/contact)', () => {
       introPs.nth(1).locator('.contact-page__intro-reach'),
     ).toHaveText('Reach out.');
 
-    const formLink = page.getByRole('link', { name: /Direct contact/i });
+    const formLink = page.getByRole('link', { name: 'Message', exact: true });
     await expect(formLink).toBeVisible();
     await expect(formLink).toHaveAttribute('href', '/contact/form');
     await expect(formLink.locator('img')).toHaveAttribute(

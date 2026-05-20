@@ -32,8 +32,8 @@ import { CONTACT_STATUS_LAYOUT } from '../../src/lib/contact-status';
 import {
   CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP,
   CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW,
-  CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_DESKTOP,
-  CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_NARROW,
+  CONTACT_PANEL_LINKS_FONT_SCALE,
+  CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT,
   CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH,
 } from '../../src/constants/contact-panel-typography';
 
@@ -168,20 +168,14 @@ describe('layout contracts: contact panel typography (constants ↔ contact.css)
     );
   });
 
-  it('panel link labels are 500 by default and 600 inside narrow media query', () => {
+  it('panel link labels use page-buttons weight and match intro font scale', () => {
     expect(css).toMatch(
       new RegExp(
-        `\\.contact-page \\.contact-extra-link \\.contact-extra-link__text\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_DESKTOP}`,
+        `\\.contact-page \\.contact-extra-link \\.contact-extra-link__text\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT}`,
       ),
     );
-    const narrowBlock = css.slice(
-      css.indexOf(`@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`),
-    );
-    expect(narrowBlock).toContain(
-      '.contact-page .contact-extra-link .contact-extra-link__text',
-    );
-    expect(narrowBlock).toContain(
-      `font-weight: ${CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT_NARROW}`,
+    expect(css).toContain(
+      `--contact-links-font-scale: ${CONTACT_PANEL_LINKS_FONT_SCALE}`,
     );
   });
 });

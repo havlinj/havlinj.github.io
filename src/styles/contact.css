@@ -35,7 +35,8 @@
     calc(var(--panel-fluid-font-preferred) + 0.03rem),
     var(--panel-fluid-font-max)
   );
-  --contact-links-font-scale: 0.95;
+  /* Same em size as intro inset (was 0.95 — labels looked smaller than copy). */
+  --contact-links-font-scale: 1;
   --contact-links-width: 38%;
   /* Floored by JS from panel edge; static fallback for noscript. */
   --contact-link-tail-min-px: 13px;
@@ -58,7 +59,7 @@
   }
 
   /*
-   * Narrow panel: bump weight for readability (smaller --contact-fluid-font × scale).
+   * Narrow panel: bump intro weight for readability (smaller --contact-fluid-font × scale).
    * sync: CONTACT_PANEL_* in src/constants/contact-panel-typography.ts
    */
   .contact-page__intro,
@@ -66,10 +67,6 @@
   .contact-page__intro--deck,
   .contact-page__intro-reach {
     font-weight: 500;
-  }
-
-  .contact-page .contact-extra-link .contact-extra-link__text {
-    font-weight: 600;
   }
 }
 
@@ -170,14 +167,14 @@
   flex-direction: column;
   justify-content: flex-start;
   /* Lead ↔ body: typographic step (decoupled from button row-gap). */
-  gap: clamp(0.5em, 0.4rem + 1.1vw, 0.6em);
+  gap: clamp(0.48em, 0.39rem + 1.06vw, 0.58em);
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
   /* Tight vertical footprint (more background visible); scales like --content-side-pad-compact. */
   --contact-intro-pad-left: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
   --contact-intro-pad-right: clamp(0.9rem, 0.72rem + 2.15vw, 1.24rem);
-  --contact-intro-pad-top: clamp(0.6rem, 0.5rem + 1.2vw, 1.04rem);
-  --contact-intro-pad-bottom: clamp(0.74rem, 0.56rem + 1.65vw, 1.18rem);
+  --contact-intro-pad-top: clamp(0.76rem, 0.52rem + 1.25vw, 1.19rem);
+  --contact-intro-pad-bottom: clamp(0.74rem, 0.56rem + 1.65vw, 1.15rem);
   padding: var(--contact-intro-pad-top) var(--contact-intro-pad-right)
     var(--contact-intro-pad-bottom) var(--contact-intro-pad-left);
 }
@@ -224,7 +221,7 @@
   font-weight: 400;
   opacity: 0.98;
   /* Slight lift vs body; em tracks scaled inset font-size. */
-  font-size: 1em;
+  font-size: 0.995em;
 }
 
 .contact-page__intro--deck {
@@ -235,7 +232,7 @@
 /* "Reach out." deck text */
 .contact-page__intro-reach {
   font-weight: 400;
-  letter-spacing: 0.004em;
+  letter-spacing: 0.005em;
 }
 
 .contact-page__links {
@@ -293,9 +290,8 @@
   font-size: inherit;
   min-width: 0;
   line-height: 1.24;
-  letter-spacing: 0.01em;
-  opacity: 0.98;
-  /* Desktop: page-buttons row (500); narrow panel → 600 in @media (max-width: 36rem). */
+  letter-spacing: 0.02em;
+  /* page-buttons row weight; sync CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT */
   font-weight: 500;
 }
 
