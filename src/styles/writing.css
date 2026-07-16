@@ -235,12 +235,7 @@ ul.post-list > li::before {
   text-wrap: pretty;
 }
 
-/* --- Blog posts: emphasis blocks + <sp> / <fz> rhythm (all .md articles share this) --- */
-.blog-post
-  .article-body
-  :is(.statement-hero, .statement-emphasis, .statement-soft, .statement-plain) {
-  hyphens: none;
-}
+/* --- Blog posts: <sp> / <fz> rhythm (all .md articles share this) --- */
 
 /* <sp> in articles: between global presets and “flat”; keeps bands visible on phones */
 .blog-post .article-body sp[space='xs'] {

@@ -230,46 +230,48 @@ sp[space='xl'] {
 }
 
 /* ===============================
-   STATEMENT PRESETS (blog article emphasis)
+   STATEMENT PRESETS (markdown emphasis)
+   Same on blog posts and content pages.
    Usage in .md:
    <p class="statement-plain">...</p>
    <p class="statement-soft">...</p>
    <p class="statement-emphasis">...</p>
    <p class="statement-hero">...</p>
 ================================ */
-.blog-post .article-body .statement-plain,
-.blog-post .article-body .statement-soft,
-.blog-post .article-body .statement-emphasis,
-.blog-post .article-body .statement-hero {
+.statement-plain,
+.statement-soft,
+.statement-emphasis,
+.statement-hero {
   text-wrap: pretty;
+  hyphens: none;
 }
 
-.blog-post .article-body .statement-plain {
+.statement-plain {
   margin-top: 1.4rem;
   margin-bottom: 1.4rem;
 }
 
-.blog-post .article-body .statement-soft {
+.statement-soft {
   margin: 1.7rem 0 1.85rem 0.01em;
   line-height: 1.58;
   letter-spacing: 0.009em;
 }
 
-.blog-post .article-body .statement-emphasis {
+.statement-emphasis {
   margin: 1.9em 1.8em 2em 0.01em;
   line-height: 1.6;
   font-size: 1.035em;
   letter-spacing: 0.01em;
 }
 
-.blog-post .article-body .statement-hero {
+.statement-hero {
   margin: 2.3em 1.5em 2.4em 0.01em;
   line-height: 1.62;
   font-size: 1.06em;
   letter-spacing: 0.011em;
 }
 
-.blog-post .article-body .inline-emphasis {
+.inline-emphasis {
   font-weight: 500;
   font-style: italic;
 }

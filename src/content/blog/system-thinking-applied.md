@@ -6,7 +6,7 @@ featured: true
 
 Beyond engineering, I've always gravitated toward creative disciplines. Art has long been a parallel interest in my life, one of those things that becomes part of you and cannot be separated. At first glance, it may seem like a completely different world from software, yet it has shaped how I think about structure, growth, and intention. Art is inherently abstract, and so is software. At its core, it is about creativity. It becomes particularly important in projects without established patterns or prior solutions.
 
-<p class="statement-emphasis">
+<p class="statement-soft">
     Creativity serves as a reliable engine&nbsp;for&nbsp;me.
 </p>
 
@@ -34,7 +34,7 @@ Each obstacle must be understood, reduced, and resolved. <span class="inline-emp
 
 It is not a fight for survival, but the tension is real, and anyone who has worked through complex systems has felt it, at least at times.
 
-<p style="margin: 3em 0 1.5em 0">
+<p style="margin: 2.8em 0 1.5em 0">
     I recognize strong influences of both in myself.
 </p>
 
@@ -58,7 +58,7 @@ A long game requires sustained concentration, positional thinking, and respect f
 
 I see it as something that is designed, constructed, and gradually brought into structural integrity. It takes time and effort to do it well.
 
-<p class="statement-hero">
+<p class="statement-emphasis">
     System engineering leaves little room for complacency.
 </p>
 

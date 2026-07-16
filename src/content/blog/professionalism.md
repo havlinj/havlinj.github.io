@@ -33,7 +33,7 @@ They take satisfaction in work done well. They care about continuity — about w
     A reputation built on quality is hard to destroy.
 </p>
 
-<p class="statement-hero" style="margin: 2.05em 3em 2.15em 0.03em">
+<p class="statement-emphasis" style="margin: 2.05em 3em 2.15em 0.03em">
     Professionalism cannot be achieved without replacing the selfish "I" with a&nbsp;more responsible and considerate "we".
 </p>
 
@@ -82,7 +82,7 @@ This effect can be observed everywhere — if only more people who are capable o
 
 <lh rel="relaxed">I have often been drawn to thinking beyond myself — toward broader social contexts rather than a purely individual focus.</lh>
 
-<p class="statement-hero">
+<p class="statement-emphasis">
     Work that lacks the potential to create real impact or carry broader meaning has never truly fulfilled me.
 </p>
 
@@ -158,8 +158,8 @@ It was difficult to fully believe that this was possible — until I saw it firs
 
 Of course, one can also arrive at this realization through books — through reading about historical figures, for example. But I was never particularly drawn to biographies.
 
-And yet now, I feel a certain closeness to those kinds of people.
+<sp space="md" side="top">And yet now, I feel a certain closeness to those kinds of people.</sp>
 
-I do not know exactly how exposure to a true professional affects others. But this is how it affected me.
+<sp space="md" side="top">I do not know exactly how exposure to a true professional affects others. But this is how it affected me.</sp>
 
-<sp space="lg" side="top">It gave me new energy.</sp>
+<sp space="md" side="top">It gave me new energy.</sp>
