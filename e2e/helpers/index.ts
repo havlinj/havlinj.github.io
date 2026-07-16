@@ -29,6 +29,7 @@ export {
   CONTACT_ERROR_MESSAGES,
   expectContactFormShowsApiError,
   fillContactFormWithValidData,
+  gotoContactForm,
   installTurnstileResetCounter,
   mockContactApiError,
   readTurnstileResetCount,

@@ -34,7 +34,7 @@ function readStatementMetrics(selector: string): StatementMetrics | null {
 }
 
 test.describe('Blog statement styles (mobile)', () => {
-  test('without statement media overrides, emphasis and hero stay consistent vs desktop', async ({
+  test('without statement media overrides, soft and emphasis stay consistent vs desktop', async ({
     page,
     browserName,
   }) => {
@@ -43,45 +43,66 @@ test.describe('Blog statement styles (mobile)', () => {
       waitUntil: 'domcontentloaded',
     });
 
+    const soft = page.locator('.article-body .statement-soft').first();
     const emphasis = page.locator('.article-body .statement-emphasis').first();
-    const hero = page.locator('.article-body .statement-hero').first();
 
+    await expect(soft).toBeVisible();
     await expect(emphasis).toBeVisible();
-    await expect(hero).toBeVisible();
 
+    const desktopSoft = await page.evaluate(
+      readStatementMetrics,
+      '.article-body .statement-soft',
+    );
     const desktopEmphasis = await page.evaluate(
       readStatementMetrics,
       '.article-body .statement-emphasis',
     );
-    const desktopHero = await page.evaluate(
-      readStatementMetrics,
-      '.article-body .statement-hero',
-    );
 
+    expect(desktopSoft).not.toBeNull();
     expect(desktopEmphasis).not.toBeNull();
-    expect(desktopHero).not.toBeNull();
 
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/blog/system-thinking-applied', {
       waitUntil: 'domcontentloaded',
     });
 
+    const mobileSoft = await page.evaluate(
+      readStatementMetrics,
+      '.article-body .statement-soft',
+    );
     const mobileEmphasis = await page.evaluate(
       readStatementMetrics,
       '.article-body .statement-emphasis',
     );
-    const mobileHero = await page.evaluate(
-      readStatementMetrics,
-      '.article-body .statement-hero',
-    );
 
+    expect(mobileSoft).not.toBeNull();
     expect(mobileEmphasis).not.toBeNull();
-    expect(mobileHero).not.toBeNull();
 
     /* WebKit rounds lh/margin ratios slightly differently vs Chromium at mobile widths. */
     const p = browserName === 'webkit' ? 1 : 2;
 
     // No @media overrides for statements: values should stay effectively unchanged.
+    expect(mobileSoft!.lineHeightRatio).toBeCloseTo(
+      desktopSoft!.lineHeightRatio,
+      p,
+    );
+    expect(mobileSoft!.marginTopOverFont).toBeCloseTo(
+      desktopSoft!.marginTopOverFont,
+      p,
+    );
+    expect(mobileSoft!.marginRightOverFont).toBeCloseTo(
+      desktopSoft!.marginRightOverFont,
+      p,
+    );
+    expect(mobileSoft!.marginBottomOverFont).toBeCloseTo(
+      desktopSoft!.marginBottomOverFont,
+      p,
+    );
+    expect(mobileSoft!.marginLeftOverFont).toBeCloseTo(
+      desktopSoft!.marginLeftOverFont,
+      p,
+    );
+
     expect(mobileEmphasis!.lineHeightRatio).toBeCloseTo(
       desktopEmphasis!.lineHeightRatio,
       p,
@@ -100,27 +121,6 @@ test.describe('Blog statement styles (mobile)', () => {
     );
     expect(mobileEmphasis!.marginLeftOverFont).toBeCloseTo(
       desktopEmphasis!.marginLeftOverFont,
-      p,
-    );
-
-    expect(mobileHero!.lineHeightRatio).toBeCloseTo(
-      desktopHero!.lineHeightRatio,
-      p,
-    );
-    expect(mobileHero!.marginTopOverFont).toBeCloseTo(
-      desktopHero!.marginTopOverFont,
-      p,
-    );
-    expect(mobileHero!.marginRightOverFont).toBeCloseTo(
-      desktopHero!.marginRightOverFont,
-      p,
-    );
-    expect(mobileHero!.marginBottomOverFont).toBeCloseTo(
-      desktopHero!.marginBottomOverFont,
-      p,
-    );
-    expect(mobileHero!.marginLeftOverFont).toBeCloseTo(
-      desktopHero!.marginLeftOverFont,
       p,
     );
   });

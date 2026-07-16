@@ -60,18 +60,31 @@ test.describe('/profile mobile regressions @serial', () => {
 
   test('Foundations reveal visual snapshot on mobile', async ({ page }) => {
     await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 1200);
+    // Keep default reveal timeout (~7s); a short override (1200ms) raced WebKit typefit.
 
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.scrollIntoViewIfNeeded();
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await expect(tile).not.toHaveClass(/is-reveal-fading-out/);
+    await expect(tile).not.toHaveClass(/is-reveal-opening/);
     await expectFoundationsRevealCopyPainted(tile);
 
     await tile.scrollIntoViewIfNeeded();
     const reveal = page.locator('.prof-tile--foundations .prof-tile__reveal');
-    await expect(reveal).toBeVisible();
+    await expect
+      .poll(
+        async () =>
+          reveal.evaluate((el) => {
+            const cs = getComputedStyle(el);
+            return (
+              cs.visibility === 'visible' && Number.parseFloat(cs.opacity) > 0.9
+            );
+          }),
+        { timeout: 5000 },
+      )
+      .toBe(true);
     await expect(reveal).toBeInViewport();
     await reveal.scrollIntoViewIfNeeded();
 
@@ -100,12 +113,12 @@ test.describe('/profile mobile regressions @serial', () => {
 
   test('Foundations reveal text fits inside state2 box', async ({ page }) => {
     await gotoProfileWhenReady(page);
-    await setRevealTimeoutMs(page, 1200);
 
     const tile = page.getByRole('link', { name: 'Foundations' });
     await tile.click();
     await expect(tile).toHaveClass(/is-revealed/);
     await expect(tile).toHaveClass(/is-reveal-typefit-ready/);
+    await expect(tile).not.toHaveClass(/is-reveal-fading-out/);
     await expectFoundationsRevealCopyPainted(tile);
 
     await expect

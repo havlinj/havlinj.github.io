@@ -34,7 +34,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
     "@fontsource/inter": "^5.2.8",
-    "astro": "^6.3.5"
+    "astro": "^6.4.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^9.39.3",
     "eslint-plugin-astro": "^1.6.0",
-    "lighthouse": "^13.1.0",
+    "lighthouse": "^13.4.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",

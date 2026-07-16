@@ -4,6 +4,7 @@ import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
 import {
   expectNavLinkActive,
   fillContactFormWithValidData,
+  gotoContactForm,
   gotoProfileWhenReady,
   hasAstroStylesheetBundle,
   installTurnstileResetCounter,
@@ -748,7 +749,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('form page shows contact form fields', async ({ page }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
 
     await expect(page.getByLabel('Name')).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
@@ -759,7 +760,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('form page shows contact form id and attributes', async ({ page }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await expect(page.locator('#contact-form')).toBeVisible();
     await expect(page.locator('#contact-form')).toHaveAttribute(
       'novalidate',
@@ -774,7 +775,7 @@ test.describe('Contact page (/contact)', () => {
   test('send status is rendered inline next to Send button', async ({
     page,
   }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     const actions = page.locator('#contact-form .contact-form__actions');
     const send = actions.getByRole('button', { name: 'Send' });
     const status = actions.locator('#status');
@@ -787,7 +788,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('honeypot company field is hidden from a11y tree', async ({ page }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     const company = page.locator('#contact-form input[name="company"]');
     const hiddenWrapper = page.locator('#contact-form .hidden');
     await expect(company).toBeAttached();
@@ -810,7 +811,7 @@ test.describe('Contact page (/contact)', () => {
   });
 
   test('status region is present and empty before submit', async ({ page }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     const status = page.locator('#status');
     await expect(status).toBeAttached();
     await expect(status).toHaveText('');
@@ -819,7 +820,7 @@ test.describe('Contact page (/contact)', () => {
   test('contact field autocomplete policy is set as intended', async ({
     page,
   }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await expect(page.getByLabel('Name')).toHaveAttribute(
       'autocomplete',
       'name',
@@ -876,7 +877,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await fillContactFormWithValidData(page);
 
     await page.getByRole('button', { name: 'Send' }).click();
@@ -908,7 +909,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await fillContactFormWithValidData(page);
 
     const nameBefore = await page
@@ -975,7 +976,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await installTurnstileResetCounter(page);
     await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
@@ -996,7 +997,7 @@ test.describe('Contact page (/contact)', () => {
       await route.abort();
     });
 
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await installTurnstileResetCounter(page);
     await fillContactFormWithValidData(page);
     await page.getByRole('button', { name: 'Send' }).click();
@@ -1025,7 +1026,7 @@ test.describe('Contact page (/contact)', () => {
       });
     });
 
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await fillContactFormWithValidData(page);
 
     const send = page.getByRole('button', { name: 'Send' });

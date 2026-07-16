@@ -78,6 +78,21 @@ export async function submitContactForm(page: Page): Promise<void> {
 
 export { CONTACT_ERROR_CODES, CONTACT_ERROR_MESSAGES, type ContactErrorCode };
 
+/**
+ * Open the contact form without waiting on Cloudflare Turnstile.
+ * Default `load` hangs when challenges.cloudflare.com is slow/unreachable.
+ */
+export async function gotoContactForm(page: Page): Promise<void> {
+  await page.route('**/challenges.cloudflare.com/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: 'window.turnstile={render(){},reset(){},remove(){},getResponse(){return"test";}};',
+    });
+  });
+  await page.goto('/contact/form', { waitUntil: 'domcontentloaded' });
+}
+
 export async function fillContactFormWithValidData(page: Page): Promise<void> {
   await page.getByLabel('Name').fill('Jan Test');
   await page.getByLabel('Email').fill('jan@example.com');

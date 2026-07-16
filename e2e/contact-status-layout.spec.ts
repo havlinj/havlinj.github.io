@@ -1,4 +1,5 @@
 import { test } from '@playwright/test';
+import { gotoContactForm } from './helpers/contact';
 import {
   allContactErrorCodes,
   expectStatusFitsSendSlot,
@@ -9,7 +10,7 @@ for (const code of allContactErrorCodes()) {
   test(`error status "${code}" fits beside Send (desktop)`, async ({
     page,
   }) => {
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await showContactStatus(page, code);
     await expectStatusFitsSendSlot(page);
   });

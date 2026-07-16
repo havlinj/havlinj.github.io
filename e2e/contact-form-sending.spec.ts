@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import {
   fillContactFormWithValidData,
+  gotoContactForm,
   mockContactApiDelayedSuccess,
   submitContactForm,
 } from './helpers/contact';
@@ -10,7 +11,7 @@ test('submit shows sending status and pending class until API completes', async 
   page,
 }) => {
   const { release } = await mockContactApiDelayedSuccess(page);
-  await page.goto('/contact/form');
+  await gotoContactForm(page);
   await fillContactFormWithValidData(page);
   await submitContactForm(page);
 

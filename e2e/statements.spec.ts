@@ -44,11 +44,9 @@ test.describe('Blog statement styles (desktop)', () => {
 
     const soft = page.locator('.article-body .statement-soft').first();
     const emphasis = page.locator('.article-body .statement-emphasis').first();
-    const hero = page.locator('.article-body .statement-hero').first();
 
     await expect(soft).toBeVisible();
     await expect(emphasis).toBeVisible();
-    await expect(hero).toBeVisible();
 
     const softMetrics = await page.evaluate(
       readStatementMetrics,
@@ -58,14 +56,9 @@ test.describe('Blog statement styles (desktop)', () => {
       readStatementMetrics,
       '.article-body .statement-emphasis',
     );
-    const heroMetrics = await page.evaluate(
-      readStatementMetrics,
-      '.article-body .statement-hero',
-    );
 
     expect(softMetrics).not.toBeNull();
     expect(emphasisMetrics).not.toBeNull();
-    expect(heroMetrics).not.toBeNull();
 
     expect(softMetrics!.lineHeightRatio).toBeGreaterThan(1.56);
     expect(softMetrics!.lineHeightRatio).toBeLessThan(1.6);
@@ -80,6 +73,18 @@ test.describe('Blog statement styles (desktop)', () => {
     expect(emphasisMetrics!.marginBottomOverFont).toBeLessThan(2.03);
     expect(emphasisMetrics!.marginLeftOverFont).toBeGreaterThanOrEqual(0);
     expect(emphasisMetrics!.marginLeftOverFont).toBeLessThan(0.04);
+
+    // Hero is used on content pages (e.g. What I do), not this blog post.
+    // Prefer an unstyled instance so inline margins do not skew CSS assertions.
+    await page.goto('/what-i-do', { waitUntil: 'domcontentloaded' });
+    const hero = page.locator('.statement-hero:not([style])').first();
+    await expect(hero).toBeVisible();
+
+    const heroMetrics = await page.evaluate(
+      readStatementMetrics,
+      '.statement-hero:not([style])',
+    );
+    expect(heroMetrics).not.toBeNull();
 
     expect(heroMetrics!.lineHeightRatio).toBeGreaterThan(1.6);
     expect(heroMetrics!.lineHeightRatio).toBeLessThan(1.64);

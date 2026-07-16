@@ -7,6 +7,7 @@ import {
   type ContactErrorCode,
   type ContactStatusCode,
 } from '../../src/lib/contact-status';
+import { gotoContactForm } from './contact';
 
 export { CONTACT_ERROR_CODES, CONTACT_ERROR_MESSAGES };
 
@@ -152,7 +153,7 @@ export async function expectContactStatusTypographyBothMedia(
       width: viewport.width,
       height: viewport.height,
     });
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await showContactStatus(page, 'message_length');
     await expectContactStatusTypography(page);
   }

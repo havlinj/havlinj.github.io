@@ -2,23 +2,21 @@
 title: 'What I do'
 ---
 
-<p class="statement-hero" style="margin-top: 2.5em">
+<p class="statement-hero" style="margin: 3em 0 3em 0">
     Software engineering.
 </p>
 
 It's also the least interesting thing I've got to say.
 
-<p style="margin-top: 2.5em">
-    Read on—or don't.
-</p>
+Read on—or don't.
 
 Either way is perfectly fine.
 
-<p style="margin-top: 4em">
-    I've never been someone with just one interest.
-</p>
+For a long time, I couldn't imagine dedicating my professional life to a single discipline.
 
-For a long time, I couldn't imagine dedicating my professional life to a single discipline. Then software *happened*—not because I wanted to become a programmer, but because I discovered a medium with an extraordinarily short distance between imagination and real-world impact.
+Then software _happened_.
+
+Not because I wanted to become a programmer, but because I discovered a medium where ideas don't stay ideas for very long.
 
 Finding software answered one question.
 

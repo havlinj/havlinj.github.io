@@ -4,6 +4,7 @@ import {
   CONTACT_ERROR_CODES,
   expectContactFormShowsApiError,
   fillContactFormWithValidData,
+  gotoContactForm,
   installTurnstileResetCounter,
   mockContactApiError,
   readTurnstileResetCount,
@@ -25,7 +26,7 @@ for (const code of CONTACT_ERROR_CODES) {
       code,
       resetTurnstile: shouldResetTurnstile(code),
     });
-    await page.goto('/contact/form');
+    await gotoContactForm(page);
     await installTurnstileResetCounter(page);
     await fillContactFormWithValidData(page);
     await submitContactForm(page);
@@ -45,7 +46,7 @@ test('legacy API error string without code still resolves status', async ({
 }) => {
   const code: ContactErrorCode = 'invalid_email';
   await mockContactApiError(page, { code, legacyErrorOnly: true });
-  await page.goto('/contact/form');
+  await gotoContactForm(page);
   await fillContactFormWithValidData(page);
   await submitContactForm(page);
   await expectContactFormShowsApiError(page, code);
@@ -60,7 +61,7 @@ test('unknown API error shows generic message', async ({ page }) => {
     });
   });
 
-  await page.goto('/contact/form');
+  await gotoContactForm(page);
   await fillContactFormWithValidData(page);
   await submitContactForm(page);
 
