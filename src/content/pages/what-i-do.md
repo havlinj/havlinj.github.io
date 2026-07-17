@@ -2,31 +2,27 @@
 title: 'What I do'
 ---
 
-<p class="statement-hero" style="margin: 3em 0 3em 0">
-    Software engineering.
-</p>
+If you've read Why This, you already know I think of myself as an engineer.
+
+I build software.
+
+Simple.
 
 It's also the least interesting thing I've got to say.
 
 Read on—or don't.
 
-Either way is perfectly fine.
+Software was never the destination.
 
-For a long time, I couldn't imagine dedicating my professional life to a single discipline.
-
-Then software _happened_.
-
-Not because I wanted to become a programmer, but because I discovered a medium where ideas don't stay ideas for very long.
+I didn't choose it because I wanted to become a programmer, but because I discovered a medium where ideas don't stay ideas for very long.
 
 Finding software answered one question.
 
-The next one has proved considerably more difficult—and, I suspect, considerably more universal.
+The next has proved considerably more difficult—and, I suspect, considerably more universal.
 
 <p class="statement-emphasis">
      What is worth building?
 </p>
-
----
 
 ## Building Systems
 
@@ -40,8 +36,6 @@ The more experience I gain, the more convinced I become that software engineerin
 
 It's about making good decisions before, during, and long after the code exists.
 
----
-
 ## Technology
 
 Languages, databases, cloud platforms, messaging systems, AI—I've invested a great deal of time in all of them, and I don't expect that to change. It demands an unusual amount of time and energy. I still believe it's one of the best investments I can make.
@@ -53,8 +47,6 @@ That's why understanding them matters.
 Defining ourselves by them doesn't.
 
 I don't expect my professional identity to revolve around a particular language, framework, or domain. Technologies shape how I think. They shouldn't become the thing I think about.
-
----
 
 ## Architecture
 
@@ -74,8 +66,6 @@ How do we keep changing a system without gradually working against it?
 
 In this profession, it is code that creates reality. That's why I have no ambition to become someone who only designs systems. Building them is part of understanding them.
 
----
-
 ## The Problems Worth Solving
 
 You usually hear about distributed systems, platform engineering, cloud infrastructure, messaging, observability, or developer experience as separate disciplines.
@@ -93,8 +83,6 @@ That's the part I keep coming back to.
 Not because complexity deserves admiration.
 
 Because people using the software shouldn't have to carry its weight.
-
----
 
 ## Looking Ahead
 
