@@ -18,9 +18,17 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
   if (!pathnameIsProfile(page.url())) {
     await page.goto('/profile');
   }
-  await page
-    .locator('.profile-section:not(.profile-section--loading)')
-    .waitFor({ state: 'visible', timeout: 15000 });
+  const section = page.locator(
+    '.profile-section:not(.profile-section--loading)',
+  );
+  await section.waitFor({ state: 'visible', timeout: 15000 });
+  /* Wait for the shared 0.22s reveal fade (Hero / Writing / Contact use the same timing). */
+  await page.waitForFunction(() => {
+    const el = document.querySelector('.profile-section');
+    if (!(el instanceof HTMLElement)) return false;
+    if (el.classList.contains('profile-section--loading')) return false;
+    return Number.parseFloat(getComputedStyle(el).opacity) >= 0.99;
+  });
 }
 
 /**

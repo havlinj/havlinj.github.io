@@ -30,6 +30,10 @@ import {
 } from '../../src/utils/profile-reveal-constants';
 import { CONTACT_STATUS_LAYOUT } from '../../src/lib/contact-status';
 import {
+  PAGE_REVEAL_OPACITY_TRANSITION,
+  PAGE_REVEAL_STYLESHEETS,
+} from '../../src/constants/page-reveal';
+import {
   CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP,
   CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW,
   CONTACT_PANEL_LINKS_FONT_SCALE,
@@ -221,4 +225,13 @@ describe('layout contracts: theme colors (tokens.css ↔ colors.ts)', () => {
     expect(global).toContain("@import './tokens.css'");
     expect(global).not.toMatch(/--color-page-bg:\s*#/);
   });
+});
+
+describe('layout contracts: page reveal fade (CSS ↔ page-reveal.ts)', () => {
+  for (const relPath of PAGE_REVEAL_STYLESHEETS) {
+    it(`${relPath} declares shared opacity reveal transition`, () => {
+      const css = readRepoFile(relPath);
+      expect(css).toContain(PAGE_REVEAL_OPACITY_TRANSITION);
+    });
+  }
 });

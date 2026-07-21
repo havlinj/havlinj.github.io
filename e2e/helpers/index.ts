@@ -41,3 +41,18 @@ export {
   type ResponsivePanelBgMatrixConfig,
 } from './responsive-panel-bg-matrix';
 export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';
+export {
+  expectProfileLayoutStable,
+  expectSharedPageRevealTransition,
+  gotoMainPageRevealReady,
+  normalizeOpacityTransition,
+  PAGE_REVEAL_OPACITY_TRANSITION,
+  PAGE_REVEAL_SELECTORS,
+  readOpacityTransition,
+  readProfileLayoutSnapshot,
+  waitForOpacityRevealComplete,
+} from './page-reveal';
+export {
+  holdProfilePortrait,
+  waitForProfileTileLabelFit,
+} from './profile-portrait-gate';

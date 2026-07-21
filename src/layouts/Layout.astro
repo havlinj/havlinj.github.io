@@ -6,6 +6,10 @@ import '../styles/site-header.css';
 import '../styles/footer.css';
 import '../styles/page-buttons.css';
 import profileStylesUrl from '../styles/profile.css?url';
+import ProfileAppendStyles from '../components/layout/ProfileAppendStyles.astro';
+import ProfileLayoutHead from '../components/layout/ProfileLayoutHead.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
 
 const {
   title,
@@ -14,11 +18,7 @@ const {
   profileStylesLast = false,
 } = Astro.props;
 const pageTitle = title || 'Astro Basics';
-const navItems = [
-  { href: '/profile', label: 'Profile', section: 'profile' },
-  { href: '/writing', label: 'Writing', section: 'writing' },
-  { href: '/contact', label: 'Contact', section: 'contact' },
-];
+const showSiteHeader = Boolean(activeSection || showHeader);
 ---
 
 <!doctype html>
@@ -37,120 +37,16 @@ const navItems = [
       type="font/woff2"
       crossorigin="anonymous"
     />
+    {profileStylesLast && <ProfileLayoutHead profileStylesUrl={profileStylesUrl} />}
     <slot name="head" />
   </head>
   <body>
+    {profileStylesLast && <ProfileAppendStyles profileStylesUrl={profileStylesUrl} />}
     <main class="content">
-      {
-        (activeSection || showHeader) && (
-          <header class="site-header">
-            {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
-            <div class="site-header__inner">
-              {navItems.map((item) => (
-                <a
-                  href={item.href}
-                  class={
-                    'site-header__item site-nav__link' +
-                    (activeSection === item.section
-                      ? ' site-nav__link--active'
-                      : '')
-                  }
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </header>
-        )
-      }
+      {showSiteHeader && <SiteHeader activeSection={activeSection} />}
       <slot />
-      <footer class="site-footer">
-        <div class="site-footer__inner">
-          <a href="/" class="site-footer__link site-footer__home">Home</a>
-          <a href="/credits" class="site-footer__link site-footer__credits">
-            Credits
-          </a>
-          <p class="site-footer__copyright">© 2026 Jan Havlín</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
-    {profileStylesLast && <link rel="stylesheet" href={profileStylesUrl} />}
-    <script is:inline>
-      (function () {
-        'use strict';
-        /* Profile: fade grid in only after portrait is ready AND tile type-fit JS ran
-           (register type-fit listener synchronously — module may run before DOMContentLoaded). */
-
-        var TYPE_FIT_FALLBACK_TIMEOUT_MS = 8000;
-        var PORTRAIT_READY_TIMEOUT_MS = 4000;
-
-        var section = document.querySelector('.profile-section--loading');
-        if (!section) return;
-
-        var portraitReady = false;
-        var typeFitReady = false;
-
-        function tryReveal() {
-          if (!portraitReady || !typeFitReady) return;
-          section.classList.remove('profile-section--loading');
-        }
-
-        function markTypeFitReady() {
-          if (typeFitReady) return;
-          typeFitReady = true;
-          tryReveal();
-        }
-
-        document.addEventListener(
-          'profileTileTypeFit',
-          function onTypeFit() {
-            markTypeFitReady();
-          },
-          { once: true },
-        );
-
-        setTimeout(function () {
-          markTypeFitReady();
-        }, TYPE_FIT_FALLBACK_TIMEOUT_MS);
-
-        function wirePortrait() {
-          var img = section.querySelector('.profile-photo-frame img');
-          if (!img) {
-            portraitReady = true;
-            tryReveal();
-            return;
-          }
-          var timeoutId;
-          function reveal() {
-            if (timeoutId) clearTimeout(timeoutId);
-            img.removeEventListener('load', onReady);
-            img.removeEventListener('error', reveal);
-            portraitReady = true;
-            tryReveal();
-          }
-          function onReady() {
-            if (img.decode) {
-              img.decode().then(reveal).catch(reveal);
-            } else {
-              reveal();
-            }
-          }
-          if (img.complete && img.naturalWidth > 0) {
-            onReady();
-            return;
-          }
-          img.addEventListener('load', onReady);
-          img.addEventListener('error', reveal);
-          timeoutId = setTimeout(reveal, PORTRAIT_READY_TIMEOUT_MS);
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', wirePortrait);
-        } else {
-          wirePortrait();
-        }
-      })();
-    </script>
     <script>
       import { initZoomGuard } from '../scripts/zoom-guard-init.ts';
       initZoomGuard();

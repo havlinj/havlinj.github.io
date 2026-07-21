@@ -1,0 +1,51 @@
+---
+import interLatin700Woff2 from '@fontsource/inter/files/inter-latin-700-normal.woff2?url';
+import {
+  PROFILE_PORTRAIT_HREF,
+  PROFILE_TILE_BG_FOUNDATIONS,
+  PROFILE_TILE_BG_WHY,
+} from '../../constants/profile-layout';
+
+interface Props {
+  profileStylesUrl: string;
+}
+
+const { profileStylesUrl } = Astro.props;
+---
+
+{
+  /* Profile grid must stay invisible until portrait + type-fit. The hide rule
+     lives in profile.css (applied early via head-append script). Without this
+     head snippet, page-button min/max-height paints thin outlines first. */
+}
+<style is:inline>
+  .profile-section--loading {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    /* Reserve square canvas so the page does not jump when profile.css arrives */
+    height: 100cqw;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .profile-section--loading .page-button.prof-tile {
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+</style>
+<link rel="preload" href={profileStylesUrl} as="style" />
+<link
+  rel="preload"
+  href={interLatin700Woff2}
+  as="font"
+  type="font/woff2"
+  crossorigin="anonymous"
+/>
+<link
+  rel="preload"
+  as="image"
+  href={PROFILE_PORTRAIT_HREF}
+  fetchpriority="high"
+/>
+<link rel="preload" as="image" href={PROFILE_TILE_BG_WHY} />
+<link rel="preload" as="image" href={PROFILE_TILE_BG_FOUNDATIONS} />

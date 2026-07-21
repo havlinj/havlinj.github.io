@@ -1,6 +1,7 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
+import typeFitUrl from '../scripts/profile-tile-type-fit.ts?url';
 
 const page = await getEntry('pages', 'profile');
 if (!page) {
@@ -10,10 +11,15 @@ const { Content } = await render(page);
 ---
 
 <Layout title={page.data.title} activeSection="profile" profileStylesLast>
+  <link slot="head" rel="modulepreload" href={typeFitUrl} />
   <article class="has-buttons-panel">
     <h1 class="page-title">{page.data.title}</h1>
     <Content />
   </article>
+  <script>
+    import { initProfileLoadingVeil } from '../scripts/profile-loading-veil.ts';
+    initProfileLoadingVeil();
+  </script>
   <script>
     import '../scripts/profile-tile-type-fit.ts';
   </script>

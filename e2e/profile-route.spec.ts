@@ -16,6 +16,7 @@ import {
   pathnameIsProfile,
   readStylesheetHrefs,
   readProfileFrameGutterSnapshot,
+  holdProfilePortrait,
 } from './helpers';
 import {
   PROFILE_SEAM_VIEWPORT_WIDTHS,
@@ -98,6 +99,103 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
     await gotoProfileWhenReady(page);
     const hrefs = await readStylesheetHrefs(page);
     expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(true);
+  });
+
+  /**
+   * Loading veil: critical <head> CSS must hide the grid before profile.css applies,
+   * and Layout must keep `.profile-section--loading` until portrait + type-fit.
+   * Without the head veil, page-button min/max-height paints thin tile outlines (FOUC).
+   */
+  test('keeps profile grid hidden until ready (critical head veil + reveal)', async ({
+    page,
+  }) => {
+    const portrait = await holdProfilePortrait(page);
+    try {
+      await page.goto('/profile', { waitUntil: 'domcontentloaded' });
+
+      const headCss = await page.evaluate(() =>
+        Array.from(document.head.querySelectorAll('style'))
+          .map((el) => el.textContent ?? '')
+          .join('\n'),
+      );
+      expect(headCss).toMatch(/\.profile-section--loading\s*\{/);
+      expect(headCss).toMatch(/opacity:\s*0/);
+      expect(headCss).toMatch(/visibility:\s*hidden/);
+      expect(headCss).toMatch(
+        /\.profile-section--loading\s+\.page-button\.prof-tile\s*\{[^}]*max-height:\s*none/s,
+      );
+
+      const hasProfileStylePreload = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll('link[rel="preload"][as="style"]'),
+        ).some((el) =>
+          ((el as HTMLLinkElement).href || '').includes('profile'),
+        ),
+      );
+      expect(hasProfileStylePreload).toBe(true);
+
+      const hasPortraitPreload = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll('link[rel="preload"][as="image"]'),
+        ).some((el) =>
+          ((el as HTMLLinkElement).href || '').includes(
+            'portrait_bayer16_style',
+          ),
+        ),
+      );
+      expect(hasPortraitPreload).toBe(true);
+
+      const section = page.locator('.profile-section');
+      await expect(section).toHaveClass(/profile-section--loading/);
+
+      const veil = await section.evaluate((el) => {
+        const cs = getComputedStyle(el);
+        const tiles = Array.from(
+          el.querySelectorAll('.page-button.prof-tile'),
+        ).map((tile) => {
+          const tcs = getComputedStyle(tile);
+          return { minHeight: tcs.minHeight, maxHeight: tcs.maxHeight };
+        });
+        return {
+          opacity: cs.opacity,
+          visibility: cs.visibility,
+          tiles,
+        };
+      });
+      expect(veil.opacity).toBe('0');
+      expect(veil.visibility).toBe('hidden');
+      expect(veil.tiles.length).toBe(3);
+      for (const tile of veil.tiles) {
+        expect(tile.maxHeight).toBe('none');
+        expect(tile.minHeight).toBe('0px');
+      }
+
+      portrait.allow();
+      await gotoProfileWhenReady(page);
+
+      await expect(section).not.toHaveClass(/profile-section--loading/);
+      await expect(section).toHaveCSS('opacity', '1');
+      await expect(section).toHaveCSS('visibility', 'visible');
+
+      const frameSizes = await page.evaluate(() =>
+        Array.from(
+          document.querySelectorAll(
+            '.profile-section .prof-tile, .profile-section .profile-photo-frame',
+          ),
+        ).map((el) => {
+          const r = el.getBoundingClientRect();
+          return { width: r.width, height: r.height };
+        }),
+      );
+      expect(frameSizes).toHaveLength(4);
+      for (const frame of frameSizes) {
+        // Real tiles, not page-button compact bars (~1.8–2.8rem).
+        expect(frame.width).toBeGreaterThan(80);
+        expect(frame.height).toBeGreaterThan(80);
+      }
+    } finally {
+      await portrait.dispose();
+    }
   });
 
   test.use({

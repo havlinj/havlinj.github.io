@@ -14,7 +14,7 @@ export const REVEAL_OVERFLOW_V_PAD_PX = 4;
  */
 export const REVEAL_INK_H_PAD_PX = 4;
 
-/** Layout.astro listens (once) before fading `.profile-section--loading` away. */
+/** Profile loading veil listens before fading `.profile-section--loading` away. */
 export const TYPE_FIT_EVENT = 'profileTileTypeFit';
 export const SELECTORS = {
   profileSection: '.profile-section',

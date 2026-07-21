@@ -46,6 +46,8 @@ article.has-buttons-panel > h1.page-title {
   /* Main canvas: same square logic as hero */
   height: 100cqw;
   overflow: hidden;
+  /* Reveal fade — same contract as Hero (.hero-content), Writing (--visible), Contact (--visible). */
+  transition: opacity 0.22s ease-out;
   --profile-tile-text-inset-anchor-x: 10%;
   --profile-tile-text-inset-far-x: 6%;
   --profile-top-label-strip-ratio: 80.5;
@@ -271,10 +273,11 @@ article .profile-section:last-child {
   margin-bottom: 0;
 }
 
-/* Hidden until portrait has loaded, then both columns appear together */
+/* Hidden until portrait + type-fit (Layout also inlines this in <head> so it
+   applies before this sheet loads — see profileStylesLast in Layout.astro). */
 .profile-section--loading {
   opacity: 0;
-  transition: opacity 0.2s ease-out;
+  visibility: hidden;
 }
 
 /* Each grid tile */
@@ -1106,6 +1109,10 @@ article .profile-section:last-child {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .profile-section {
+    transition: none;
+  }
+
   .prof-tile--foundations.is-revealed .prof-tile__reveal {
     transition:
       opacity var(--profile-reveal-fade-duration, 0.18s) ease,

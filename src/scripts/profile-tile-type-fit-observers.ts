@@ -18,7 +18,14 @@ export function wireResize(): void {
   const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
   if (!section) return;
   const scheduleFitAll = makeRafCoalesced(fitAll);
-  const ro = new ResizeObserver(scheduleFitAll);
+  let skipInitial = true;
+  const ro = new ResizeObserver(() => {
+    if (skipInitial) {
+      skipInitial = false;
+      return;
+    }
+    scheduleFitAll();
+  });
   ro.observe(section);
   window.addEventListener('orientationchange', scheduleFitAll);
   // Pinch/browser zoom can change visual viewport without triggering element ResizeObserver.

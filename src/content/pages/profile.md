@@ -170,7 +170,7 @@ title: 'Profile'
               src="/assets/pages/profile/portrait_bayer16_style.png"
               alt="Jan Havlín"
               fetchpriority="high"
-              decoding="async"
+              decoding="sync"
             />
           </div>
         </div>

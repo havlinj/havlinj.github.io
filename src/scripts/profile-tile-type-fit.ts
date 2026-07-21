@@ -10,7 +10,11 @@
 import { wireProfileGifTileMedia } from './profile-gif-tile-video';
 import { syncProfileFrameGuttersFromWhatTile } from './profile-frame-gutters';
 import { queryElement } from './profile-fit-dom';
-import { TYPE_FIT_EVENT, SELECTORS } from './profile-tile-type-fit-constants';
+import {
+  LABEL_VAR,
+  TYPE_FIT_EVENT,
+  SELECTORS,
+} from './profile-tile-type-fit-constants';
 import {
   wireFoundationsRevealResize,
   wireResize,
@@ -18,22 +22,81 @@ import {
 import { fitAll } from './profile-tile-type-fit-pass';
 import { wireFoundationsReveal } from './profile-tile-type-fit-reveal-wire';
 
-const INITIAL_FIT_MAX_FRAMES = 18;
-const INITIAL_FIT_STABLE_PASSES = 2;
+const INITIAL_FIT_MAX_FRAMES = 24;
+const INITIAL_FIT_STABLE_PASSES = 3;
+const PROFILE_FONT_WAIT_MS = 4000;
+const PROFILE_CSS_WAIT_MS = 3000;
+/** ResizeObserver's first delivery often refits on the frame after reveal — defer wiring. */
+const RESIZE_OBSERVER_DEFER_FRAMES = 4;
 
 function signalTypeFitReady(): void {
   document.dispatchEvent(new CustomEvent(TYPE_FIT_EVENT));
 }
 
-function readLayoutKey(): string {
-  const section = document.querySelector('.profile-section');
-  const why = document.querySelector(".profile-section > a[href='/why-this']");
-  const what = document.querySelector(
-    ".profile-section > a[href='/what-i-do']",
-  );
-  const foundations = document.querySelector(
-    '.profile-section .prof-tile--foundations',
-  );
+/** Tile labels use Inter 700; body copy uses 400. Never short-circuit unless both are loaded. */
+function waitForProfileFonts(): Promise<void> {
+  const fonts = document.fonts;
+  if (!fonts?.load) return Promise.resolve();
+
+  return Promise.race([
+    Promise.all([
+      fonts.load('700 16px Inter'),
+      fonts.load('400 16px Inter'),
+    ]).then(() => undefined),
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, PROFILE_FONT_WAIT_MS);
+    }),
+  ]).catch(() => undefined);
+}
+
+function profileLayoutCssReady(): boolean {
+  const tile = document.querySelector(`${SELECTORS.profileSection} .prof-tile`);
+  if (!(tile instanceof HTMLElement)) return false;
+  return getComputedStyle(tile).maxHeight === 'none';
+}
+
+function waitForProfileLayoutCss(): Promise<void> {
+  if (profileLayoutCssReady()) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    const deadline = performance.now() + PROFILE_CSS_WAIT_MS;
+    const tick = () => {
+      if (profileLayoutCssReady() || performance.now() >= deadline) {
+        resolve();
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function waitForProfileSection(): Promise<HTMLElement | null> {
+  const existing = queryElement(document, SELECTORS.profileSection, HTMLElement);
+  if (existing) return Promise.resolve(existing);
+
+  return new Promise((resolve) => {
+    const deadline = performance.now() + PROFILE_CSS_WAIT_MS;
+    const tick = () => {
+      const section = queryElement(
+        document,
+        SELECTORS.profileSection,
+        HTMLElement,
+      );
+      if (section || performance.now() >= deadline) {
+        resolve(section);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function readLayoutKey(section: HTMLElement): string {
+  const why = document.querySelector(SELECTORS.whyTile);
+  const what = document.querySelector(SELECTORS.whatIDoTile);
+  const foundations = document.querySelector(SELECTORS.foundationsTile);
 
   const toRectKey = (el: Element | null): string => {
     if (!(el instanceof HTMLElement)) return 'na';
@@ -46,30 +109,43 @@ function readLayoutKey(): string {
     ].join(',');
   };
 
-  const rootStyle = document.documentElement.style;
-  const labelSize = rootStyle.getPropertyValue(
-    '--profile-tile-label-font-size',
-  );
-  const revealSize = rootStyle.getPropertyValue('--profile-reveal-font-size');
+  const labelSize = section.style.getPropertyValue(LABEL_VAR).trim();
+  const blockGutter = section.style
+    .getPropertyValue('--profile-frame-gutter-block-px')
+    .trim();
+  const sideGutter = section.style
+    .getPropertyValue('--profile-frame-gutter-side-px')
+    .trim();
 
   return [
     toRectKey(section),
     toRectKey(why),
     toRectKey(what),
     toRectKey(foundations),
-    labelSize.trim(),
-    revealSize.trim(),
+    labelSize,
+    blockGutter,
+    sideGutter,
   ].join('|');
 }
 
 function runInitialFitUntilStable(onDone: () => void): void {
+  const section = queryElement(
+    document,
+    SELECTORS.profileSection,
+    HTMLElement,
+  );
+  if (!section) {
+    onDone();
+    return;
+  }
+
   let frameCount = 0;
   let stablePasses = 0;
   let previousKey = '';
 
   const step = () => {
-    fitAll();
-    const currentKey = readLayoutKey();
+    fitAll({ includeReveal: false });
+    const currentKey = readLayoutKey(section);
     if (currentKey !== '' && currentKey === previousKey) {
       stablePasses += 1;
     } else {
@@ -91,41 +167,37 @@ function runInitialFitUntilStable(onDone: () => void): void {
   requestAnimationFrame(step);
 }
 
+function deferWireResizeObservers(onReady: () => void): void {
+  let framesLeft = RESIZE_OBSERVER_DEFER_FRAMES;
+  const tick = () => {
+    framesLeft -= 1;
+    if (framesLeft <= 0) {
+      onReady();
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 async function start(): Promise<void> {
-  wireProfileGifTileMedia();
-
-  try {
-    await Promise.race([
-      document.fonts.ready,
-      new Promise<void>((resolve) => window.setTimeout(resolve, 6000)),
-    ]);
-  } catch {
-    /* ignore */
-  }
-
-  /*
-   * ResizeObserver on `.profile-section` must attach only after the first-fit burst + signal.
-   * If RO is registered earlier, its first delivery often lands on the frame after
-   * `profileTileTypeFit` — then a late `fitAll()` nudges label size / cqi while the grid
-   * is already visible (seams at Why/What I do and What I do/Foundations).
-   */
   wireFoundationsReveal();
-  const sectionEarly = queryElement(
-    document,
-    SELECTORS.profileSection,
-    HTMLElement,
-  );
-  if (sectionEarly) syncProfileFrameGuttersFromWhatTile(sectionEarly);
+
+  const section = await waitForProfileSection();
+  if (!section) return;
+
+  await Promise.all([waitForProfileFonts(), waitForProfileLayoutCss()]);
+
+  // Video + poster swap while still under the loading veil.
+  wireProfileGifTileMedia();
 
   runInitialFitUntilStable(() => {
     signalTypeFitReady();
-    wireResize();
-    wireFoundationsRevealResize();
+    deferWireResizeObservers(() => {
+      wireResize();
+      wireFoundationsRevealResize();
+    });
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => void start());
-} else {
-  void start();
-}
+void start();

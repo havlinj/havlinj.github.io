@@ -1,0 +1,20 @@
+---
+interface Props {
+  profileStylesUrl: string;
+}
+
+const { profileStylesUrl } = Astro.props;
+---
+
+{
+  /* Apply profile.css at the first moment of <body> — append to <head> so cascade
+     still wins over Layout page-buttons, while <main> is still parsing. */
+}
+<script is:inline define:vars={{ profileStylesUrl }}>
+  (function () {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = profileStylesUrl;
+    document.head.appendChild(link);
+  })();
+</script>

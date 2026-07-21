@@ -1,0 +1,28 @@
+---
+import { LAYOUT_NAV_ITEMS, type LayoutNavSection } from '../../layouts/layout-nav';
+
+interface Props {
+  activeSection?: LayoutNavSection | string;
+}
+
+const { activeSection } = Astro.props;
+---
+
+<header class="site-header">
+  {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
+  <div class="site-header__inner">
+    {
+      LAYOUT_NAV_ITEMS.map((item) => (
+        <a
+          href={item.href}
+          class={
+            'site-header__item site-nav__link' +
+            (activeSection === item.section ? ' site-nav__link--active' : '')
+          }
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </div>
+</header>
