@@ -12,21 +12,30 @@ import { chromium } from '@playwright/test';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const URL = 'http://127.0.0.1:4321/profile';
-const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7)) || 30;
+const RUNS =
+  Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7)) || 30;
 
 function stats(values) {
   const sorted = [...values].sort((a, b) => a - b);
   const n = sorted.length;
   const mean = sorted.reduce((a, b) => a + b, 0) / n;
-  return { mean, median: sorted[Math.floor(n / 2)], p95: sorted[Math.floor(n * 0.95)] };
+  return {
+    mean,
+    median: sorted[Math.floor(n / 2)],
+    p95: sorted[Math.floor(n * 0.95)],
+  };
 }
 
 function startPreview() {
-  return spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4321'], {
-    cwd: ROOT,
-    stdio: 'ignore',
-    env: { ...process.env, FORCE_COLOR: '0' },
-  });
+  return spawn(
+    'npm',
+    ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4321'],
+    {
+      cwd: ROOT,
+      stdio: 'ignore',
+      env: { ...process.env, FORCE_COLOR: '0' },
+    },
+  );
 }
 
 async function waitForServer() {
@@ -44,7 +53,9 @@ async function waitForServer() {
 }
 
 async function measureRun(browser) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+  });
   await context.addInitScript(() => {
     const navStart = () =>
       performance.getEntriesByType('navigation')[0]?.startTime ?? 0;
@@ -57,14 +68,20 @@ async function measureRun(browser) {
     window.__veilBreakdown = marks;
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => mark('domContentLoaded'));
+      document.addEventListener('DOMContentLoaded', () =>
+        mark('domContentLoaded'),
+      );
     } else {
       mark('domContentLoaded');
     }
 
-    document.addEventListener('profileTileTypeFit', () => mark('typeFitEvent'), {
-      once: true,
-    });
+    document.addEventListener(
+      'profileTileTypeFit',
+      () => mark('typeFitEvent'),
+      {
+        once: true,
+      },
+    );
 
     const poll = () => {
       const section = document.querySelector('.profile-section');
@@ -78,7 +95,11 @@ async function measureRun(browser) {
         }
       }
       const img = document.querySelector('.profile-photo-frame img');
-      if (img instanceof HTMLImageElement && img.complete && img.naturalWidth > 0) {
+      if (
+        img instanceof HTMLImageElement &&
+        img.complete &&
+        img.naturalWidth > 0
+      ) {
         mark('portraitComplete');
       }
       if (marks.veilRemoved == null) requestAnimationFrame(poll);
@@ -89,7 +110,10 @@ async function measureRun(browser) {
 
     const cssPoll = () => {
       const tile = document.querySelector('.profile-section .prof-tile');
-      if (tile instanceof HTMLElement && getComputedStyle(tile).maxHeight === 'none') {
+      if (
+        tile instanceof HTMLElement &&
+        getComputedStyle(tile).maxHeight === 'none'
+      ) {
         mark('profileCssApplied');
         return;
       }
@@ -159,7 +183,9 @@ const keys = [
 console.log('=== Milestone means (ms from navigation) ===\n');
 for (const key of keys) {
   const s = meanKey(runs, key);
-  console.log(`${key.padEnd(20)} mean=${s.mean.toFixed(1)}  median=${s.median.toFixed(1)}  p95=${s.p95.toFixed(1)}`);
+  console.log(
+    `${key.padEnd(20)} mean=${s.mean.toFixed(1)}  median=${s.median.toFixed(1)}  p95=${s.p95.toFixed(1)}`,
+  );
 }
 
 console.log('\n=== Typical resource timing (mean end ms) ===\n');
@@ -170,7 +196,9 @@ for (const run of runs) {
     byName.get(r.name).push(r.end);
   }
 }
-for (const [name, ends] of [...byName.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+for (const [name, ends] of [...byName.entries()].sort((a, b) =>
+  a[0].localeCompare(b[0]),
+)) {
   const s = stats(ends);
   console.log(`${name.padEnd(40)} end mean=${s.mean.toFixed(1)}ms`);
 }
@@ -182,5 +210,9 @@ console.log('\n=== Gate analysis ===');
 console.log(`typeFitEvent mean:      ${typeFit.mean.toFixed(1)} ms`);
 console.log(`portraitComplete mean:  ${portrait.mean.toFixed(1)} ms`);
 console.log(`veilRemoved mean:       ${veil.mean.toFixed(1)} ms`);
-console.log(`slow gate (approx):     ${Math.max(typeFit.mean, portrait.mean).toFixed(1)} ms`);
-console.log(`+rAF after slow gate:  ~${(veil.mean - Math.max(typeFit.mean, portrait.mean)).toFixed(1)} ms`);
+console.log(
+  `slow gate (approx):     ${Math.max(typeFit.mean, portrait.mean).toFixed(1)} ms`,
+);
+console.log(
+  `+rAF after slow gate:  ~${(veil.mean - Math.max(typeFit.mean, portrait.mean)).toFixed(1)} ms`,
+);

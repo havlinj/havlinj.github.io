@@ -1,9 +1,5 @@
 ---
-interface Props {
-  profileStylesUrl: string;
-}
-
-const { profileStylesUrl } = Astro.props;
+const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
 ---
 
 {

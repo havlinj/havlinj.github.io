@@ -1,15 +1,18 @@
 ---
-import { LAYOUT_NAV_ITEMS, type LayoutNavSection } from '../../layouts/layout-nav';
+import {
+  LAYOUT_NAV_ITEMS,
+  type LayoutNavSection,
+} from '../../layouts/layout-nav';
 
-interface Props {
+const { activeSection } = Astro.props as {
   activeSection?: LayoutNavSection | string;
-}
-
-const { activeSection } = Astro.props;
+};
 ---
 
 <header class="site-header">
-  {/* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */}
+  {
+    /* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */
+  }
   <div class="site-header__inner">
     {
       LAYOUT_NAV_ITEMS.map((item) => (

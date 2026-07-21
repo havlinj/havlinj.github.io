@@ -8,7 +8,6 @@
  */
 
 import { wireProfileGifTileMedia } from './profile-gif-tile-video';
-import { syncProfileFrameGuttersFromWhatTile } from './profile-frame-gutters';
 import { queryElement } from './profile-fit-dom';
 import {
   LABEL_VAR,
@@ -34,16 +33,20 @@ function signalTypeFitReady(): void {
 }
 
 /** Tile labels use Inter 700; Foundations reveal copy uses 400 but is hidden until open. */
-function waitForProfileFonts(): Promise<void> {
+async function waitForProfileFonts(): Promise<void> {
   const fonts = document.fonts;
-  if (!fonts?.load) return Promise.resolve();
+  if (!fonts?.load) return;
 
-  return Promise.race([
-    fonts.load('700 16px Inter').then(() => undefined),
-    new Promise<void>((resolve) => {
-      window.setTimeout(resolve, PROFILE_FONT_WAIT_MS);
-    }),
-  ]).catch(() => undefined);
+  try {
+    await Promise.race([
+      fonts.load('700 16px Inter'),
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, PROFILE_FONT_WAIT_MS);
+      }),
+    ]);
+  } catch {
+    /* ignore */
+  }
 }
 
 function profileLayoutCssReady(): boolean {
@@ -69,7 +72,11 @@ function waitForProfileLayoutCss(): Promise<void> {
 }
 
 function waitForProfileSection(): Promise<HTMLElement | null> {
-  const existing = queryElement(document, SELECTORS.profileSection, HTMLElement);
+  const existing = queryElement(
+    document,
+    SELECTORS.profileSection,
+    HTMLElement,
+  );
   if (existing) return Promise.resolve(existing);
 
   return new Promise((resolve) => {
@@ -126,11 +133,7 @@ function readLayoutKey(section: HTMLElement): string {
 }
 
 function runInitialFitUntilStable(onDone: () => void): void {
-  const section = queryElement(
-    document,
-    SELECTORS.profileSection,
-    HTMLElement,
-  );
+  const section = queryElement(document, SELECTORS.profileSection, HTMLElement);
   if (!section) {
     onDone();
     return;

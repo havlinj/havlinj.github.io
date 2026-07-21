@@ -77,10 +77,11 @@ function wirePortraitImage(
   state: ProfileLoadingVeilState,
   img: HTMLImageElement,
 ): void {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timer: { id: number | undefined } = { id: undefined };
 
   const reveal = (): void => {
-    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    if (timer.id !== undefined) window.clearTimeout(timer.id);
+    timer.id = undefined;
     img.removeEventListener('load', onReady);
     img.removeEventListener('error', reveal);
     markPortraitReady(state);
@@ -99,5 +100,5 @@ function wirePortraitImage(
 
   img.addEventListener('load', onReady);
   img.addEventListener('error', reveal);
-  timeoutId = window.setTimeout(reveal, PORTRAIT_READY_TIMEOUT_MS);
+  timer.id = window.setTimeout(reveal, PORTRAIT_READY_TIMEOUT_MS);
 }

@@ -37,11 +37,19 @@ const showSiteHeader = Boolean(activeSection || showHeader);
       type="font/woff2"
       crossorigin="anonymous"
     />
-    {profileStylesLast && <ProfileLayoutHead profileStylesUrl={profileStylesUrl} />}
+    {
+      profileStylesLast && (
+        <ProfileLayoutHead profileStylesUrl={profileStylesUrl} />
+      )
+    }
     <slot name="head" />
   </head>
   <body>
-    {profileStylesLast && <ProfileAppendStyles profileStylesUrl={profileStylesUrl} />}
+    {
+      profileStylesLast && (
+        <ProfileAppendStyles profileStylesUrl={profileStylesUrl} />
+      )
+    }
     <main class="content">
       {showSiteHeader && <SiteHeader activeSection={activeSection} />}
       <slot />

@@ -33,7 +33,9 @@ function main() {
   const after = load(afterPath);
 
   console.log(`\nCompare: ${before.label} → ${after.label}`);
-  console.log(`Runs: ${before.config?.runs ?? '?'} → ${after.config?.runs ?? '?'}\n`);
+  console.log(
+    `Runs: ${before.config?.runs ?? '?'} → ${after.config?.runs ?? '?'}\n`,
+  );
 
   const metrics = Object.keys(before.summary);
   for (const metric of metrics) {

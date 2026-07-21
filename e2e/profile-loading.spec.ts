@@ -23,10 +23,7 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
     page,
   }) => {
     await gotoMainPageRevealReady(page, 'profile');
-    await expectSharedPageRevealTransition(
-      page,
-      PAGE_REVEAL_SELECTORS.profile,
-    );
+    await expectSharedPageRevealTransition(page, PAGE_REVEAL_SELECTORS.profile);
   });
 
   test('preloads portrait and tile background images in head', async ({

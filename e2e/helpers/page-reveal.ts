@@ -14,6 +14,7 @@ export {
   PAGE_REVEAL_OPACITY_EASING,
   PAGE_REVEAL_OPACITY_TRANSITION,
   PAGE_REVEAL_SELECTORS,
+  type PageRevealRoute,
 };
 
 /** Normalize computed `transition` to `opacity <duration> <easing>`. */
@@ -119,9 +120,7 @@ export async function readProfileLayoutSnapshot(
       };
     });
     return {
-      labelFontPx: cs
-        .getPropertyValue('--profile-tile-label-font-size')
-        .trim(),
+      labelFontPx: cs.getPropertyValue('--profile-tile-label-font-size').trim(),
       blockGutterPx: section.style
         .getPropertyValue('--profile-frame-gutter-block-px')
         .trim(),

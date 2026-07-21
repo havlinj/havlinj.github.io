@@ -57,14 +57,11 @@ function stats(values) {
   const n = sorted.length;
   const mean = sorted.reduce((a, b) => a + b, 0) / n;
   const median =
-    n % 2 === 0
-      ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2
-      : sorted[(n - 1) / 2];
+    n % 2 === 0 ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2 : sorted[(n - 1) / 2];
   const p95 = sorted[Math.min(n - 1, Math.floor(n * 0.95))];
   const min = sorted[0];
   const max = sorted[n - 1];
-  const variance =
-    sorted.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
+  const variance = sorted.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
   const stddev = Math.sqrt(variance);
   return { mean, median, p95, min, max, stddev, n };
 }
@@ -83,7 +80,7 @@ async function waitForServer(url, timeoutMs) {
   throw new Error(`Server not ready at ${url} within ${timeoutMs}ms`);
 }
 
-function startPreviewServer(baseUrl) {
+function startPreviewServer(_baseUrl) {
   const child = spawn(
     'npm',
     ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4321'],

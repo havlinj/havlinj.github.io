@@ -7,11 +7,7 @@ import {
   PROFILE_WHAT_I_DO_FALLBACK_HREF,
 } from '../../constants/profile-layout';
 
-interface Props {
-  profileStylesUrl: string;
-}
-
-const { profileStylesUrl } = Astro.props;
+const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
 ---
 
 {
