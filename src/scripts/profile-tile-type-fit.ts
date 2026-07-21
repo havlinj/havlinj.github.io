@@ -23,7 +23,7 @@ import { fitAll } from './profile-tile-type-fit-pass';
 import { wireFoundationsReveal } from './profile-tile-type-fit-reveal-wire';
 
 const INITIAL_FIT_MAX_FRAMES = 24;
-const INITIAL_FIT_STABLE_PASSES = 2;
+const INITIAL_FIT_STABLE_PASSES = 1;
 const PROFILE_FONT_WAIT_MS = 4000;
 const PROFILE_CSS_WAIT_MS = 3000;
 /** ResizeObserver's first delivery often refits on the frame after reveal — defer wiring. */
@@ -33,16 +33,13 @@ function signalTypeFitReady(): void {
   document.dispatchEvent(new CustomEvent(TYPE_FIT_EVENT));
 }
 
-/** Tile labels use Inter 700; body copy uses 400. Never short-circuit unless both are loaded. */
+/** Tile labels use Inter 700; Foundations reveal copy uses 400 but is hidden until open. */
 function waitForProfileFonts(): Promise<void> {
   const fonts = document.fonts;
   if (!fonts?.load) return Promise.resolve();
 
   return Promise.race([
-    Promise.all([
-      fonts.load('700 16px Inter'),
-      fonts.load('400 16px Inter'),
-    ]).then(() => undefined),
+    fonts.load('700 16px Inter').then(() => undefined),
     new Promise<void>((resolve) => {
       window.setTimeout(resolve, PROFILE_FONT_WAIT_MS);
     }),
@@ -142,6 +139,11 @@ function runInitialFitUntilStable(onDone: () => void): void {
   let frameCount = 0;
   let stablePasses = 0;
   let previousKey = '';
+
+  /* One sync fit before the rAF loop — saves a frame vs waiting for first animation frame. */
+  fitAll({ includeReveal: false });
+  previousKey = readLayoutKey(section);
+  frameCount = 1;
 
   const step = () => {
     fitAll({ includeReveal: false });

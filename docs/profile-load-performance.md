@@ -142,7 +142,8 @@ Reference baseline: **492.6 ms** `fullyVisible` mean (100 runs, preview, 1280×9
 | **12** | Hover prefetch `/profile` (`profile-route-prefetch.ts`) | **+3.3 ms** (direct) / −4.5 ms (via-home, different harness) | — | Pass | **Rejected** — file removed; warm-cache mode not comparable to cold baseline |
 | **HR-9** | Parallel font load + type-fit | **+19.7 ms** | — | Pass | **Reverted** — regressed |
 | **defer-what-i-do-video** | MP4 wiring after veil (4 rAF); preload fallback poster; video `preload="none"` | **−0.5 ms** | **−2.9 ms** | Pass | **Kept** — architectural |
-| **veil-path-shorten** | D (stable passes 2) + reveal 1 rAF (was 2) + defer-video | **−32.2 ms** | **−36.9 ms** | Pass | **Kept** — see veilRemoved breakdown |
+| **veil-path-shorten** | D (stable passes 2) + reveal 1 rAF (was 2) + defer-video | **−32.2 ms** | **−36.9 ms** | Pass | **Applied** (commit eecc082) |
+| **stable-pass-1** | Stable passes 1 + sync first fit + Inter 700-only font gate | **−34.1 ms** vs veil-path | **−26.9 ms** | Pass | **Applied** |
 
 ### Baseline breakdown (mean)
 
@@ -153,13 +154,15 @@ Reference baseline: **492.6 ms** `fullyVisible` mean (100 runs, preview, 1280×9
 | `veilRemoved` | 216.3 | Both gates done; fade starts |
 | `fullyVisible` | 492.6 | Opacity ≥ 0.99 (includes **~220 ms** shared fade) |
 
-The gap `veilRemoved` → `fullyVisible` (~276 ms baseline) is dominated by the fixed opacity transition, not network or type-fit. After veil-path optimizations (2026-07-21) the gap is ~281 ms — `fullyVisible` dropped with `veilRemoved`, fade duration unchanged.
+**Current (stable-pass-1, 2026-07-21):** `veilRemoved` **152.5 ms**, `fullyVisible` **426.3 ms** (−66 ms vs baseline KPI).
+
+The gap `veilRemoved` → `fullyVisible` (~276 ms baseline) is dominated by the fixed opacity transition, not network or type-fit. After veil-path + stable-pass-1 optimizations, the gap is ~274 ms — `fullyVisible` dropped with `veilRemoved`, fade duration unchanged.
 
 ### Notes on decisions
 
 - **veil-path-shorten** targets the type-fit stable loop and post-gate rAF overhead, not portrait or MP4 (see breakdown below).
 - **defer-what-i-do-video** was kept despite neutral KPI in isolation: reveal never gated on video, but MP4 previously downloaded under the veil.
-- Rejected variants were reverted; active uncommitted work: defer-video + veil-path-shorten + docs/gitignore/breakdown script.
+- **stable-pass-1** (1 stable rAF pass, sync fit before loop, Inter 700-only): further **−27 ms** `veilRemoved` vs veil-path-shorten; layout snapshot unchanged.
 
 ---
 
