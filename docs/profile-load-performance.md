@@ -57,6 +57,7 @@ Secondary: `veilRemoved` (logic ready), `typeFitLabelVar` (JS fit done).
 ## Benchmark harness
 
 Script: `scripts/benchmark/profile-load-measure.mjs`  
+Breakdown (veil timeline): `scripts/benchmark/profile-load-breakdown.mjs`  
 Compare saved runs: `scripts/benchmark/profile-load-compare-results.mjs`
 
 ```bash
@@ -81,9 +82,23 @@ npm run benchmark:profile-load:measure -- --label=after-A-defer-bg-preload
 
 ### Output
 
-- JSON: `benchmarks/profile-load/<label>-<timestamp>.json`
-- Summary: `benchmarks/profile-load/<label>-latest.json` (overwrite per label)
+- JSON: `benchmarks/profile-load/<label>-<timestamp>.json` (**local only** — gitignored)
+- Summary: `benchmarks/profile-load/<label>-latest.json` (overwrite per label; gitignored)
 - Console: mean, median, p95, min, max, stddev per metric
+- **Permanent record:** update the **Results log** in this doc (numbers + decision). Do not commit JSON files.
+
+The `benchmarks/profile-load/` directory is a **local cache** created by the measure script. It is not part of the repo (JSON is gitignored). Safe to delete; it is recreated on the next run. Keep only what you need for active comparisons (typically `baseline-latest.json` plus the current experiment).
+
+### Apply / reject criteria
+
+| Outcome | Criteria |
+|---------|----------|
+| **Apply (performance)** | Profile e2e + layout snapshots pass **and** `fullyVisible` mean improves by **≥ 10 ms** vs baseline **and** p95 does not regress |
+| **Apply (architecture)** | Tests pass, KPI neutral or slightly better on secondary metrics (e.g. `veilRemoved`), and the change fixes a clear loading-order bug |
+| **Defer** | Meaningful gain but residual layout risk or needs explicit product approval (e.g. variant **D**) |
+| **Reject** | Tests fail, KPI regresses, or gain is within noise (±10 ms) with no architectural benefit |
+
+Re-baseline when Node, Playwright, or major profile boot code changes.
 
 ### Comparing two runs
 
@@ -111,9 +126,23 @@ Reports delta (ms and %) per metric with label names.
 
 ## Results log
 
-| Label | Date | Runs | fullyVisible mean | fullyVisible p95 | veilRemoved mean | Notes |
-|-------|------|------|-------------------|------------------|------------------|-------|
-| `baseline` | 2026-07-21 | 100 | **492.6 ms** | **537.4 ms** | **216.3 ms** | Preview build, 1280×900, cold context, cache off. Raw: `benchmarks/profile-load/baseline-latest.json` |
+Reference baseline: **492.6 ms** `fullyVisible` mean (100 runs, preview, 1280×900, cold context, cache off, 2026-07-21).
+
+| Label | Change | Δ fullyVisible | Δ veilRemoved | Tests | Decision |
+|-------|--------|----------------|---------------|-------|----------|
+| `baseline` | — (reference) | — | — | — | Reference KPI |
+| **A** | Remove Why/Foundations tile BG preloads from head | **+6.2 ms** | +4.1 ms | Pass | **Rejected** — slower |
+| **B** | Font gate: Inter 700 only (skip 400 wait) | **+4.6 ms** | — | Pass | **Rejected** — slower |
+| **C** | Defer `wireProfileGifTileMedia` until after type-fit signal | **+0.2 ms** | — | Pass | **Rejected** — neutral |
+| **D** | Stable fit passes 3 → 2 | **−11.5 ms** (isolated) | — | Pass | **Applied** — part of veil-path-shorten bundle |
+| **E** | Earlier type-fit boot (head `modulepreload` / script order) | **+2.9 ms** | — | Pass (one variant broke head slot) | **Rejected** |
+| **F** | `profile.css` as `<link rel="stylesheet">` in head | — | — | **Fail** (snapshot / gutters) | **Rejected** |
+| **F v2** | Insert `profile.css` link after Layout bundle | — | — | **Fail** | **Rejected** |
+| **WebP** | Portrait as WebP instead of PNG | — | — | N/A | **Not viable** — full-res WebP ~4 MB vs PNG ~318 KB |
+| **12** | Hover prefetch `/profile` (`profile-route-prefetch.ts`) | **+3.3 ms** (direct) / −4.5 ms (via-home, different harness) | — | Pass | **Rejected** — file removed; warm-cache mode not comparable to cold baseline |
+| **HR-9** | Parallel font load + type-fit | **+19.7 ms** | — | Pass | **Reverted** — regressed |
+| **defer-what-i-do-video** | MP4 wiring after veil (4 rAF); preload fallback poster; video `preload="none"` | **−0.5 ms** | **−2.9 ms** | Pass | **Kept** — architectural |
+| **veil-path-shorten** | D (stable passes 2) + reveal 1 rAF (was 2) + defer-video | **−32.2 ms** | **−36.9 ms** | Pass | **Kept** — see veilRemoved breakdown |
 
 ### Baseline breakdown (mean)
 
@@ -124,7 +153,45 @@ Reports delta (ms and %) per metric with label names.
 | `veilRemoved` | 216.3 | Both gates done; fade starts |
 | `fullyVisible` | 492.6 | Opacity ≥ 0.99 (includes **~220 ms** shared fade) |
 
-The gap `veilRemoved` → `fullyVisible` (~276 ms) is dominated by the fixed opacity transition, not network or type-fit.
+The gap `veilRemoved` → `fullyVisible` (~276 ms baseline) is dominated by the fixed opacity transition, not network or type-fit. After veil-path optimizations (2026-07-21) the gap is ~281 ms — `fullyVisible` dropped with `veilRemoved`, fade duration unchanged.
+
+### Notes on decisions
+
+- **veil-path-shorten** targets the type-fit stable loop and post-gate rAF overhead, not portrait or MP4 (see breakdown below).
+- **defer-what-i-do-video** was kept despite neutral KPI in isolation: reveal never gated on video, but MP4 previously downloaded under the veil.
+- Rejected variants were reverted; active uncommitted work: defer-video + veil-path-shorten + docs/gitignore/breakdown script.
+
+---
+
+## veilRemoved breakdown (~216 ms baseline)
+
+Diagnostic: `npm run benchmark:profile-load:breakdown` (50 runs, local preview).
+
+On cold desktop preview (1280×900), **portrait is not the bottleneck** — preload + `decoding="sync"` delivers pixels by ~40 ms. The veil waits on **type-fit finishing** and then **extra rAF delay** before removing `--loading`.
+
+| Milestone | ~ms (baseline) | Role |
+|-----------|----------------|------|
+| `profileCssApplied` | 44 | `profile.css` injected at body start |
+| `fontsReady` | 58 | Inter 400 + 700 `fonts.load` |
+| `domContentLoaded` | 70 | HTML + inline hide rules parsed |
+| `typeFitLabelVar` | 98 | First `fitAll` — label size applied |
+| **`typeFitEvent`** | **155** | **3 stable rAF passes done — slow gate** |
+| `portraitComplete` | 38 | Already ready long before veil drops |
+| **`veilRemoved`** | **192–216** | typeFit + **2 rAF** (~37 ms overhead) |
+
+**Applied shortenings (2026-07-21):**
+
+1. Stable fit passes **3 → 2** (variant D).
+2. Reveal **2 rAF → 1 rAF** after both gates (saved ~20 ms; e2e stable).
+
+Combined with defer-what-i-do-video (architectural), 100-run result vs baseline:
+
+| Metric | Baseline | After | Δ |
+|--------|----------|-------|---|
+| `veilRemoved` | 216.3 ms | **179.4 ms** | **−36.9 ms** |
+| `fullyVisible` | 492.6 ms | **460.4 ms** | **−32.2 ms** |
+
+Further gains on `veilRemoved` need earlier type-fit boot or fewer measurement frames — diminishing returns. `fullyVisible` still includes the fixed **220 ms fade**.
 
 ---
 

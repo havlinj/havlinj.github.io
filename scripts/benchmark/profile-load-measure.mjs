@@ -25,13 +25,14 @@ const DEFAULTS = {
 };
 
 function parseArgs(argv) {
-  const opts = { ...DEFAULTS, startServer: true };
+  const opts = { ...DEFAULTS, startServer: true, prefetchViaHome: false };
   for (let i = 2; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--no-server') opts.startServer = false;
     else if (arg.startsWith('--runs=')) opts.runs = Number(arg.slice(7));
     else if (arg.startsWith('--label=')) opts.label = arg.slice(8);
     else if (arg.startsWith('--base-url=')) opts.baseUrl = arg.slice(11);
+    else if (arg === '--prefetch-via-home') opts.prefetchViaHome = true;
     else if (arg === '--help' || arg === '-h') {
       console.log(`Usage: node scripts/benchmark/profile-load-measure.mjs [options]
 
@@ -39,6 +40,8 @@ function parseArgs(argv) {
   --label=baseline    Result label (default baseline)
   --base-url=URL      Server base (default http://127.0.0.1:4321)
   --no-server         Do not start astro preview; assume server is up
+  --prefetch-via-home Visit / first, hover Profile nav link, then measure /profile
+                      (browser cache enabled — not comparable to cold baseline KPI)
 `);
       process.exit(0);
     }
@@ -93,7 +96,13 @@ function startPreviewServer(baseUrl) {
   return child;
 }
 
-async function measureOneRun(browser, url, viewport, navigationTimeoutMs) {
+async function measureOneRun(
+  browser,
+  url,
+  viewport,
+  navigationTimeoutMs,
+  prefetchViaHome,
+) {
   const context = await browser.newContext({ viewport });
 
   await context.addInitScript(() => {
@@ -155,6 +164,16 @@ async function measureOneRun(browser, url, viewport, navigationTimeoutMs) {
   const page = await context.newPage();
 
   try {
+    if (prefetchViaHome) {
+      const homeUrl = `${new URL(url).origin}/`;
+      await page.goto(homeUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: navigationTimeoutMs,
+      });
+      await page.locator('a.site-nav__link[href="/profile"]').hover();
+      await page.waitForTimeout(150);
+    }
+
     await page.goto(url, {
       waitUntil: 'commit',
       timeout: navigationTimeoutMs,
@@ -232,7 +251,7 @@ async function main() {
   }
 
   const browser = await chromium.launch({
-    args: ['--disable-http-cache'],
+    args: opts.prefetchViaHome ? [] : ['--disable-http-cache'],
   });
 
   /** @type {Array<Record<string, number | null>>} */
@@ -248,6 +267,7 @@ async function main() {
           url,
           opts.viewport,
           opts.navigationTimeoutMs,
+          opts.prefetchViaHome,
         );
         runs.push(sample);
       } catch (err) {
@@ -275,7 +295,8 @@ async function main() {
       url,
       viewport: opts.viewport,
       coldContextPerRun: true,
-      disableHttpCache: true,
+      disableHttpCache: !opts.prefetchViaHome,
+      prefetchViaHome: opts.prefetchViaHome,
     },
     summary,
     runs,

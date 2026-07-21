@@ -50,6 +50,10 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
       hrefs.some((h) => h.includes('uve-sanchez-9DRX_cW48RQ-unsplashdichrom')),
       'Foundations tile bg preload',
     ).toBe(true);
+    expect(
+      hrefs.some((h) => h.includes('what-i-do/fallback_desktop')),
+      'What I do fallback poster preload',
+    ).toBe(true);
   });
 
   test('grid geometry and type-fit vars stay stable after reveal', async ({

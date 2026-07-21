@@ -32,6 +32,9 @@ test-results/
 # Lighthouse
 lighthouse-report/
 
+# Profile load benchmark JSON (local artifacts; log results in docs/profile-load-performance.md)
+benchmarks/profile-load/*.json
+
 # Contact worker (nested package)
 contact_worker/node_modules/
 contact_worker/.wrangler/

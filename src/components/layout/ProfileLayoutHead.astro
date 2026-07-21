@@ -4,6 +4,7 @@ import {
   PROFILE_PORTRAIT_HREF,
   PROFILE_TILE_BG_FOUNDATIONS,
   PROFILE_TILE_BG_WHY,
+  PROFILE_WHAT_I_DO_FALLBACK_HREF,
 } from '../../constants/profile-layout';
 
 interface Props {
@@ -49,3 +50,4 @@ const { profileStylesUrl } = Astro.props;
 />
 <link rel="preload" as="image" href={PROFILE_TILE_BG_WHY} />
 <link rel="preload" as="image" href={PROFILE_TILE_BG_FOUNDATIONS} />
+<link rel="preload" as="image" href={PROFILE_WHAT_I_DO_FALLBACK_HREF} />

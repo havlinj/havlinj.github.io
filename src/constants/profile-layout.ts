@@ -8,3 +8,6 @@ export const PROFILE_TILE_BG_WHY =
 
 export const PROFILE_TILE_BG_FOUNDATIONS =
   '/assets/pages/profile/uve-sanchez-9DRX_cW48RQ-unsplashdichrom.png';
+
+/** What I do tile poster (113 KB desktop) — preload for reveal; MP4 waits until after veil. */
+export { PROFILE_GIF_TILE_POSTER_DESKTOP as PROFILE_WHAT_I_DO_FALLBACK_HREF } from './profile-media';

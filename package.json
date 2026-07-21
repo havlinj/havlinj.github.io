@@ -20,6 +20,7 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "benchmark:profile-load:measure": "node scripts/benchmark/profile-load-measure.mjs",
+    "benchmark:profile-load:breakdown": "node scripts/benchmark/profile-load-breakdown.mjs",
     "benchmark:profile-load:compare-results": "node scripts/benchmark/profile-load-compare-results.mjs",
     "test:update-snapshots": "bash ./scripts/web/update-playwright-snapshots.sh",
     "test:update-snapshots:all": "PW_SERVER_MODE=preview PLAYWRIGHT_FORCE_TTY=1 playwright test --update-snapshots",

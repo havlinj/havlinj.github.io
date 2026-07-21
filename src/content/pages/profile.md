@@ -137,7 +137,7 @@ title: 'Profile'
         <img
           src="/assets/pages/profile/what-i-do/fallback_desktop.jpg"
           alt=""
-          decoding="async"
+          decoding="sync"
           width="1920"
           height="1080"
         />
@@ -149,7 +149,7 @@ title: 'Profile'
         muted
         loop
         playsinline
-        preload="metadata"
+        preload="none"
         aria-hidden="true"
       ></video>
       </div>

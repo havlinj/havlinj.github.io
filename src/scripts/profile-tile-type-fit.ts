@@ -23,7 +23,7 @@ import { fitAll } from './profile-tile-type-fit-pass';
 import { wireFoundationsReveal } from './profile-tile-type-fit-reveal-wire';
 
 const INITIAL_FIT_MAX_FRAMES = 24;
-const INITIAL_FIT_STABLE_PASSES = 3;
+const INITIAL_FIT_STABLE_PASSES = 2;
 const PROFILE_FONT_WAIT_MS = 4000;
 const PROFILE_CSS_WAIT_MS = 3000;
 /** ResizeObserver's first delivery often refits on the frame after reveal — defer wiring. */
@@ -188,12 +188,11 @@ async function start(): Promise<void> {
 
   await Promise.all([waitForProfileFonts(), waitForProfileLayoutCss()]);
 
-  // Video + poster swap while still under the loading veil.
-  wireProfileGifTileMedia();
-
   runInitialFitUntilStable(() => {
     signalTypeFitReady();
     deferWireResizeObservers(() => {
+      /* What I do MP4 (~3.7 MB) — after veil + 4 rAF; poster JPG is in markup + head preload. */
+      wireProfileGifTileMedia();
       wireResize();
       wireFoundationsRevealResize();
     });
