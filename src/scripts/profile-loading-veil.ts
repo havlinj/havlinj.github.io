@@ -33,7 +33,7 @@ export function initProfileLoadingVeil(): void {
 function tryReveal(state: ProfileLoadingVeilState): void {
   if (!state.portraitReady || !state.typeFitReady) return;
 
-  /* One paint frame under the veil, then reveal (opacity 0.22s — Hero/Writing/Contact).
+  /* One paint frame under the veil, then reveal (shared page-reveal fade — Hero/Writing/Contact).
      Two rAF added ~37 ms with no e2e stability gain (see profile-load-breakdown.mjs). */
   requestAnimationFrame(() => {
     state.section.classList.remove('profile-section--loading');

@@ -161,7 +161,7 @@
 .contact-page .contact-page__fit-content.contact-page__fit-content--visible {
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 0.22s ease-out;
+  transition: opacity 0.18s ease-out;
 }
 
 .contact-page__inset-rect {

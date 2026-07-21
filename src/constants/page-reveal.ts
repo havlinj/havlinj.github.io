@@ -2,7 +2,7 @@
  * Shared content-reveal fade on main panel pages (Hero / Writing / Contact / Profile).
  * Keep CSS `transition: opacity …` on those routes aligned with these values.
  */
-export const PAGE_REVEAL_OPACITY_DURATION_S = 0.22;
+export const PAGE_REVEAL_OPACITY_DURATION_S = 0.18;
 export const PAGE_REVEAL_OPACITY_EASING = 'ease-out';
 export const PAGE_REVEAL_OPACITY_TRANSITION =
   `opacity ${PAGE_REVEAL_OPACITY_DURATION_S}s ${PAGE_REVEAL_OPACITY_EASING}` as const;

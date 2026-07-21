@@ -22,7 +22,7 @@ export async function gotoProfileWhenReady(page: Page): Promise<void> {
     '.profile-section:not(.profile-section--loading)',
   );
   await section.waitFor({ state: 'visible', timeout: 15000 });
-  /* Wait for the shared 0.22s reveal fade (Hero / Writing / Contact use the same timing). */
+  /* Wait for the shared page reveal fade (Hero / Writing / Contact / Profile). */
   await page.waitForFunction(() => {
     const el = document.querySelector('.profile-section');
     if (!(el instanceof HTMLElement)) return false;

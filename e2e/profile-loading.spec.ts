@@ -19,7 +19,7 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
     viewport: { width: 1280, height: 900 },
   });
 
-  test('uses shared 0.22s ease-out reveal transition on the grid', async ({
+  test('uses shared page reveal opacity transition on the grid', async ({
     page,
   }) => {
     await gotoMainPageRevealReady(page, 'profile');
@@ -67,7 +67,7 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
     expect(settled.labelFontPx).toMatch(/px$/);
     expect(settled.frames).toHaveLength(4);
 
-    /* Past deferred ResizeObserver wiring (4 rAF) + reveal fade (220ms). */
+    /* Past deferred ResizeObserver wiring (4 rAF) + reveal fade (~180ms). */
     await page.waitForTimeout(500);
 
     const after = await readProfileLayoutSnapshot(page);

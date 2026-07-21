@@ -47,7 +47,7 @@ article.has-buttons-panel > h1.page-title {
   height: 100cqw;
   overflow: hidden;
   /* Reveal fade — same contract as Hero (.hero-content), Writing (--visible), Contact (--visible). */
-  transition: opacity 0.22s ease-out;
+  transition: opacity 0.18s ease-out;
   --profile-tile-text-inset-anchor-x: 10%;
   --profile-tile-text-inset-far-x: 6%;
   --profile-top-label-strip-ratio: 80.5;

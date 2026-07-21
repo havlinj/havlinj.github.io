@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import {
   PAGE_REVEAL_SELECTORS,
+  PAGE_REVEAL_OPACITY_TRANSITION,
   type PageRevealRoute,
   expectSharedPageRevealTransition,
   gotoMainPageRevealReady,
@@ -13,7 +14,7 @@ const MAIN_PAGE_REVEAL_ROUTES: PageRevealRoute[] = [
   'profile',
 ];
 
-test.describe('Main pages — shared content reveal fade (0.22s ease-out)', () => {
+test.describe(`Main pages — shared content reveal fade (${PAGE_REVEAL_OPACITY_TRANSITION})`, () => {
   for (const route of MAIN_PAGE_REVEAL_ROUTES) {
     test(`${route} uses opacity ${PAGE_REVEAL_SELECTORS[route]} transition`, async ({
       page,

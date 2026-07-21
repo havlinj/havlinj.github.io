@@ -98,7 +98,7 @@
   max-width: 100%;
   z-index: 2;
   opacity: 0;
-  transition: opacity 0.22s ease-out;
+  transition: opacity 0.18s ease-out;
 }
 
 .hero.hero--ready .hero-content {
