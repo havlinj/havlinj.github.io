@@ -1081,21 +1081,21 @@ test.describe('/why-this page @serial', () => {
         return Math.abs(setTop - expected);
       });
 
-    const wideDelta = await readDelta();
-    expect(wideDelta).not.toBeNull();
-    expect(
-      wideDelta!,
-      'CTA top should match 3/5 anchor at wide viewport',
-    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+    await expect
+      .poll(readDelta, {
+        message: 'CTA top should match 3/5 anchor at wide viewport',
+      })
+      .toBeLessThanOrEqual(LAYOUT_TOLERANCE);
 
     await page.setViewportSize({ width: 760, height: 520 });
     await gotoWhyWhenReady(page);
-    const narrowDelta = await readDelta();
-    expect(narrowDelta).not.toBeNull();
-    expect(
-      narrowDelta!,
-      'CTA top should keep 3/5 anchor at narrow viewport (no progressive pull)',
-    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+
+    await expect
+      .poll(readDelta, {
+        message:
+          'CTA top should keep 3/5 anchor at narrow viewport (no progressive pull)',
+      })
+      .toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
   test('CTA veil top: below lead/wide+clearance and above arrow+min gap when feasible', async ({

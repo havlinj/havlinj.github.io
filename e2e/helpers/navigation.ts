@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { waitTwoFrames } from './raf';
 
 /**
  * True when the page is already on /profile (with optional trailing slash / query / hash).
@@ -60,7 +61,17 @@ export async function awaitWhyLayoutReady(page: Page): Promise<void> {
           .getPropertyValue('--why-scroll-pad-top')
           .trim();
         const hasLayoutVar = /^\d+(\.\d+)?px$/.test(padTop);
-        return isReadyClass || hasLayoutVar;
+        if (!isReadyClass && !hasLayoutVar) return false;
+
+        const box = document.querySelector('.why-page .why-box');
+        const cta = document.querySelector('.why-page .why-scroll-cta');
+        if (box instanceof HTMLElement && cta) {
+          const ctaTop = getComputedStyle(box)
+            .getPropertyValue('--why-cta-top')
+            .trim();
+          if (!/^\d+(\.\d+)?px$/.test(ctaTop)) return false;
+        }
+        return true;
       },
       {
         timeout: 10000,
@@ -75,6 +86,7 @@ export async function awaitWhyLayoutReady(page: Page): Promise<void> {
 export async function gotoWhyWhenReady(page: Page): Promise<void> {
   await page.goto('/why-this', { waitUntil: 'domcontentloaded' });
   await awaitWhyLayoutReady(page);
+  await waitTwoFrames(page);
 }
 
 export async function expectNavLinkActive(
