@@ -1,0 +1,147 @@
+---
+description: Clean code, readability, and best practices for JS/TS, HTML, and CSS
+alwaysApply: true
+---
+
+# Clean code and readability
+
+Code is read far more often than it is written. Optimize for the next developer — including future you. **Verbose is fine** when it makes intent, data flow, or invariants obvious.
+
+This rule complements `general_notes.mdc` (visual/design contracts). When both apply, design tokens and page styling follow `general_notes`; logic and structure follow this file.
+
+---
+
+## Core principles
+
+1. **Clarity over cleverness** — Prefer boring, obvious code to compact or “smart” code.
+2. **One obvious entry point** — Named `initX()` / `startX()` / `handleX()` beats anonymous IIFE unless isolation is truly required (e.g. raw inline script with no module scope).
+3. **Explicit beats implicit** — Pass state in parameters or a typed object; avoid hidden closure mutations unless the scope is tiny (~30 lines) and purely local.
+4. **Small, named units** — Functions do one thing; files have one main responsibility.
+5. **Minimize diff scope** — Change only what the task requires; don’t refactor unrelated code in the same pass.
+6. **Match the codebase** — Read surrounding files first; extend existing patterns before inventing new ones.
+
+---
+
+## Naming
+
+- Use **full words**: `markPortraitReady`, not `mpr`; `ProfileLoadingVeilState`, not `st`.
+- Names describe **intent or domain**, not mechanics: `wireTypeFitGate`, not `setupListener2`.
+- Booleans read as questions: `isReady`, `hasPortrait`, `shouldDeferReveal`.
+- Constants: `SCREAMING_SNAKE` for true constants; group related values in `*-constants.ts` or `src/constants/`.
+- Event names and CSS classes stay **stable contracts** — document pairs (TS event ↔ CSS class ↔ e2e helper) when adding them.
+
+---
+
+## TypeScript and JavaScript
+
+### Structure
+
+- Prefer **`.ts` modules** bundled by Astro/Vite over `.js?raw` inline scripts. Use inline/raw only when synchronous parse-time execution is required; then still use **named functions** and a single clear init call.
+- **Export a named init** for page boot (`initProfileLoadingVeil()`, `initZoomGuard()`), not side-effect-only files unless the file is explicitly an entry shim.
+- Order within a file (top → bottom):
+  1. Module doc comment (what / when / who calls it)
+  2. Imports
+  3. Constants / types
+  4. Pure helpers
+  5. Orchestration / init
+  6. Entry call (if entry file)
+- Keep **flat function lists** over deep nesting; extract nested handlers when they exceed ~10 lines or serve a distinct sub-task.
+
+### State and data flow
+
+- Use a **typed state object** when multiple functions share mutable flags:
+
+```typescript
+type GateState = { section: HTMLElement; portraitReady: boolean; typeFitReady: boolean };
+
+function tryReveal(state: GateState): void { ... }
+```
+
+- Prefer **early return** over deep `if` ladders.
+- Avoid `any`; use narrow types, type guards (`instanceof HTMLElement`), and `as const` for selector maps.
+
+### Functions
+
+- **Pure functions** where possible (layout math, string/format helpers, CSS var parsing).
+- Side effects (DOM, events, timers) in clearly named `wire*` / `init*` / `sync*` functions.
+- **No silent failures** in logic paths that affect UX — log or fail visibly in dev; use bounded timeouts with documented fallbacks for loading gates.
+- **Document non-obvious timing** (rAF chains, `ResizeObserver` defer, font/CSS waits) with a one-line comment explaining *why*, not *what*.
+
+### Async and events
+
+- Register listeners **before** async work that may emit events; order scripts in markup accordingly.
+- Name event listeners when reused; use `{ once: true }` when appropriate.
+- Prefer `document.fonts.load(...)` + timeout race over indefinite waits.
+
+### Anti-patterns (avoid)
+
+- Anonymous IIFE wrapping an entire module “by default”.
+- Mega-functions (> ~40 lines) mixing measurement, DOM writes, and orchestration.
+- Magic numbers — lift to named constants with units in the name (`PORTRAIT_READY_TIMEOUT_MS`).
+- Commented-out code left in place (delete; git has history).
+- Abbreviations in public API names.
+
+---
+
+## HTML and Astro markup
+
+- **Semantic structure**: headings hierarchy, landmarks (`main`, `header`, `footer`, `nav`), meaningful `alt` on images.
+- **Accessibility**: `aria-hidden` on decorative duplicates; don’t rely on div-only buttons when `<button>` / `<a href>` fits.
+- Keep **markup shallow** — extract repeated structures to Astro components.
+- **Colocate page-specific boot** in the page file when order matters (e.g. veil init before type-fit), with a short comment.
+- Prefer **`decoding` / `fetchpriority` / preload** attributes intentionally documented when they affect loading contracts.
+- Slot and prop names should match domain language (`profileStylesLast`, not `flag2`).
+
+---
+
+## CSS
+
+- **One concern per block**; group custom properties at the top of a component/section.
+- Name classes by **role**, not appearance: `.profile-section--loading`, not `.hidden-gray`.
+- Shared literals (e.g. reveal fade `opacity 0.22s ease-out`) live in **`src/constants/`** + contract tests — don’t duplicate magic strings across stylesheets.
+- Prefer **custom properties** for values JS or tests must read (`--profile-tile-label-font-size`).
+- Comment **why** a rule exists when it fights cascade or load order (critical head CSS vs deferred stylesheet).
+- Respect `prefers-reduced-motion` when adding transitions.
+- Avoid `!important` except documented load-order / FOUC guards.
+
+---
+
+## Comments and documentation
+
+- **Module header**: 2–4 lines — responsibility, caller, important timing or contract.
+- Comment **why**, not what the syntax already says.
+- Verbose comments are welcome for: loading sequences, dual gates, cascade order, e2e/contract pairs, browser quirks.
+- Don’t narrate every line; do explain invariants (“must run before `profileTileTypeFit`”).
+
+---
+
+## Files and modules
+
+- Split when a file mixes unrelated concerns (layout shell vs profile loading vs type-fit pass).
+- Suggested layout:
+  - `src/constants/` — shared literals and contracts
+  - `src/scripts/` — client logic (entry + helpers)
+  - `src/components/` — reusable Astro UI
+  - `src/layouts/` — page shells
+- Name files after **domain**: `profile-loading-veil.ts`, not `helpers2.ts`.
+- Re-export from `e2e/helpers/index.ts` when tests reuse the same concepts.
+
+---
+
+## Tests
+
+- Test **real behavior** and **contracts** (CSS ↔ TS ↔ e2e constants), not implementation trivia.
+- Helpers should have **simple APIs** (`holdProfilePortrait` → `{ allow, dispose }`); avoid callback pyramids in specs.
+- Prefer descriptive test names that state the user-visible guarantee.
+- Add/update contract tests when introducing shared constants used in CSS and TS.
+
+---
+
+## Before submitting changes
+
+1. Re-read the diff as a reviewer — can you follow control flow without running the app?
+2. Are names, entry points, and state visible at a glance?
+3. Is scope limited to the task?
+4. Do comments explain non-obvious timing, loading, or cascade decisions?
+
+When in doubt, choose the version a new contributor understands in five minutes over the version that saves five lines.
