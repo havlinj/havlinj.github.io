@@ -7,6 +7,7 @@ import {
   applyContactFitPasses,
   clampContactInsetPanelPadFrac,
   computeIntroLinksGapPx,
+  computeLinksTopPxForCenterFromBottom,
   outerRectSizeWithMarginsCeil,
   resolveContactFluidFontPx,
 } from '../utils/contact-layout-math';
@@ -27,16 +28,12 @@ function startContactInsetFit(): void {
   const zone = document.querySelector(CONTACT_SELECTORS.zone);
   const mainEl = document.querySelector(CONTACT_SELECTORS.mainContent);
 
-  if (
-    !(panel instanceof HTMLElement) ||
-    !(introRect instanceof HTMLElement) ||
-    !(linksRect instanceof HTMLElement)
-  ) {
+  if (!(panel instanceof HTMLElement) || !(linksRect instanceof HTMLElement)) {
     return;
   }
   const panelEl = panel;
   const fitContentEl = fitContent instanceof HTMLElement ? fitContent : null;
-  const introRectEl = introRect;
+  const introRectEl = introRect instanceof HTMLElement ? introRect : null;
   const linksRectEl = linksRect;
   const cssVarCache = new Map<string, string>();
 
@@ -62,7 +59,6 @@ function startContactInsetFit(): void {
 
   function revealAfterStableLayout(): void {
     if (revealed || !fitContentEl) return;
-    // Reveal right after first measured layout pass; keep refinement async.
     forceReveal();
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -117,8 +113,19 @@ function startContactInsetFit(): void {
   function measureNeededContent(panelEdge: number): NeededContent {
     const topPad = Math.round(readPanelTopPadPx());
     const leftPad = Math.round(readPanelLeftPadPx());
-    const intro = measureRectOuterSize(introRectEl);
     const links = measureRectOuterSize(linksRectEl);
+
+    if (!introRectEl) {
+      return {
+        neededWidth: links.w + leftPad + CONTACT_LAYOUT.fitSafetyXPx,
+        neededHeight: links.h + CONTACT_LAYOUT.fitSafetyYPx,
+        topPad,
+        introH: 0,
+        introLinksGapPx: 0,
+      };
+    }
+
+    const intro = measureRectOuterSize(introRectEl);
     const introLinksGapPx = computeIntroLinksGapPx(intro.h, panelEdge);
     const neededWidth =
       Math.max(intro.w, links.w) + leftPad + CONTACT_LAYOUT.fitSafetyXPx;
@@ -143,8 +150,6 @@ function startContactInsetFit(): void {
       1,
       Math.min(panelEl.clientWidth, panelEl.clientHeight),
     );
-    // Wide panels: inherit computed size so JS mostly refines overflow. Narrow squares otherwise
-    // stick at root ~16px and ignore our curve — typography reads oversized on phones.
     const cssFontPx = parseFloat(getComputedStyle(panelEl).fontSize);
     let desiredFontPx = resolveContactFluidFontPx(panelEdge, cssFontPx);
 
@@ -169,11 +174,21 @@ function startContactInsetFit(): void {
     }));
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
 
-    setPanelVar('--contact-intro-top-px', `${topPad}px`);
-    setPanelVar(
-      '--contact-links-top-px',
-      `${topPad + introH + introLinksGapPx}px`,
-    );
+    if (!introRectEl) {
+      const links = measureRectOuterSize(linksRectEl);
+      const panelH = Math.max(1, panelEl.clientHeight);
+      const linksTopPx = computeLinksTopPxForCenterFromBottom(panelH, links.h);
+      setPanelVar('--contact-intro-top-px', `${topPad}px`);
+      setPanelVar('--contact-links-top-px', `${linksTopPx}px`);
+      setPanelVar('--contact-links-y-transform', 'none');
+    } else {
+      setPanelVar('--contact-intro-top-px', `${topPad}px`);
+      setPanelVar(
+        '--contact-links-top-px',
+        `${topPad + introH + introLinksGapPx}px`,
+      );
+      setPanelVar('--contact-links-y-transform', 'none');
+    }
 
     revealAfterStableLayout();
   }
@@ -221,7 +236,6 @@ function startContactInsetFit(): void {
   }
   window.addEventListener('load', schedule, { passive: true });
   window.setTimeout(() => {
-    // Hard fallback: never leave the content hidden if layout stabilization stalls.
     forceReveal();
   }, CONTACT_LAYOUT.revealFallbackMs);
 

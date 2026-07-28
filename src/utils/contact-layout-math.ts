@@ -1,6 +1,5 @@
 import { CONTACT_LAYOUT } from '../constants/contact-layout';
 
-/** Vertical gap intro → links on contact landing (used by contact-layout-fit). */
 export function computeIntroLinksGapPx(
   introOuterH: number,
   panelEdge: number,
@@ -11,7 +10,6 @@ export function computeIntroLinksGapPx(
   return Math.round(Math.max(minG, Math.min(fromIntro, fromPanel)));
 }
 
-/** Minimum fluid font size for a panel square edge (used by contact-layout-fit). */
 export function computeMinFontPx(panelEdge: number): number {
   const lo = CONTACT_LAYOUT.minFontEdgeLo;
   const hi = CONTACT_LAYOUT.minFontEdgeHi;
@@ -23,7 +21,6 @@ export function computeMinFontPx(panelEdge: number): number {
   return a + ((b - a) * (edge - lo)) / (hi - lo);
 }
 
-/** Nominal fluid font for a panel square edge (curve only; no CSS inherit). */
 export function computeDesiredFontPx(panelEdge: number): number {
   const refEdge = Math.max(1, CONTACT_LAYOUT.fontBaselineReferenceEdgePx);
   const fontToEdgeRatio = CONTACT_LAYOUT.baselineFontPx / refEdge;
@@ -41,9 +38,6 @@ export function computeDesiredFontPx(panelEdge: number): number {
   return Math.min(CONTACT_LAYOUT.maxFontPx, Math.max(minPx, scaledFontPx));
 }
 
-/**
- * First-pass fluid font: narrow panels use the curve; wide panels keep computed CSS size when valid.
- */
 export function resolveContactFluidFontPx(
   panelEdge: number,
   cssFontPx: number,
@@ -64,7 +58,6 @@ export type ContactFitContentSize = {
   neededHeight: number;
 };
 
-/** Shrink font until content fits inset box (same loop as contact-layout-fit flush). */
 export function applyContactFitPasses(params: {
   panelEdge: number;
   desiredFontPx: number;
@@ -90,13 +83,11 @@ export function applyContactFitPasses(params: {
   return { desiredFontPx, neededWidth, neededHeight };
 }
 
-/** Inset pad fraction clamp (contact-layout-fit default branch 0.1). */
 export function clampContactInsetPanelPadFrac(raw: number): number {
   if (Number.isFinite(raw) && raw > 0) return Math.min(0.5, raw);
   return 0.1;
 }
 
-/** Outer size including margins (contact intro/links measurement). */
 export function outerRectSizeWithMarginsCeil(
   scrollWidth: number,
   scrollHeight: number,
@@ -109,4 +100,15 @@ export function outerRectSizeWithMarginsCeil(
     w: Math.ceil(scrollWidth + marginLeft + marginRight),
     h: Math.ceil(scrollHeight + marginTop + marginBottom),
   };
+}
+
+export function computeLinksTopPxForCenterFromBottom(
+  panelH: number,
+  linksH: number,
+  fromBottomRatio: number = CONTACT_LAYOUT.linksCenterFromBottomRatio,
+): number {
+  const h = Math.max(1, panelH);
+  const centerYFromTop = h * (1 - fromBottomRatio);
+  const top = Math.round(centerYFromTop - linksH / 2);
+  return Math.max(0, Math.min(top, Math.max(0, Math.round(h - linksH))));
 }

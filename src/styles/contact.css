@@ -8,7 +8,6 @@
   gap: 0;
 }
 
-/* Landing: square panel (same contract as Writing — page-buttons.css + tokens). */
 .contact-page {
   display: flex;
   flex-direction: column;
@@ -20,7 +19,7 @@
   --panel-bg-saturation: 0.97;
   --panel-bg-brightness: 1;
   --panel-bg-contrast: 0.97;
-  --panel-bg-zoom: 1.1;
+  --panel-bg-zoom: 1.38;
   --panel-bg-nudge-x: 0;
   --panel-bg-nudge-y: 0.2;
   --panel-padding-top: 10%;
@@ -47,45 +46,26 @@
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
   --contact-intro-top-px: 16px;
-  --contact-links-top-px: 120px;
-  /* Multiplies JS/CSS --contact-fluid-font on intro + link rows (icons use em). */
+  --contact-links-top-px: 80%;
   --contact-font-scale: 1;
   --contact-fluid-font: clamp(
     var(--panel-fluid-font-min),
     calc(var(--panel-fluid-font-preferred) + 0.03rem),
     var(--panel-fluid-font-max)
   );
-  /* Same em size as intro inset (was 0.95 — labels looked smaller than copy). */
   --contact-links-font-scale: 1;
   --contact-links-width: 38%;
-  /* Floored by JS from panel edge; static fallback for noscript. */
   --contact-link-tail-min-px: 13px;
 }
 
 @media (max-width: 36rem) {
   .contact-page .page-buttons-panel {
-    /*
-     * One knob: intro block + link rows share fluid font × this (icons track em).
-     * sync: /why revolver body inherits `.why-scroll` — why.css `--why-copy-font-size`
-     *   = clamp(0.96rem, 0.93rem + 0.52vw, 1.18rem) * var(--why-font-scale)
-     * Keep contact base (after JS --contact-fluid-font) in the same ballpark as that band;
-     * why can still dip lower via FONT_MIN (~0.52) when the reference line is tight.
-     */
     --contact-font-scale: 0.91;
-    /* Slightly stronger Y nudge than article inline (0.2); same calc as ::before bg-position. */
-    --panel-bg-nudge-y: 0.25;
-    /* Article default 1.1 — extra zoom on small viewports (background-size on ::before). */
-    --panel-bg-zoom: 1;
+    --panel-bg-nudge-y: 0.22;
+    --panel-bg-zoom: 1.38;
   }
 
-  /*
-   * Narrow panel: bump intro weight for readability (smaller --contact-fluid-font × scale).
-   * sync: CONTACT_PANEL_* in src/constants/contact-panel-typography.ts
-   */
-  .contact-page__intro,
-  .contact-page__intro--lead,
-  .contact-page__intro--deck,
-  .contact-page__intro-reach {
+  .contact-page__intro {
     font-weight: 500;
   }
 }
@@ -96,10 +76,6 @@
   }
 }
 
-/*
- * Contact panel BG: responsive `<picture>` (ResponsiveDichromPicture), not `::before`.
- * Zoom matches legacy `background-size: calc(zoom * 100%) auto`: oversized img centered via inset math (no transform).
- */
 .contact-page .page-buttons-panel::before {
   content: none;
 }
@@ -142,17 +118,14 @@
 }
 
 /*
- * Do not set position on `.contact-page__fit-content`: inset rects use `position: absolute`
- * and must use `.page-buttons-panel` as containing block (same inset math as Writing buttons).
- * A positioned wrapper would shrink-wrap (absolute children out of flow) and break top/left margins.
- * Z-order: `.contact-page__inset-rect` uses z-index: 2 above `.page-buttons-panel__media` (0).
+ * Do not set position on `.contact-page__fit-content`: absolute inset rects must
+ * use `.page-buttons-panel` as containing block.
  */
 
 .contact-page .page-buttons-panel::after {
   content: none;
 }
 
-/* Keep fit-driven content hidden until first stable layout pass completes. */
 .contact-page .contact-page__fit-content.contact-page__fit-content--pending {
   opacity: 0;
   pointer-events: none;
@@ -186,21 +159,20 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Lead ↔ body: typographic step (decoupled from button row-gap). */
-  gap: clamp(0.48em, 0.39rem + 1.06vw, 0.58em);
+  gap: clamp(0.72em, 0.58rem + 1.35vw, 0.98em);
   width: calc(100% - var(--panel-padding-left, 2rem));
   max-width: calc(100% - var(--panel-padding-left, 2rem));
-  /* Tight vertical footprint (more background visible); scales like --content-side-pad-compact. */
-  --contact-intro-pad-left: clamp(0.62rem, 0.48rem + 1.85vw, 0.85rem);
-  --contact-intro-pad-right: clamp(0.9rem, 0.72rem + 2.15vw, 1.24rem);
-  --contact-intro-pad-top: clamp(0.76rem, 0.52rem + 1.25vw, 1.19rem);
-  --contact-intro-pad-bottom: clamp(0.74rem, 0.56rem + 1.65vw, 1.15rem);
+  --contact-intro-pad-left: clamp(0.74rem, 0.56rem + 2.05vw, 1.02rem);
+  --contact-intro-pad-right: clamp(1.02rem, 0.82rem + 2.35vw, 1.42rem);
+  --contact-intro-pad-top: clamp(0.88rem, 0.62rem + 1.45vw, 1.32rem);
+  --contact-intro-pad-bottom: clamp(0.86rem, 0.66rem + 1.8vw, 1.28rem);
   padding: var(--contact-intro-pad-top) var(--contact-intro-pad-right)
     var(--contact-intro-pad-bottom) var(--contact-intro-pad-left);
 }
 
 .contact-page__inset-rect--links {
   top: var(--contact-links-top-px);
+  transform: var(--contact-links-y-transform, translateY(-50%));
   left: auto;
   right: 0;
   inset-inline-start: auto;
@@ -222,10 +194,9 @@
 .contact-page__intro {
   margin: 0;
   padding: 0;
-  /* Desktop: /why body band (400); narrow panel → 500 in @media (max-width: 36rem). */
-  font-weight: 400;
-  line-height: 1.46;
-  letter-spacing: -0.006em;
+  font-weight: 500;
+  line-height: 1.52;
+  letter-spacing: 0.018em;
   color: rgba(var(--color-ink-rgb), 0.96);
   white-space: normal;
   max-width: 100%;
@@ -233,26 +204,14 @@
   hyphens: none;
   word-break: normal;
   overflow-wrap: break-word;
-}
-
-.contact-page__intro--lead {
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  font-weight: 400;
   opacity: 0.98;
-  /* Slight lift vs body; em tracks scaled inset font-size. */
   font-size: 0.995em;
 }
 
-.contact-page__intro--deck {
-  line-height: 1.45;
-  font-weight: 400;
-}
-
-/* "Reach out." deck text */
-.contact-page__intro-reach {
-  font-weight: 400;
-  letter-spacing: 0.005em;
+.contact-page__intro-prompt {
+  font-weight: 600;
+  font-size: 1.045em;
+  letter-spacing: 0.02em;
 }
 
 .contact-page__links {
@@ -272,7 +231,6 @@
   inline-size: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
-  /* Match Writing row-height resizing rules (cqi-driven with rem guardrails). */
   min-height: clamp(
     var(--panel-row-min-h),
     var(--contact-link-row-min-h, 6.8cqi),
@@ -284,7 +242,6 @@
   color: rgba(var(--color-ink-rgb), 0.96);
   font-size: inherit;
   gap: 0.62em;
-  /* Tail padding wins vs %-column squeeze: never smaller than --contact-link-tail-min-px. */
   padding: var(--contact-link-pad-block, 0.2em)
     max(
       var(--contact-link-tail-min-px, 13px),
@@ -311,7 +268,6 @@
   min-width: 0;
   line-height: 1.24;
   letter-spacing: 0.02em;
-  /* page-buttons row weight; sync CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT */
   font-weight: 500;
 }
 
@@ -336,7 +292,6 @@
   filter: invert(1) brightness(1.05);
 }
 
-/* Icon size relative to link text size (`em`) */
 .contact-page .contact-extra-link__icon--bubble {
   width: calc(var(--contact-link-icon-size) * var(--contact-bubble-size-mul));
   height: calc(var(--contact-link-icon-size) * var(--contact-bubble-size-mul));
@@ -439,7 +394,6 @@
   --contact-send-max-height: 2rem;
   --contact-status-pad-block: 0.15rem;
   --contact-status-pad-inline: 0.1rem;
-  /* Room for two lines of copy plus inner padding (slot may exceed button height). */
   --contact-status-max-height: calc(
     var(--contact-send-max-height) + 2 * var(--contact-status-pad-block)
   );

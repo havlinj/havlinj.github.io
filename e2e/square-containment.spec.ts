@@ -57,7 +57,6 @@ const CASES = [
     rightAnchorSelector: '.site-header__inner a[href="/contact"]',
     requiredInsideSelectors: [
       '.contact-page__fit-content',
-      '.contact-page__inset-rect--intro',
       '.contact-page__inset-rect--links',
     ],
   },
@@ -161,7 +160,6 @@ test.describe('Square layout containment matrix', () => {
           const insideMissing = inside.missing ?? [];
           const insideOverflowing = inside.overflowing ?? [];
           const contactInsetOverflowAllowed = new Set([
-            '.contact-page__inset-rect--intro',
             '.contact-page__inset-rect--links',
           ]);
           const insideOk = isExtremeMobileContactZoom

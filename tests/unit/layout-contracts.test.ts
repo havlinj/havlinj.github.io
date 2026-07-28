@@ -158,7 +158,7 @@ describe('layout contracts: contact panel typography (constants ↔ contact.css)
     );
   });
 
-  it('intro is 400 by default and 500 inside narrow media query', () => {
+  it('intro uses configured default and narrow font weights', () => {
     expect(css).toMatch(
       new RegExp(
         `\\.contact-page__intro\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP}`,
@@ -167,7 +167,7 @@ describe('layout contracts: contact panel typography (constants ↔ contact.css)
     const narrowBlock = css.slice(
       css.indexOf(`@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`),
     );
-    expect(narrowBlock).toContain('.contact-page__intro--lead');
+    expect(narrowBlock).toContain('.contact-page__intro');
     expect(narrowBlock).toContain(
       `font-weight: ${CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW}`,
     );

@@ -48,7 +48,6 @@ export const ZOOM_COMPOSITION_CASES: readonly CompositionCase[] = [
     squareSelector: '.contact-page .page-buttons-panel',
     requiredInsideSelectors: [
       '.contact-page__fit-content',
-      '.contact-page__inset-rect--intro',
       '.contact-page__inset-rect--links',
     ],
   },
@@ -188,7 +187,6 @@ export async function assertCompositionLayout(
   const vw = page.viewportSize()?.width ?? 9999;
   const isExtremeMobileContact = c.name === 'contact' && vw <= 430;
   const contactInsetOverflowAllowed = new Set([
-    '.contact-page__inset-rect--intro',
     '.contact-page__inset-rect--links',
   ]);
   const insideOk =

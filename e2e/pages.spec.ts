@@ -476,22 +476,15 @@ test.describe('Contact page (/contact)', () => {
     ).toBeVisible();
   });
 
-  test('landing shows intro on panel and links to form', async ({ page }) => {
+  test('landing shows contact links including form', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.contact-page__fit-content')).toBeAttached();
-    const introRect = page.locator('.contact-page__inset-rect--intro');
-    await expect(introRect).toBeVisible();
-    const introPs = introRect.locator('.contact-page__intro');
-    await expect(introPs).toHaveCount(2);
-    await expect(introPs.nth(0)).toHaveText('Glad you made it this far.');
-    await expect(introPs.nth(0)).toHaveClass(/contact-page__intro--lead/);
-    await expect(introPs.nth(1)).toHaveClass(/contact-page__intro--deck/);
-    await expect(introPs.nth(1)).toHaveText(
-      'If we think alike, there\u2019s probably something worth building together. Reach out.',
-    );
     await expect(
-      introPs.nth(1).locator('.contact-page__intro-reach'),
-    ).toHaveText('Reach out.');
+      page.locator('.contact-page__inset-rect--intro'),
+    ).toHaveCount(0);
+    await expect(
+      page.locator('.contact-page__inset-rect--links'),
+    ).toBeVisible();
 
     const formLink = page.getByRole('link', { name: 'Message', exact: true });
     await expect(formLink).toBeVisible();
@@ -539,9 +532,6 @@ test.describe('Contact page (/contact)', () => {
       await page.goto('/contact');
       await expect(page.locator('.contact-page__fit-content')).toBeAttached();
       await expect(
-        page.locator('.contact-page__inset-rect--intro'),
-      ).toBeVisible();
-      await expect(
         page.locator('.contact-page__inset-rect--links'),
       ).toBeVisible();
 
@@ -553,16 +543,13 @@ test.describe('Contact page (/contact)', () => {
         await page.waitForTimeout(80);
 
         const result = await page.evaluate(() => {
-          const intro = document.querySelector(
-            '.contact-page__inset-rect--intro',
-          ) as HTMLElement | null;
           const links = document.querySelector(
             '.contact-page__inset-rect--links',
           ) as HTMLElement | null;
           const fitContent = document.querySelector(
             '.contact-page__fit-content',
           ) as HTMLElement | null;
-          if (!intro || !links || !fitContent) {
+          if (!links || !fitContent) {
             return {
               ok: false,
               reason: 'missing required contact nodes',
@@ -570,9 +557,6 @@ test.describe('Contact page (/contact)', () => {
           }
 
           const tol = 1;
-          const introOk =
-            intro.scrollWidth <= intro.clientWidth + tol &&
-            intro.scrollHeight <= intro.clientHeight + tol;
           const linksOk =
             links.scrollWidth <= links.clientWidth + tol &&
             links.scrollHeight <= links.clientHeight + tol;
@@ -587,7 +571,6 @@ test.describe('Contact page (/contact)', () => {
 
           return {
             ok: linksOk && linkRowsNoWrap,
-            introOk,
             linksOk,
             linkRowsNoWrap,
             zoom: getComputedStyle(document.documentElement).zoom || 'n/a',
@@ -612,15 +595,12 @@ test.describe('Contact page (/contact)', () => {
     });
   });
 
-  test('landing keeps contact layout ratios (links width + intro-to-links gap)', async ({
+  test('landing keeps contact layout ratios (links width + vertical anchor)', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/contact');
     await expect(page.locator('.contact-page__fit-content')).toBeAttached();
-    await expect(
-      page.locator('.contact-page__inset-rect--intro'),
-    ).toBeVisible();
     await expect(
       page.locator('.contact-page__inset-rect--links'),
     ).toBeVisible();
@@ -629,34 +609,25 @@ test.describe('Contact page (/contact)', () => {
       const panel = document.querySelector(
         '.contact-page .page-buttons-panel',
       ) as HTMLElement | null;
-      const intro = document.querySelector(
-        '.contact-page__inset-rect--intro',
-      ) as HTMLElement | null;
       const linksRect = document.querySelector(
         '.contact-page__inset-rect--links',
       ) as HTMLElement | null;
-      const firstLink = document.querySelector(
-        '.contact-page__links .contact-extra-link',
-      ) as HTMLElement | null;
-      if (!panel || !intro || !linksRect || !firstLink) return null;
+      if (!panel || !linksRect) return null;
 
       const panelR = panel.getBoundingClientRect();
-      const introR = intro.getBoundingClientRect();
       const linksR = linksRect.getBoundingClientRect();
-      const firstLinkR = firstLink.getBoundingClientRect();
+      const linksCenterFromBottom =
+        (panelR.bottom - (linksR.top + linksR.height / 2)) / panelR.height;
 
       return {
         linksWidthFrac: linksR.width / panelR.width,
-        introToFirstLinkGap: firstLinkR.top - introR.bottom,
-        introHeight: introR.height,
+        linksCenterFromBottom,
       };
     });
 
     expect(data).not.toBeNull();
     expect(data!.linksWidthFrac).toBeCloseTo(0.38, 2);
-    // Intro→links gap is intentionally smaller than intro height on small panels (scaled fit).
-    expect(data!.introToFirstLinkGap).toBeGreaterThan(6);
-    expect(data!.introToFirstLinkGap).toBeLessThan(data!.introHeight);
+    expect(data!.linksCenterFromBottom).toBeCloseTo(0.2, 1);
   });
 
   test('zoom freeze activates on profile and contact after viewport squeeze', async ({
