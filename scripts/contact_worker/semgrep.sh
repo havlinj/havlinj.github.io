@@ -8,8 +8,13 @@ cd "$WORKER_DIR"
 SEMGREP_CONFIG="${SEMGREP_CONFIG:-p/javascript}"
 SEMGREP_TARGET="${SEMGREP_TARGET:-worker/}"
 
+if command -v semgrep >/dev/null 2>&1; then
+  semgrep scan --config "$SEMGREP_CONFIG" --error "$SEMGREP_TARGET"
+  exit 0
+fi
+
 if ! command -v docker >/dev/null 2>&1; then
-  echo "docker is required. Install Docker or use: pip install semgrep" >&2
+  echo "semgrep or docker is required" >&2
   exit 1
 fi
 
