@@ -25,7 +25,7 @@ export const CONTACT_LAYOUT = {
   defaultBoxGapPx: 18,
   linkTailMinPx: 13,
   linkTailMinPanelRatio: 0.036,
-  linksCenterFromBottomRatio: 0.2,
+  linksCenterFromBottomRatio: 0.25,
 } as const;
 
 export const CONTACT_SELECTORS = {

@@ -110,5 +110,9 @@ export function computeLinksTopPxForCenterFromBottom(
   const h = Math.max(1, panelH);
   const centerYFromTop = h * (1 - fromBottomRatio);
   const top = Math.round(centerYFromTop - linksH / 2);
-  return Math.max(0, Math.min(top, Math.max(0, Math.round(h - linksH))));
+  const maxTop = Math.max(
+    0,
+    Math.round(h - linksH - CONTACT_LAYOUT.fitSafetyYPx),
+  );
+  return Math.max(0, Math.min(top, maxTop));
 }

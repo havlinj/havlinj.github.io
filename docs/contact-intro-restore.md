@@ -42,27 +42,29 @@ vertical stack math automatically.
 
 From `src/constants/contact-layout.ts` + `src/styles/contact.css` (keep in sync):
 
-| Token / rule | Value | Role |
-| --- | --- | --- |
-| `CONTACT_LAYOUT.insetPanelPadFrac` | `0.1` | Panel inset pad fraction (matches `--panel-padding-*` 10%) |
-| `--panel-padding-top` / `left` | `10%` | Panel content inset |
-| `--panel-padding-bottom` | `24%` | Space below last row |
-| `--contact-links-width` | `38%` | Links column width (right-aligned) |
-| Intro width | `calc(100% - var(--panel-padding-left))` | Full remaining panel width |
-| Intro position | `top: var(--contact-intro-top-px)`; `right: 0` | Set by fit JS |
-| Links position | `top: var(--contact-links-top-px)`; `right: 0` | Set by fit JS |
-| Intro→links gap | `computeIntroLinksGapPx(introH, panelEdge)` | See below |
+| Token / rule                       | Value                                          | Role                                                       |
+| ---------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `CONTACT_LAYOUT.insetPanelPadFrac` | `0.1`                                          | Panel inset pad fraction (matches `--panel-padding-*` 10%) |
+| `--panel-padding-top` / `left`     | `10%`                                          | Panel content inset                                        |
+| `--panel-padding-bottom`           | `24%`                                          | Space below last row                                       |
+| `--contact-links-width`            | `38%`                                          | Links column width (right-aligned)                         |
+| Intro width                        | `calc(100% - var(--panel-padding-left))`       | Full remaining panel width                                 |
+| Intro position                     | `top: var(--contact-intro-top-px)`; `right: 0` | Set by fit JS                                              |
+| Links position                     | `top: var(--contact-links-top-px)`; `right: 0` | Set by fit JS                                              |
+| Intro→links gap                    | `computeIntroLinksGapPx(introH, panelEdge)`    | See below                                                  |
 
 ### Intro→links gap formula
 
 ```ts
-gap = round(max(
-  introLinksGapMinPx,                          // 32
-  min(
-    introOuterH * introLinksGapIntroHeightRatio, // 0.74
-    panelEdge * introLinksGapPanelRatio,         // 0.072
+gap = round(
+  max(
+    introLinksGapMinPx, // 32
+    min(
+      introOuterH * introLinksGapIntroHeightRatio, // 0.74
+      panelEdge * introLinksGapPanelRatio, // 0.072
+    ),
   ),
-))
+);
 ```
 
 Constants (`CONTACT_LAYOUT`):
@@ -94,16 +96,16 @@ max(introW, linksW) + leftPad + fitSafetyXPx
 
 Safety: `fitSafetyXPx: 2`, `fitSafetyYPx: 6`.
 
-Without intro (current): links stack center sits at **20% of panel height from the bottom**
-(`CONTACT_LAYOUT.linksCenterFromBottomRatio = 0.2`):
+Without intro (current): links stack center sits at **25% of panel height from the bottom**
+(`CONTACT_LAYOUT.linksCenterFromBottomRatio = 0.25`):
 
 ```text
-centerYFromTop = panelHeight * (1 - 0.2)
+centerYFromTop = panelHeight * (1 - 0.25)
 --contact-links-top-px = clamp(round(centerYFromTop - linksH / 2))
 --contact-links-y-transform = none
 ```
 
-CSS fallback before fit / noscript: `top: 80%` + `translateY(-50%)`.
+CSS fallback before fit / noscript: `top: 75%` + `translateY(-50%)`.
 
 ## Intro box CSS (kept in `contact.css`)
 

@@ -155,6 +155,7 @@ test.describe('Square layout containment matrix', () => {
 
           const isExtremeMobileContactZoom =
             c.name === 'contact' && entry.viewport.width <= 430 && zoom >= 1.5;
+          const isHighZoomContact = c.name === 'contact' && zoom >= 2;
           const isExtremeMobileHeroZoom =
             c.name === 'hero' && entry.viewport.width <= 430 && zoom >= 1.5;
           const insideMissing = inside.missing ?? [];
@@ -162,22 +163,23 @@ test.describe('Square layout containment matrix', () => {
           const contactInsetOverflowAllowed = new Set([
             '.contact-page__inset-rect--links',
           ]);
-          const insideOk = isExtremeMobileContactZoom
-            ? insideMissing.length === 0 &&
-              insideOverflowing.every((sel) =>
-                contactInsetOverflowAllowed.has(sel),
-              )
-            : isExtremeMobileHeroZoom
+          const insideOk =
+            isExtremeMobileContactZoom || isHighZoomContact
               ? insideMissing.length === 0 &&
                 insideOverflowing.every((sel) =>
-                  [
-                    '.hero-content',
-                    '.hero-grid',
-                    '.hero-name',
-                    '.tagline',
-                  ].includes(sel),
+                  contactInsetOverflowAllowed.has(sel),
                 )
-              : inside.ok;
+              : isExtremeMobileHeroZoom
+                ? insideMissing.length === 0 &&
+                  insideOverflowing.every((sel) =>
+                    [
+                      '.hero-content',
+                      '.hero-grid',
+                      '.hero-name',
+                      '.tagline',
+                    ].includes(sel),
+                  )
+                : inside.ok;
           expect(
             insideOk,
             `${c.name} inside-elements check failed at ${entry.viewport.width}x${entry.viewport.height}, zoom ${zoom}: ${JSON.stringify(

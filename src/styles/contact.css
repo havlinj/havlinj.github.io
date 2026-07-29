@@ -22,6 +22,7 @@
   --panel-bg-zoom: 1.38;
   --panel-bg-nudge-x: 0;
   --panel-bg-nudge-y: 0.2;
+  --panel-bg-rotate: 0.35deg;
   --panel-padding-top: 10%;
   --panel-padding-left: 10%;
   --panel-padding-bottom: 24%;
@@ -46,7 +47,7 @@
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
   --contact-intro-top-px: 16px;
-  --contact-links-top-px: 80%;
+  --contact-links-top-px: 75%;
   --contact-font-scale: 1;
   --contact-fluid-font: clamp(
     var(--panel-fluid-font-min),
@@ -115,6 +116,7 @@
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
   opacity: var(--panel-bg-layer-opacity, 1);
+  transform: rotate(var(--panel-bg-rotate, 0deg));
 }
 
 /*

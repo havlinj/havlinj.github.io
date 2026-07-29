@@ -194,15 +194,15 @@ describe('outerRectSizeWithMarginsCeil', () => {
 });
 
 describe('computeLinksTopPxForCenterFromBottom', () => {
-  it('anchors stack center at 20% of height from the bottom', () => {
-    expect(computeLinksTopPxForCenterFromBottom(1000, 200, 0.2)).toBe(700);
+  it('anchors stack center at 25% of height from the bottom', () => {
+    expect(computeLinksTopPxForCenterFromBottom(1000, 200, 0.25)).toBe(650);
   });
 
   it('clamps when the stack is taller than the panel', () => {
-    expect(computeLinksTopPxForCenterFromBottom(100, 200, 0.2)).toBe(0);
+    expect(computeLinksTopPxForCenterFromBottom(100, 200, 0.25)).toBe(0);
   });
 
   it('uses CONTACT_LAYOUT default ratio when omitted', () => {
-    expect(computeLinksTopPxForCenterFromBottom(1000, 200)).toBe(700);
+    expect(computeLinksTopPxForCenterFromBottom(1000, 200)).toBe(650);
   });
 });

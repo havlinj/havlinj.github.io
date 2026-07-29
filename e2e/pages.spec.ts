@@ -479,9 +479,9 @@ test.describe('Contact page (/contact)', () => {
   test('landing shows contact links including form', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.contact-page__fit-content')).toBeAttached();
-    await expect(
-      page.locator('.contact-page__inset-rect--intro'),
-    ).toHaveCount(0);
+    await expect(page.locator('.contact-page__inset-rect--intro')).toHaveCount(
+      0,
+    );
     await expect(
       page.locator('.contact-page__inset-rect--links'),
     ).toBeVisible();
@@ -627,7 +627,7 @@ test.describe('Contact page (/contact)', () => {
 
     expect(data).not.toBeNull();
     expect(data!.linksWidthFrac).toBeCloseTo(0.38, 2);
-    expect(data!.linksCenterFromBottom).toBeCloseTo(0.2, 1);
+    expect(data!.linksCenterFromBottom).toBeCloseTo(0.25, 1);
   });
 
   test('zoom freeze activates on profile and contact after viewport squeeze', async ({
