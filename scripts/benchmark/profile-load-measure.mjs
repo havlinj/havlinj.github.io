@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Measure Profile load times — N cold-context navigations to /profile, write JSON results.
- * See docs/profile-load-performance.md for methodology.
+ * See docs/working-notes/profile-load-performance.md for methodology.
  */
 
 import { spawn } from 'node:child_process';

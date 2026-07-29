@@ -51,8 +51,9 @@ Scope and intent:
   - `scripts/web/integration-tests.sh`
   - `e2e/`
   - `tests/unit/`
-  - `scripts/web/` — site pipeline (`all.sh`, lint, unit, Playwright, Lighthouse)
+  - `scripts/web/` — site pipeline (`all.sh`, lint, unit, Playwright, Lighthouse, Pages build, sitemap verify)
   - `scripts/contact_worker/` — worker pipeline (`all.sh`, semgrep)
+  - `scripts/ci/local.sh` — local CI parity (audit + Semgrep + full gate + Lighthouse + Pages/sitemap; no deploy)
   - `contact_worker/` — Cloudflare contact API
   - `shared/contact-api-errors.mjs` (API error codes for site + worker)
 - **Performance and accessibility quality bars**
@@ -63,25 +64,31 @@ Scope and intent:
   - `src/utils/writing-posts.ts`
   - `src/pages/writing.astro`
 - **Workflow and deployment checks**
-  - `.github/workflows/deploy.yml`
+  - `.github/workflows/deploy.yml` — calls the same shared scripts as local CI parity
+- **Working notes / initiative plans**
+  - `docs/working-notes/` — restore recipes and performance initiative notes (not product docs)
 
 ## Development Process (Overview)
 
-- **Local quality flow**
-  - Site-only gate: `bash scripts/web/all.sh` (or `npm run all:web`).
-  - Worker-only gate: `bash scripts/contact_worker/all.sh` (or `npm run all:contact-worker`).
-  - Full monorepo gate: `bash scripts/all.sh`.
-  - Lint/sanity includes linting, formatting, and Astro structural/type checks.
+- **Local quality gates (layered)**
+  - Site-only: `bash scripts/web/all.sh` (or `npm run all:web`) — lint/format, `astro check`, unit, Playwright.
+  - Worker-only: `bash scripts/contact_worker/all.sh` (or `npm run all:contact-worker`).
+  - Full monorepo: `bash scripts/all.sh` (or `npm run all`) — web + worker.
+  - CI parity (no deploy): `bash scripts/ci/local.sh` (or `npm run all:ci`) — Semgrep → `npm audit --audit-level=high` → `all.sh` → Lighthouse → Pages build → sitemap verify.
+- **CI and deploy**
+  - GitHub Actions (`.github/workflows/deploy.yml`) runs the same shared scripts, then uploads/deploys to Pages.
+  - Prefer fixing failures with `all:ci` locally before push; keep default `all.sh` for day-to-day speed when audit/Lighthouse/Pages steps are not needed.
 - **Test orchestration strategy**
   - Integration tests are intentionally split between parallel-safe and serial-sensitive subsets.
   - The test runner defaults to stable `preview`-mode orchestration to reduce flakiness.
   - Visual snapshots are maintained through a dedicated update process.
 - **Performance and accessibility process**
   - Accessibility is validated in automated browser tests (including keyboard-flow checks).
-  - Homepage performance budgets are validated through a dedicated Lighthouse process.
+  - Homepage performance budgets are validated through a dedicated Lighthouse process (stricter locally; CI relaxes LCP/perf slightly for runner variance).
 - **Operational stability practices**
   - Cleanup routines and port/process guards are built into scripts to prevent stale-run issues.
   - Reproducibility is favored over ad-hoc speed in CI-critical paths.
+  - Dependency audit fails on high/critical; transitive pins live in `package.json` `overrides` when upstream cannot clear them cleanly.
 
 ## Scope Of This README
 
