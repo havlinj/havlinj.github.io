@@ -88,6 +88,7 @@ jobs:
         env:
           PW_WORKERS: '4'
           ALL_SH_CLEAN: '0'
+          PW_SKIP_EXTREME_ZOOM_VISUAL: '0'
       - name: Lighthouse budget
         run: bash ./scripts/web/lighthouse.sh
         working-directory: ${{ env.BUILD_PATH }}

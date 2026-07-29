@@ -11,6 +11,8 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"
 
+export PW_SKIP_EXTREME_ZOOM_VISUAL="${PW_SKIP_EXTREME_ZOOM_VISUAL:-1}"
+
 RUN_CLEAN="${ALL_SH_CLEAN:-1}"
 if [ "$RUN_CLEAN" = "1" ]; then
   echo "--- 0/4 Clean build/test artifacts ---"

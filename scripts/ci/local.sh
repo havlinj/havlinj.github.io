@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$ROOT_DIR"
 
+export PW_SKIP_EXTREME_ZOOM_VISUAL=0
+
 echo "=== Semgrep (contact worker) ==="
 bash "$ROOT_DIR/scripts/contact_worker/semgrep.sh"
 
@@ -13,7 +15,7 @@ echo "=== npm audit ==="
 npm audit --audit-level=high
 
 echo ""
-echo "=== Quality gate (all.sh) ==="
+echo "=== Quality gate (all.sh, full Playwright) ==="
 bash "$ROOT_DIR/scripts/all.sh"
 
 echo ""

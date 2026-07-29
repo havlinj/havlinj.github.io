@@ -39,12 +39,11 @@ This rule complements `general_notes.mdc` (visual/design contracts). When both a
 - Prefer **`.ts` modules** bundled by Astro/Vite over `.js?raw` inline scripts. Use inline/raw only when synchronous parse-time execution is required; then still use **named functions** and a single clear init call.
 - **Export a named init** for page boot (`initProfileLoadingVeil()`, `initZoomGuard()`), not side-effect-only files unless the file is explicitly an entry shim.
 - Order within a file (top → bottom):
-  1. Module doc comment (what / when / who calls it)
-  2. Imports
-  3. Constants / types
-  4. Pure helpers
-  5. Orchestration / init
-  6. Entry call (if entry file)
+  1. Imports
+  2. Constants / types
+  3. Pure helpers
+  4. Orchestration / init
+  5. Entry call (if entry file)
 - Keep **flat function lists** over deep nesting; extract nested handlers when they exceed ~10 lines or serve a distinct sub-task.
 
 ### State and data flow
@@ -65,7 +64,7 @@ function tryReveal(state: GateState): void { ... }
 - **Pure functions** where possible (layout math, string/format helpers, CSS var parsing).
 - Side effects (DOM, events, timers) in clearly named `wire*` / `init*` / `sync*` functions.
 - **No silent failures** in logic paths that affect UX — log or fail visibly in dev; use bounded timeouts with documented fallbacks for loading gates.
-- **Document non-obvious timing** (rAF chains, `ResizeObserver` defer, font/CSS waits) with a one-line comment explaining *why*, not *what*.
+- Prefer encoding non-obvious timing in **names and structure** (rAF chains, `ResizeObserver` defer, font/CSS waits); add a comment only under the comments policy below.
 
 ### Async and events
 
@@ -88,7 +87,7 @@ function tryReveal(state: GateState): void { ... }
 - **Semantic structure**: headings hierarchy, landmarks (`main`, `header`, `footer`, `nav`), meaningful `alt` on images.
 - **Accessibility**: `aria-hidden` on decorative duplicates; don’t rely on div-only buttons when `<button>` / `<a href>` fits.
 - Keep **markup shallow** — extract repeated structures to Astro components.
-- **Colocate page-specific boot** in the page file when order matters (e.g. veil init before type-fit), with a short comment.
+- **Colocate page-specific boot** in the page file when order matters (e.g. veil init before type-fit); make order obvious from script placement and names, not from narration.
 - Prefer **`decoding` / `fetchpriority` / preload** attributes intentionally documented when they affect loading contracts.
 - Slot and prop names should match domain language (`profileStylesLast`, not `flag2`).
 
@@ -100,7 +99,7 @@ function tryReveal(state: GateState): void { ... }
 - Name classes by **role**, not appearance: `.profile-section--loading`, not `.hidden-gray`.
 - Shared literals (e.g. reveal fade `opacity 0.22s ease-out`) live in **`src/constants/`** + contract tests — don’t duplicate magic strings across stylesheets.
 - Prefer **custom properties** for values JS or tests must read (`--profile-tile-label-font-size`).
-- Comment **why** a rule exists when it fights cascade or load order (critical head CSS vs deferred stylesheet).
+- Prefer names, cascade structure, and constants over comments when fighting load order (critical head CSS vs deferred stylesheet).
 - Respect `prefers-reduced-motion` when adding transitions.
 - Avoid `!important` except documented load-order / FOUC guards.
 
@@ -108,10 +107,20 @@ function tryReveal(state: GateState): void { ... }
 
 ## Comments and documentation
 
-- **Module header**: 2–4 lines — responsibility, caller, important timing or contract.
-- Comment **why**, not what the syntax already says.
-- Verbose comments are welcome for: loading sequences, dual gates, cascade order, e2e/contract pairs, browser quirks.
-- Don’t narrate every line; do explain invariants (“must run before `profileTileTypeFit`”).
+**Default: no comments.** Prefer clear names, small functions, constants, tests, and `docs/working-notes/` for plans/recipes.
+
+Do **not** add:
+- Module/file headers that restate the filename or obvious responsibility
+- Narration of what the next line does
+- TODOs, “for clarity”, or process notes that belong in git history / PR text
+- Commented-out code (delete it)
+
+**Only** comment when all of these are true:
+1. The reason is a **rare exception**, non-obvious invariant, or hard-won fix (browser quirk, load-order trap, flaky race, security constraint).
+2. A future reader would likely re-break it without that note.
+3. The note explains **why / what not to undo**, not what the syntax already says — keep it short.
+
+Machine-facing annotations that are not prose (e.g. minimal JSDoc `@type` where the toolchain needs them) are fine when required.
 
 ---
 
@@ -142,6 +151,6 @@ function tryReveal(state: GateState): void { ... }
 1. Re-read the diff as a reviewer — can you follow control flow without running the app?
 2. Are names, entry points, and state visible at a glance?
 3. Is scope limited to the task?
-4. Do comments explain non-obvious timing, loading, or cascade decisions?
+4. Are there any new comments that fail the comments policy (delete them)?
 
 When in doubt, choose the version a new contributor understands in five minutes over the version that saves five lines.

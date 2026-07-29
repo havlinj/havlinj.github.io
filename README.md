@@ -71,16 +71,18 @@ Scope and intent:
 ## Development Process (Overview)
 
 - **Local quality gates (layered)**
-  - Site-only: `bash scripts/web/all.sh` (or `npm run all:web`) — lint/format, `astro check`, unit, Playwright.
+  - Site-only: `bash scripts/web/all.sh` (or `npm run all:web`) — lint/format, `astro check`, unit, Playwright **without** `@extreme-zoom-visual`.
   - Worker-only: `bash scripts/contact_worker/all.sh` (or `npm run all:contact-worker`).
-  - Full monorepo: `bash scripts/all.sh` (or `npm run all`) — web + worker.
-  - CI parity (no deploy): `bash scripts/ci/local.sh` (or `npm run all:ci`) — Semgrep → `npm audit --audit-level=high` → `all.sh` → Lighthouse → Pages build → sitemap verify.
+  - Full monorepo (day-to-day): `bash scripts/all.sh` (or `npm run all`) — web + worker; same extreme-zoom skip.
+  - Full Playwright only: `npm run all:full` / `all:web:full` (`PW_SKIP_EXTREME_ZOOM_VISUAL=0`).
+  - CI parity (no deploy): `bash scripts/ci/local.sh` (or `npm run all:ci`) — Semgrep → audit → **full** Playwright via `all.sh` → Lighthouse → Pages build → sitemap verify.
 - **CI and deploy**
-  - GitHub Actions (`.github/workflows/deploy.yml`) runs the same shared scripts, then uploads/deploys to Pages.
-  - Prefer fixing failures with `all:ci` locally before push; keep default `all.sh` for day-to-day speed when audit/Lighthouse/Pages steps are not needed.
+  - GitHub Actions (`.github/workflows/deploy.yml`) runs the same shared scripts with the full Playwright suite, then uploads/deploys to Pages.
+  - Prefer fixing failures with `all:ci` locally before push; use default `all.sh` for day-to-day speed.
 - **Test orchestration strategy**
   - Integration tests are intentionally split between parallel-safe and serial-sensitive subsets.
   - The test runner defaults to stable `preview`-mode orchestration to reduce flakiness.
+  - `@extreme-zoom-visual` is omitted from day-to-day `all.sh` and always included in `all:ci` / deploy.
   - Visual snapshots are maintained through a dedicated update process.
 - **Performance and accessibility process**
   - Accessibility is validated in automated browser tests (including keyboard-flow checks).
