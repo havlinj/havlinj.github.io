@@ -34,8 +34,6 @@ import {
   PAGE_REVEAL_STYLESHEETS,
 } from '../../src/constants/page-reveal';
 import {
-  CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP,
-  CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW,
   CONTACT_PANEL_LINKS_FONT_SCALE,
   CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT,
   CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH,
@@ -155,21 +153,6 @@ describe('layout contracts: contact panel typography (constants ↔ contact.css)
   it('uses shared narrow breakpoint with --contact-font-scale', () => {
     expect(css).toContain(
       `@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`,
-    );
-  });
-
-  it('intro uses configured default and narrow font weights', () => {
-    expect(css).toMatch(
-      new RegExp(
-        `\\.contact-page__intro\\s*\\{[^}]*font-weight:\\s*${CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP}`,
-      ),
-    );
-    const narrowBlock = css.slice(
-      css.indexOf(`@media (max-width: ${CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH})`),
-    );
-    expect(narrowBlock).toContain('.contact-page__intro');
-    expect(narrowBlock).toContain(
-      `font-weight: ${CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW}`,
     );
   });
 

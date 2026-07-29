@@ -107,9 +107,10 @@ centerYFromTop = panelHeight * (1 - 0.25)
 
 CSS fallback before fit / noscript: `top: 75%` + `translateY(-50%)`.
 
-## Intro box CSS (kept in `contact.css`)
+## Intro box CSS (removed from `contact.css`)
 
-These rules remain in the stylesheet even while markup is absent:
+These rules were removed during the links-only refactor. Re-add them to
+`contact.css` when restoring the intro:
 
 - `.contact-page__inset-rect--intro` padding (roomier inset):
   - `--contact-intro-pad-left: clamp(0.74rem, 0.56rem + 2.05vw, 1.02rem)`
@@ -119,18 +120,23 @@ These rules remain in the stylesheet even while markup is absent:
 - Gap between multi-line intro paragraphs: `clamp(0.72em, 0.58rem + 1.35vw, 0.98em)`
 - `.contact-page__intro`: weight `500`, `line-height: 1.52`, `letter-spacing: 0.018em`
 - `.contact-page__intro-prompt`: weight `600`, `font-size: 1.045em`, `letter-spacing: 0.02em`
-- Narrow (`max-width: 36rem`): intro weight stays `500` (see `CONTACT_PANEL_INTRO_*`)
+- Narrow (`max-width: 36rem`): intro weight `500`
+- `--contact-intro-top-px` custom property on `.page-buttons-panel`
 
 Shared fluid type: `--contact-fluid-font` × `--contact-font-scale` on both intro and links
 (icons track `em`). Narrow scales: `0.91` @ ≤36rem, `0.82` @ ≤22rem.
 
-## Typography constants
+## Typography constants (removed)
 
-`src/constants/contact-panel-typography.ts`:
+These were in `src/constants/contact-panel-typography.ts` and removed with the intro CSS.
+Re-add when restoring intro:
 
-- `CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH = '36rem'`
 - `CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP = 500`
 - `CONTACT_PANEL_INTRO_FONT_WEIGHT_NARROW = 500`
+
+Still present:
+
+- `CONTACT_PANEL_TYPO_NARROW_MAX_WIDTH = '36rem'`
 - `CONTACT_PANEL_LINK_TEXT_FONT_WEIGHT = 500`
 - `CONTACT_PANEL_LINKS_FONT_SCALE = 1`
 
@@ -141,12 +147,16 @@ Shared fluid type: `--contact-fluid-font` × `--contact-font-scale` on both intr
 - `e2e/square-containment.spec.ts` + `e2e/helpers/zoom-guard.ts` —
   add `.contact-page__inset-rect--intro` back to `requiredInsideSelectors`
 - Unit: `computeIntroLinksGapPx` already covered in `tests/unit/contact-layout-math.test.ts`
-- Contracts: intro weight selectors in `tests/unit/layout-contracts.test.ts`
+- Contracts: re-add intro weight test in `tests/unit/layout-contracts.test.ts`
+  (removed with CSS; import `CONTACT_PANEL_INTRO_FONT_WEIGHT_*` back)
 
 ## Restore checklist
 
 1. Re-insert intro markup in `contact.astro` (snippet above).
-2. Confirm CSS + `CONTACT_LAYOUT` intro gap tokens unchanged.
-3. Re-add e2e assertions for intro + intro→links gap.
-4. Run: `npm run test:unit -- tests/unit/contact-layout-math.test.ts tests/unit/layout-contracts.test.ts`
-5. Run contact e2e: landing fit / square-containment / pages contact tests.
+2. Re-add intro CSS rules to `contact.css` (values listed above).
+3. Re-add `CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP/NARROW` constants.
+4. Re-add intro weight contract test in `layout-contracts.test.ts`.
+5. Re-add e2e assertions for intro + intro→links gap.
+6. Confirm `CONTACT_LAYOUT` intro gap tokens unchanged.
+7. Run: `npm run test:unit -- tests/unit/contact-layout-math.test.ts tests/unit/layout-contracts.test.ts`
+8. Run contact e2e: landing fit / square-containment / pages contact tests.

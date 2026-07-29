@@ -1,11 +1,6 @@
-/* ===============================
-   CONTACT — form page (.contact) + landing (.contact-page)
-================================ */
-
 .contact {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .contact-page {
@@ -26,7 +21,6 @@
   --panel-padding-top: 10%;
   --panel-padding-left: 10%;
   --panel-padding-bottom: 24%;
-  --writing-row-gap: var(--panel-row-gap);
   --contact-link-row-min-h: var(--panel-row-min-h);
   --contact-link-row-max-h: var(--panel-row-max-h);
   --contact-link-row-gap: var(--panel-row-gap);
@@ -46,7 +40,6 @@
   background-color: var(--color-page-bg);
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
-  --contact-intro-top-px: 16px;
   --contact-links-top-px: 75%;
   --contact-font-scale: 1;
   --contact-fluid-font: clamp(
@@ -64,10 +57,6 @@
     --contact-font-scale: 0.91;
     --panel-bg-nudge-y: 0.22;
     --panel-bg-zoom: 1.38;
-  }
-
-  .contact-page__intro {
-    font-weight: 500;
   }
 }
 
@@ -119,11 +108,6 @@
   transform: rotate(var(--panel-bg-rotate, 0deg));
 }
 
-/*
- * Do not set position on `.contact-page__fit-content`: absolute inset rects must
- * use `.page-buttons-panel` as containing block.
- */
-
 .contact-page .page-buttons-panel::after {
   content: none;
 }
@@ -156,29 +140,9 @@
   z-index: 2;
 }
 
-.contact-page__inset-rect--intro {
-  top: var(--contact-intro-top-px);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: clamp(0.72em, 0.58rem + 1.35vw, 0.98em);
-  width: calc(100% - var(--panel-padding-left, 2rem));
-  max-width: calc(100% - var(--panel-padding-left, 2rem));
-  --contact-intro-pad-left: clamp(0.74rem, 0.56rem + 2.05vw, 1.02rem);
-  --contact-intro-pad-right: clamp(1.02rem, 0.82rem + 2.35vw, 1.42rem);
-  --contact-intro-pad-top: clamp(0.88rem, 0.62rem + 1.45vw, 1.32rem);
-  --contact-intro-pad-bottom: clamp(0.86rem, 0.66rem + 1.8vw, 1.28rem);
-  padding: var(--contact-intro-pad-top) var(--contact-intro-pad-right)
-    var(--contact-intro-pad-bottom) var(--contact-intro-pad-left);
-}
-
 .contact-page__inset-rect--links {
   top: var(--contact-links-top-px);
   transform: var(--contact-links-y-transform, translateY(-50%));
-  left: auto;
-  right: 0;
-  inset-inline-start: auto;
-  inset-inline-end: 0;
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
@@ -186,34 +150,9 @@
     var(--contact-fluid-font) * var(--contact-font-scale) *
       var(--contact-links-font-scale)
   );
-  inline-size: var(--contact-links-width);
   width: var(--contact-links-width);
-  max-inline-size: var(--contact-links-width);
   padding: 0;
   background: transparent;
-}
-
-.contact-page__intro {
-  margin: 0;
-  padding: 0;
-  font-weight: 500;
-  line-height: 1.52;
-  letter-spacing: 0.018em;
-  color: rgba(var(--color-ink-rgb), 0.96);
-  white-space: normal;
-  max-width: 100%;
-  min-width: 0;
-  hyphens: none;
-  word-break: normal;
-  overflow-wrap: break-word;
-  opacity: 0.98;
-  font-size: 0.995em;
-}
-
-.contact-page__intro-prompt {
-  font-weight: 600;
-  font-size: 1.045em;
-  letter-spacing: 0.02em;
 }
 
 .contact-page__links {
@@ -221,17 +160,14 @@
   flex-direction: column;
   align-items: stretch;
   gap: max(0.45rem, var(--contact-link-row-gap, var(--panel-row-gap)));
-  inline-size: 100%;
   width: 100%;
-  max-inline-size: 100%;
 }
 
 .contact-page .contact-extra-link {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  inline-size: 100%;
-  min-inline-size: 0;
+  width: 100%;
   box-sizing: border-box;
   min-height: clamp(
     var(--panel-row-min-h),
@@ -406,34 +342,4 @@
 
 .contact-form__actions .contact-status {
   min-height: 0;
-}
-
-.contact-extra-links-intro {
-  margin: 0;
-  padding: 0;
-}
-
-.contact-extra-links {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.contact-extra-link {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-decoration: none;
-  color: inherit;
-}
-
-.contact-extra-link__icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  flex: 0 0 auto;
-  display: block;
-}
-
-.contact-extra-link__text {
-  font-weight: 500;
 }
