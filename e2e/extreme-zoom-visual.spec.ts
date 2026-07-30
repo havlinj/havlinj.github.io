@@ -3,15 +3,21 @@ import { applyExtremeZoom } from './helpers';
 
 /*
  * PNG baselines must match CI / integration-tests.sh: render via astro preview, not dev.
- * Scoped to desktop-chromium via playwright.config (non-mobile specs).
- * Regenerate:
+ * Regenerate (desktop chromium):
  *   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual.spec.ts --project=desktop-chromium --update-snapshots
  * Or run ./scripts/web/update-playwright-snapshots.sh (defaults PW_SERVER_MODE=preview and updates these among others).
  */
 test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('hero square visual snapshot at extreme zoom', async ({ page }) => {
+  test('hero square visual snapshot at extreme zoom', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== 'chromium',
+      'Visual baseline is chromium-scoped.',
+    );
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/');
     await page.locator('section.hero.hero--ready').waitFor({ timeout: 15_000 });
@@ -26,7 +32,14 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     );
   });
 
-  test('writing square visual snapshot at extreme zoom', async ({ page }) => {
+  test('writing square visual snapshot at extreme zoom', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== 'chromium',
+      'Visual baseline is chromium-scoped.',
+    );
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/writing');
     await expect(
@@ -42,7 +55,14 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     });
   });
 
-  test('contact square visual snapshot at extreme zoom', async ({ page }) => {
+  test('contact square visual snapshot at extreme zoom', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== 'chromium',
+      'Visual baseline is chromium-scoped.',
+    );
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/contact');
     await expect
