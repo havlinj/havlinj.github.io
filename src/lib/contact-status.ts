@@ -34,7 +34,7 @@ export const CONTACT_STATUS_MESSAGES: Record<ContactStatusCode, string> = {
   ...CONTACT_UI_MESSAGES,
 };
 
-/** Layout budget: must match src/styles/contact.css */
+/** Layout budget: must match src/styles/pages/contact.css */
 export const CONTACT_STATUS_LAYOUT = {
   sendButtonMaxHeightRem: 2,
   statusPadBlockRem: 0.15,

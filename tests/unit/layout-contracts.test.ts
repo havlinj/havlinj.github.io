@@ -63,7 +63,7 @@ function whyBoxScrollLiteral(name: string): number {
 }
 
 describe('layout contracts: profile seam ratios (CSS ↔ e2e/profile-seam-ratios.ts)', () => {
-  const css = readRepoFile('src/styles/profile.css');
+  const css = readRepoFile('src/styles/pages/profile.css');
 
   it('CSS custom props match PROFILE_SHARED_EDGE_RATIO_BY_STEP', () => {
     const pairs: [string, keyof typeof PROFILE_SHARED_EDGE_RATIO_BY_STEP][] = [
@@ -138,7 +138,7 @@ describe('layout contracts: why layout (constants ↔ Astro ↔ why-box-scroll �
 
 describe('layout contracts: profile reveal (TS ↔ CSS calc)', () => {
   it('profile.css uses REVEAL_RIGHT_MARGIN_RATIO_MIN in reveal inset calc', () => {
-    const css = readRepoFile('src/styles/profile.css');
+    const css = readRepoFile('src/styles/pages/profile.css');
     expect(css).toContain(`* ${REVEAL_RIGHT_MARGIN_RATIO_MIN}`);
     expect(REVEAL_RIGHT_MARGIN_RATIO_MIN).toBe(1.02);
     expect(REVEAL_RIGHT_RENDER_PAD_PX).toBe(1);
@@ -148,7 +148,7 @@ describe('layout contracts: profile reveal (TS ↔ CSS calc)', () => {
 });
 
 describe('layout contracts: contact panel typography (constants ↔ contact.css)', () => {
-  const css = readRepoFile('src/styles/contact.css');
+  const css = readRepoFile('src/styles/pages/contact.css');
 
   it('uses shared narrow breakpoint with --contact-font-scale', () => {
     expect(css).toContain(
@@ -170,7 +170,7 @@ describe('layout contracts: contact panel typography (constants ↔ contact.css)
 
 describe('layout contracts: contact form status (CONTACT_STATUS_LAYOUT ↔ contact.css)', () => {
   it('.contact-form__actions custom props match CONTACT_STATUS_LAYOUT', () => {
-    const css = readRepoFile('src/styles/contact.css');
+    const css = readRepoFile('src/styles/pages/contact.css');
     expect(css).toContain(
       `--contact-send-max-height: ${CONTACT_STATUS_LAYOUT.sendButtonMaxHeightRem}rem`,
     );
@@ -183,7 +183,7 @@ describe('layout contracts: contact form status (CONTACT_STATUS_LAYOUT ↔ conta
   });
 
   it('.contact-status typography matches CONTACT_STATUS_LAYOUT', () => {
-    const css = readRepoFile('src/styles/contact.css');
+    const css = readRepoFile('src/styles/pages/contact.css');
     expect(css).toContain(
       `font-size: ${CONTACT_STATUS_LAYOUT.statusFontSizeRem}rem`,
     );

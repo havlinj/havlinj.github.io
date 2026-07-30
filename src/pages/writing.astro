@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import ResponsiveDichromPicture from '../components/ResponsiveDichromPicture.astro';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
-import '../styles/writing.css';
+import '../styles/pages/writing.css';
 import { splitAndSortWritingPosts } from '../utils/writing-posts';
 
 const posts = await getCollection('blog');

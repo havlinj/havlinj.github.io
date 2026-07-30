@@ -9,10 +9,10 @@ export const PAGE_REVEAL_OPACITY_TRANSITION =
 
 /** Stylesheets that declare the shared reveal transition on the content layer. */
 export const PAGE_REVEAL_STYLESHEETS = [
-  'src/styles/hero.css',
-  'src/styles/writing.css',
-  'src/styles/contact.css',
-  'src/styles/profile.css',
+  'src/styles/pages/hero.css',
+  'src/styles/pages/writing.css',
+  'src/styles/pages/contact.css',
+  'src/styles/pages/profile.css',
 ] as const;
 
 /** Element that carries the transition once content is (or is about to be) revealed. */

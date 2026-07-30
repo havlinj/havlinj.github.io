@@ -44,7 +44,7 @@ export const WHY_CTA_ARROW_FLOOR_OPACITY = 0.08;
 
 /**
  * JS fallback when computed padding-right is missing (≈ 3rem at 16px root).
- * sync: `--why-text-right-gutter: 2.75em` in `src/styles/why.css`
+ * sync: `--why-text-right-gutter: 2.75em` in `src/styles/pages/why.css`
  */
 export const WHY_TEXT_RIGHT_GUTTER_REM = 3;
 

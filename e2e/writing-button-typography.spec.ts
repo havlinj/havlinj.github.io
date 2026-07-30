@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 /**
  * Locks in Writing index row typography: fluid inner font-size (clamp + cqi),
  * title weight 600, date size as em of inner, container query letter-spacing.
- * @see src/styles/writing.css
+ * @see src/styles/pages/writing.css
  */
 
 async function gotoWritingReady(page: import('@playwright/test').Page) {

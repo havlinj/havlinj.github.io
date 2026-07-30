@@ -1,5 +1,5 @@
 /**
- * Sync with `src/styles/profile.css` — `.profile-section` block
+ * Sync with `src/styles/pages/profile.css` — `.profile-section` block
  * `--profile-shared-edge-ratio-base` / `-360` / `-480` / `-720` / `-960`
  * and matching `@media (min-width: …)` breakpoints (same numbers as in that file).
  */

@@ -40,7 +40,7 @@ vertical stack math automatically.
 
 ## Panel / inset proportions (restore contract)
 
-From `src/constants/contact-layout.ts` + `src/styles/contact.css` (keep in sync):
+From `src/constants/contact-layout.ts` + `src/styles/pages/contact.css` (keep in sync):
 
 | Token / rule                       | Value                                          | Role                                                       |
 | ---------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
@@ -107,10 +107,10 @@ centerYFromTop = panelHeight * (1 - 0.25)
 
 CSS fallback before fit / noscript: `top: 75%` + `translateY(-50%)`.
 
-## Intro box CSS (removed from `contact.css`)
+## Intro box CSS (removed from `src/styles/pages/contact.css`)
 
 These rules were removed during the links-only refactor. Re-add them to
-`contact.css` when restoring the intro:
+`src/styles/pages/contact.css` when restoring the intro:
 
 - `.contact-page__inset-rect--intro` padding (roomier inset):
   - `--contact-intro-pad-left: clamp(0.74rem, 0.56rem + 2.05vw, 1.02rem)`
@@ -153,7 +153,7 @@ Still present:
 ## Restore checklist
 
 1. Re-insert intro markup in `contact.astro` (snippet above).
-2. Re-add intro CSS rules to `contact.css` (values listed above).
+2. Re-add intro CSS rules to `src/styles/pages/contact.css` (values listed above).
 3. Re-add `CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP/NARROW` constants.
 4. Re-add intro weight contract test in `layout-contracts.test.ts`.
 5. Re-add e2e assertions for intro + intro→links gap.
