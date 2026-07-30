@@ -34,9 +34,10 @@ in `src/pages/contact.astro`:
 </div>
 ```
 
-`contact-layout-fit.ts` already supports an optional intro node: when
-`.contact-page__inset-rect--intro` is present again, it resumes the intro+links
-vertical stack math automatically.
+`contact-layout-fit.ts` is currently **links-only**. When restoring the intro,
+re-add the intro measurement / placement branch (see “Fit JS to restore” below).
+Keep `CONTACT_SELECTORS.introRect` and the intro gap helpers in
+`contact-layout-math.ts` / `CONTACT_LAYOUT` — they stay for restore.
 
 ## Panel / inset proportions (restore contract)
 
@@ -150,13 +151,33 @@ Still present:
 - Contracts: re-add intro weight test in `tests/unit/layout-contracts.test.ts`
   (removed with CSS; import `CONTACT_PANEL_INTRO_FONT_WEIGHT_*` back)
 
+## Fit JS to restore (`src/scripts/contact-layout-fit.ts`)
+
+Links-only fit no longer queries the intro node. When restoring, wire it back:
+
+1. `querySelector(CONTACT_SELECTORS.introRect)` → `introRectEl`.
+2. In `measureNeededContent`, if `introRectEl` is present:
+   - measure intro outer size
+   - `introLinksGapPx = computeIntroLinksGapPx(intro.h, panelEdge)`
+   - `neededWidth = max(intro.w, links.w) + leftPad + fitSafetyXPx`
+   - `neededHeight = topPad + intro.h + introLinksGapPx + links.h + topPad + fitSafetyYPx`
+3. In `flush` placement:
+   - with intro: `--contact-intro-top-px = topPad`;
+     `--contact-links-top-px = topPad + introH + introLinksGapPx`;
+     `--contact-links-y-transform = none`
+   - without intro: keep current center-from-bottom links placement
+
+Import `computeIntroLinksGapPx` again. Read panel `padding-top` for `topPad`
+(same as left pad helper).
+
 ## Restore checklist
 
 1. Re-insert intro markup in `contact.astro` (snippet above).
 2. Re-add intro CSS rules to `src/styles/pages/contact.css` (values listed above).
-3. Re-add `CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP/NARROW` constants.
-4. Re-add intro weight contract test in `layout-contracts.test.ts`.
-5. Re-add e2e assertions for intro + intro→links gap.
-6. Confirm `CONTACT_LAYOUT` intro gap tokens unchanged.
-7. Run: `npm run test:unit -- tests/unit/contact-layout-math.test.ts tests/unit/layout-contracts.test.ts`
-8. Run contact e2e: landing fit / square-containment / pages contact tests.
+3. Re-add intro branch in `contact-layout-fit.ts` (section above).
+4. Re-add `CONTACT_PANEL_INTRO_FONT_WEIGHT_DESKTOP/NARROW` constants.
+5. Re-add intro weight contract test in `layout-contracts.test.ts`.
+6. Re-add e2e assertions for intro + intro→links gap.
+7. Confirm `CONTACT_LAYOUT` intro gap tokens unchanged.
+8. Run: `npm run test:unit -- tests/unit/contact-layout-math.test.ts tests/unit/layout-contracts.test.ts`
+9. Run contact e2e: landing fit / square-containment / pages contact tests.

@@ -12,6 +12,7 @@ echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"
 
 export PW_SKIP_EXTREME_ZOOM_VISUAL="${PW_SKIP_EXTREME_ZOOM_VISUAL:-1}"
+echo "PW_SKIP_EXTREME_ZOOM_VISUAL=${PW_SKIP_EXTREME_ZOOM_VISUAL} (1=omit @extreme-zoom-visual, 0=full suite)"
 
 RUN_CLEAN="${ALL_SH_CLEAN:-1}"
 if [ "$RUN_CLEAN" = "1" ]; then

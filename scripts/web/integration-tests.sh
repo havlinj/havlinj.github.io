@@ -108,6 +108,8 @@ EXTRA_INVERT=()
 if [[ "$SKIP_EXTREME_ZOOM_VISUAL" == "1" ]]; then
   EXTRA_INVERT=(--grep-invert=@extreme-zoom-visual)
   echo "Omitting @extreme-zoom-visual specs (PW_SKIP_EXTREME_ZOOM_VISUAL=1)."
+else
+  echo "Including @extreme-zoom-visual specs (PW_SKIP_EXTREME_ZOOM_VISUAL=${SKIP_EXTREME_ZOOM_VISUAL})."
 fi
 echo "Playwright workers: $PW_WORKERS"
 echo "Playwright CI mode: $PW_CI_MODE"

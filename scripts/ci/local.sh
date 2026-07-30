@@ -16,7 +16,8 @@ npm audit --audit-level=high
 
 echo ""
 echo "=== Quality gate (all.sh, full Playwright) ==="
-bash "$ROOT_DIR/scripts/all.sh"
+# Force on the child argv — do not rely only on inherited export.
+PW_SKIP_EXTREME_ZOOM_VISUAL=0 bash "$ROOT_DIR/scripts/all.sh"
 
 echo ""
 echo "=== Lighthouse ==="

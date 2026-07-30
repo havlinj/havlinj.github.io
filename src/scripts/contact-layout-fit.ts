@@ -6,7 +6,6 @@ import {
 import {
   applyContactFitPasses,
   clampContactInsetPanelPadFrac,
-  computeIntroLinksGapPx,
   computeLinksTopPxForCenterFromBottom,
   outerRectSizeWithMarginsCeil,
   resolveContactFluidFontPx,
@@ -15,15 +14,11 @@ import {
 type NeededContent = {
   neededWidth: number;
   neededHeight: number;
-  topPad: number;
-  introH: number;
-  introLinksGapPx: number;
 };
 
 function startContactInsetFit(): void {
   const panel = document.querySelector(CONTACT_SELECTORS.panel);
   const fitContent = document.querySelector(CONTACT_SELECTORS.fitContent);
-  const introRect = document.querySelector(CONTACT_SELECTORS.introRect);
   const linksRect = document.querySelector(CONTACT_SELECTORS.linksRect);
   const zone = document.querySelector(CONTACT_SELECTORS.zone);
   const mainEl = document.querySelector(CONTACT_SELECTORS.mainContent);
@@ -33,7 +28,6 @@ function startContactInsetFit(): void {
   }
   const panelEl = panel;
   const fitContentEl = fitContent instanceof HTMLElement ? fitContent : null;
-  const introRectEl = introRect instanceof HTMLElement ? introRect : null;
   const linksRectEl = linksRect;
   const cssVarCache = new Map<string, string>();
 
@@ -84,11 +78,6 @@ function startContactInsetFit(): void {
     setPanelVar('--contact-stack-top-px', `${Math.round(insetPadPx)}px`);
   }
 
-  function readPanelTopPadPx(): number {
-    const paddingTopPx = parseFloat(getComputedStyle(panelEl).paddingTop);
-    return Number.isFinite(paddingTopPx) ? paddingTopPx : 0;
-  }
-
   function readPanelLeftPadPx(): number {
     const paddingLeftPx = parseFloat(getComputedStyle(panelEl).paddingLeft);
     return Number.isFinite(paddingLeftPx) ? paddingLeftPx : 0;
@@ -110,38 +99,12 @@ function startContactInsetFit(): void {
     );
   }
 
-  function measureNeededContent(panelEdge: number): NeededContent {
-    const topPad = Math.round(readPanelTopPadPx());
+  function measureNeededContent(): NeededContent {
     const leftPad = Math.round(readPanelLeftPadPx());
     const links = measureRectOuterSize(linksRectEl);
-
-    if (!introRectEl) {
-      return {
-        neededWidth: links.w + leftPad + CONTACT_LAYOUT.fitSafetyXPx,
-        neededHeight: links.h + CONTACT_LAYOUT.fitSafetyYPx,
-        topPad,
-        introH: 0,
-        introLinksGapPx: 0,
-      };
-    }
-
-    const intro = measureRectOuterSize(introRectEl);
-    const introLinksGapPx = computeIntroLinksGapPx(intro.h, panelEdge);
-    const neededWidth =
-      Math.max(intro.w, links.w) + leftPad + CONTACT_LAYOUT.fitSafetyXPx;
-    const neededHeight =
-      topPad +
-      intro.h +
-      introLinksGapPx +
-      links.h +
-      topPad +
-      CONTACT_LAYOUT.fitSafetyYPx;
     return {
-      neededWidth,
-      neededHeight,
-      topPad,
-      introH: intro.h,
-      introLinksGapPx,
+      neededWidth: links.w + leftPad + CONTACT_LAYOUT.fitSafetyXPx,
+      neededHeight: links.h + CONTACT_LAYOUT.fitSafetyYPx,
     };
   }
 
@@ -154,9 +117,7 @@ function startContactInsetFit(): void {
     let desiredFontPx = resolveContactFluidFontPx(panelEdge, cssFontPx);
 
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
-    const measured = measureNeededContent(panelEdge);
-    let { neededWidth, neededHeight, topPad, introH, introLinksGapPx } =
-      measured;
+    let { neededWidth, neededHeight } = measureNeededContent();
 
     ({ desiredFontPx, neededWidth, neededHeight } = applyContactFitPasses({
       panelEdge,
@@ -165,30 +126,16 @@ function startContactInsetFit(): void {
       neededHeight,
       measureAtFont: (fontPx) => {
         applyFontAndPanelMetrics(fontPx, panelEdge);
-        const m = measureNeededContent(panelEdge);
-        topPad = m.topPad;
-        introH = m.introH;
-        introLinksGapPx = m.introLinksGapPx;
-        return { neededWidth: m.neededWidth, neededHeight: m.neededHeight };
+        return measureNeededContent();
       },
     }));
     applyFontAndPanelMetrics(desiredFontPx, panelEdge);
 
-    if (!introRectEl) {
-      const links = measureRectOuterSize(linksRectEl);
-      const panelH = Math.max(1, panelEl.clientHeight);
-      const linksTopPx = computeLinksTopPxForCenterFromBottom(panelH, links.h);
-      setPanelVar('--contact-intro-top-px', `${topPad}px`);
-      setPanelVar('--contact-links-top-px', `${linksTopPx}px`);
-      setPanelVar('--contact-links-y-transform', 'none');
-    } else {
-      setPanelVar('--contact-intro-top-px', `${topPad}px`);
-      setPanelVar(
-        '--contact-links-top-px',
-        `${topPad + introH + introLinksGapPx}px`,
-      );
-      setPanelVar('--contact-links-y-transform', 'none');
-    }
+    const links = measureRectOuterSize(linksRectEl);
+    const panelH = Math.max(1, panelEl.clientHeight);
+    const linksTopPx = computeLinksTopPxForCenterFromBottom(panelH, links.h);
+    setPanelVar('--contact-links-top-px', `${linksTopPx}px`);
+    setPanelVar('--contact-links-y-transform', 'none');
 
     revealAfterStableLayout();
   }

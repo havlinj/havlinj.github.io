@@ -37,7 +37,9 @@ export default defineConfig({
     {
       name: 'mobile-chromium',
       use: { ...devices['Pixel 7'] },
+      // WebKit-only baselines: do not collect on Chromium (avoids fake skipped rows).
       testMatch: /.*-mobile\.spec\.ts/,
+      testIgnore: /extreme-zoom-visual-mobile\.spec\.ts/,
     },
     {
       name: 'mobile-webkit',

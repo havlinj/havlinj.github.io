@@ -3,17 +3,14 @@ import { applyExtremeZoom } from './helpers';
 
 /*
  * PNG baselines must match CI: astro preview (PW_SERVER_MODE=preview), not dev.
+ * Scoped to mobile-webkit via playwright.config (ignored on mobile-chromium).
  * Regenerate:
  *   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts --project=mobile-webkit --update-snapshots
  */
 test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('hero square visual snapshot on mobile webkit', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(browserName !== 'webkit', 'Mobile-webkit baseline only.');
+  test('hero square visual snapshot on mobile webkit', async ({ page }) => {
     await page.goto('/');
     await page.locator('section.hero.hero--ready').waitFor({ timeout: 15_000 });
     await applyExtremeZoom(page);
@@ -27,11 +24,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     );
   });
 
-  test('writing square visual snapshot on mobile webkit', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(browserName !== 'webkit', 'Mobile-webkit baseline only.');
+  test('writing square visual snapshot on mobile webkit', async ({ page }) => {
     await page.goto('/writing');
     await expect(
       page.locator('.writing-groups.writing-groups--visible'),
@@ -46,11 +39,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     });
   });
 
-  test('contact square visual snapshot on mobile webkit', async ({
-    page,
-    browserName,
-  }) => {
-    test.skip(browserName !== 'webkit', 'Mobile-webkit baseline only.');
+  test('contact square visual snapshot on mobile webkit', async ({ page }) => {
     await page.goto('/contact');
     await expect
       .poll(
