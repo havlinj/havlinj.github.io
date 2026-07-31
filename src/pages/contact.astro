@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ResponsiveDichromPicture from '../components/ResponsiveDichromPicture.astro';
+import { CONTACT_LAYOUT } from '../constants/contact-layout';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import '../styles/pages/contact.css';
 
@@ -9,13 +10,19 @@ const title = 'Contact — Jan Havlín';
 const contactBg = buildDichromResponsive(
   '/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom',
 );
+
+const linksTopFallbackPct =
+  (1 - CONTACT_LAYOUT.linksCenterFromBottomRatio) * 100;
 ---
 
 <Layout title={title} activeSection="contact">
   <article class="contact-page">
     <h1 class="page-title">Contact</h1>
     <div class="page-buttons-zone">
-      <div class="page-buttons-panel">
+      <div
+        class="page-buttons-panel"
+        style={`--contact-links-top-px: ${linksTopFallbackPct}%;`}
+      >
         <div class="page-buttons-panel__media" aria-hidden="true">
           <ResponsiveDichromPicture
             sources={contactBg}

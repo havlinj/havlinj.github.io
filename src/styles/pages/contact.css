@@ -10,14 +10,14 @@
   --page-title-margin-bottom: 1.35rem;
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
-  --panel-bg-layer-opacity: 0.8;
-  --panel-bg-saturation: 0.97;
-  --panel-bg-brightness: 1;
+  --panel-bg-layer-opacity: 0.98;
+  --panel-bg-saturation: 1;
+  --panel-bg-brightness: 1.11;
   --panel-bg-contrast: 0.97;
-  --panel-bg-zoom: 1.38;
-  --panel-bg-nudge-x: 0;
-  --panel-bg-nudge-y: 0.2;
-  --panel-bg-rotate: 0.35deg;
+  --panel-bg-zoom: 1.4;
+  --panel-bg-nudge-x: 0.13;
+  --panel-bg-nudge-y: 0.494;
+  --panel-bg-rotate: 0.45deg;
   --panel-padding-top: 10%;
   --panel-padding-left: 10%;
   --panel-padding-bottom: 24%;
@@ -40,7 +40,6 @@
   background-color: var(--color-page-bg);
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
-  --contact-links-top-px: 75%;
   --contact-font-scale: 1;
   --contact-fluid-font: clamp(
     var(--panel-fluid-font-min),
@@ -55,8 +54,6 @@
 @media (max-width: 36rem) {
   .contact-page .page-buttons-panel {
     --contact-font-scale: 0.91;
-    --panel-bg-nudge-y: 0.22;
-    --panel-bg-zoom: 1.38;
   }
 }
 

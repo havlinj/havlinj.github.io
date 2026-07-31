@@ -194,7 +194,7 @@ describe('outerRectSizeWithMarginsCeil', () => {
 });
 
 describe('computeLinksTopPxForCenterFromBottom', () => {
-  it('anchors stack center at 25% of height from the bottom', () => {
+  it('anchors stack center at the given ratio from the bottom', () => {
     expect(computeLinksTopPxForCenterFromBottom(1000, 200, 0.25)).toBe(650);
   });
 
@@ -203,6 +203,11 @@ describe('computeLinksTopPxForCenterFromBottom', () => {
   });
 
   it('uses CONTACT_LAYOUT default ratio when omitted', () => {
-    expect(computeLinksTopPxForCenterFromBottom(1000, 200)).toBe(650);
+    const panelH = 1000;
+    const linksH = 200;
+    const expected = Math.round(
+      panelH * (1 - CONTACT_LAYOUT.linksCenterFromBottomRatio) - linksH / 2,
+    );
+    expect(computeLinksTopPxForCenterFromBottom(panelH, linksH)).toBe(expected);
   });
 });

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
+import { CONTACT_LAYOUT } from '../src/constants/contact-layout';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
 import {
   expectNavLinkActive,
@@ -627,7 +628,10 @@ test.describe('Contact page (/contact)', () => {
 
     expect(data).not.toBeNull();
     expect(data!.linksWidthFrac).toBeCloseTo(0.38, 2);
-    expect(data!.linksCenterFromBottom).toBeCloseTo(0.25, 1);
+    expect(data!.linksCenterFromBottom).toBeCloseTo(
+      CONTACT_LAYOUT.linksCenterFromBottomRatio,
+      1,
+    );
   });
 
   test('zoom freeze activates on profile and contact after viewport squeeze', async ({
