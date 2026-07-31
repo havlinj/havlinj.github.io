@@ -96,6 +96,7 @@ jobs:
           LIGHTHOUSE_SKIP_BUILD: '1'
           LH_MAX_LCP_MS: '4000'
           LH_MIN_PERF_SCORE: '0.84'
+          LH_ATTEMPTS: '3'
       - name: Build with Astro
         run: bash ./scripts/web/build-pages.sh
         working-directory: ${{ env.BUILD_PATH }}

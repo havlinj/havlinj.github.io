@@ -13,11 +13,16 @@ REPORT_JSON="${REPORT_DIR}/home.json"
 SKIP_BUILD="${LIGHTHOUSE_SKIP_BUILD:-0}"
 SKIP_PREVIEW="${LIGHTHOUSE_SKIP_PREVIEW:-0}"
 
-# Default thresholds: stricter locally; GitHub Actions sets LH_MAX_LCP_MS in deploy.yml (noisy runners).
+# Default thresholds: stricter locally; GitHub Actions sets LH_MAX_* in deploy.yml (noisy runners).
 MIN_PERF_SCORE="${LH_MIN_PERF_SCORE:-0.85}"
 MAX_LCP_MS="${LH_MAX_LCP_MS:-3000}"
 MAX_CLS="${LH_MAX_CLS:-0.10}"
 MAX_TBT_MS="${LH_MAX_TBT_MS:-200}"
+# Retries help when the machine is busy (e.g. after full Playwright in local.sh / CI).
+ATTEMPTS="${LH_ATTEMPTS:-2}"
+if ! [[ "$ATTEMPTS" =~ ^[1-9][0-9]*$ ]]; then
+  ATTEMPTS=2
+fi
 
 kill_process_tree() {
   local pid="$1"
@@ -99,16 +104,8 @@ curl -fsS --max-time 2 "$URL" >/dev/null
 
 CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
 
-echo "Running Lighthouse against ${URL}..."
-npx lighthouse "$URL" \
-  --chrome-path="$CHROME_PATH" \
-  --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
-  --output=json \
-  --output-path="$REPORT_JSON" \
-  --only-categories=performance \
-  --quiet
-
-node - "$REPORT_JSON" "$MIN_PERF_SCORE" "$MAX_LCP_MS" "$MAX_CLS" "$MAX_TBT_MS" <<'EOF'
+evaluate_report() {
+  node - "$REPORT_JSON" "$MIN_PERF_SCORE" "$MAX_LCP_MS" "$MAX_CLS" "$MAX_TBT_MS" <<'EOF'
 const fs = require('node:fs');
 
 const [reportPath, minScoreRaw, maxLcpRaw, maxClsRaw, maxTbtRaw] = process.argv.slice(2);
@@ -143,5 +140,32 @@ if (failures.length > 0) {
   process.exit(1);
 }
 EOF
+}
+
+attempt=1
+while true; do
+  if [[ "$ATTEMPTS" -gt 1 ]]; then
+    echo "Running Lighthouse against ${URL} (attempt ${attempt}/${ATTEMPTS})..."
+  else
+    echo "Running Lighthouse against ${URL}..."
+  fi
+  npx lighthouse "$URL" \
+    --chrome-path="$CHROME_PATH" \
+    --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
+    --output=json \
+    --output-path="$REPORT_JSON" \
+    --only-categories=performance \
+    --quiet
+
+  if evaluate_report; then
+    break
+  fi
+  if [[ "$attempt" -ge "$ATTEMPTS" ]]; then
+    exit 1
+  fi
+  attempt=$((attempt + 1))
+  echo "Retrying Lighthouse (noisy TBT/LCP is common under load)..."
+  sleep 1
+done
 
 echo "Lighthouse budget passed."

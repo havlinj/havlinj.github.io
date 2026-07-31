@@ -60,7 +60,13 @@ const showSiteHeader = Boolean(activeSection || showHeader);
       initZoomGuard();
     </script>
     <script>
-      import '../scripts/layout-debug-overlay.ts';
+      try {
+        if (new URLSearchParams(location.search).has('layoutDebug')) {
+          void import('../scripts/layout-debug-overlay.ts');
+        }
+      } catch {
+        /* ignore */
+      }
     </script>
   </body>
 </html>
