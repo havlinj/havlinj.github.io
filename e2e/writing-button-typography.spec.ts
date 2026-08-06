@@ -49,9 +49,7 @@ function readWritingButtonMetrics() {
     dateTrackingRatio:
       Number.isFinite(dateTrackPx) && datePx > 0 ? dateTrackPx / datePx : NaN,
     datePadEndOverDate:
-      Number.isFinite(datePadEndPx) && datePx > 0
-        ? datePadEndPx / datePx
-        : NaN,
+      Number.isFinite(datePadEndPx) && datePx > 0 ? datePadEndPx / datePx : NaN,
     datePadStartPx,
     datePadTopPx,
     datePadBottomPx,
