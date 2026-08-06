@@ -190,7 +190,7 @@ ul.post-list > li::before {
   line-height: 1.4;
   letter-spacing: 0.035em;
   color: rgba(var(--color-ink-rgb), 0.74);
-  padding: 0.7em;
+  padding-inline-end: 0.2em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   transition: color 0.18s ease;

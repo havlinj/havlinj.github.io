@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Locks in Writing index row typography: fluid inner font-size (clamp + cqi),
- * title weight 600, date size as em of inner, container query letter-spacing.
+ * title weight 600, date size as em of inner, container query letter-spacing,
+ * and date end padding (padding-inline-end only).
  * @see src/styles/pages/writing.css
  */
 
@@ -32,6 +33,10 @@ function readWritingButtonMetrics() {
   const datePx = parseFloat(csDate.fontSize);
   const textTrackPx = parseFloat(csText.letterSpacing);
   const dateTrackPx = parseFloat(csDate.letterSpacing);
+  const datePadEndPx = parseFloat(csDate.paddingInlineEnd);
+  const datePadStartPx = parseFloat(csDate.paddingInlineStart);
+  const datePadTopPx = parseFloat(csDate.paddingTop);
+  const datePadBottomPx = parseFloat(csDate.paddingBottom);
 
   return {
     innerPx,
@@ -43,6 +48,13 @@ function readWritingButtonMetrics() {
       Number.isFinite(textTrackPx) && textPx > 0 ? textTrackPx / textPx : NaN,
     dateTrackingRatio:
       Number.isFinite(dateTrackPx) && datePx > 0 ? dateTrackPx / datePx : NaN,
+    datePadEndOverDate:
+      Number.isFinite(datePadEndPx) && datePx > 0
+        ? datePadEndPx / datePx
+        : NaN,
+    datePadStartPx,
+    datePadTopPx,
+    datePadBottomPx,
     fontWeight: csText.fontWeight,
     fontStyle: csText.fontStyle,
   };
@@ -108,5 +120,17 @@ test.describe('Writing page button typography', () => {
 
     expect(narrow!.textTrackingRatio).toBeLessThan(wide!.textTrackingRatio);
     expect(narrow!.dateTrackingRatio).toBeLessThan(wide!.dateTrackingRatio);
+  });
+
+  test('date padding is end-only (~0.2em of date size)', async ({ page }) => {
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await gotoWritingReady(page);
+    const m = await page.evaluate(readWritingButtonMetrics);
+    expect(m).not.toBeNull();
+    expect(m!.datePadEndOverDate).toBeGreaterThan(0.18);
+    expect(m!.datePadEndOverDate).toBeLessThan(0.22);
+    expect(m!.datePadStartPx).toBe(0);
+    expect(m!.datePadTopPx).toBe(0);
+    expect(m!.datePadBottomPx).toBe(0);
   });
 });
