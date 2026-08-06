@@ -91,45 +91,54 @@ ul.post-list > li::before {
 }
 
 /*
- * Section heading "tab": inverted colors (ink bg, page-bg text) — the resting
- * state of the same invert used on button hover/focus. `.writing-groups` and
- * `.writing-section` carry no left inset of their own (the panel's left
- * padding moved onto `.page-buttons` above), so this sits flush against the
- * square's true left edge with no offset to fake — the opposite edge from
- * where the button rows anchor (rows are flush against the square's right
- * edge; only their left side carries the inset).
+ * Section heading "tab": solid page-bg strip with ink text — same material
+ * language as resting buttons, flush to the square's left edge (panel left
+ * padding lives on `.page-buttons`, not on `.writing-groups`).
  *
  * Width is uniform across sections: JS measures each heading's natural
  * (text + padding) width and writes the widest one to
- * `--writing-section-heading-width` on `.writing-groups`, so every heading —
- * including future categories — inherits the same rectangle length. Without
- * JS, each heading falls back to fitting its own text.
+ * `--writing-section-heading-width` on `.writing-groups`. Without JS, each
+ * heading falls back to fitting its own text.
  */
 .writing-page .writing-section__heading {
   display: inline-block;
   width: var(--writing-section-heading-width, fit-content);
   max-width: 100%;
   margin: 0;
-  padding: 0.55em 0.9em;
-  background-color: var(--color-ink);
-  color: var(--color-page-bg);
+  padding: 0.52em 1.35em;
+  background-color: var(--color-page-bg);
+  color: var(--color-ink);
   text-align: left;
-  font-size: clamp(0.7rem, 0.6rem + 0.85cqi, 0.88rem);
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
+  font-size: clamp(0.88rem, 0.74rem + 1.35cqi, 1.14rem);
+  font-weight: 700;
+  letter-spacing: 0.085em;
+  line-height: 1.2;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Placeholder row ("Coming up…"): same shape as a real button, but inert. */
+/*
+ * Placeholder row ("Coming up…"): same shape as a real button, but inert and
+ * lightly ink-washed so it reads as deferred rather than clickable.
+ */
 .writing-page .page-button--placeholder {
   cursor: default;
   pointer-events: none;
 }
 
+.writing-page .page-button--placeholder .page-button__bg,
+.writing-page .page-button--placeholder .page-button__overlay {
+  background-color: color-mix(
+    in srgb,
+    var(--color-ink) 10%,
+    var(--color-page-bg)
+  );
+}
+
 .writing-page .page-button__text--placeholder {
   font-weight: 400;
+  letter-spacing: 0.03em;
+  color: rgba(var(--color-ink-rgb), 0.58);
 }
 
 /*
