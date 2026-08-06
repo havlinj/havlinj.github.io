@@ -1,10 +1,18 @@
+export type WritingCategory = 'technical' | 'conceptual';
+
 export type WritingPostLike = {
   id: string;
   data: {
     title: string;
     date: Date;
     featured?: boolean;
+    category: WritingCategory;
   };
+};
+
+export type WritingCategoryGroup<T> = {
+  featuredPosts: T[];
+  regularPosts: T[];
 };
 
 function compareByDateDescThenTitleAsc(
@@ -31,19 +39,38 @@ function dedupeByTitleAndDate<T extends WritingPostLike>(posts: T[]): T[] {
   return out;
 }
 
+function splitFeatured<T extends WritingPostLike>(
+  posts: T[],
+): WritingCategoryGroup<T> {
+  const featuredPosts = posts.filter((post) => Boolean(post.data.featured));
+  const featuredIds = new Set(featuredPosts.map((p) => p.id));
+  const regularPosts = posts.filter((post) => !featuredIds.has(post.id));
+  return { featuredPosts, regularPosts };
+}
+
+/** Writing index: posts split into Technical Deep Dives / Conceptual Reflections sections, each with its own featured/regular sub-group. */
 export function splitAndSortWritingPosts<T extends WritingPostLike>(
   posts: T[],
 ): {
-  featuredPosts: T[];
-  regularPosts: T[];
+  technical: WritingCategoryGroup<T>;
+  conceptual: WritingCategoryGroup<T>;
 } {
   const sorted = dedupeByTitleAndDate(
     [...posts].sort(compareByDateDescThenTitleAsc),
   );
-  const featuredPosts = sorted.filter((post) => Boolean(post.data.featured));
-  const featuredIds = new Set(featuredPosts.map((p) => p.id));
-  const regularPosts = sorted.filter(
-    (post) => !Boolean(post.data.featured) && !featuredIds.has(post.id),
-  );
-  return { featuredPosts, regularPosts };
+  return {
+    technical: splitFeatured(
+      sorted.filter((post) => post.data.category === 'technical'),
+    ),
+    conceptual: splitFeatured(
+      sorted.filter((post) => post.data.category === 'conceptual'),
+    ),
+  };
+}
+
+export function formatWritingListDate(d: Date): string {
+  const yy = String(d.getFullYear()).slice(-2);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yy}.${mm}.${dd}`;
 }

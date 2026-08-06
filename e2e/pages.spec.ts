@@ -191,15 +191,18 @@ test.describe('Writing page (/writing)', () => {
   test('gaps between navbar, title, content', async ({ page }) => {
     const nav = page.locator('.site-header');
     const title = page.getByRole('heading', { name: 'Writing', level: 1 });
-    const list = page.locator('.writing-groups .post-list').first();
+    /* Content start = the panel's own top inset, not the first section
+       heading's own box — the heading's padding/font-size would otherwise
+       inflate this measurement without the panel's top offset changing. */
+    const content = page.locator('.writing-groups');
     await expect(nav).toBeVisible();
     await expect(title).toBeVisible();
-    await expect(list).toBeVisible();
+    await expect(content).toBeVisible();
     const nBox = await mustBox(nav);
     const tBox = await mustBox(title);
-    const lBox = await mustBox(list);
+    const cBox = await mustBox(content);
     const gapNavToTitle = tBox.y - (nBox.y + nBox.height);
-    const gapTitleToContent = lBox.y - (tBox.y + tBox.height);
+    const gapTitleToContent = cBox.y - (tBox.y + tBox.height);
     expect(gapNavToTitle).toBeGreaterThanOrEqual(MIN_GAP);
     expect(gapNavToTitle).toBeLessThanOrEqual(MAX_GAP);
     expect(gapTitleToContent).toBeGreaterThanOrEqual(MIN_GAP);
@@ -213,22 +216,47 @@ test.describe('Writing page (/writing)', () => {
     await expect(page.locator('.page-buttons-zone')).toBeVisible();
     await expect(page.locator('.page-buttons-panel')).toBeVisible();
     const featuredList = page.getByRole('list', {
-      name: 'Featured articles',
+      name: 'Featured conceptual articles',
     });
     const articlesList = page.getByRole('list', {
-      name: 'Articles',
+      name: 'Conceptual Reflections articles',
       exact: true,
     });
     await expect(featuredList).toBeVisible();
-    await expect(featuredList.locator('a.page-button')).toHaveCount(2);
-    // Regular list can be hidden when there are zero non-featured posts.
-    await expect(articlesList.locator('a.page-button')).toHaveCount(0);
+    await expect(featuredList.locator('a.page-button')).toHaveCount(1);
+    await expect(articlesList.locator('a.page-button')).toHaveCount(1);
     await expect(
       page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: /Professionalism/ }),
     ).toBeVisible();
+  });
+
+  test('section headings for Technical Deep Dives and Conceptual Reflections are visible', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Technical Deep Dives', level: 2 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Conceptual Reflections', level: 2 }),
+    ).toBeVisible();
+  });
+
+  test('empty Technical Deep Dives section shows a non-interactive "Coming up…" placeholder', async ({
+    page,
+  }) => {
+    const technicalList = page.getByRole('list', {
+      name: 'Technical Deep Dives articles',
+    });
+    await expect(technicalList).toBeVisible();
+    await expect(technicalList.locator('a.page-button')).toHaveCount(0);
+
+    const placeholder = technicalList.locator('.page-button--placeholder');
+    await expect(placeholder).toBeVisible();
+    await expect(placeholder).toHaveText(/Coming up/);
+    await expect(placeholder).toHaveCSS('pointer-events', 'none');
   });
 
   test('each writing list link targets /blog/ slug', async ({ page }) => {

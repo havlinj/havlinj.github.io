@@ -2,23 +2,52 @@
 import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import ResponsiveDichromPicture from '../components/ResponsiveDichromPicture.astro';
+import WritingPostButton from '../components/WritingPostButton.astro';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import '../styles/pages/writing.css';
-import { splitAndSortWritingPosts } from '../utils/writing-posts';
+import {
+  splitAndSortWritingPosts,
+  type WritingCategoryGroup,
+  type WritingPostLike,
+} from '../utils/writing-posts';
 
 const posts = await getCollection('blog');
-const { featuredPosts, regularPosts } = splitAndSortWritingPosts(posts);
+const { technical, conceptual } = splitAndSortWritingPosts(posts);
 
 const writingBg = buildDichromResponsive(
   '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
 );
 
-function formatWritingListDate(d: Date): string {
-  const yy = String(d.getFullYear()).slice(-2);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yy}.${mm}.${dd}`;
+type WritingSectionView = {
+  headingId: string;
+  heading: string;
+  hasPosts: boolean;
+  featuredPosts: WritingPostLike[];
+  regularPosts: WritingPostLike[];
+  featuredLabel: string;
+  regularLabel: string;
+};
+
+function buildWritingSectionView(
+  key: string,
+  heading: string,
+  group: WritingCategoryGroup<WritingPostLike>,
+): WritingSectionView {
+  return {
+    headingId: `writing-section-heading-${key}`,
+    heading,
+    hasPosts: group.featuredPosts.length + group.regularPosts.length > 0,
+    featuredPosts: group.featuredPosts,
+    regularPosts: group.regularPosts,
+    featuredLabel: `Featured ${key} articles`,
+    regularLabel: `${heading} articles`,
+  };
 }
+
+const sections: WritingSectionView[] = [
+  buildWritingSectionView('technical', 'Technical Deep Dives', technical),
+  buildWritingSectionView('conceptual', 'Conceptual Reflections', conceptual),
+];
 ---
 
 <Layout title="Writing" activeSection="writing">
@@ -36,57 +65,55 @@ function formatWritingListDate(d: Date): string {
         </div>
         <div class="writing-groups writing-groups--pending" aria-busy="true">
           {
-            featuredPosts.length > 0 && (
-              <ul class="post-list page-buttons" aria-label="Featured articles">
-                {featuredPosts.map((post) => (
-                  <li>
-                    <a href={`/blog/${post.id}`} class="page-button">
-                      <span class="page-button__bg" aria-hidden="true" />
-                      <span class="page-button__overlay" aria-hidden="true" />
-                      <span class="page-button__inner">
-                        <span class="page-button__glow-wrap" aria-hidden="true">
-                          <span class="page-button__glow">
-                            {post.data.title}
+            sections.map((section) => (
+              <section
+                class="writing-section"
+                aria-labelledby={section.headingId}
+              >
+                <h2 id={section.headingId} class="writing-section__heading">
+                  {section.heading}
+                </h2>
+                {section.featuredPosts.length > 0 && (
+                  <ul
+                    class="post-list page-buttons"
+                    aria-label={section.featuredLabel}
+                  >
+                    {section.featuredPosts.map((post) => (
+                      <WritingPostButton post={post} />
+                    ))}
+                  </ul>
+                )}
+                {section.hasPosts && (
+                  <ul
+                    class="post-list page-buttons"
+                    aria-label={section.regularLabel}
+                  >
+                    {section.regularPosts.map((post) => (
+                      <WritingPostButton post={post} />
+                    ))}
+                  </ul>
+                )}
+                {!section.hasPosts && (
+                  <ul
+                    class="post-list page-buttons"
+                    aria-label={section.regularLabel}
+                  >
+                    <li>
+                      <div class="page-button page-button--placeholder">
+                        <span class="page-button__bg" aria-hidden="true" />
+                        <span class="page-button__overlay" aria-hidden="true" />
+                        <span class="page-button__inner">
+                          <span class="page-button__text page-button__text--placeholder">
+                            Coming up&hellip;
                           </span>
                         </span>
-                        <span class="page-button__text">{post.data.title}</span>
-                        <time
-                          class="page-button__date"
-                          datetime={post.data.date.toISOString()}
-                        >
-                          {formatWritingListDate(post.data.date)}
-                        </time>
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )
+                      </div>
+                    </li>
+                  </ul>
+                )}
+              </section>
+            ))
           }
-          <ul class="post-list page-buttons" aria-label="Articles">
-            {
-              regularPosts.map((post) => (
-                <li>
-                  <a href={`/blog/${post.id}`} class="page-button">
-                    <span class="page-button__bg" aria-hidden="true" />
-                    <span class="page-button__overlay" aria-hidden="true" />
-                    <span class="page-button__inner">
-                      <span class="page-button__glow-wrap" aria-hidden="true">
-                        <span class="page-button__glow">{post.data.title}</span>
-                      </span>
-                      <span class="page-button__text">{post.data.title}</span>
-                      <time
-                        class="page-button__date"
-                        datetime={post.data.date.toISOString()}
-                      >
-                        {formatWritingListDate(post.data.date)}
-                      </time>
-                    </span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
         </div>
       </div>
     </div>
@@ -104,13 +131,40 @@ function formatWritingListDate(d: Date): string {
       const SELECTORS = {
         writingArticle: 'article.writing-page',
         writingGroups: '.writing-page .writing-groups',
+        sectionHeading: '.writing-page .writing-section__heading',
+        cqContainer: 'main.content',
       };
+      const HEADING_WIDTH_VAR = '--writing-section-heading-width';
+
       const writingGroups = document.querySelector(SELECTORS.writingGroups);
+
+      /*
+       * Section heading rectangles share one width: the widest heading's own
+       * (text + padding) size, written to `--writing-section-heading-width`
+       * on `.writing-groups` so every `.writing-section__heading` (see
+       * writing.css) inherits it via `var()`. Heading font-size is `cqi`-based
+       * off `main.content`, so re-measure whenever that container resizes —
+       * clearing the previous value first so each heading reports its own
+       * natural width rather than the last equalized one.
+       */
+      function equalizeWritingSectionHeadingWidths() {
+        if (!(writingGroups instanceof HTMLElement)) return;
+        const headings = Array.from(
+          document.querySelectorAll(SELECTORS.sectionHeading),
+        );
+        if (headings.length === 0) return;
+        writingGroups.style.removeProperty(HEADING_WIDTH_VAR);
+        const widestPx = Math.max(
+          ...headings.map((heading) => heading.getBoundingClientRect().width),
+        );
+        writingGroups.style.setProperty(HEADING_WIDTH_VAR, `${widestPx}px`);
+      }
 
       let buttonsRevealed = false;
       function revealWritingButtons() {
         if (buttonsRevealed || !writingGroups) return;
         buttonsRevealed = true;
+        equalizeWritingSectionHeadingWidths();
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             writingGroups.classList.remove('writing-groups--pending');
@@ -123,6 +177,20 @@ function formatWritingListDate(d: Date): string {
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       fontsReady.finally(() => revealWritingButtons());
       window.setTimeout(revealWritingButtons, 2500);
+
+      const cqContainer = document.querySelector(SELECTORS.cqContainer);
+      if (cqContainer instanceof HTMLElement && 'ResizeObserver' in window) {
+        let widthSyncScheduled = false;
+        const resizeObserver = new ResizeObserver(() => {
+          if (!buttonsRevealed || widthSyncScheduled) return;
+          widthSyncScheduled = true;
+          requestAnimationFrame(() => {
+            widthSyncScheduled = false;
+            equalizeWritingSectionHeadingWidths();
+          });
+        });
+        resizeObserver.observe(cqContainer);
+      }
     })();
   </script>
 </Layout>

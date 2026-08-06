@@ -2,6 +2,7 @@
 title: 'Professionalism'
 date: 2026-04-10
 featured: true
+category: conceptual
 ---
 
 Not everyone develops a strong relationship with their work over the course of their life. Many people do what they do simply to make a living, not because they enjoy it. In other words, they do it because they have to. There is nothing to blame them for. The world has always been harsh in this regard — it does not allow everyone to truly “find themselves.”

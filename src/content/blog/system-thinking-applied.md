@@ -1,7 +1,8 @@
 ---
 title: 'System Thinking, Applied'
 date: 2026-03-03
-featured: true
+featured: false
+category: conceptual
 ---
 
 Beyond engineering, I've always gravitated toward creative disciplines. Art has long been a parallel interest in my life, one of those things that becomes part of you and cannot be separated. At first glance, it may seem like a completely different world from software, yet it has shaped how I think about structure, growth, and intention. Art is inherently abstract, and so is software. At its core, it is about creativity. It becomes particularly important in projects without established patterns or prior solutions.

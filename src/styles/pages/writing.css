@@ -16,6 +16,7 @@
   --writing-row-min-h: 5.8cqi;
   --writing-row-max-h: 6.8cqi;
   --writing-row-pad-block: 0.32cqi;
+  --writing-section-heading-gap: 1.5cqi;
 }
 
 ul.post-list {
@@ -58,22 +59,89 @@ ul.post-list > li::before {
   }
 }
 
-/* Writing index only: extra space between article rows (default .page-buttons gap is 0.4rem). */
+/*
+ * Writing index only: extra space between article rows (default .page-buttons
+ * gap is 0.4rem). Left inset also lives here instead of on `.page-buttons-panel`
+ * (see that rule below) so section headings — siblings of these rows, not
+ * inside them — can sit flush against the square's true left edge with no
+ * inset to undo.
+ */
 .writing-page .page-buttons {
   gap: var(--writing-row-gap, var(--panel-row-gap));
+  padding-left: var(--panel-padding-left, 10%);
 }
 
-/* Featured vs rest: ~3× the writing row gap */
-.writing-page .writing-groups > .post-list + .post-list {
+/* Featured vs rest, within one category section: ~3× the writing row gap */
+.writing-page .writing-section > .post-list + .post-list {
   margin-top: calc(
     var(--writing-row-gap, 2.8cqi) * var(--writing-group-gap-mult, 3)
   );
 }
 
-/* Writing: square panel; wash behind pool photo (no ink panel — only global page background). */
+/* Between category sections (Technical Deep Dives / Conceptual Reflections):
+   same offset as the panel's own top inset, so the gap reads as a deliberate
+   break rather than just another row gap. */
+.writing-page .writing-groups > .writing-section + .writing-section {
+  margin-top: var(--panel-padding-top, 10%);
+}
+
+/* Heading to its first row: a touch tighter than the row-to-row gap. */
+.writing-page .writing-section__heading + .post-list {
+  margin-top: var(--writing-section-heading-gap, 1.5cqi);
+}
+
+/*
+ * Section heading "tab": inverted colors (ink bg, page-bg text) — the resting
+ * state of the same invert used on button hover/focus. `.writing-groups` and
+ * `.writing-section` carry no left inset of their own (the panel's left
+ * padding moved onto `.page-buttons` above), so this sits flush against the
+ * square's true left edge with no offset to fake — the opposite edge from
+ * where the button rows anchor (rows are flush against the square's right
+ * edge; only their left side carries the inset).
+ *
+ * Width is uniform across sections: JS measures each heading's natural
+ * (text + padding) width and writes the widest one to
+ * `--writing-section-heading-width` on `.writing-groups`, so every heading —
+ * including future categories — inherits the same rectangle length. Without
+ * JS, each heading falls back to fitting its own text.
+ */
+.writing-page .writing-section__heading {
+  display: inline-block;
+  width: var(--writing-section-heading-width, fit-content);
+  max-width: 100%;
+  margin: 0;
+  padding: 0.55em 0.9em;
+  background-color: var(--color-ink);
+  color: var(--color-page-bg);
+  text-align: left;
+  font-size: clamp(0.7rem, 0.6rem + 0.85cqi, 0.88rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Placeholder row ("Coming up…"): same shape as a real button, but inert. */
+.writing-page .page-button--placeholder {
+  cursor: default;
+  pointer-events: none;
+}
+
+.writing-page .page-button__text--placeholder {
+  font-weight: 400;
+}
+
+/*
+ * Writing: square panel; wash behind pool photo (no ink panel — only global
+ * page background). Left inset removed here (unlike profile/contact) and
+ * reapplied on `.page-buttons` instead, so `.writing-groups`'s direct
+ * children — the section headings — reach the panel's true left edge.
+ */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
   background-color: var(--color-page-bg);
+  padding-left: 0;
 }
 
 /*

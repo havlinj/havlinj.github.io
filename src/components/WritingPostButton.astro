@@ -1,0 +1,31 @@
+---
+import { formatWritingListDate } from '../utils/writing-posts';
+
+interface Props {
+  post: {
+    id: string;
+    data: {
+      title: string;
+      date: Date;
+    };
+  };
+}
+
+const { post }: Props = Astro.props;
+---
+
+<li>
+  <a href={`/blog/${post.id}`} class="page-button">
+    <span class="page-button__bg" aria-hidden="true"></span>
+    <span class="page-button__overlay" aria-hidden="true"></span>
+    <span class="page-button__inner">
+      <span class="page-button__glow-wrap" aria-hidden="true">
+        <span class="page-button__glow">{post.data.title}</span>
+      </span>
+      <span class="page-button__text">{post.data.title}</span>
+      <time class="page-button__date" datetime={post.data.date.toISOString()}>
+        {formatWritingListDate(post.data.date)}
+      </time>
+    </span>
+  </a>
+</li>
