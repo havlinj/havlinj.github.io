@@ -138,7 +138,7 @@ ul.post-list > li::before {
 
 /* Title left, date right; horizontal padding matches .page-button__inner (0 0.65em).
    Small vertical padding + no subpixel nudge avoids blurry/clipped glyph edges with overflow:hidden on .page-button.
-   Fluid type: font-size on inner (main.content supplies cqi); title 1em, date 8/11 em — same ratio at any size. */
+   Fluid type: font-size on inner (main.content supplies cqi); title 1em, date 0.8em — same ratio at any size. */
 .writing-page .page-button__inner {
   /*
    * Display-scaled title rhythm:
@@ -185,12 +185,12 @@ ul.post-list > li::before {
 .writing-page .page-button__date {
   flex-shrink: 0;
   text-align: right;
-  font-size: 0.78em;
+  font-size: 0.8em;
   font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.035em;
   color: rgba(var(--color-ink-rgb), 0.74);
-  padding: 0.15em;
+  padding: 0.7em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   transition: color 0.18s ease;
@@ -200,14 +200,14 @@ ul.post-list > li::before {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Narrow content column: tighter title tracking; date slightly looser than wide for balance. */
+/* Narrow content column: tighter title tracking; date slightly tighter than wide. */
 @container (max-width: 34rem) {
   .writing-page .page-button__text {
     letter-spacing: 0.02em;
   }
 
   .writing-page .page-button__date {
-    letter-spacing: 0.027em;
+    letter-spacing: 0.03em;
   }
 }
 

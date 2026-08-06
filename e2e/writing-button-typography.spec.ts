@@ -49,7 +49,7 @@ function readWritingButtonMetrics() {
 }
 
 test.describe('Writing page button typography', () => {
-  test('title weight 600; date height tracks inner (~0.78em); title ~0.98em of inner', async ({
+  test('title weight 600; date height tracks inner (~0.8em); title ~0.98em of inner', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
@@ -57,8 +57,8 @@ test.describe('Writing page button typography', () => {
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m, 'metrics from first list button').not.toBeNull();
     expect(m!.fontWeight).toBe('600');
-    expect(m!.dateOverInner).toBeGreaterThan(0.76);
-    expect(m!.dateOverInner).toBeLessThan(0.8);
+    expect(m!.dateOverInner).toBeGreaterThan(0.78);
+    expect(m!.dateOverInner).toBeLessThan(0.82);
     expect(m!.textOverInner).toBeGreaterThan(0.96);
     expect(m!.textOverInner).toBeLessThan(1.0);
     expect(m!.fontStyle).toBe('normal');
@@ -80,7 +80,7 @@ test.describe('Writing page button typography', () => {
     expect(narrow!.innerPx).toBeLessThan(wide!.innerPx);
   });
 
-  test('wide column: title ~0.06em tracking; date ~0.02em', async ({
+  test('wide column: title ~0.06em tracking; date ~0.035em', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
@@ -89,11 +89,11 @@ test.describe('Writing page button typography', () => {
     expect(m).not.toBeNull();
     expect(m!.textTrackingRatio).toBeGreaterThan(0.058);
     expect(m!.textTrackingRatio).toBeLessThan(0.062);
-    expect(m!.dateTrackingRatio).toBeGreaterThan(0.015);
-    expect(m!.dateTrackingRatio).toBeLessThan(0.025);
+    expect(m!.dateTrackingRatio).toBeGreaterThan(0.032);
+    expect(m!.dateTrackingRatio).toBeLessThan(0.038);
   });
 
-  test('narrow column (container ≤34rem): title tighter than wide; date looser than wide', async ({
+  test('narrow column (container ≤34rem): title tighter than wide; date tighter than wide', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
@@ -107,6 +107,6 @@ test.describe('Writing page button typography', () => {
     expect(narrow).not.toBeNull();
 
     expect(narrow!.textTrackingRatio).toBeLessThan(wide!.textTrackingRatio);
-    expect(narrow!.dateTrackingRatio).toBeGreaterThan(wide!.dateTrackingRatio);
+    expect(narrow!.dateTrackingRatio).toBeLessThan(wide!.dateTrackingRatio);
   });
 });
