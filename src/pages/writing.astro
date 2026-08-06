@@ -130,39 +130,13 @@ const sections: WritingSectionView[] = [
     (() => {
       const SELECTORS = {
         writingGroups: '.writing-page .writing-groups',
-        sectionHeading: '.writing-page .writing-section__heading',
-        cqContainer: 'main.content',
       };
-      const HEADING_WIDTH_VAR = '--writing-section-heading-width';
-
       const writingGroups = document.querySelector(SELECTORS.writingGroups);
-
-      /*
-       * Section heading rectangles share one width: the widest heading's own
-       * (text + padding) size, written to `--writing-section-heading-width`
-       * on `.writing-groups` so every `.writing-section__heading` inherits it.
-       * Heading font-size is `cqi`-based off `main.content`, so re-measure on
-       * that container's resize — clear first so each heading reports natural
-       * width rather than the last equalized value.
-       */
-      function equalizeWritingSectionHeadingWidths() {
-        if (!(writingGroups instanceof HTMLElement)) return;
-        const headings = Array.from(
-          document.querySelectorAll(SELECTORS.sectionHeading),
-        );
-        if (headings.length === 0) return;
-        writingGroups.style.removeProperty(HEADING_WIDTH_VAR);
-        const widestPx = Math.max(
-          ...headings.map((heading) => heading.getBoundingClientRect().width),
-        );
-        writingGroups.style.setProperty(HEADING_WIDTH_VAR, `${widestPx}px`);
-      }
 
       let buttonsRevealed = false;
       function revealWritingButtons() {
         if (buttonsRevealed || !writingGroups) return;
         buttonsRevealed = true;
-        equalizeWritingSectionHeadingWidths();
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             writingGroups.classList.remove('writing-groups--pending');
@@ -175,20 +149,6 @@ const sections: WritingSectionView[] = [
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       fontsReady.finally(() => revealWritingButtons());
       window.setTimeout(revealWritingButtons, 2500);
-
-      const cqContainer = document.querySelector(SELECTORS.cqContainer);
-      if (cqContainer instanceof HTMLElement && 'ResizeObserver' in window) {
-        let widthSyncScheduled = false;
-        const resizeObserver = new ResizeObserver(() => {
-          if (!buttonsRevealed || widthSyncScheduled) return;
-          widthSyncScheduled = true;
-          requestAnimationFrame(() => {
-            widthSyncScheduled = false;
-            equalizeWritingSectionHeadingWidths();
-          });
-        });
-        resizeObserver.observe(cqContainer);
-      }
     })();
   </script>
 </Layout>
