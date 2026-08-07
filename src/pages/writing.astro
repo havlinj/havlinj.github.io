@@ -129,22 +129,65 @@ const sections: WritingSectionView[] = [
   <script is:inline>
     (() => {
       const SELECTORS = {
+        writingPage: '.writing-page',
         writingGroups: '.writing-page .writing-groups',
+        date: '.writing-page .page-button__date',
       };
+      const writingPage = document.querySelector(SELECTORS.writingPage);
       const writingGroups = document.querySelector(SELECTORS.writingGroups);
+
+      function syncHeadingSpanToDateColumn() {
+        if (!writingPage) return;
+        const date = writingPage.querySelector(SELECTORS.date);
+        const button = date?.closest('.page-button');
+        if (!(date instanceof HTMLElement) || !(button instanceof HTMLElement)) {
+          return;
+        }
+        const buttonRect = button.getBoundingClientRect();
+        if (buttonRect.width <= 0) return;
+
+        const textRange = document.createRange();
+        textRange.selectNodeContents(date);
+        const textRects = textRange.getClientRects();
+        const textRect = textRects.length > 0 ? textRects[0] : null;
+        if (!textRect || textRect.width <= 0) return;
+
+        const edgeGapPx = Math.max(0, buttonRect.right - textRect.right);
+        writingPage.style.setProperty(
+          '--writing-date-edge-gap',
+          `${edgeGapPx}px`,
+        );
+        writingPage.style.setProperty(
+          '--writing-date-width',
+          `${textRect.width}px`,
+        );
+      }
 
       let buttonsRevealed = false;
       function revealWritingButtons() {
         if (buttonsRevealed || !writingGroups) return;
         buttonsRevealed = true;
+        syncHeadingSpanToDateColumn();
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
+            syncHeadingSpanToDateColumn();
             writingGroups.classList.remove('writing-groups--pending');
             writingGroups.classList.add('writing-groups--visible');
             writingGroups.removeAttribute('aria-busy');
           });
         });
       }
+
+      let resizeSyncFrame = 0;
+      function scheduleHeadingSpanSync() {
+        if (resizeSyncFrame) return;
+        resizeSyncFrame = window.requestAnimationFrame(() => {
+          resizeSyncFrame = 0;
+          syncHeadingSpanToDateColumn();
+        });
+      }
+
+      window.addEventListener('resize', scheduleHeadingSpanSync);
 
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       fontsReady.finally(() => revealWritingButtons());
