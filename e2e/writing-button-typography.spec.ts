@@ -90,17 +90,17 @@ test.describe('Writing page button typography', () => {
     expect(narrow!.innerPx).toBeLessThan(wide!.innerPx);
   });
 
-  test('wide column: title ~0.03em tracking; date ~0.035em', async ({
+  test('wide column: title ~0.022em tracking; date ~0.04em', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await gotoWritingReady(page);
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m).not.toBeNull();
-    expect(m!.textTrackingRatio).toBeGreaterThan(0.028);
-    expect(m!.textTrackingRatio).toBeLessThan(0.032);
-    expect(m!.dateTrackingRatio).toBeGreaterThan(0.032);
-    expect(m!.dateTrackingRatio).toBeLessThan(0.038);
+    expect(m!.textTrackingRatio).toBeGreaterThan(0.02);
+    expect(m!.textTrackingRatio).toBeLessThan(0.024);
+    expect(m!.dateTrackingRatio).toBeGreaterThan(0.037);
+    expect(m!.dateTrackingRatio).toBeLessThan(0.043);
   });
 
   test('narrow column (container ≤34rem): title tighter than wide; date tighter than wide', async ({

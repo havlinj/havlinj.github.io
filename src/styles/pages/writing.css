@@ -11,14 +11,17 @@
   --panel-padding-top: 10%;
   --panel-padding-left: 10%;
   --panel-padding-bottom: 24%;
-  --writing-row-gap: 2cqi;
-  --writing-group-gap-mult: 3;
+  --writing-row-gap: 2.55cqi;
+  --writing-group-gap-mult: 3.35;
   --writing-row-min-h: 5.8cqi;
   --writing-row-max-h: 6.8cqi;
   --writing-row-pad-block: 0.32cqi;
-  --writing-section-heading-gap: 1.55cqi;
-  /* Golden section of the panel (1/φ) — past halfway, short of full bleed. */
-  --writing-section-heading-span: 61.8%;
+  --writing-section-heading-gap: 1.7cqi;
+  /* Flush left; right gap mirrors the buttons' left inset (--panel-padding-left). */
+  --writing-section-heading-span: calc(100% - var(--panel-padding-left, 10%));
+  /* Same type size as article titles; thinner bar via pad, not type scale. */
+  --writing-section-heading-pad-block: 0.28em;
+  --writing-section-heading-pad-inline-end: 0.95em;
   /* Shared with article rows so section labels share the title column. */
   --writing-button-font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
   --writing-button-inner-pad-inline: 0.65em;
@@ -99,24 +102,27 @@ ul.post-list > li::before {
 }
 
 /*
- * One page-bg rectangle: flush left, golden-section width of the panel;
- * text stays locked to the article-title column via left pad.
+ * Same type size as article titles; height differs via tighter pad-block
+ * (no button min/max-height), so the bar reads as a label strip.
  */
 .writing-page .writing-section__heading {
   display: block;
-  width: var(--writing-section-heading-span, 61.8%);
+  width: var(--writing-section-heading-span);
   max-width: 100%;
   margin: 0;
-  padding: 0.55em 0.95em 0.55em
-    calc(var(--panel-padding-left, 10%) + var(--writing-title-inline-start));
+  padding-block: var(--writing-section-heading-pad-block);
+  padding-inline-end: var(--writing-section-heading-pad-inline-end);
+  padding-inline-start: calc(
+    var(--panel-padding-left, 10%) + var(--writing-title-inline-start)
+  );
   box-sizing: border-box;
   background-color: var(--color-page-bg);
   color: var(--color-ink);
   text-align: left;
-  font-size: clamp(0.74rem, 0.64rem + 0.92cqi, 0.94rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.3;
+  font-size: calc(var(--writing-button-font-size) * 0.98);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -132,7 +138,7 @@ ul.post-list > li::before {
 
 .writing-page .page-button--placeholder .page-button__bg,
 .writing-page .page-button--placeholder .page-button__overlay {
-  background-color: rgba(var(--color-page-bg-rgb), 0.5);
+  background-color: rgba(var(--color-page-bg-rgb), 0.42);
 }
 
 /*
@@ -244,8 +250,8 @@ ul.post-list > li::before {
   white-space: nowrap;
   font-size: var(--writing-button-title-size);
   line-height: var(--writing-title-lh);
-  letter-spacing: 0.03em;
-  color: rgba(var(--color-ink-rgb), 0.86);
+  letter-spacing: 0.022em;
+  color: rgba(var(--color-ink-rgb), 0.82);
   padding: var(--writing-button-title-pad);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -255,7 +261,8 @@ ul.post-list > li::before {
 /* After `.page-button__text` so color/weight win over the article-title defaults. */
 .writing-page .page-button__text--placeholder {
   font-weight: 400;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.022em;
+  color: rgba(var(--color-ink-rgb), 0.55);
 }
 
 .writing-page .page-button__date {
@@ -264,8 +271,8 @@ ul.post-list > li::before {
   font-size: 0.74em;
   font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.035em;
-  color: rgba(var(--color-ink-rgb), 0.62);
+  letter-spacing: 0.04em;
+  color: rgba(var(--color-ink-rgb), 0.54);
   padding-inline-end: 0.2em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -279,11 +286,11 @@ ul.post-list > li::before {
 /* Narrow content column: tighter title tracking; date slightly tighter than wide. */
 @container (max-width: 34rem) {
   .writing-page .page-button__text {
-    letter-spacing: 0.015em;
+    letter-spacing: 0.012em;
   }
 
   .writing-page .page-button__date {
-    letter-spacing: 0.03em;
+    letter-spacing: 0.034em;
   }
 }
 
