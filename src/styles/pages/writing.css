@@ -16,7 +16,7 @@
   --writing-row-min-h: 5.8cqi;
   --writing-row-max-h: 6.8cqi;
   --writing-row-pad-block: 0.32cqi;
-  --writing-section-heading-gap: 1.15cqi;
+  --writing-section-heading-gap: 1.55cqi;
   /* Shared with article rows so section labels share the title column. */
   --writing-button-font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
   --writing-button-inner-pad-inline: 0.65em;
@@ -69,9 +69,9 @@ ul.post-list > li::before {
 }
 
 /*
- * Writing index only: extra space between article rows (default .page-buttons
- * gap is 0.4rem). Left inset lives here (not on the panel) so section heading
- * bars can span edge-to-edge while article rows keep the shared title column.
+ * Writing index only: extra space between article rows. Left inset lives on
+ * the button lists (not the panel) so heading bars can sit flush to the
+ * square's left edge while rows keep the shared title column.
  */
 .writing-page .page-buttons {
   gap: var(--writing-row-gap, var(--panel-row-gap));
@@ -92,34 +92,24 @@ ul.post-list > li::before {
   margin-top: var(--panel-padding-top, 10%);
 }
 
-/* Heading to its first row: a touch tighter than the row-to-row gap. */
 .writing-page .writing-section__heading + .post-list {
-  margin-top: var(--writing-section-heading-gap, 1.15cqi);
+  margin-top: var(--writing-section-heading-gap, 1.55cqi);
 }
 
 /*
- * Section heading bar: solid mid gray cutout (ink×page-bg mix — not pure
- * black, not translucent) with page-bg text, edge-to-edge on the square.
- * Thin page-bg rules on the top/bottom edges (~type-stroke scale via em).
- * Text stays in the article-title column via panel left inset +
- * `--writing-title-inline-start` (button inner pad + title pad).
+ * One page-bg rectangle: flush left, half the panel wide; text stays locked
+ * to the article-title column via left pad (does not travel with width).
  */
 .writing-page .writing-section__heading {
   display: block;
-  width: 100%;
+  width: 50%;
+  max-width: 100%;
   margin: 0;
-  padding: 0.72em var(--writing-button-inner-pad-inline) 0.72em
-    calc(
-      var(--panel-padding-left, 10%) + var(--writing-title-inline-start)
-    );
+  padding: 0.5em 0.95em 0.5em
+    calc(var(--panel-padding-left, 10%) + var(--writing-title-inline-start));
   box-sizing: border-box;
-  border-block: max(1px, 0.16em) solid var(--color-page-bg);
-  background-color: color-mix(
-    in srgb,
-    var(--color-ink) 55%,
-    var(--color-page-bg)
-  );
-  color: var(--color-page-bg);
+  background-color: var(--color-page-bg);
+  color: var(--color-ink);
   text-align: left;
   font-size: clamp(0.68rem, 0.58rem + 0.78cqi, 0.84rem);
   font-weight: 600;
@@ -130,8 +120,8 @@ ul.post-list > li::before {
 }
 
 /*
- * Placeholder row ("Coming up…"): same shape as a real button, but inert and
- * lightly ink-washed so it reads as deferred rather than clickable.
+ * Placeholder row ("Coming up…"): same shape as a real button, but inert;
+ * classic page-bg at reduced opacity so it reads as deferred.
  */
 .writing-page .page-button--placeholder {
   cursor: default;
@@ -140,17 +130,12 @@ ul.post-list > li::before {
 
 .writing-page .page-button--placeholder .page-button__bg,
 .writing-page .page-button--placeholder .page-button__overlay {
-  background-color: color-mix(
-    in srgb,
-    var(--color-ink) 10%,
-    var(--color-page-bg)
-  );
+  background-color: rgba(var(--color-page-bg-rgb), 0.5);
 }
 
 /*
- * Writing: square panel; wash behind pool photo (no ink panel — only global
- * page background). Left inset removed here and reapplied on `.page-buttons`
- * so heading bars can reach both true edges of the square.
+ * Writing: square panel; wash behind pool photo. Left inset removed here and
+ * reapplied on `.page-buttons` so heading bars can sit flush to the left edge.
  */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
