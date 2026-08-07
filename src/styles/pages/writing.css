@@ -22,6 +22,12 @@
   /* Same type size as article titles; thinner bar via pad, not type scale. */
   --writing-section-heading-pad-block: 0.28em;
   --writing-section-heading-pad-inline-end: 0.95em;
+  /* Tracking ladder: label → title → date (nums open past words). */
+  --writing-heading-tracking: 0.05em;
+  --writing-title-tracking: 0.02em;
+  --writing-title-tracking-narrow: 0.01em;
+  --writing-date-tracking: 0.045em;
+  --writing-date-tracking-narrow: 0.032em;
   /* Shared with article rows so section labels share the title column. */
   --writing-button-font-size: clamp(0.78rem, 0.68rem + 1.1cqi, 1.1rem);
   --writing-button-inner-pad-inline: 0.65em;
@@ -121,7 +127,7 @@ ul.post-list > li::before {
   text-align: left;
   font-size: calc(var(--writing-button-font-size) * 0.98);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--writing-heading-tracking);
   line-height: 1.25;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -250,8 +256,8 @@ ul.post-list > li::before {
   white-space: nowrap;
   font-size: var(--writing-button-title-size);
   line-height: var(--writing-title-lh);
-  letter-spacing: 0.022em;
-  color: rgba(var(--color-ink-rgb), 0.82);
+  letter-spacing: var(--writing-title-tracking);
+  color: rgba(var(--color-ink-rgb), 0.8);
   padding: var(--writing-button-title-pad);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -261,8 +267,8 @@ ul.post-list > li::before {
 /* After `.page-button__text` so color/weight win over the article-title defaults. */
 .writing-page .page-button__text--placeholder {
   font-weight: 400;
-  letter-spacing: 0.022em;
-  color: rgba(var(--color-ink-rgb), 0.55);
+  letter-spacing: var(--writing-title-tracking);
+  color: rgba(var(--color-ink-rgb), 0.52);
 }
 
 .writing-page .page-button__date {
@@ -271,8 +277,8 @@ ul.post-list > li::before {
   font-size: 0.74em;
   font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.04em;
-  color: rgba(var(--color-ink-rgb), 0.54);
+  letter-spacing: var(--writing-date-tracking);
+  color: rgba(var(--color-ink-rgb), 0.5);
   padding-inline-end: 0.2em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -286,11 +292,11 @@ ul.post-list > li::before {
 /* Narrow content column: tighter title tracking; date slightly tighter than wide. */
 @container (max-width: 34rem) {
   .writing-page .page-button__text {
-    letter-spacing: 0.012em;
+    letter-spacing: var(--writing-title-tracking-narrow);
   }
 
   .writing-page .page-button__date {
-    letter-spacing: 0.034em;
+    letter-spacing: var(--writing-date-tracking-narrow);
   }
 }
 
