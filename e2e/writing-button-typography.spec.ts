@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Locks in Writing index row typography: fluid inner font-size (clamp + cqi),
- * title weight 600, date size as em of inner, container query letter-spacing,
- * and date end padding (padding-inline-end only).
+ * quieter title weight 500 + tracking, date size as em of inner, container
+ * query letter-spacing, and date end padding (padding-inline-end only).
  * @see src/styles/pages/writing.css
  */
 
@@ -59,16 +59,16 @@ function readWritingButtonMetrics() {
 }
 
 test.describe('Writing page button typography', () => {
-  test('title weight 600; date height tracks inner (~0.8em); title ~0.98em of inner', async ({
+  test('title weight 500; date height tracks inner (~0.74em); title ~0.98em of inner', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await gotoWritingReady(page);
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m, 'metrics from first list button').not.toBeNull();
-    expect(m!.fontWeight).toBe('600');
-    expect(m!.dateOverInner).toBeGreaterThan(0.78);
-    expect(m!.dateOverInner).toBeLessThan(0.82);
+    expect(m!.fontWeight).toBe('500');
+    expect(m!.dateOverInner).toBeGreaterThan(0.72);
+    expect(m!.dateOverInner).toBeLessThan(0.76);
     expect(m!.textOverInner).toBeGreaterThan(0.96);
     expect(m!.textOverInner).toBeLessThan(1.0);
     expect(m!.fontStyle).toBe('normal');
@@ -90,15 +90,15 @@ test.describe('Writing page button typography', () => {
     expect(narrow!.innerPx).toBeLessThan(wide!.innerPx);
   });
 
-  test('wide column: title ~0.06em tracking; date ~0.035em', async ({
+  test('wide column: title ~0.03em tracking; date ~0.035em', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await gotoWritingReady(page);
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m).not.toBeNull();
-    expect(m!.textTrackingRatio).toBeGreaterThan(0.058);
-    expect(m!.textTrackingRatio).toBeLessThan(0.062);
+    expect(m!.textTrackingRatio).toBeGreaterThan(0.028);
+    expect(m!.textTrackingRatio).toBeLessThan(0.032);
     expect(m!.dateTrackingRatio).toBeGreaterThan(0.032);
     expect(m!.dateTrackingRatio).toBeLessThan(0.038);
   });
