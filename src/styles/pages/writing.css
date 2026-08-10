@@ -19,25 +19,23 @@
   --writing-row-pad-block: 0.32cqi;
   --writing-section-heading-gap: 1.7cqi;
   /*
-   * Flush left; right edge stops before the date column: edge-gap + date + edge-gap.
-   * Gap and date width are measured in writing.astro (fallbacks until then).
+   * Full-width bar (same span as article buttons); inner control sizes to the
+   * longest category label + pad, then doubles when open.
    */
-  --writing-date-edge-gap: 0.65em;
-  --writing-date-width: 4.75em;
-  --writing-heading-end-to-edge: calc(
-    var(--writing-date-edge-gap) + var(--writing-date-width) +
-      var(--writing-date-edge-gap)
-  );
-  --writing-section-heading-span: calc(100% - var(--writing-heading-end-to-edge));
-  /* Slightly smaller type than article titles; thinner bar via pad. */
+  --writing-category-picker-frame-margin: 0.28em;
+  --writing-category-slot-width: 7.5em;
+  --writing-category-expand-ms: 320ms;
   --writing-section-heading-pad-block: 0.4em;
-  --writing-section-heading-pad-inline-end: 0.95em;
-  /* Tracking ladder: label → title → date (nums open past words). */
+  --writing-section-heading-pad-inline-end: 0.85em;
+  --writing-section-heading-pad-inline-start: 0.85em;
+  /* Tracking ladder: label → placeholder → title → date (nums open past words). */
   --writing-heading-tracking: 0.05em;
-  --writing-title-tracking: 0.02em;
-  --writing-title-tracking-narrow: 0.01em;
+  --writing-placeholder-tracking: 0.035em;
+  --writing-title-tracking: 0.015em;
+  --writing-title-tracking-narrow: 0.008em;
   --writing-date-tracking: 0.045em;
   --writing-date-tracking-narrow: 0.032em;
+  --writing-placeholder-title-size: 0.94em;
   /*
    * Writing type scale: between panel fluid (Contact) and the older louder clamp —
    * same family, slightly more presence for the list/index.
@@ -94,8 +92,7 @@ ul.post-list > li::before {
 
 /*
  * Writing index only: extra space between article rows. Left inset lives on
- * the button lists (not the panel) so heading bars can sit flush to the
- * square's left edge while rows keep the shared title column.
+ * the button lists (not the panel); category bar uses the same left inset.
  */
 .writing-page .page-buttons {
   gap: var(--writing-row-gap, var(--panel-row-gap));
@@ -109,42 +106,163 @@ ul.post-list > li::before {
   );
 }
 
-/* Between category sections (Technical Deep Dives / Conceptual Reflections):
-   same offset as the panel's own top inset, so the gap reads as a deliberate
-   break rather than just another row gap. */
-.writing-page .writing-groups > .writing-section + .writing-section {
-  margin-top: var(--panel-padding-top, 10%);
-}
-
-.writing-page .writing-section__heading + .post-list {
-  margin-top: var(--writing-section-heading-gap, 1.55cqi);
-}
-
 /*
- * Slightly smaller type than article titles; height differs via tighter pad-block
- * (no button min/max-height), so the bar reads as a label strip.
- * Width ends before the date column (gap + date + gap; see --writing-section-heading-span).
+ * Full-width page-bg bar aligned with article buttons; left-aligned caption +
+ * expandable ink-framed control (one slot collapsed, two when open).
  */
-.writing-page .writing-section__heading {
-  display: block;
-  width: var(--writing-section-heading-span);
+.writing-page .writing-category-picker {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - var(--panel-padding-left, 10%));
   max-width: 100%;
-  margin: 0;
-  padding-block: var(--writing-section-heading-pad-block);
-  padding-inline-end: var(--writing-section-heading-pad-inline-end);
-  padding-inline-start: calc(
-    var(--panel-padding-left, 10%) + var(--writing-title-inline-start)
-  );
+  margin: 0 0 var(--writing-section-heading-gap, 1.55cqi)
+    var(--panel-padding-left, 10%);
   box-sizing: border-box;
   background-color: var(--color-page-bg);
+  /* Left pad matches article title inset so "Category" shares that column. */
+  padding: var(--writing-category-picker-frame-margin) 0
+    var(--writing-category-picker-frame-margin)
+    var(--writing-title-inline-start);
+}
+
+.writing-page .writing-category-picker__bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.85em;
+  min-width: 0;
+}
+
+.writing-page .writing-category-picker__caption {
+  flex: 0 0 auto;
   color: var(--color-ink);
-  text-align: left;
   font-size: calc(var(--writing-button-font-size) * 0.8);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: var(--writing-heading-tracking);
   line-height: 1.25;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.writing-page .writing-category-picker__control {
+  flex: 0 0 auto;
+  width: var(--writing-category-slot-width);
+  /* Nudge the framed control left ~5% of the Category→box gap; width unchanged. */
+  margin-inline-start: calc(-0.05 * 0.85em);
+  transition: width var(--writing-category-expand-ms) ease;
+}
+
+.writing-page
+  .writing-category-picker--open
+  .writing-category-picker__control {
+  width: calc(2 * var(--writing-category-slot-width));
+}
+
+.writing-page .writing-category-picker__shell {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-ink);
+  box-sizing: border-box;
+  background-color: var(--color-page-bg);
+  color: var(--color-ink);
+}
+
+.writing-page .writing-category-picker__track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: calc(2 * var(--writing-category-slot-width));
+  transform: translateX(0);
+  transition: transform var(--writing-category-expand-ms) ease;
+  will-change: transform;
+}
+
+.writing-page .writing-category-picker__option {
+  flex: 0 0 var(--writing-category-slot-width);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--writing-section-heading-pad-block)
+    var(--writing-section-heading-pad-inline-end)
+    var(--writing-section-heading-pad-block)
+    var(--writing-section-heading-pad-inline-start);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+  font: inherit;
+  font-size: calc(var(--writing-button-font-size) * 0.8);
+  font-weight: 600;
+  letter-spacing: var(--writing-heading-tracking);
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.writing-page
+  .writing-category-picker--open
+  .writing-category-picker__option + .writing-category-picker__option {
+  box-shadow: inset 1px 0 0 rgba(var(--color-ink-rgb), 0.2);
+}
+
+.writing-page .writing-category-picker__option::before {
+  content: none;
+  display: none;
+}
+
+.writing-page .writing-category-picker__option.is-flashing {
+  background-color: var(--color-ink);
+  color: var(--color-page-bg);
+}
+
+.writing-page .writing-category-picker__option:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .writing-page
+    .writing-category-picker--open
+    .writing-category-picker__option:hover:not(.is-flashing) {
+    background-color: rgba(var(--color-ink-rgb), 0.08);
+  }
+}
+
+.writing-page .writing-category-picker__measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+}
+
+.writing-page .writing-category-picker__measure-item {
+  display: inline-block;
+  padding: var(--writing-section-heading-pad-block)
+    var(--writing-section-heading-pad-inline-end)
+    var(--writing-section-heading-pad-block)
+    var(--writing-section-heading-pad-inline-start);
+  font-size: calc(var(--writing-button-font-size) * 0.8);
+  font-weight: 600;
+  letter-spacing: var(--writing-heading-tracking);
+  line-height: 1.25;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-page .writing-category-picker__control,
+  .writing-page .writing-category-picker__track {
+    transition: none;
+  }
 }
 
 /*
@@ -163,8 +281,7 @@ ul.post-list > li::before {
 
 /*
  * Writing: square panel; wash behind pool photo. Left inset removed here and
- * reapplied on `.page-buttons` so heading bars can sit flush to the left edge.
- * Top inset matches the buttons' left inset (square edge → button edge).
+ * reapplied on `.page-buttons`. Top inset matches the buttons' left inset.
  */
 .writing-page .page-buttons-panel {
   aspect-ratio: 1 / 1;
@@ -273,18 +390,19 @@ ul.post-list > li::before {
   font-size: var(--writing-button-title-size);
   line-height: var(--writing-title-lh);
   letter-spacing: var(--writing-title-tracking);
-  color: rgba(var(--color-ink-rgb), 0.8);
+  color: rgba(var(--color-ink-rgb), 0.7);
   padding: var(--writing-button-title-pad);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* After `.page-button__text` so color/weight win over the article-title defaults. */
+/* After `.page-button__text` so color/weight/size win over the article-title defaults. */
 .writing-page .page-button__text--placeholder {
+  font-size: var(--writing-placeholder-title-size);
   font-weight: 400;
-  letter-spacing: var(--writing-title-tracking);
-  color: rgba(var(--color-ink-rgb), 0.52);
+  letter-spacing: var(--writing-placeholder-tracking);
+  color: rgba(var(--color-ink-rgb), 0.68);
 }
 
 .writing-page .page-button__date {
@@ -309,6 +427,10 @@ ul.post-list > li::before {
 @container (max-width: 34rem) {
   .writing-page .page-button__text {
     letter-spacing: var(--writing-title-tracking-narrow);
+  }
+
+  .writing-page .page-button__text--placeholder {
+    letter-spacing: var(--writing-placeholder-tracking);
   }
 
   .writing-page .page-button__date {

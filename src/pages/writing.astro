@@ -19,7 +19,7 @@ const writingBg = buildDichromResponsive(
 );
 
 type WritingSectionView = {
-  headingId: string;
+  key: string;
   heading: string;
   hasPosts: boolean;
   featuredPosts: WritingPostLike[];
@@ -34,7 +34,7 @@ function buildWritingSectionView(
   group: WritingCategoryGroup<WritingPostLike>,
 ): WritingSectionView {
   return {
-    headingId: `writing-section-heading-${key}`,
+    key,
     heading,
     hasPosts: group.featuredPosts.length + group.regularPosts.length > 0,
     featuredPosts: group.featuredPosts,
@@ -45,9 +45,11 @@ function buildWritingSectionView(
 }
 
 const sections: WritingSectionView[] = [
-  buildWritingSectionView('technical', 'Technical Deep Dives', technical),
-  buildWritingSectionView('conceptual', 'Conceptual Reflections', conceptual),
+  buildWritingSectionView('technical', 'Rigor', technical),
+  buildWritingSectionView('conceptual', 'Freestyle', conceptual),
 ];
+
+const defaultCategory = 'technical';
 ---
 
 <Layout title="Writing" activeSection="writing">
@@ -64,15 +66,57 @@ const sections: WritingSectionView[] = [
           />
         </div>
         <div class="writing-groups writing-groups--pending" aria-busy="true">
+          <div
+            class="writing-category-picker"
+            aria-expanded="false"
+            aria-label="Article category"
+          >
+            <div class="writing-category-picker__bar">
+              <span class="writing-category-picker__caption">Category</span>
+              <div class="writing-category-picker__control">
+                <div class="writing-category-picker__shell">
+                  <div class="writing-category-picker__track" role="listbox">
+                    {
+                      sections.map((section) => (
+                        <button
+                          type="button"
+                          role="option"
+                          class:list={[
+                            'writing-category-picker__option',
+                            {
+                              'is-selected': section.key === defaultCategory,
+                            },
+                          ]}
+                          data-category={section.key}
+                          aria-selected={section.key === defaultCategory}
+                        >
+                          {section.heading}
+                        </button>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="writing-category-picker__measure" aria-hidden="true">
+              {
+                sections.map((section) => (
+                  <span class="writing-category-picker__measure-item">
+                    {section.heading}
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+
           {
             sections.map((section) => (
               <section
                 class="writing-section"
-                aria-labelledby={section.headingId}
+                data-writing-category={section.key}
+                aria-label={section.heading}
+                hidden={section.key !== defaultCategory}
               >
-                <h2 id={section.headingId} class="writing-section__heading">
-                  {section.heading}
-                </h2>
                 {section.featuredPosts.length > 0 && (
                   <ul
                     class="post-list page-buttons"
@@ -124,70 +168,40 @@ const sections: WritingSectionView[] = [
         opacity: 1 !important;
         pointer-events: auto !important;
       }
+      .writing-page .writing-category-picker {
+        display: none !important;
+      }
+      .writing-page .writing-section[hidden] {
+        display: block !important;
+      }
+      .writing-page .writing-section + .writing-section {
+        margin-top: var(--panel-padding-top, 10%);
+      }
     </style>
   </noscript>
+  <script>
+    import { initWritingCategoryPicker } from '../scripts/writing-category-picker';
+
+    initWritingCategoryPicker();
+  </script>
   <script is:inline>
     (() => {
-      const SELECTORS = {
-        writingPage: '.writing-page',
-        writingGroups: '.writing-page .writing-groups',
-        date: '.writing-page .page-button__date',
-      };
-      const writingPage = document.querySelector(SELECTORS.writingPage);
-      const writingGroups = document.querySelector(SELECTORS.writingGroups);
-
-      function syncHeadingSpanToDateColumn() {
-        if (!writingPage) return;
-        const date = writingPage.querySelector(SELECTORS.date);
-        const button = date?.closest('.page-button');
-        if (!(date instanceof HTMLElement) || !(button instanceof HTMLElement)) {
-          return;
-        }
-        const buttonRect = button.getBoundingClientRect();
-        if (buttonRect.width <= 0) return;
-
-        const textRange = document.createRange();
-        textRange.selectNodeContents(date);
-        const textRects = textRange.getClientRects();
-        const textRect = textRects.length > 0 ? textRects[0] : null;
-        if (!textRect || textRect.width <= 0) return;
-
-        const edgeGapPx = Math.max(0, buttonRect.right - textRect.right);
-        writingPage.style.setProperty(
-          '--writing-date-edge-gap',
-          `${edgeGapPx}px`,
-        );
-        writingPage.style.setProperty(
-          '--writing-date-width',
-          `${textRect.width}px`,
-        );
-      }
+      const writingGroups = document.querySelector(
+        '.writing-page .writing-groups',
+      );
 
       let buttonsRevealed = false;
       function revealWritingButtons() {
         if (buttonsRevealed || !writingGroups) return;
         buttonsRevealed = true;
-        syncHeadingSpanToDateColumn();
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            syncHeadingSpanToDateColumn();
             writingGroups.classList.remove('writing-groups--pending');
             writingGroups.classList.add('writing-groups--visible');
             writingGroups.removeAttribute('aria-busy');
           });
         });
       }
-
-      let resizeSyncFrame = 0;
-      function scheduleHeadingSpanSync() {
-        if (resizeSyncFrame) return;
-        resizeSyncFrame = window.requestAnimationFrame(() => {
-          resizeSyncFrame = 0;
-          syncHeadingSpanToDateColumn();
-        });
-      }
-
-      window.addEventListener('resize', scheduleHeadingSpanSync);
 
       const fontsReady = document.fonts?.ready ?? Promise.resolve();
       fontsReady.finally(() => revealWritingButtons());

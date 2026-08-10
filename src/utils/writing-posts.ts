@@ -48,7 +48,7 @@ function splitFeatured<T extends WritingPostLike>(
   return { featuredPosts, regularPosts };
 }
 
-/** Writing index: posts split into Technical Deep Dives / Conceptual Reflections sections, each with its own featured/regular sub-group. */
+/** Writing index: posts split into Rigor / Freestyle sections, each with its own featured/regular sub-group. */
 export function splitAndSortWritingPosts<T extends WritingPostLike>(
   posts: T[],
 ): {

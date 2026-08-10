@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { selectWritingCategory } from './helpers';
 
 /**
  * Locks in Writing index row typography: fluid inner font-size (clamp + cqi),
@@ -12,6 +13,7 @@ async function gotoWritingReady(page: import('@playwright/test').Page) {
   await expect(
     page.locator('.writing-groups.writing-groups--visible'),
   ).toBeVisible({ timeout: 10_000 });
+  await selectWritingCategory(page, 'conceptual');
 }
 
 function readWritingButtonMetrics() {
@@ -90,15 +92,15 @@ test.describe('Writing page button typography', () => {
     expect(narrow!.innerPx).toBeLessThan(wide!.innerPx);
   });
 
-  test('wide column: title ~0.02em tracking; date ~0.045em', async ({
+  test('wide column: title ~0.015em tracking; date ~0.045em', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await gotoWritingReady(page);
     const m = await page.evaluate(readWritingButtonMetrics);
     expect(m).not.toBeNull();
-    expect(m!.textTrackingRatio).toBeGreaterThan(0.018);
-    expect(m!.textTrackingRatio).toBeLessThan(0.022);
+    expect(m!.textTrackingRatio).toBeGreaterThan(0.013);
+    expect(m!.textTrackingRatio).toBeLessThan(0.017);
     expect(m!.dateTrackingRatio).toBeGreaterThan(0.042);
     expect(m!.dateTrackingRatio).toBeLessThan(0.048);
   });

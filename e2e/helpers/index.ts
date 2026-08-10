@@ -41,6 +41,7 @@ export {
   type ResponsivePanelBgMatrixConfig,
 } from './responsive-panel-bg-matrix';
 export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';
+export { selectWritingCategory } from './writing-category';
 export {
   expectProfileLayoutStable,
   expectSharedPageRevealTransition,

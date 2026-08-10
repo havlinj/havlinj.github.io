@@ -12,6 +12,7 @@ import {
   mustBox,
   readStylesheetHrefs,
   readTurnstileResetCount,
+  selectWritingCategory,
 } from './helpers';
 
 // ---------------------------------------------------------------------------
@@ -183,6 +184,7 @@ test.describe('Writing page (/writing)', () => {
     await expect(
       page.getByRole('heading', { name: 'Writing', level: 1 }),
     ).toBeVisible();
+    await selectWritingCategory(page, 'conceptual');
     await expect(
       page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
@@ -215,11 +217,14 @@ test.describe('Writing page (/writing)', () => {
     await expect(page.locator('article.writing-page')).toBeVisible();
     await expect(page.locator('.page-buttons-zone')).toBeVisible();
     await expect(page.locator('.page-buttons-panel')).toBeVisible();
+
+    await selectWritingCategory(page, 'conceptual');
+
     const featuredList = page.getByRole('list', {
       name: 'Featured conceptual articles',
     });
     const articlesList = page.getByRole('list', {
-      name: 'Conceptual Reflections articles',
+      name: 'Freestyle articles',
       exact: true,
     });
     await expect(featuredList).toBeVisible();
@@ -233,22 +238,36 @@ test.describe('Writing page (/writing)', () => {
     ).toBeVisible();
   });
 
-  test('section headings for Technical Deep Dives and Conceptual Reflections are visible', async ({
+  test('category picker expands, selects Freestyle, and collapses', async ({
     page,
   }) => {
+    const picker = page.locator('.writing-category-picker');
+    await expect(picker).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Technical Deep Dives', level: 2 }),
+      page.locator(
+        '.writing-category-picker__option[data-category="technical"]',
+      ),
+    ).toHaveAttribute('aria-selected', 'true');
+
+    await selectWritingCategory(page, 'conceptual');
+    await expect(
+      page.locator(
+        '.writing-category-picker__option[data-category="conceptual"]',
+      ),
+    ).toHaveAttribute('aria-selected', 'true');
+    await expect(
+      page.getByRole('link', { name: /Professionalism/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Conceptual Reflections', level: 2 }),
-    ).toBeVisible();
+      page.getByRole('list', { name: 'Rigor articles' }),
+    ).toBeHidden();
   });
 
-  test('empty Technical Deep Dives section shows a non-interactive "Coming up…" placeholder', async ({
+  test('empty Rigor category shows a non-interactive "Coming up…" placeholder', async ({
     page,
   }) => {
     const technicalList = page.getByRole('list', {
-      name: 'Technical Deep Dives articles',
+      name: 'Rigor articles',
     });
     await expect(technicalList).toBeVisible();
     await expect(technicalList.locator('a.page-button')).toHaveCount(0);
@@ -260,6 +279,7 @@ test.describe('Writing page (/writing)', () => {
   });
 
   test('each writing list link targets /blog/ slug', async ({ page }) => {
+    await selectWritingCategory(page, 'conceptual');
     const links = page.locator('.post-list a.page-button');
     const n = await links.count();
     expect(n).toBeGreaterThanOrEqual(1);
@@ -271,6 +291,7 @@ test.describe('Writing page (/writing)', () => {
   test('each writing row shows a date on the same line as the title', async ({
     page,
   }) => {
+    await selectWritingCategory(page, 'conceptual');
     const links = page.locator('.writing-groups .post-list a.page-button');
     const n = await links.count();
     expect(n).toBeGreaterThanOrEqual(1);
@@ -289,6 +310,7 @@ test.describe('Writing page (/writing)', () => {
   test('writing rows keep crisp label rendering (padding, no subpixel translate)', async ({
     page,
   }) => {
+    await selectWritingCategory(page, 'conceptual');
     const PX_TOLERANCE = 0.1;
     const links = page.locator('.writing-groups .post-list a.page-button');
     const n = await links.count();
@@ -316,6 +338,7 @@ test.describe('Writing page (/writing)', () => {
   });
 
   test('writing buttons invert colors on hover', async ({ page }) => {
+    await selectWritingCategory(page, 'conceptual');
     const button = page
       .getByRole('link', { name: /System Thinking, Applied/ })
       .first();
@@ -326,7 +349,7 @@ test.describe('Writing page (/writing)', () => {
     /* Writing index title uses near-black ink with slight transparency */
     await expect(text).toHaveCSS(
       'color',
-      /rgba\(17,\s*17,\s*17,\s*0\.(?:8[0-9]*|9[0-9]*)\)|rgb\(17,\s*17,\s*17\)/,
+      /rgba\(17,\s*17,\s*17,\s*0\.(?:7[0-9]*|8[0-9]*|9[0-9]*)\)|rgb\(17,\s*17,\s*17\)/,
     );
     await expect(bg).toHaveCSS('background-color', RGB_PAGE_BG);
 
@@ -424,6 +447,7 @@ test.describe('Writing page (/writing)', () => {
     await expect(
       page.getByRole('heading', { name: 'Writing', level: 1 }),
     ).toBeVisible();
+    await selectWritingCategory(page, 'conceptual');
     await expect(
       page.locator('.post-list a.page-button').first(),
     ).toBeVisible();
