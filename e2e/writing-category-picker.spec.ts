@@ -409,27 +409,38 @@ test.describe('Writing category picker', () => {
     page,
   }) => {
     await selectWritingCategory(page, 'conceptual');
-    const gap = await page.evaluate(() => {
+    const spacing = await page.evaluate(() => {
       const picker = document.querySelector('.writing-category-picker');
       const section = document.querySelector(
         '.writing-section[data-writing-category="conceptual"]',
       );
+      const buttons = document.querySelector(
+        '.writing-section[data-writing-category="conceptual"] .page-buttons',
+      );
       if (
         !(picker instanceof HTMLElement) ||
-        !(section instanceof HTMLElement)
+        !(section instanceof HTMLElement) ||
+        !(buttons instanceof HTMLElement)
       ) {
-        throw new Error('missing picker/section');
+        throw new Error('missing picker/section/buttons');
       }
       const pickerBottom = picker.getBoundingClientRect().bottom;
       const sectionTop = section.getBoundingClientRect().top;
       const marginBottom = Number.parseFloat(
         getComputedStyle(picker).marginBottom,
       );
-      return { gap: sectionTop - pickerBottom, marginBottom };
+      const rowGap = Number.parseFloat(getComputedStyle(buttons).gap);
+      return {
+        gap: sectionTop - pickerBottom,
+        marginBottom,
+        rowGap,
+      };
     });
 
-    expect(gap.marginBottom).toBeGreaterThan(4);
-    expect(gap.gap).toBeGreaterThan(4);
+    expect(spacing.rowGap).toBeGreaterThan(4);
+    expect(spacing.marginBottom).toBeGreaterThan(spacing.rowGap * 0.65);
+    expect(spacing.marginBottom).toBeLessThan(spacing.rowGap * 0.95);
+    expect(spacing.gap).toBeGreaterThan(spacing.rowGap * 0.6);
   });
 
   test('listbox semantics: track is listbox; options are buttons with role=option', async ({

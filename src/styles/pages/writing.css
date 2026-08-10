@@ -12,12 +12,13 @@
   --panel-padding-left: 10%;
   --panel-padding-bottom: 24%;
   --writing-row-gap: 2.55cqi;
-  --writing-group-gap-mult: 3.35;
+  --writing-group-gap-mult: 3;
+  /* Category bar → first row: distinct from article gaps (tighter than row-gap). */
+  --writing-category-list-gap-mult: 0.8;
   /* Writing voice: a touch taller/looser than Contact Send, not full panel-row. */
   --writing-row-min-h: 5.6cqi;
   --writing-row-max-h: 6.5cqi;
   --writing-row-pad-block: 0.32cqi;
-  --writing-section-heading-gap: 1.7cqi;
   /*
    * Full-width bar (same span as article buttons); inner control sizes to the
    * longest category label + pad, then doubles when open.
@@ -117,7 +118,11 @@ ul.post-list > li::before {
   z-index: 2;
   width: calc(100% - var(--panel-padding-left, 10%));
   max-width: 100%;
-  margin: 0 0 var(--writing-section-heading-gap, 1.55cqi)
+  margin: 0 0
+    calc(
+      var(--writing-row-gap, 2.55cqi) *
+        var(--writing-category-list-gap-mult, 0.8)
+    )
     var(--panel-padding-left, 10%);
   box-sizing: border-box;
   background-color: var(--color-page-bg);
