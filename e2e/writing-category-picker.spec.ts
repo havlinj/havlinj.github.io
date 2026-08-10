@@ -58,9 +58,9 @@ test.describe('Writing category picker', () => {
     await expect(page.locator('.writing-category-picker__caption')).toHaveText(
       'Category',
     );
-    await expect(page.locator('.writing-category-picker__caption')).not.toHaveText(
-      /Category:/,
-    );
+    await expect(
+      page.locator('.writing-category-picker__caption'),
+    ).not.toHaveText(/Category:/);
 
     await expect(option(page, 'technical')).toHaveAttribute(
       'aria-selected',
@@ -83,10 +83,12 @@ test.describe('Writing category picker', () => {
     await expect(rigor).toBeVisible();
     await expect(freestyle).toBeHidden();
 
-    await expect(page.getByRole('list', { name: 'Rigor articles' })).toBeVisible();
     await expect(
-      page.locator('.page-button--placeholder'),
-    ).toHaveText(/Coming up/);
+      page.getByRole('list', { name: 'Rigor articles' }),
+    ).toBeVisible();
+    await expect(page.locator('.page-button--placeholder')).toHaveText(
+      /Coming up/,
+    );
     await expect(
       page.getByRole('list', { name: 'Freestyle articles' }),
     ).toBeHidden();
@@ -182,8 +184,8 @@ test.describe('Writing category picker', () => {
     await expect(option(page, 'technical')).toBeVisible();
     await expect(option(page, 'conceptual')).toBeVisible();
 
-    const divider = await option(page, 'conceptual').evaluate((el) =>
-      getComputedStyle(el).boxShadow,
+    const divider = await option(page, 'conceptual').evaluate(
+      (el) => getComputedStyle(el).boxShadow,
     );
     expect(divider).toMatch(/inset/i);
     expect(divider).toMatch(/rgba?\(\s*17,\s*17,\s*17/i);
@@ -412,7 +414,10 @@ test.describe('Writing category picker', () => {
       const section = document.querySelector(
         '.writing-section[data-writing-category="conceptual"]',
       );
-      if (!(picker instanceof HTMLElement) || !(section instanceof HTMLElement)) {
+      if (
+        !(picker instanceof HTMLElement) ||
+        !(section instanceof HTMLElement)
+      ) {
         throw new Error('missing picker/section');
       }
       const pickerBottom = picker.getBoundingClientRect().bottom;

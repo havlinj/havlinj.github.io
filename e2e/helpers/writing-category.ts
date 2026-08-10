@@ -19,7 +19,11 @@ export async function selectWritingCategory(
 
 export async function openWritingCategoryPicker(page: Page): Promise<void> {
   const picker = page.locator('.writing-category-picker');
-  if (await picker.evaluate((el) => el.classList.contains('writing-category-picker--open'))) {
+  if (
+    await picker.evaluate((el) =>
+      el.classList.contains('writing-category-picker--open'),
+    )
+  ) {
     return;
   }
   await page.locator('.writing-category-picker__shell').click();
@@ -110,7 +114,8 @@ export async function readWritingCategoryPickerLayout(
     const controlRect = control.getBoundingClientRect();
     const shellRect = shell.getBoundingClientRect();
     const selectedRect = selected.getBoundingClientRect();
-    const titleRect = title instanceof HTMLElement ? title.getBoundingClientRect() : null;
+    const titleRect =
+      title instanceof HTMLElement ? title.getBoundingClientRect() : null;
     const placeholderRect =
       placeholder instanceof HTMLElement
         ? placeholder.getBoundingClientRect()
@@ -166,8 +171,7 @@ export async function waitForWritingCategoryPickerSlotReady(
           const slotPx = Number.parseFloat(slotRaw);
           if (!(slotPx > 0)) return 0;
           const controlWidth = control.getBoundingClientRect().width;
-          const ratio =
-            Math.abs(controlWidth - slotPx) / Math.max(slotPx, 1);
+          const ratio = Math.abs(controlWidth - slotPx) / Math.max(slotPx, 1);
           return ratio < 0.2 ? slotPx : 0;
         }),
       { timeout: 5000 },

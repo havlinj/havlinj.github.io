@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { selectWritingCategory } from './helpers';
 
 test.describe('Blog post pages (/blog/...)', () => {
   test('blog post page shows title and navbar with active Writing', async ({
@@ -22,6 +23,7 @@ test.describe('Blog post pages (/blog/...)', () => {
     await expect(
       page.locator('.writing-groups.writing-groups--visible'),
     ).toBeVisible({ timeout: 10000 });
+    await selectWritingCategory(page, 'conceptual');
     const link = page
       .locator('a.page-button')
       .filter({ hasText: 'System Thinking, Applied' })

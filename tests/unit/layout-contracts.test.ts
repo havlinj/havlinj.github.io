@@ -221,11 +221,12 @@ describe('layout contracts: page reveal fade (CSS ↔ page-reveal.ts)', () => {
 
 describe('layout contracts: Writing category picker idle (CSS ↔ TS ↔ Foundations)', () => {
   it('idle MS matches Foundations DEFAULT_REVEAL_TIMEOUT_MS and writing.css', async () => {
-    const { WRITING_CATEGORY_PICKER_IDLE_MS, WRITING_CATEGORY_PICKER_FLASH_MS } =
-      await import('../../src/constants/writing-category-picker');
-    const { DEFAULT_REVEAL_TIMEOUT_MS } = await import(
-      '../../src/scripts/profile-tile-type-fit-constants'
-    );
+    const {
+      WRITING_CATEGORY_PICKER_IDLE_MS,
+      WRITING_CATEGORY_PICKER_FLASH_MS,
+    } = await import('../../src/constants/writing-category-picker');
+    const { DEFAULT_REVEAL_TIMEOUT_MS } =
+      await import('../../src/scripts/profile-tile-type-fit-constants');
     const writingCss = readRepoFile('src/styles/pages/writing.css');
 
     expect(WRITING_CATEGORY_PICKER_IDLE_MS).toBe(DEFAULT_REVEAL_TIMEOUT_MS);

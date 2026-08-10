@@ -137,7 +137,9 @@ function flashAndSelect(state: PickerState, category: string): void {
   clearIdleTimer(state);
   clearFlashTimer(state);
 
-  const chosen = state.options.find((option) => option.dataset.category === category);
+  const chosen = state.options.find(
+    (option) => option.dataset.category === category,
+  );
   if (!chosen) return;
 
   for (const option of state.options) {
@@ -157,7 +159,10 @@ function flashAndSelect(state: PickerState, category: string): void {
     return;
   }
 
-  state.flashTimerId = window.setTimeout(finish, WRITING_CATEGORY_PICKER_FLASH_MS);
+  state.flashTimerId = window.setTimeout(
+    finish,
+    WRITING_CATEGORY_PICKER_FLASH_MS,
+  );
 }
 
 function initPickerState(root: HTMLElement): PickerState | null {
