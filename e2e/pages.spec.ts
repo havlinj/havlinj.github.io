@@ -170,9 +170,23 @@ test.describe('Writing page (/writing)', () => {
     ).toBeVisible({ timeout: 10000 });
   });
 
-  test('loads writing.css bundle and not profile.css', async ({ page }) => {
+  test('loads writing page styles (not profile.css)', async ({ page }) => {
+    /* Dev may inject CSS via Vite style tags; preview uses /_astro/writing.*.css. */
+    await expect
+      .poll(async () => {
+        const hrefs = await readStylesheetHrefs(page);
+        if (hasAstroStylesheetBundle(hrefs, 'writing')) return 'bundle';
+        return page.evaluate(() => {
+          const el = document.querySelector('.writing-page');
+          if (!(el instanceof HTMLElement)) return '';
+          return getComputedStyle(el)
+            .getPropertyValue('--writing-category-expand-ms')
+            .trim();
+        });
+      })
+      .toMatch(/^(bundle|320ms)$/);
+
     const hrefs = await readStylesheetHrefs(page);
-    expect(hasAstroStylesheetBundle(hrefs, 'writing')).toBe(true);
     expect(hasAstroStylesheetBundle(hrefs, 'profile')).toBe(false);
   });
 

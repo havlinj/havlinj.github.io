@@ -41,7 +41,16 @@ export {
   type ResponsivePanelBgMatrixConfig,
 } from './responsive-panel-bg-matrix';
 export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';
-export { selectWritingCategory } from './writing-category';
+export {
+  expectWritingCategoryPickerClosed,
+  openWritingCategoryPicker,
+  readWritingCategoryPickerLayout,
+  selectWritingCategory,
+  setWritingCategoryPickerIdleMs,
+  waitForWritingCategoryPickerExpanded,
+  waitForWritingCategoryPickerSlotReady,
+  type WritingCategoryPickerLayout,
+} from './writing-category';
 export {
   expectProfileLayoutStable,
   expectSharedPageRevealTransition,

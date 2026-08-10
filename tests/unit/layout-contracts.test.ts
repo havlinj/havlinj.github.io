@@ -218,3 +218,41 @@ describe('layout contracts: page reveal fade (CSS ↔ page-reveal.ts)', () => {
     });
   }
 });
+
+describe('layout contracts: Writing category picker idle (CSS ↔ TS ↔ Foundations)', () => {
+  it('idle MS matches Foundations DEFAULT_REVEAL_TIMEOUT_MS and writing.css', async () => {
+    const { WRITING_CATEGORY_PICKER_IDLE_MS, WRITING_CATEGORY_PICKER_FLASH_MS } =
+      await import('../../src/constants/writing-category-picker');
+    const { DEFAULT_REVEAL_TIMEOUT_MS } = await import(
+      '../../src/scripts/profile-tile-type-fit-constants'
+    );
+    const writingCss = readRepoFile('src/styles/pages/writing.css');
+
+    expect(WRITING_CATEGORY_PICKER_IDLE_MS).toBe(DEFAULT_REVEAL_TIMEOUT_MS);
+    expect(WRITING_CATEGORY_PICKER_IDLE_MS).toBe(7000);
+    expect(cssCustomProp(writingCss, '--writing-category-picker-idle-ms')).toBe(
+      '7000',
+    );
+    expect(WRITING_CATEGORY_PICKER_FLASH_MS).toBe(220);
+  });
+
+  it('picker script reads idle from CSS custom property with constant fallback', () => {
+    const src = readRepoFile('src/scripts/writing-category-picker.ts');
+    expect(src).toContain('--writing-category-picker-idle-ms');
+    expect(src).toContain('WRITING_CATEGORY_PICKER_IDLE_MS');
+    expect(src).toContain('WRITING_CATEGORY_PICKER_FLASH_MS');
+  });
+
+  it('writing.css defines open divider and is-flashing invert', () => {
+    const writingCss = readRepoFile('src/styles/pages/writing.css');
+    expect(writingCss).toMatch(
+      /\.writing-category-picker--open[\s\S]*?\.writing-category-picker__option\s*\+\s*\.writing-category-picker__option\s*\{[\s\S]*?box-shadow:\s*inset 1px 0 0 rgba\(var\(--color-ink-rgb\),\s*0\.2\)/,
+    );
+    expect(writingCss).toMatch(
+      /\.writing-category-picker__option\.is-flashing\s*\{[\s\S]*?background-color:\s*var\(--color-ink\)[\s\S]*?color:\s*var\(--color-page-bg\)/,
+    );
+    expect(writingCss).toContain(
+      'width: calc(2 * var(--writing-category-slot-width))',
+    );
+  });
+});

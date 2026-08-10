@@ -62,6 +62,17 @@ function updateTrackOffset(state: PickerState): void {
   state.track.style.transform = `translateX(calc(-1 * ${offsetIndex} * var(--writing-category-slot-width)))`;
 }
 
+function readIdleMs(root: HTMLElement): number {
+  const raw = getComputedStyle(root)
+    .getPropertyValue('--writing-category-picker-idle-ms')
+    .trim();
+  const parsed = Number.parseFloat(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return WRITING_CATEGORY_PICKER_IDLE_MS;
+  }
+  return parsed;
+}
+
 function setOpen(state: PickerState, open: boolean): void {
   clearIdleTimer(state);
   state.root.classList.toggle('writing-category-picker--open', open);
@@ -72,7 +83,7 @@ function setOpen(state: PickerState, open: boolean): void {
     state.idleTimerId = window.setTimeout(() => {
       state.idleTimerId = 0;
       setOpen(state, false);
-    }, WRITING_CATEGORY_PICKER_IDLE_MS);
+    }, readIdleMs(state.root));
   }
 }
 

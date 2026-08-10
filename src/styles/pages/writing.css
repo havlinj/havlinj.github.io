@@ -25,6 +25,8 @@
   --writing-category-picker-frame-margin: 0.28em;
   --writing-category-slot-width: 7.5em;
   --writing-category-expand-ms: 320ms;
+  /* Idle auto-collapse; mirrors Foundations reveal (overridable in e2e). */
+  --writing-category-picker-idle-ms: 7000;
   --writing-section-heading-pad-block: 0.4em;
   --writing-section-heading-pad-inline-end: 0.85em;
   --writing-section-heading-pad-inline-start: 0.85em;
@@ -390,7 +392,7 @@ ul.post-list > li::before {
   font-size: var(--writing-button-title-size);
   line-height: var(--writing-title-lh);
   letter-spacing: var(--writing-title-tracking);
-  color: rgba(var(--color-ink-rgb), 0.7);
+  color: rgba(var(--color-ink-rgb), 0.82);
   padding: var(--writing-button-title-pad);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -402,7 +404,7 @@ ul.post-list > li::before {
   font-size: var(--writing-placeholder-title-size);
   font-weight: 400;
   letter-spacing: var(--writing-placeholder-tracking);
-  color: rgba(var(--color-ink-rgb), 0.68);
+  color: rgba(var(--color-ink-rgb), 0.78);
 }
 
 .writing-page .page-button__date {
@@ -412,7 +414,7 @@ ul.post-list > li::before {
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: var(--writing-date-tracking);
-  color: rgba(var(--color-ink-rgb), 0.5);
+  color: rgba(var(--color-ink-rgb), 0.64);
   padding-inline-end: 0.2em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
