@@ -1,6 +1,8 @@
 import {
+  WRITING_CATEGORY_PICKER_BOOT_TIMEOUT_MS,
   WRITING_CATEGORY_PICKER_FLASH_MS,
   WRITING_CATEGORY_PICKER_IDLE_MS,
+  WRITING_CATEGORY_PICKER_READY_CLASS,
   WRITING_CATEGORY_PICKER_SELECTORS as SELECTORS,
 } from '../constants/writing-category-picker';
 
@@ -14,6 +16,7 @@ type PickerState = {
   idleTimerId: number;
   flashTimerId: number;
   selectedCategory: string;
+  bootFinished: boolean;
 };
 
 function prefersReducedMotion(): boolean {
@@ -34,6 +37,36 @@ function syncSlotWidth(state: PickerState): void {
   const slotPx = measureSlotWidth(state.root);
   if (slotPx <= 0) return;
   state.root.style.setProperty('--writing-category-slot-width', `${slotPx}px`);
+}
+
+function revealWritingGroups(): void {
+  const writingGroups = document.querySelector(SELECTORS.groups);
+  if (!(writingGroups instanceof HTMLElement)) return;
+  if (writingGroups.classList.contains('writing-groups--visible')) return;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      writingGroups.classList.remove('writing-groups--pending');
+      writingGroups.classList.add('writing-groups--visible');
+      writingGroups.removeAttribute('aria-busy');
+    });
+  });
+}
+
+/**
+ * Apply the measured slot with transitions still off, then enable expand
+ * motion and fade the list in — avoids the first-load width shrink.
+ */
+function finishPickerBoot(state: PickerState): void {
+  if (state.bootFinished) return;
+  state.bootFinished = true;
+
+  syncSlotWidth(state);
+  updateTrackOffset(state);
+  void state.control.offsetWidth;
+
+  state.root.classList.add(WRITING_CATEGORY_PICKER_READY_CLASS);
+  revealWritingGroups();
 }
 
 function clearIdleTimer(state: PickerState): void {
@@ -162,25 +195,33 @@ function initPickerState(root: HTMLElement): PickerState | null {
     idleTimerId: 0,
     flashTimerId: 0,
     selectedCategory: selected,
+    bootFinished: false,
   };
 }
 
 export function initWritingCategoryPicker(): void {
   const root = document.querySelector(SELECTORS.root);
-  if (!(root instanceof HTMLElement)) return;
+  if (!(root instanceof HTMLElement)) {
+    revealWritingGroups();
+    return;
+  }
 
   const state = initPickerState(root);
-  if (!state || state.options.length === 0) return;
+  if (!state || state.options.length === 0) {
+    revealWritingGroups();
+    return;
+  }
 
   syncSlotWidth(state);
   showCategory(state, state.selectedCategory);
   setOpen(state, false);
 
   const fontsReady = document.fonts?.ready ?? Promise.resolve();
-  fontsReady.finally(() => {
-    syncSlotWidth(state);
-    updateTrackOffset(state);
-  });
+  fontsReady.finally(() => finishPickerBoot(state));
+  window.setTimeout(
+    () => finishPickerBoot(state),
+    WRITING_CATEGORY_PICKER_BOOT_TIMEOUT_MS,
+  );
 
   state.shell.addEventListener('click', (event) => {
     event.stopPropagation();

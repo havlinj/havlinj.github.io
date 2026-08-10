@@ -255,4 +255,14 @@ describe('layout contracts: Writing category picker idle (CSS ↔ TS ↔ Foundat
       'width: calc(2 * var(--writing-category-slot-width))',
     );
   });
+
+  it('writing.css enables expand transitions only after --ready', () => {
+    const writingCss = readRepoFile('src/styles/pages/writing.css');
+    expect(writingCss).toMatch(
+      /\.writing-category-picker--ready[\s\S]*?\.writing-category-picker__control\s*\{[\s\S]*?transition:\s*width/,
+    );
+    expect(writingCss).not.toMatch(
+      /\.writing-page \.writing-category-picker__control\s*\{[^}]*transition:\s*width/,
+    );
+  });
 });

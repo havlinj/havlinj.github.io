@@ -3,8 +3,10 @@ import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import { WRITING_CATEGORY_PICKER_FLASH_MS } from '../src/constants/writing-category-picker';
 import {
   expectWritingCategoryPickerClosed,
+  installWritingCategoryPickerWidthProbe,
   openWritingCategoryPicker,
   readWritingCategoryPickerLayout,
+  readWritingCategoryPickerWidthLog,
   selectWritingCategory,
   setWritingCategoryPickerIdleMs,
   waitForWritingCategoryPickerExpanded,
@@ -41,9 +43,17 @@ test.describe('Writing category picker', () => {
   }) => {
     const picker = page.locator('.writing-category-picker');
     await expect(picker).toBeVisible();
+    await expect(picker).toHaveClass(/writing-category-picker--ready/);
     await expect(picker).toHaveAttribute('aria-label', 'Article category');
     await expect(picker).toHaveAttribute('aria-expanded', 'false');
     await expect(picker).not.toHaveClass(/writing-category-picker--open/);
+
+    const slotUnit = await picker.evaluate((el) =>
+      getComputedStyle(el)
+        .getPropertyValue('--writing-category-slot-width')
+        .trim(),
+    );
+    expect(slotUnit).toMatch(/px$/);
 
     await expect(page.locator('.writing-category-picker__caption')).toHaveText(
       'Category',
@@ -446,6 +456,13 @@ test.describe('Writing category picker', () => {
   test('open option hover applies a light ink wash (not when flashing)', async ({
     page,
   }) => {
+    await page.addStyleTag({
+      content: `
+        .writing-page .writing-category-picker__option {
+          transition: none !important;
+        }
+      `,
+    });
     await openWritingCategoryPicker(page);
     const freestyle = option(page, 'conceptual');
     await freestyle.hover();
@@ -517,5 +534,50 @@ test.describe('Writing category picker — narrow viewport', () => {
     await expect(
       page.getByRole('link', { name: /System Thinking, Applied/ }),
     ).toBeVisible();
+  });
+});
+
+test.describe('Writing category picker — first paint width', () => {
+  test('control width does not shrink once the list is visible', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await installWritingCategoryPickerWidthProbe(page);
+    await page.goto('/writing', { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.locator('.writing-groups.writing-groups--visible'),
+    ).toBeVisible({ timeout: 10_000 });
+    /* Cover the old expand-ms window where a late measure used to animate shrink. */
+    await page.waitForTimeout(450);
+
+    const log = await readWritingCategoryPickerWidthLog(page);
+    expect(log.length, 'probe should record frames').toBeGreaterThan(10);
+
+    const visible = log.filter(
+      (sample) => sample.groupsVisible && sample.groupsOpacity > 0.05,
+    );
+    expect(visible.length, 'need samples after reveal').toBeGreaterThan(8);
+
+    for (const sample of visible) {
+      expect(
+        sample.pickerReady,
+        'list must not appear before the measured slot is ready',
+      ).toBe(true);
+    }
+
+    const widths = visible.map((sample) => sample.controlWidth);
+    const minWidth = Math.min(...widths);
+    const maxWidth = Math.max(...widths);
+    expect(
+      maxWidth - minWidth,
+      `visible widths drifted: min=${minWidth} max=${maxWidth}`,
+    ).toBeLessThanOrEqual(1.5);
+
+    for (let i = 1; i < visible.length; i++) {
+      expect(
+        visible[i]!.controlWidth,
+        `shrink at sample ${i}: ${visible[i - 1]!.controlWidth} → ${visible[i]!.controlWidth}`,
+      ).toBeGreaterThanOrEqual(visible[i - 1]!.controlWidth - 1);
+    }
   });
 });

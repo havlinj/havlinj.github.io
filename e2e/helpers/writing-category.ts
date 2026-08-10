@@ -190,3 +190,98 @@ export async function waitForWritingCategoryPickerExpanded(
     )
     .toBeGreaterThan(0.92);
 }
+
+export type WritingCategoryPickerWidthSample = {
+  t: number;
+  controlWidth: number;
+  groupsVisible: boolean;
+  pickerReady: boolean;
+  groupsOpacity: number;
+};
+
+/**
+ * Start sampling the category-control width from the first DOM paint.
+ * Call before `page.goto('/writing')`.
+ */
+export async function installWritingCategoryPickerWidthProbe(
+  page: Page,
+): Promise<void> {
+  await page.addInitScript(() => {
+    type Sample = {
+      t: number;
+      controlWidth: number;
+      groupsVisible: boolean;
+      pickerReady: boolean;
+      groupsOpacity: number;
+    };
+
+    const win = window as Window & {
+      __writingPickerWidthLog?: Sample[];
+    };
+    win.__writingPickerWidthLog = [];
+
+    const sample = () => {
+      const control = document.querySelector(
+        '.writing-category-picker__control',
+      );
+      const groups = document.querySelector('.writing-page .writing-groups');
+      const picker = document.querySelector('.writing-category-picker');
+      if (!(control instanceof HTMLElement)) return;
+
+      const groupsOpacity =
+        groups instanceof HTMLElement
+          ? Number.parseFloat(getComputedStyle(groups).opacity)
+          : 0;
+
+      win.__writingPickerWidthLog!.push({
+        t: performance.now(),
+        controlWidth: control.getBoundingClientRect().width,
+        groupsVisible:
+          groups instanceof HTMLElement &&
+          groups.classList.contains('writing-groups--visible'),
+        pickerReady:
+          picker instanceof HTMLElement &&
+          picker.classList.contains('writing-category-picker--ready'),
+        groupsOpacity: Number.isFinite(groupsOpacity) ? groupsOpacity : 0,
+      });
+    };
+
+    const start = () => {
+      const observer = new MutationObserver(sample);
+      observer.observe(document.documentElement, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['class', 'style'],
+      });
+      const tick = () => {
+        sample();
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start, { once: true });
+    } else {
+      start();
+    }
+  });
+}
+
+export async function readWritingCategoryPickerWidthLog(
+  page: Page,
+): Promise<WritingCategoryPickerWidthSample[]> {
+  return page.evaluate(() => {
+    const win = window as Window & {
+      __writingPickerWidthLog?: Array<{
+        t: number;
+        controlWidth: number;
+        groupsVisible: boolean;
+        pickerReady: boolean;
+        groupsOpacity: number;
+      }>;
+    };
+    return [...(win.__writingPickerWidthLog ?? [])];
+  });
+}

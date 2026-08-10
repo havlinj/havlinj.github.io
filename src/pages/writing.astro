@@ -184,28 +184,4 @@ const defaultCategory = 'technical';
 
     initWritingCategoryPicker();
   </script>
-  <script is:inline>
-    (() => {
-      const writingGroups = document.querySelector(
-        '.writing-page .writing-groups',
-      );
-
-      let buttonsRevealed = false;
-      function revealWritingButtons() {
-        if (buttonsRevealed || !writingGroups) return;
-        buttonsRevealed = true;
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            writingGroups.classList.remove('writing-groups--pending');
-            writingGroups.classList.add('writing-groups--visible');
-            writingGroups.removeAttribute('aria-busy');
-          });
-        });
-      }
-
-      const fontsReady = document.fonts?.ready ?? Promise.resolve();
-      fontsReady.finally(() => revealWritingButtons());
-      window.setTimeout(revealWritingButtons, 2500);
-    })();
-  </script>
 </Layout>

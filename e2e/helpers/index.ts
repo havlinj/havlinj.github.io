@@ -43,13 +43,16 @@ export {
 export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';
 export {
   expectWritingCategoryPickerClosed,
+  installWritingCategoryPickerWidthProbe,
   openWritingCategoryPicker,
   readWritingCategoryPickerLayout,
+  readWritingCategoryPickerWidthLog,
   selectWritingCategory,
   setWritingCategoryPickerIdleMs,
   waitForWritingCategoryPickerExpanded,
   waitForWritingCategoryPickerSlotReady,
   type WritingCategoryPickerLayout,
+  type WritingCategoryPickerWidthSample,
 } from './writing-category';
 export {
   expectProfileLayoutStable,
