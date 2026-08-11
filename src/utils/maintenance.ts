@@ -43,10 +43,7 @@ type EnvLike = Record<string, string | undefined>;
 /** Allows // and /* *\/ comments in maintenance.json (JSONC-style). */
 export function parseMaintenanceJson(raw: string): unknown {
   const withoutBlockComments = raw.replace(/\/\*[\s\S]*?\*\//g, '');
-  const withoutLineComments = withoutBlockComments.replace(
-    /^\s*\/\/.*$/gm,
-    '',
-  );
+  const withoutLineComments = withoutBlockComments.replace(/^\s*\/\/.*$/gm, '');
   return JSON.parse(withoutLineComments) as unknown;
 }
 

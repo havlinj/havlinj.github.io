@@ -28,5 +28,6 @@
  * - Comments in this file are allowed (JSONC-style).
  */
 {
-  "mode": "off"
+  "mode": "routes",
+  "routes": [{ "path": "/writing", "started": "2026-08-08", "match": "prefix" }]
 }

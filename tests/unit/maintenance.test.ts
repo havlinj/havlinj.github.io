@@ -150,11 +150,6 @@ describe('maintenance schema (mode discriminated union)', () => {
     );
   });
 
-  it('loads the repo maintenance.json as mode=off', () => {
-    const config = loadMaintenanceConfig();
-    expect(config).toEqual({ mode: 'off' });
-  });
-
   it('parses JSONC comments in maintenance config text', () => {
     const source = parseMaintenanceJson(`
       /* block */
@@ -304,7 +299,7 @@ describe('maintenance config source overrides', () => {
     ).toThrow(/valid JSON/);
   });
 
-  it('reads MAINTENANCE_CONFIG_PATH fixture', () => {
+  it('reads MAINTENANCE_CONFIG_PATH routes fixture', () => {
     const source = readMaintenanceConfigSource({
       MAINTENANCE_CONFIG_PATH: 'e2e/fixtures/maintenance-routes.json',
     });
@@ -313,6 +308,13 @@ describe('maintenance config source overrides', () => {
     if (config.mode === 'routes') {
       expect(config.routes[0]?.path).toBe('/writing');
     }
+  });
+
+  it('reads MAINTENANCE_CONFIG_PATH off fixture (default shape)', () => {
+    const source = readMaintenanceConfigSource({
+      MAINTENANCE_CONFIG_PATH: 'e2e/fixtures/maintenance-off.json',
+    });
+    expect(loadMaintenanceConfig(source)).toEqual({ mode: 'off' });
   });
 
   it('prefers JSON env over path env', () => {
