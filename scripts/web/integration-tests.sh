@@ -62,6 +62,11 @@ ensure_port_ready_for_fresh_server() {
 echo "Moving to project root: $ROOT_DIR"
 cd "$ROOT_DIR"
 
+# Always exercise the real site in CI/local gates, even if maintenance.json
+# marks routes (or global) unavailable for the production Pages build.
+export MAINTENANCE_FORCE_OFF="${MAINTENANCE_FORCE_OFF:-1}"
+echo "MAINTENANCE_FORCE_OFF=${MAINTENANCE_FORCE_OFF}"
+
 # Local-first defaults:
 # - do NOT force CI mode (CI retries and stricter orchestration can be much slower locally)
 # - keep worker count conservative to avoid dev-server contention on repeated runs

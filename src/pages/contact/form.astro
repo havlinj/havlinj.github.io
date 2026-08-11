@@ -1,21 +1,38 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ContactForm from '../../components/ContactForm.astro';
+import RouteMaintenanceNotice from '../../components/RouteMaintenanceNotice.astro';
+import { resolveMaintenance } from '../../utils/maintenance';
 import '../../styles/pages/contact.css';
+
+const maintenance = resolveMaintenance(Astro.url.pathname);
+
+if (maintenance.kind === 'global') {
+  return Astro.redirect('/');
+}
 
 const title = 'Contact form — Jan Havlín';
 ---
 
-<Layout title={title} activeSection="contact">
-  <Fragment slot="head">
-    <script
-      is:inline
-      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-      async
-      defer></script>
-  </Fragment>
-  <article class="contact has-page-title-rule">
-    <h1 class="page-title">Contact</h1>
-    <ContactForm />
-  </article>
-</Layout>
+{
+  maintenance.kind === 'route' ? (
+    <Layout title="Whoops" activeSection="contact">
+      <RouteMaintenanceNotice decision={maintenance} />
+    </Layout>
+  ) : (
+    <Layout title={title} activeSection="contact">
+      <Fragment slot="head">
+        <script
+          is:inline
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          async
+          defer
+        />
+      </Fragment>
+      <article class="contact has-page-title-rule">
+        <h1 class="page-title">Contact</h1>
+        <ContactForm />
+      </article>
+    </Layout>
+  )
+}

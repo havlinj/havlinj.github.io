@@ -1,187 +1,24 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import ResponsiveDichromPicture from '../components/ResponsiveDichromPicture.astro';
-import WritingPostButton from '../components/WritingPostButton.astro';
-import { buildDichromResponsive } from '../constants/dichrom-responsive';
-import '../styles/pages/writing.css';
-import {
-  splitAndSortWritingPosts,
-  type WritingCategoryGroup,
-  type WritingPostLike,
-} from '../utils/writing-posts';
+import RouteMaintenanceNotice from '../components/RouteMaintenanceNotice.astro';
+import WritingPageBody from '../components/WritingPageBody.astro';
+import { resolveMaintenance } from '../utils/maintenance';
 
-const posts = await getCollection('blog');
-const { technical, conceptual } = splitAndSortWritingPosts(posts);
+const maintenance = resolveMaintenance(Astro.url.pathname);
 
-const writingBg = buildDichromResponsive(
-  '/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
-);
-
-type WritingSectionView = {
-  key: string;
-  heading: string;
-  hasPosts: boolean;
-  featuredPosts: WritingPostLike[];
-  regularPosts: WritingPostLike[];
-  featuredLabel: string;
-  regularLabel: string;
-};
-
-function buildWritingSectionView(
-  key: string,
-  heading: string,
-  group: WritingCategoryGroup<WritingPostLike>,
-): WritingSectionView {
-  return {
-    key,
-    heading,
-    hasPosts: group.featuredPosts.length + group.regularPosts.length > 0,
-    featuredPosts: group.featuredPosts,
-    regularPosts: group.regularPosts,
-    featuredLabel: `Featured ${key} articles`,
-    regularLabel: `${heading} articles`,
-  };
+if (maintenance.kind === 'global') {
+  return Astro.redirect('/');
 }
-
-const sections: WritingSectionView[] = [
-  buildWritingSectionView('technical', 'Rigor', technical),
-  buildWritingSectionView('conceptual', 'Freestyle', conceptual),
-];
-
-const defaultCategory = 'technical';
 ---
 
-<Layout title="Writing" activeSection="writing">
-  <article class="writing-page">
-    <h1 class="page-title">Writing</h1>
-    <div class="page-buttons-zone">
-      <div class="page-buttons-panel">
-        <div class="page-buttons-panel__media" aria-hidden="true">
-          <ResponsiveDichromPicture
-            sources={writingBg}
-            width={2736}
-            height={2204}
-            fetchpriority="high"
-          />
-        </div>
-        <div class="writing-groups writing-groups--pending" aria-busy="true">
-          <div
-            class="writing-category-picker"
-            aria-expanded="false"
-            aria-label="Article category"
-          >
-            <div class="writing-category-picker__bar">
-              <span class="writing-category-picker__caption">Category</span>
-              <div class="writing-category-picker__control">
-                <div class="writing-category-picker__shell">
-                  <div class="writing-category-picker__track" role="listbox">
-                    {
-                      sections.map((section) => (
-                        <button
-                          type="button"
-                          role="option"
-                          class:list={[
-                            'writing-category-picker__option',
-                            {
-                              'is-selected': section.key === defaultCategory,
-                            },
-                          ]}
-                          data-category={section.key}
-                          aria-selected={section.key === defaultCategory}
-                        >
-                          {section.heading}
-                        </button>
-                      ))
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="writing-category-picker__measure" aria-hidden="true">
-              {
-                sections.map((section) => (
-                  <span class="writing-category-picker__measure-item">
-                    {section.heading}
-                  </span>
-                ))
-              }
-            </div>
-          </div>
-
-          {
-            sections.map((section) => (
-              <section
-                class="writing-section"
-                data-writing-category={section.key}
-                aria-label={section.heading}
-                hidden={section.key !== defaultCategory}
-              >
-                {section.featuredPosts.length > 0 && (
-                  <ul
-                    class="post-list page-buttons"
-                    aria-label={section.featuredLabel}
-                  >
-                    {section.featuredPosts.map((post) => (
-                      <WritingPostButton post={post} />
-                    ))}
-                  </ul>
-                )}
-                {section.hasPosts && (
-                  <ul
-                    class="post-list page-buttons"
-                    aria-label={section.regularLabel}
-                  >
-                    {section.regularPosts.map((post) => (
-                      <WritingPostButton post={post} />
-                    ))}
-                  </ul>
-                )}
-                {!section.hasPosts && (
-                  <ul
-                    class="post-list page-buttons"
-                    aria-label={section.regularLabel}
-                  >
-                    <li>
-                      <div class="page-button page-button--placeholder">
-                        <span class="page-button__bg" aria-hidden="true" />
-                        <span class="page-button__overlay" aria-hidden="true" />
-                        <span class="page-button__inner">
-                          <span class="page-button__text page-button__text--placeholder">
-                            Coming up&hellip;
-                          </span>
-                        </span>
-                      </div>
-                    </li>
-                  </ul>
-                )}
-              </section>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  </article>
-  <noscript>
-    <style>
-      .writing-page .writing-groups.writing-groups--pending {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-      }
-      .writing-page .writing-category-picker {
-        display: none !important;
-      }
-      .writing-page .writing-section[hidden] {
-        display: block !important;
-      }
-      .writing-page .writing-section + .writing-section {
-        margin-top: var(--panel-padding-top, 10%);
-      }
-    </style>
-  </noscript>
-  <script>
-    import { initWritingCategoryPicker } from '../scripts/writing-category-picker';
-
-    initWritingCategoryPicker();
-  </script>
-</Layout>
+{
+  maintenance.kind === 'route' ? (
+    <Layout title="Whoops" activeSection="writing">
+      <RouteMaintenanceNotice decision={maintenance} />
+    </Layout>
+  ) : (
+    <Layout title="Writing" activeSection="writing">
+      <WritingPageBody />
+    </Layout>
+  )
+}

@@ -2,6 +2,8 @@
 import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import WhyContent from '../components/WhyContent.astro';
+import RouteMaintenanceNotice from '../components/RouteMaintenanceNotice.astro';
+import { resolveMaintenance } from '../utils/maintenance';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
@@ -14,11 +16,11 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const page = await getEntry('pages', slug);
-if (!page) {
-  return new Response(null, { status: 404, statusText: 'Not Found' });
+const maintenance = resolveMaintenance(`/${slug}`);
+
+if (maintenance.kind === 'global') {
+  return Astro.redirect('/');
 }
-const { Content } = await render(page);
 
 const PROFILE_SECTION_SLUGS = new Set([
   'profile',
@@ -37,17 +39,36 @@ const isWhy = slug === 'why-this';
 /** Same 1px rule under H1 as Contact (special-typography.css --page-title-rule-gap) */
 const hasPageTitleRule =
   slug === 'credits' || slug === 'what-i-do' || slug === 'foundations';
+
+let pageTitle = 'Whoops';
+let Content: Awaited<ReturnType<typeof render>>['Content'] | null = null;
+
+if (maintenance.kind !== 'route') {
+  const page = await getEntry('pages', slug);
+  if (!page) {
+    return new Response(null, { status: 404, statusText: 'Not Found' });
+  }
+  const rendered = await render(page);
+  pageTitle = page.data.title;
+  Content = rendered.Content;
+}
 ---
 
-<Layout title={page.data.title} activeSection={activeSection}>
-  <article
-    class={[isWhy && 'why-page', hasPageTitleRule && 'has-page-title-rule']
-      .filter(Boolean)
-      .join(' ')}
-  >
-    <h1 class="page-title">
-      {page.data.title}
-    </h1>
-    {isWhy ? <WhyContent /> : <Content />}
-  </article>
-</Layout>
+{
+  maintenance.kind === 'route' ? (
+    <Layout title="Whoops" activeSection={activeSection}>
+      <RouteMaintenanceNotice decision={maintenance} />
+    </Layout>
+  ) : (
+    <Layout title={pageTitle} activeSection={activeSection}>
+      <article
+        class={[isWhy && 'why-page', hasPageTitleRule && 'has-page-title-rule']
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <h1 class="page-title">{pageTitle}</h1>
+        {isWhy ? <WhyContent /> : Content && <Content />}
+      </article>
+    </Layout>
+  )
+}

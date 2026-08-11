@@ -8,4 +8,7 @@ cd "$ROOT_DIR"
 SITE="${ASTRO_SITE:-http://127.0.0.1:4321}"
 BASE="${ASTRO_BASE:-/}"
 
+# Production Pages artifact: honor src/config/maintenance.json (do not force off).
+unset MAINTENANCE_FORCE_OFF || true
+
 npx --no-install astro build --site "$SITE" --base "$BASE"

@@ -19,6 +19,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export PLAYWRIGHT_FORCE_TTY=1
 export PW_SERVER_MODE="${PW_SERVER_MODE:-preview}"
+export MAINTENANCE_FORCE_OFF="${MAINTENANCE_FORCE_OFF:-1}"
 
 # Build once so each Playwright invocation below only spins up `astro preview`
 # (otherwise the webServer command rebuilds on every run and risks exceeding

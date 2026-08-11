@@ -48,6 +48,10 @@ export default defineConfig({
   webServer: {
     command: webServerCommand,
     url: 'http://localhost:4321',
+    env: {
+      ...process.env,
+      MAINTENANCE_FORCE_OFF: process.env.MAINTENANCE_FORCE_OFF ?? '1',
+    },
     // When Playwright starts dev (CI=1 / all.sh), hide its stdout — otherwise Vite/Astro floods the terminal.
     stdout: 'ignore',
     // Local `npm test` in dev-mode can reuse existing server for faster iteration.

@@ -1,0 +1,34 @@
+---
+import {
+  formatMaintenanceStartedDate,
+  type MaintenanceDecision,
+} from '../utils/maintenance';
+import '../styles/pages/maintenance.css';
+
+type Props = {
+  decision: Extract<MaintenanceDecision, { kind: 'route' }>;
+};
+
+const { decision } = Astro.props;
+const startedLabel = formatMaintenanceStartedDate(decision.started);
+const routeLabel = decision.displayPath;
+---
+
+<article class="route-maintenance-page">
+  <h1 class="page-title">Whoops</h1>
+  <div class="page-buttons-zone">
+    <div class="page-buttons-panel route-maintenance-panel">
+      <div class="route-maintenance-panel__copy">
+        <p class="route-maintenance-panel__headline">
+          Page <span class="route-maintenance-panel__route">{routeLabel}</span> is
+          under maintenance.
+        </p>
+        <div class="route-maintenance-panel__info">
+          <p class="route-maintenance-panel__date">Started on {startedLabel}</p>
+          <p>Content will return soon.</p>
+          <p>Thank you for your understanding.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
