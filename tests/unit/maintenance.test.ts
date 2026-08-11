@@ -3,6 +3,7 @@ import {
   assertValidConfig,
   findUnavailableRoute,
   formatMaintenanceStartedDate,
+  gateNonHomeMaintenance,
   isMaintenanceForcedOff,
   loadMaintenanceConfig,
   normalizeRoutePath,
@@ -236,6 +237,37 @@ describe('resolveMaintenance', () => {
         env: { MAINTENANCE_FORCE_OFF: 'true' },
       }),
     ).toEqual({ kind: 'none' });
+  });
+});
+
+describe('gateNonHomeMaintenance', () => {
+  it('signals redirect-home for global mode', () => {
+    expect(
+      gateNonHomeMaintenance('/writing', { config: globalConfig, env: {} }),
+    ).toEqual({
+      redirectHome: true,
+      decision: { kind: 'none' },
+    });
+  });
+
+  it('passes through route and none decisions', () => {
+    expect(
+      gateNonHomeMaintenance('/writing', { config: routesConfig, env: {} }),
+    ).toEqual({
+      redirectHome: false,
+      decision: {
+        kind: 'route',
+        configPath: '/writing',
+        displayPath: '/writing',
+        started: '2026-08-07',
+      },
+    });
+    expect(
+      gateNonHomeMaintenance('/profile', { config: routesConfig, env: {} }),
+    ).toEqual({
+      redirectHome: false,
+      decision: { kind: 'none' },
+    });
   });
 });
 

@@ -1,8 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import RouteMaintenanceNotice from '../../components/RouteMaintenanceNotice.astro';
-import { resolveMaintenance } from '../../utils/maintenance';
+import RouteMaintenancePage from '../../components/RouteMaintenancePage.astro';
+import { gateNonHomeMaintenance } from '../../utils/maintenance';
 import '../../styles/pages/writing.css';
 
 export async function getStaticPaths() {
@@ -14,10 +14,10 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const pathname = `/blog/${post.id}`;
-const maintenance = resolveMaintenance(pathname);
-
-if (maintenance.kind === 'global') {
+const { redirectHome, decision: maintenance } = gateNonHomeMaintenance(
+  `/blog/${post.id}`,
+);
+if (redirectHome) {
   return Astro.redirect('/');
 }
 
@@ -37,9 +37,7 @@ if (maintenance.kind !== 'route') {
 
 {
   maintenance.kind === 'route' ? (
-    <Layout title="Whoops" activeSection="writing">
-      <RouteMaintenanceNotice decision={maintenance} />
-    </Layout>
+    <RouteMaintenancePage decision={maintenance} activeSection="writing" />
   ) : (
     <Layout title={post.data.title} activeSection="writing">
       <article class="blog-post">

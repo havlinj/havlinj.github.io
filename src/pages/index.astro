@@ -7,17 +7,16 @@ import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import { resolveMaintenance } from '../utils/maintenance';
 
 const maintenance = resolveMaintenance(Astro.url.pathname);
-const isGlobalMaintenance = maintenance.kind === 'global';
-
-const heroBg = isGlobalMaintenance
-  ? null
-  : buildDichromResponsive(
-      '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom',
-    );
+const heroBg =
+  maintenance.kind === 'global'
+    ? null
+    : buildDichromResponsive(
+        '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom',
+      );
 ---
 
 {
-  isGlobalMaintenance ? (
+  maintenance.kind === 'global' ? (
     <Layout title="Website under maintenance">
       <GlobalMaintenanceNotice started={maintenance.started} />
     </Layout>

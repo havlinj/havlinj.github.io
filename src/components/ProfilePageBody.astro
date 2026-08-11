@@ -1,0 +1,24 @@
+---
+type ProfileContent = Awaited<
+  ReturnType<typeof import('astro:content').render>
+>['Content'];
+
+interface Props {
+  pageTitle: string;
+  Content: ProfileContent;
+}
+
+const { pageTitle, Content }: Props = Astro.props;
+---
+
+<article class="has-buttons-panel">
+  <h1 class="page-title">{pageTitle}</h1>
+  <Content />
+</article>
+<script>
+  import { initProfileLoadingVeil } from '../scripts/profile-loading-veil.ts';
+  initProfileLoadingVeil();
+</script>
+<script>
+  import '../scripts/profile-tile-type-fit.ts';
+</script>

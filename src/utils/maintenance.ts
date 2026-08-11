@@ -26,14 +26,68 @@ export type MaintenanceDecision =
       started: string;
     };
 
+export type NonHomeMaintenanceDecision = Exclude<
+  MaintenanceDecision,
+  { kind: 'global' }
+>;
+
 export const MAINTENANCE_FORCE_OFF_ENV = 'MAINTENANCE_FORCE_OFF';
 export const MAINTENANCE_CONFIG_JSON_ENV = 'MAINTENANCE_CONFIG_JSON';
 export const MAINTENANCE_CONFIG_PATH_ENV = 'MAINTENANCE_CONFIG_PATH';
+
+const ROUTE_FIELD_KEYS = ['path', 'started', 'match'] as const;
+const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 type EnvLike = Record<string, string | undefined>;
 
 function readProcessEnv(): EnvLike {
   return (globalThis as { process?: { env?: EnvLike } }).process?.env ?? {};
+}
+
+function hasOwn(record: object, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(record, key);
+}
+
+function asRecord(value: unknown, label: string): Record<string, unknown> {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`maintenance.json: ${label} must be an object`);
+  }
+  return value as Record<string, unknown>;
+}
+
+function assertNonEmptyString(
+  value: unknown,
+  label: string,
+): asserts value is string {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`maintenance.json: ${label} must be a non-empty string`);
+  }
+}
+
+function assertRequiredPresent(
+  record: Record<string, unknown>,
+  key: string,
+  label: string,
+): void {
+  if (!hasOwn(record, key)) {
+    throw new Error(`maintenance.json: ${label} is required`);
+  }
+  if (record[key] === null) {
+    throw new Error(`maintenance.json: ${label} must not be null`);
+  }
+}
+
+function assertNoExtraKeys(
+  record: Record<string, unknown>,
+  allowed: readonly string[],
+  label: string,
+): void {
+  const extraKeys = Object.keys(record).filter((key) => !allowed.includes(key));
+  if (extraKeys.length > 0) {
+    throw new Error(
+      `maintenance.json: ${label} has unknown keys: ${extraKeys.join(', ')}`,
+    );
+  }
 }
 
 export function isMaintenanceForcedOff(
@@ -51,7 +105,7 @@ export function normalizeRoutePath(pathname: string): string {
 }
 
 export function formatMaintenanceStartedDate(isoDate: string): string {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate.trim());
+  const match = ISO_DATE_PATTERN.exec(isoDate.trim());
   if (!match) {
     throw new Error(
       `maintenance started date must be YYYY-MM-DD, got: ${JSON.stringify(isoDate)}`,
@@ -61,26 +115,10 @@ export function formatMaintenanceStartedDate(isoDate: string): string {
   return `${year.slice(2)}.${month}.${day}.`;
 }
 
-function assertNonEmptyString(
-  value: unknown,
-  label: string,
-): asserts value is string {
-  if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(`maintenance.json: ${label} must be a non-empty string`);
-  }
-}
-
-function assertNoExtraKeys(
-  record: Record<string, unknown>,
-  allowed: readonly string[],
-  label: string,
-): void {
-  const extraKeys = Object.keys(record).filter((key) => !allowed.includes(key));
-  if (extraKeys.length > 0) {
-    throw new Error(
-      `maintenance.json: ${label} has unknown keys: ${extraKeys.join(', ')}`,
-    );
-  }
+function assertStartedDate(value: unknown, label: string): string {
+  assertNonEmptyString(value, label);
+  formatMaintenanceStartedDate(value);
+  return value.trim();
 }
 
 function assertValidRoute(
@@ -88,70 +126,40 @@ function assertValidRoute(
   index: number,
 ): asserts route is MaintenanceRouteEntry {
   const label = `routes[${index}]`;
-  if (route === null || typeof route !== 'object' || Array.isArray(route)) {
-    throw new Error(`maintenance.json: ${label} must be an object`);
-  }
-  const record = route as Record<string, unknown>;
-  for (const key of ['path', 'started', 'match'] as const) {
-    if (!Object.prototype.hasOwnProperty.call(record, key)) {
-      throw new Error(`maintenance.json: ${label}.${key} is required`);
-    }
-    if (record[key] === null) {
-      throw new Error(`maintenance.json: ${label}.${key} must not be null`);
-    }
+  const record = asRecord(route, label);
+  for (const key of ROUTE_FIELD_KEYS) {
+    assertRequiredPresent(record, key, `${label}.${key}`);
   }
   assertNonEmptyString(record.path, `${label}.path`);
   if (!record.path.startsWith('/')) {
     throw new Error(`maintenance.json: ${label}.path must start with /`);
   }
-  assertNonEmptyString(record.started, `${label}.started`);
-  formatMaintenanceStartedDate(record.started);
+  assertStartedDate(record.started, `${label}.started`);
   if (record.match !== 'exact' && record.match !== 'prefix') {
     throw new Error(
       `maintenance.json: ${label}.match must be "exact" or "prefix"`,
     );
   }
-  assertNoExtraKeys(record, ['path', 'started', 'match'], label);
+  assertNoExtraKeys(record, ROUTE_FIELD_KEYS, label);
 }
 
 export function assertValidConfig(
   config: unknown,
 ): asserts config is MaintenanceConfigFile {
-  if (config === null || typeof config !== 'object' || Array.isArray(config)) {
-    throw new Error('maintenance.json: root must be an object');
-  }
-  const record = config as Record<string, unknown>;
-  if (!Object.prototype.hasOwnProperty.call(record, 'mode')) {
-    throw new Error(
-      'maintenance.json: "mode" is required ("off" | "global" | "routes")',
-    );
-  }
-  if (record.mode === null) {
-    throw new Error('maintenance.json: "mode" must not be null');
-  }
+  const record = asRecord(config, 'root');
+  assertRequiredPresent(record, 'mode', '"mode"');
   if (record.mode === 'off') {
     assertNoExtraKeys(record, ['mode'], 'root (mode=off)');
     return;
   }
   if (record.mode === 'global') {
-    if (!Object.prototype.hasOwnProperty.call(record, 'started')) {
-      throw new Error('maintenance.json: started is required when mode=global');
-    }
-    if (record.started === null) {
-      throw new Error('maintenance.json: started must not be null');
-    }
-    assertNonEmptyString(record.started, 'started');
-    formatMaintenanceStartedDate(record.started);
+    assertRequiredPresent(record, 'started', 'started');
+    assertStartedDate(record.started, 'started');
     assertNoExtraKeys(record, ['mode', 'started'], 'root (mode=global)');
     return;
   }
   if (record.mode === 'routes') {
-    if (!Object.prototype.hasOwnProperty.call(record, 'routes')) {
-      throw new Error('maintenance.json: routes is required when mode=routes');
-    }
-    if (record.routes === null) {
-      throw new Error('maintenance.json: routes must not be null');
-    }
+    assertRequiredPresent(record, 'routes', 'routes');
     if (!Array.isArray(record.routes)) {
       throw new Error('maintenance.json: routes must be an array');
     }
@@ -214,15 +222,15 @@ export function loadMaintenanceConfig(
 loadMaintenanceConfig();
 
 function routeMatches(entry: MaintenanceRouteEntry, pathname: string): boolean {
-  const path = normalizeRoutePath(entry.path);
+  const configured = normalizeRoutePath(entry.path);
   const current = normalizeRoutePath(pathname);
   if (entry.match === 'exact') {
-    return current === path;
+    return current === configured;
   }
-  if (path === '/') {
+  if (configured === '/') {
     return true;
   }
-  return current === path || current.startsWith(`${path}/`);
+  return current === configured || current.startsWith(`${configured}/`);
 }
 
 export function findUnavailableRoute(
@@ -250,15 +258,13 @@ export function resolveMaintenance(
   if (isMaintenanceForcedOff(options.env)) {
     return { kind: 'none' };
   }
-  const config =
+  const source =
     options.config !== undefined
-      ? loadMaintenanceConfig(options.config)
-      : loadMaintenanceConfig(readMaintenanceConfigSource(options.env));
+      ? options.config
+      : readMaintenanceConfigSource(options.env);
+  const config = loadMaintenanceConfig(source);
   if (config.mode === 'global') {
-    return {
-      kind: 'global',
-      started: config.started,
-    };
+    return { kind: 'global', started: config.started };
   }
   if (config.mode === 'off') {
     return { kind: 'none' };
@@ -273,4 +279,25 @@ export function resolveMaintenance(
     displayPath: normalizeRoutePath(pathname),
     started: route.started,
   };
+}
+
+/**
+ * Gate for every page except home. Callers must `return Astro.redirect('/')`
+ * when `redirectHome` is true.
+ */
+export function gateNonHomeMaintenance(
+  pathname: string,
+  options: {
+    config?: MaintenanceConfigFile;
+    env?: EnvLike;
+  } = {},
+): {
+  redirectHome: boolean;
+  decision: NonHomeMaintenanceDecision;
+} {
+  const decision = resolveMaintenance(pathname, options);
+  if (decision.kind === 'global') {
+    return { redirectHome: true, decision: { kind: 'none' } };
+  }
+  return { redirectHome: false, decision };
 }

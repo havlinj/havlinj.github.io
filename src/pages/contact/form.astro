@@ -1,13 +1,14 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ContactForm from '../../components/ContactForm.astro';
-import RouteMaintenanceNotice from '../../components/RouteMaintenanceNotice.astro';
-import { resolveMaintenance } from '../../utils/maintenance';
+import RouteMaintenancePage from '../../components/RouteMaintenancePage.astro';
+import { gateNonHomeMaintenance } from '../../utils/maintenance';
 import '../../styles/pages/contact.css';
 
-const maintenance = resolveMaintenance(Astro.url.pathname);
-
-if (maintenance.kind === 'global') {
+const { redirectHome, decision: maintenance } = gateNonHomeMaintenance(
+  Astro.url.pathname,
+);
+if (redirectHome) {
   return Astro.redirect('/');
 }
 
@@ -16,9 +17,7 @@ const title = 'Contact form — Jan Havlín';
 
 {
   maintenance.kind === 'route' ? (
-    <Layout title="Whoops" activeSection="contact">
-      <RouteMaintenanceNotice decision={maintenance} />
-    </Layout>
+    <RouteMaintenancePage decision={maintenance} activeSection="contact" />
   ) : (
     <Layout title={title} activeSection="contact">
       <Fragment slot="head">

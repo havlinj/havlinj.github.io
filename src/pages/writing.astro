@@ -1,21 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import RouteMaintenanceNotice from '../components/RouteMaintenanceNotice.astro';
+import RouteMaintenancePage from '../components/RouteMaintenancePage.astro';
 import WritingPageBody from '../components/WritingPageBody.astro';
-import { resolveMaintenance } from '../utils/maintenance';
+import { gateNonHomeMaintenance } from '../utils/maintenance';
 
-const maintenance = resolveMaintenance(Astro.url.pathname);
-
-if (maintenance.kind === 'global') {
+const { redirectHome, decision: maintenance } = gateNonHomeMaintenance(
+  Astro.url.pathname,
+);
+if (redirectHome) {
   return Astro.redirect('/');
 }
 ---
 
 {
   maintenance.kind === 'route' ? (
-    <Layout title="Whoops" activeSection="writing">
-      <RouteMaintenanceNotice decision={maintenance} />
-    </Layout>
+    <RouteMaintenancePage decision={maintenance} activeSection="writing" />
   ) : (
     <Layout title="Writing" activeSection="writing">
       <WritingPageBody />

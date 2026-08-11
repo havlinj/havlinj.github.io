@@ -2,8 +2,8 @@
 import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import WhyContent from '../components/WhyContent.astro';
-import RouteMaintenanceNotice from '../components/RouteMaintenanceNotice.astro';
-import { resolveMaintenance } from '../utils/maintenance';
+import RouteMaintenancePage from '../components/RouteMaintenancePage.astro';
+import { gateNonHomeMaintenance } from '../utils/maintenance';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
@@ -16,9 +16,10 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const maintenance = resolveMaintenance(`/${slug}`);
-
-if (maintenance.kind === 'global') {
+const { redirectHome, decision: maintenance } = gateNonHomeMaintenance(
+  `/${slug}`,
+);
+if (redirectHome) {
   return Astro.redirect('/');
 }
 
@@ -56,9 +57,10 @@ if (maintenance.kind !== 'route') {
 
 {
   maintenance.kind === 'route' ? (
-    <Layout title="Whoops" activeSection={activeSection}>
-      <RouteMaintenanceNotice decision={maintenance} />
-    </Layout>
+    <RouteMaintenancePage
+      decision={maintenance}
+      activeSection={activeSection}
+    />
   ) : (
     <Layout title={pageTitle} activeSection={activeSection}>
       <article

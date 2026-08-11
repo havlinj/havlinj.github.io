@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RouteMaintenanceNotice from './RouteMaintenanceNotice.astro';
+import type { MaintenanceDecision } from '../utils/maintenance';
+
+interface Props {
+  decision: Extract<MaintenanceDecision, { kind: 'route' }>;
+  activeSection?: string;
+}
+
+const { decision, activeSection }: Props = Astro.props;
+---
+
+<Layout title="Whoops" activeSection={activeSection}>
+  <RouteMaintenanceNotice decision={decision} />
+</Layout>
