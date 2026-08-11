@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import maintenanceConfig from '../config/maintenance.json';
 
 export type MaintenanceMatchMode = 'exact' | 'prefix';
@@ -8,14 +10,11 @@ export type MaintenanceRouteEntry = {
   match: MaintenanceMatchMode;
 };
 
-export type MaintenanceGlobalEntry = {
-  started: string;
-};
-
-export type MaintenanceConfigFile = {
-  global: MaintenanceGlobalEntry | null;
-  routes: MaintenanceRouteEntry[];
-};
+/** Discriminated config — global and routes cannot coexist. */
+export type MaintenanceConfigFile =
+  | { mode: 'off' }
+  | { mode: 'global'; started: string }
+  | { mode: 'routes'; routes: MaintenanceRouteEntry[] };
 
 export type MaintenanceDecision =
   | { kind: 'none' }
@@ -27,7 +26,9 @@ export type MaintenanceDecision =
       started: string;
     };
 
-const FORCE_OFF_ENV = 'MAINTENANCE_FORCE_OFF';
+export const MAINTENANCE_FORCE_OFF_ENV = 'MAINTENANCE_FORCE_OFF';
+export const MAINTENANCE_CONFIG_JSON_ENV = 'MAINTENANCE_CONFIG_JSON';
+export const MAINTENANCE_CONFIG_PATH_ENV = 'MAINTENANCE_CONFIG_PATH';
 
 type EnvLike = Record<string, string | undefined>;
 
@@ -38,7 +39,7 @@ function readProcessEnv(): EnvLike {
 export function isMaintenanceForcedOff(
   env: EnvLike = readProcessEnv(),
 ): boolean {
-  const raw = env[FORCE_OFF_ENV];
+  const raw = env[MAINTENANCE_FORCE_OFF_ENV];
   return raw === '1' || raw === 'true';
 }
 
@@ -69,30 +70,15 @@ function assertNonEmptyString(
   }
 }
 
-function assertValidGlobal(
-  global: unknown,
-): asserts global is MaintenanceGlobalEntry | null {
-  if (global === null) {
-    return;
-  }
-  if (typeof global !== 'object' || Array.isArray(global)) {
-    throw new Error(
-      'maintenance.json: "global" must be null or { "started": "YYYY-MM-DD" }',
-    );
-  }
-  const record = global as Record<string, unknown>;
-  if (!Object.prototype.hasOwnProperty.call(record, 'started')) {
-    throw new Error('maintenance.json: global.started is required');
-  }
-  if (record.started === null) {
-    throw new Error('maintenance.json: global.started must not be null');
-  }
-  assertNonEmptyString(record.started, 'global.started');
-  formatMaintenanceStartedDate(record.started);
-  const extraKeys = Object.keys(record).filter((key) => key !== 'started');
+function assertNoExtraKeys(
+  record: Record<string, unknown>,
+  allowed: readonly string[],
+  label: string,
+): void {
+  const extraKeys = Object.keys(record).filter((key) => !allowed.includes(key));
   if (extraKeys.length > 0) {
     throw new Error(
-      `maintenance.json: global has unknown keys: ${extraKeys.join(', ')}`,
+      `maintenance.json: ${label} has unknown keys: ${extraKeys.join(', ')}`,
     );
   }
 }
@@ -125,14 +111,7 @@ function assertValidRoute(
       `maintenance.json: ${label}.match must be "exact" or "prefix"`,
     );
   }
-  const extraKeys = Object.keys(record).filter(
-    (key) => key !== 'path' && key !== 'started' && key !== 'match',
-  );
-  if (extraKeys.length > 0) {
-    throw new Error(
-      `maintenance.json: ${label} has unknown keys: ${extraKeys.join(', ')}`,
-    );
-  }
+  assertNoExtraKeys(record, ['path', 'started', 'match'], label);
 }
 
 export function assertValidConfig(
@@ -142,39 +121,87 @@ export function assertValidConfig(
     throw new Error('maintenance.json: root must be an object');
   }
   const record = config as Record<string, unknown>;
-  if (!Object.prototype.hasOwnProperty.call(record, 'global')) {
+  if (!Object.prototype.hasOwnProperty.call(record, 'mode')) {
     throw new Error(
-      'maintenance.json: "global" is required (use null when off)',
+      'maintenance.json: "mode" is required ("off" | "global" | "routes")',
     );
   }
-  if (!Object.prototype.hasOwnProperty.call(record, 'routes')) {
-    throw new Error('maintenance.json: "routes" is required');
+  if (record.mode === null) {
+    throw new Error('maintenance.json: "mode" must not be null');
   }
-  if (record.routes === null) {
-    throw new Error('maintenance.json: "routes" must not be null');
+  if (record.mode === 'off') {
+    assertNoExtraKeys(record, ['mode'], 'root (mode=off)');
+    return;
   }
-  if (!Array.isArray(record.routes)) {
-    throw new Error('maintenance.json: "routes" must be an array');
+  if (record.mode === 'global') {
+    if (!Object.prototype.hasOwnProperty.call(record, 'started')) {
+      throw new Error('maintenance.json: started is required when mode=global');
+    }
+    if (record.started === null) {
+      throw new Error('maintenance.json: started must not be null');
+    }
+    assertNonEmptyString(record.started, 'started');
+    formatMaintenanceStartedDate(record.started);
+    assertNoExtraKeys(record, ['mode', 'started'], 'root (mode=global)');
+    return;
   }
-  assertValidGlobal(record.global);
-  record.routes.forEach((route, index) => assertValidRoute(route, index));
-  const extraKeys = Object.keys(record).filter(
-    (key) => key !== 'global' && key !== 'routes',
+  if (record.mode === 'routes') {
+    if (!Object.prototype.hasOwnProperty.call(record, 'routes')) {
+      throw new Error('maintenance.json: routes is required when mode=routes');
+    }
+    if (record.routes === null) {
+      throw new Error('maintenance.json: routes must not be null');
+    }
+    if (!Array.isArray(record.routes)) {
+      throw new Error('maintenance.json: routes must be an array');
+    }
+    if (record.routes.length === 0) {
+      throw new Error(
+        'maintenance.json: routes must be non-empty when mode=routes (use mode=off instead)',
+      );
+    }
+    record.routes.forEach((route, index) => assertValidRoute(route, index));
+    assertNoExtraKeys(record, ['mode', 'routes'], 'root (mode=routes)');
+    return;
+  }
+  throw new Error(
+    'maintenance.json: mode must be "off", "global", or "routes"',
   );
-  if (extraKeys.length > 0) {
-    throw new Error(
-      `maintenance.json: unknown top-level keys: ${extraKeys.join(', ')}`,
-    );
+}
+
+export function readMaintenanceConfigSource(
+  env: EnvLike = readProcessEnv(),
+): unknown {
+  const jsonRaw = env[MAINTENANCE_CONFIG_JSON_ENV];
+  if (jsonRaw !== undefined && jsonRaw !== '') {
+    try {
+      return JSON.parse(jsonRaw) as unknown;
+    } catch {
+      throw new Error(`${MAINTENANCE_CONFIG_JSON_ENV} must be valid JSON`);
+    }
   }
+  const pathRaw = env[MAINTENANCE_CONFIG_PATH_ENV];
+  if (pathRaw !== undefined && pathRaw !== '') {
+    const absolute = path.isAbsolute(pathRaw)
+      ? pathRaw
+      : path.resolve(process.cwd(), pathRaw);
+    return JSON.parse(readFileSync(absolute, 'utf8')) as unknown;
+  }
+  return maintenanceConfig;
 }
 
 export function loadMaintenanceConfig(
-  config: unknown = maintenanceConfig,
+  config: unknown = readMaintenanceConfigSource(),
 ): MaintenanceConfigFile {
   assertValidConfig(config);
+  if (config.mode === 'off') {
+    return { mode: 'off' };
+  }
+  if (config.mode === 'global') {
+    return { mode: 'global', started: config.started.trim() };
+  }
   return {
-    global:
-      config.global === null ? null : { started: config.global.started.trim() },
+    mode: 'routes',
     routes: config.routes.map((route) => ({
       path: normalizeRoutePath(route.path),
       started: route.started.trim(),
@@ -183,8 +210,8 @@ export function loadMaintenanceConfig(
   };
 }
 
-/** Validates repo config at import time so bad JSON fails `astro build`. */
-loadMaintenanceConfig(maintenanceConfig);
+/** Validates active config at import time so bad JSON fails `astro build`. */
+loadMaintenanceConfig();
 
 function routeMatches(entry: MaintenanceRouteEntry, pathname: string): boolean {
   const path = normalizeRoutePath(entry.path);
@@ -202,6 +229,9 @@ export function findUnavailableRoute(
   pathname: string,
   config: MaintenanceConfigFile = loadMaintenanceConfig(),
 ): MaintenanceRouteEntry | null {
+  if (config.mode !== 'routes') {
+    return null;
+  }
   const matches = config.routes.filter((route) =>
     routeMatches(route, pathname),
   );
@@ -220,12 +250,18 @@ export function resolveMaintenance(
   if (isMaintenanceForcedOff(options.env)) {
     return { kind: 'none' };
   }
-  const config = loadMaintenanceConfig(options.config);
-  if (config.global !== null) {
+  const config =
+    options.config !== undefined
+      ? loadMaintenanceConfig(options.config)
+      : loadMaintenanceConfig(readMaintenanceConfigSource(options.env));
+  if (config.mode === 'global') {
     return {
       kind: 'global',
-      started: config.global.started,
+      started: config.started,
     };
+  }
+  if (config.mode === 'off') {
+    return { kind: 'none' };
   }
   const route = findUnavailableRoute(pathname, config);
   if (!route) {

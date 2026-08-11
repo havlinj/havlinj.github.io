@@ -139,4 +139,32 @@ if [ "$REUSE_FLAG" = "0" ]; then ensure_port_ready_for_fresh_server; fi
 CI="$PW_CI_MODE" PW_REUSE_SERVER="$REUSE_FLAG" PW_SERVER_MODE="preview" npm run test -- e2e/profile-mobile.spec.ts --workers=1 "${EXTRA_INVERT[@]}"
 
 echo ""
+echo "Running maintenance build integration (injected config → dist HTML)..."
+npx vitest run tests/integration
+
+echo ""
+echo "Running maintenance Playwright (routes fixture on :4322)..."
+# Main suite may leave PW_SKIP_BUILD=1; maintenance config ignores it, but clear
+# reuse flags so we never accidentally attach to a stale FORCE_OFF preview.
+unset PW_SKIP_BUILD || true
+if [ "$REUSE_FLAG" = "0" ]; then
+  stale_maint="$(lsof -tiTCP:4322 -sTCP:LISTEN 2>/dev/null | head -n1 || true)"
+  if [[ -n "$stale_maint" ]]; then
+    kill "$stale_maint" 2>/dev/null || true
+  fi
+fi
+PW_REUSE_SERVER=0 PLAYWRIGHT_FORCE_TTY=1 npx playwright test -c playwright.maintenance.config.ts e2e/maintenance-routes.spec.ts
+
+echo ""
+echo "Running maintenance Playwright (global fixture on :4322)..."
+PW_REUSE_SERVER=0 \
+  MAINTENANCE_CONFIG_PATH=e2e/fixtures/maintenance-global.json \
+  PLAYWRIGHT_FORCE_TTY=1 \
+  npx playwright test -c playwright.maintenance.config.ts e2e/maintenance-global.spec.ts
+
+echo ""
+echo "Restoring default dist for subsequent jobs (Lighthouse)..."
+MAINTENANCE_FORCE_OFF=1 npm run build
+
+echo ""
 echo "Integration tests passed."

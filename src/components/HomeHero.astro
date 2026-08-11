@@ -3,11 +3,11 @@ import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import '../styles/pages/hero.css';
 
-type Props = {
+interface Props {
   sources: ReturnType<typeof buildDichromResponsive>;
-};
+}
 
-const { sources: heroBg } = Astro.props;
+const { sources: heroBg }: Props = Astro.props;
 ---
 
 <nav class="hero-header" aria-label="Main navigation">

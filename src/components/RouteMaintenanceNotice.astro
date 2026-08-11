@@ -5,11 +5,11 @@ import {
 } from '../utils/maintenance';
 import '../styles/pages/maintenance.css';
 
-type Props = {
+interface Props {
   decision: Extract<MaintenanceDecision, { kind: 'route' }>;
-};
+}
 
-const { decision } = Astro.props;
+const { decision }: Props = Astro.props;
 const startedLabel = formatMaintenanceStartedDate(decision.started);
 const routeLabel = decision.displayPath;
 ---

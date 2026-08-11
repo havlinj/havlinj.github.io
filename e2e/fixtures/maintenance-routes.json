@@ -1,0 +1,15 @@
+{
+  "mode": "routes",
+  "routes": [
+    {
+      "path": "/writing",
+      "started": "2026-08-07",
+      "match": "prefix"
+    },
+    {
+      "path": "/contact",
+      "started": "2026-08-08",
+      "match": "exact"
+    }
+  ]
+}

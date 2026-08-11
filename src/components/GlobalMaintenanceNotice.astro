@@ -2,11 +2,11 @@
 import { formatMaintenanceStartedDate } from '../utils/maintenance';
 import '../styles/pages/maintenance.css';
 
-type Props = {
+interface Props {
   started: string;
-};
+}
 
-const { started } = Astro.props;
+const { started }: Props = Astro.props;
 const startedLabel = formatMaintenanceStartedDate(started);
 ---
 
