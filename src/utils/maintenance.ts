@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import maintenanceConfig from '../config/maintenance.json';
+import maintenanceConfig from '../../config/maintenance.json';
 
 export type MaintenanceMatchMode = 'exact' | 'prefix';
 

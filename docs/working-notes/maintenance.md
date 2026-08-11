@@ -8,7 +8,7 @@ Invalid config throws during `astro build` (schema is validated when `src/utils/
 
 `mode` is a discriminated union — global and routes cannot be set together.
 
-Edit [`src/config/maintenance.json`](../src/config/maintenance.json):
+Edit [`config/maintenance.json`](../config/maintenance.json):
 
 ```json
 { "mode": "off" }
