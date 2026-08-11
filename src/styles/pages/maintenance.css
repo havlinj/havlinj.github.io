@@ -24,27 +24,70 @@
 }
 
 .route-maintenance-panel__copy {
+  --route-maintenance-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
+  --route-maintenance-headline-tracking: -0.03em;
+  --route-maintenance-headline-leading: 1.2;
   position: absolute;
   inset: 0;
   z-index: 1;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   box-sizing: border-box;
-  padding: clamp(1.5rem, 8%, 2.75rem) clamp(2rem, 14%, 4.5rem)
-    clamp(1.5rem, 8%, 2.75rem) clamp(2.25rem, 16%, 5rem);
+  padding: clamp(1.5rem, 8%, 2.75rem) clamp(1.5rem, 8%, 2.75rem);
   max-width: 100%;
+}
+
+/*
+ * Horizontal optical center: ghost width = “is under maintenance.”.
+ * Flex centers that rail; real copy shares its left edge and stays left-aligned.
+ */
+.route-maintenance-panel__centerer {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+}
+
+.route-maintenance-panel__center-ref {
+  display: block;
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: var(--route-maintenance-headline-size);
+  font-weight: 600;
+  line-height: var(--route-maintenance-headline-leading);
+  letter-spacing: var(--route-maintenance-headline-tracking);
+}
+
+.route-maintenance-panel__inner {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+  width: max-content;
+  max-width: min(22rem, 72cqi);
 }
 
 .route-maintenance-panel__headline {
   margin: 0;
-  max-width: 22rem;
-  font-size: clamp(1.35rem, 4.2cqi, 1.85rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12em;
+  font-size: var(--route-maintenance-headline-size);
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  line-height: var(--route-maintenance-headline-leading);
+  letter-spacing: var(--route-maintenance-headline-tracking);
   color: var(--color-ink);
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.route-maintenance-panel__headline-tail {
+  white-space: nowrap;
 }
 
 .route-maintenance-panel__route {
@@ -53,25 +96,35 @@
 }
 
 .route-maintenance-panel__info {
-  margin-top: clamp(1.25rem, 5cqi, 1.85rem);
-  max-width: 22rem;
+  margin-top: clamp(1.45rem, 5.5cqi, 2.05rem);
+  max-width: 20rem;
 }
 
 .route-maintenance-panel__info p {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.72;
-  letter-spacing: -0.01em;
-  color: rgba(17, 17, 17, 0.72);
+  font-size: clamp(0.9375rem, 2.85cqi, 1rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: rgba(17, 17, 17, 0.68);
+  -webkit-font-smoothing: antialiased;
+  hyphens: none;
+  -webkit-hyphens: none;
 }
 
 .route-maintenance-panel__info p + p {
-  margin-top: 0.25rem;
+  margin-top: 0.2em;
 }
 
 .route-maintenance-panel__date {
   color: var(--color-ink);
   font-weight: 500;
+  letter-spacing: 0.012em;
+  line-height: 1.35;
+}
+
+.route-maintenance-panel__date + p {
+  margin-top: 0.7em;
 }
 
 .global-maintenance-page {
@@ -99,27 +152,37 @@
 .global-maintenance-page__info p {
   margin: 0;
   font-size: 1rem;
-  line-height: 1.72;
-  letter-spacing: -0.01em;
-  color: rgba(17, 17, 17, 0.72);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: rgba(17, 17, 17, 0.68);
+  -webkit-font-smoothing: antialiased;
+  hyphens: none;
+  -webkit-hyphens: none;
 }
 
 .global-maintenance-page__info p + p {
-  margin-top: 0.25rem;
+  margin-top: 0.2em;
 }
 
 .global-maintenance-page__date {
   color: var(--color-ink);
   font-weight: 500;
+  letter-spacing: 0.012em;
+  line-height: 1.35;
+}
+
+.global-maintenance-page__date + p {
+  margin-top: 0.7em;
 }
 
 @media (max-width: 640px) {
   .route-maintenance-panel__copy {
-    padding-inline: clamp(1.5rem, 12vw, 2.25rem) clamp(1.25rem, 8vw, 2rem);
+    padding-inline: clamp(1.25rem, 6vw, 1.75rem);
   }
 
   .route-maintenance-panel__info p {
-    font-size: 0.96875rem;
+    font-size: 0.9375rem;
   }
 
   .global-maintenance-page {
@@ -135,6 +198,6 @@
   }
 
   .global-maintenance-page__info p {
-    font-size: 0.96875rem;
+    font-size: 0.9375rem;
   }
 }

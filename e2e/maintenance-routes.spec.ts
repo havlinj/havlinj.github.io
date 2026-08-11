@@ -30,6 +30,26 @@ test.describe('maintenance routes fixture', () => {
       (el) => getComputedStyle(el).backgroundColor,
     );
     expect(bg).toBe(RGB_PAGE_BG);
+
+    const alignment = await page.evaluate(() => {
+      const square = document.querySelector('.route-maintenance-panel');
+      const tail = document.querySelector(
+        '.route-maintenance-panel__headline-tail',
+      );
+      if (!(square instanceof HTMLElement) || !(tail instanceof HTMLElement)) {
+        return null;
+      }
+      const squareBox = square.getBoundingClientRect();
+      const tailBox = tail.getBoundingClientRect();
+      return {
+        squareCenterX: squareBox.left + squareBox.width / 2,
+        tailCenterX: tailBox.left + tailBox.width / 2,
+      };
+    });
+    expect(alignment).not.toBeNull();
+    expect(
+      Math.abs(alignment!.tailCenterX - alignment!.squareCenterX),
+    ).toBeLessThan(2);
   });
 
   test('exact /contact is unavailable but /contact/form stays live', async ({

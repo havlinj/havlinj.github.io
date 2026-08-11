@@ -12,6 +12,7 @@ interface Props {
 const { decision }: Props = Astro.props;
 const startedLabel = formatMaintenanceStartedDate(decision.started);
 const routeLabel = decision.displayPath;
+const headlineTail = 'is under maintenance.';
 ---
 
 <article class="route-maintenance-page">
@@ -19,14 +20,29 @@ const routeLabel = decision.displayPath;
   <div class="page-buttons-zone">
     <div class="page-buttons-panel route-maintenance-panel">
       <div class="route-maintenance-panel__copy">
-        <p class="route-maintenance-panel__headline">
-          Page <span class="route-maintenance-panel__route">{routeLabel}</span> is
-          under maintenance.
-        </p>
-        <div class="route-maintenance-panel__info">
-          <p class="route-maintenance-panel__date">Started on {startedLabel}</p>
-          <p>Content will return soon.</p>
-          <p>Thank you for your understanding.</p>
+        <div class="route-maintenance-panel__centerer">
+          <span class="route-maintenance-panel__center-ref" aria-hidden="true"
+            >{headlineTail}</span
+          >
+          <div class="route-maintenance-panel__inner">
+            <p class="route-maintenance-panel__headline">
+              <span class="route-maintenance-panel__headline-lead">
+                Page <span class="route-maintenance-panel__route"
+                  >{routeLabel}</span
+                >
+              </span>
+              <span class="route-maintenance-panel__headline-tail"
+                >{headlineTail}</span
+              >
+            </p>
+            <div class="route-maintenance-panel__info">
+              <p class="route-maintenance-panel__date">
+                Started on {startedLabel}
+              </p>
+              <p>Content will return soon.</p>
+              <p>Thank you for your understanding.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
