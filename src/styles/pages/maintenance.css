@@ -2,6 +2,16 @@
 
 .route-maintenance-page {
   --page-title-margin-bottom: 1.35rem;
+  --panel-bg-pos-x: 50%;
+  --panel-bg-pos-y: 50%;
+  --panel-bg-layer-opacity: 1;
+  --panel-bg-saturation: 1;
+  --panel-bg-brightness: 1;
+  --panel-bg-contrast: 1;
+  --panel-bg-zoom: 1.25;
+  --panel-bg-nudge-x: 0;
+  --panel-bg-nudge-y: 0;
+  --panel-bg-rotate: 0deg;
 }
 
 .route-maintenance-page .page-buttons-zone,
@@ -15,6 +25,8 @@
   background-color: var(--color-page-bg);
   padding: 0;
   overflow: hidden;
+  border: none;
+  --route-maintenance-panel-edge: 320px;
 }
 
 .route-maintenance-page .page-buttons-panel.route-maintenance-panel::before,
@@ -23,49 +35,66 @@
   display: none;
 }
 
+.route-maintenance-page .page-buttons-panel__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.route-maintenance-page .page-buttons-panel__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.route-maintenance-page .page-buttons-panel__media img {
+  position: absolute;
+  display: block;
+  left: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  top: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  width: calc(100% * var(--panel-bg-zoom, 1));
+  height: calc(100% * var(--panel-bg-zoom, 1));
+  object-fit: cover;
+  object-position: calc(
+      var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
+        var(--route-maintenance-panel-edge, 320px)
+    )
+    calc(
+      var(--panel-bg-pos-y, 50%) + var(--panel-bg-nudge-y, 0) *
+        var(--route-maintenance-panel-edge, 320px)
+    );
+  image-rendering: auto;
+  filter: saturate(var(--panel-bg-saturation, 1))
+    brightness(var(--panel-bg-brightness, 1))
+    contrast(var(--panel-bg-contrast, 1));
+  opacity: var(--panel-bg-layer-opacity, 1);
+  transform: rotate(var(--panel-bg-rotate, 0deg));
+}
+
 .route-maintenance-panel__copy {
   --route-maintenance-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
   --route-maintenance-headline-tracking: -0.03em;
   --route-maintenance-headline-leading: 1.2;
+  --route-maintenance-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
+  --route-maintenance-band-pad-x-left: clamp(0.7rem, 2.4cqi, 1.1rem);
+  --route-maintenance-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  padding: clamp(1.5rem, 8%, 2.75rem) clamp(1.5rem, 8%, 2.75rem);
-  max-width: 100%;
-}
-
-/*
- * Horizontal optical center: ghost width = “is under maintenance.”.
- * Flex centers that rail; real copy shares its left edge and stays left-aligned.
- */
-.route-maintenance-panel__centerer {
-  position: relative;
-  width: max-content;
-  max-width: 100%;
-}
-
-.route-maintenance-panel__center-ref {
-  display: block;
-  visibility: hidden;
-  white-space: nowrap;
-  font-size: var(--route-maintenance-headline-size);
-  font-weight: 600;
-  line-height: var(--route-maintenance-headline-leading);
-  letter-spacing: var(--route-maintenance-headline-tracking);
-}
-
-.route-maintenance-panel__inner {
-  position: absolute;
-  left: 0;
   top: 50%;
+  right: 0;
+  left: auto;
   transform: translateY(-50%);
-  text-align: left;
+  z-index: 1;
+  box-sizing: border-box;
   width: max-content;
-  max-width: min(22rem, 72cqi);
+  max-width: calc(100% - var(--panel-padding-left, 2rem));
+  min-width: 0;
+  padding: var(--route-maintenance-band-pad-y)
+    var(--route-maintenance-band-pad-x-right)
+    var(--route-maintenance-band-pad-y) var(--route-maintenance-band-pad-x-left);
+  background-color: var(--color-page-bg);
+  text-align: left;
 }
 
 .route-maintenance-panel__headline {
@@ -178,7 +207,8 @@
 
 @media (max-width: 640px) {
   .route-maintenance-panel__copy {
-    padding-inline: clamp(1.25rem, 6vw, 1.75rem);
+    --route-maintenance-band-pad-y: clamp(1rem, 6vw, 1.45rem);
+    --route-maintenance-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
   }
 
   .route-maintenance-panel__info p {

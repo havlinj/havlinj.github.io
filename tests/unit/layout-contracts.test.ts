@@ -267,3 +267,64 @@ describe('layout contracts: Writing category picker idle (CSS ↔ TS ↔ Foundat
     );
   });
 });
+
+describe('layout contracts: route maintenance panel look', () => {
+  it('maintenance.css panel-bg knobs match MAINTENANCE_PANEL_BG', async () => {
+    const { MAINTENANCE_PANEL_BG } =
+      await import('../../src/constants/maintenance-panel');
+    const css = readRepoFile('src/styles/pages/maintenance.css');
+
+    expect(cssCustomProp(css, '--panel-bg-pos-x')).toBe(
+      MAINTENANCE_PANEL_BG.posX,
+    );
+    expect(cssCustomProp(css, '--panel-bg-pos-y')).toBe(
+      MAINTENANCE_PANEL_BG.posY,
+    );
+    expect(cssCustomProp(css, '--panel-bg-layer-opacity')).toBe(
+      MAINTENANCE_PANEL_BG.layerOpacity,
+    );
+    expect(cssCustomProp(css, '--panel-bg-saturation')).toBe(
+      MAINTENANCE_PANEL_BG.saturation,
+    );
+    expect(cssCustomProp(css, '--panel-bg-brightness')).toBe(
+      MAINTENANCE_PANEL_BG.brightness,
+    );
+    expect(cssCustomProp(css, '--panel-bg-contrast')).toBe(
+      MAINTENANCE_PANEL_BG.contrast,
+    );
+    expect(cssCustomProp(css, '--panel-bg-zoom')).toBe(
+      MAINTENANCE_PANEL_BG.zoom,
+    );
+    expect(cssCustomProp(css, '--panel-bg-nudge-x')).toBe(
+      MAINTENANCE_PANEL_BG.nudgeX,
+    );
+    expect(cssCustomProp(css, '--panel-bg-nudge-y')).toBe(
+      MAINTENANCE_PANEL_BG.nudgeY,
+    );
+    expect(cssCustomProp(css, '--panel-bg-rotate')).toBe(
+      MAINTENANCE_PANEL_BG.rotate,
+    );
+  });
+
+  it('RouteMaintenanceNotice wires dichrom media from MAINTENANCE_PANEL_BG_STEM', async () => {
+    const { MAINTENANCE_PANEL_BG_STEM } =
+      await import('../../src/constants/maintenance-panel');
+    const astro = readRepoFile('src/components/RouteMaintenanceNotice.astro');
+    expect(astro).toContain('MAINTENANCE_PANEL_BG_STEM');
+    expect(astro).toContain('page-buttons-panel__media');
+    expect(astro).toContain('ResponsiveDichromPicture');
+    expect(MAINTENANCE_PANEL_BG_STEM).toContain('/assets/pages/maintenance/');
+    expect(MAINTENANCE_PANEL_BG_STEM).toMatch(/_dichrom$/);
+  });
+
+  it('maintenance.css uses contact-style zoom/nudge img wiring', () => {
+    const css = readRepoFile('src/styles/pages/maintenance.css');
+    expect(css).toContain('width: calc(100% * var(--panel-bg-zoom, 1))');
+    expect(css).toContain('var(--panel-bg-nudge-x, 0)');
+    expect(css).toContain('var(--panel-bg-nudge-y, 0)');
+    expect(css).toContain('opacity: var(--panel-bg-layer-opacity, 1)');
+    expect(css).toMatch(
+      /\.route-maintenance-panel__copy\s*\{[\s\S]*?right:\s*0;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
+    );
+  });
+});

@@ -499,6 +499,7 @@ test.describe('Credits page (/credits)', () => {
     await expect(page.getByText('Evgeni Tcherkasski')).toBeVisible();
     await expect(page.getByText('Weichao Deng')).toBeVisible();
     await expect(page.getByText('Guillaume Didelet')).toBeVisible();
+    await expect(page.getByText('Frankie Cordoba')).toBeVisible();
     await expect(page.getByText('Raddy')).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'deconjpa', exact: true }),

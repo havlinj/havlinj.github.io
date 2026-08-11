@@ -55,6 +55,8 @@ describe('maintenance build integration', () => {
     const writing = readDist('writing/index.html');
     expect(writing).toContain('Whoops');
     expect(writing).toContain('route-maintenance-page');
+    expect(writing).toContain('page-buttons-panel__media');
+    expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(writing).toContain('/writing');
     expect(writing).toContain('Started on 26.08.07.');
     expect(writing).toContain('site-header');

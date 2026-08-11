@@ -37,6 +37,11 @@ All Unsplash media listed below are used according to the
   - Source: [Unsplash](https://unsplash.com/photos/ivuU1X9ULVk)
   - Edits: dichromatic treatment, noise
 
+- **Maintenance page background image**
+  - Author: [Frankie Cordoba](https://unsplash.com/@noorvoux)
+  - Source: [Unsplash](https://unsplash.com/photos/s8Y5e0DNiro)
+  - Edits: dichromatic treatment, noise
+
 ### Videos
 
 All Pexels media listed below are used according to the

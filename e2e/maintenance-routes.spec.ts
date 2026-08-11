@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { RGB_PAGE_BG } from '../src/constants/colors';
+import {
+  MAINTENANCE_PANEL_BG,
+  MAINTENANCE_PANEL_BG_STEM,
+} from '../src/constants/maintenance-panel';
 
 test.describe('maintenance routes fixture', () => {
   test('writing shows Whoops notice inside the square panel', async ({
@@ -28,25 +32,145 @@ test.describe('maintenance routes fixture', () => {
     );
     expect(bg).toBe(RGB_PAGE_BG);
 
-    const alignment = await page.evaluate(() => {
+    const band = page.locator('.route-maintenance-panel__copy');
+    await expect(band).toBeVisible();
+    const bandBg = await band.evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+    expect(bandBg).toBe(RGB_PAGE_BG);
+
+    const layout = await page.evaluate(() => {
       const square = document.querySelector('.route-maintenance-panel');
-      const tail = document.querySelector(
-        '.route-maintenance-panel__headline-tail',
+      const plate = document.querySelector('.route-maintenance-panel__copy');
+      const headline = document.querySelector(
+        '.route-maintenance-panel__headline',
       );
-      if (!(square instanceof HTMLElement) || !(tail instanceof HTMLElement)) {
+      const info = document.querySelector('.route-maintenance-panel__info');
+      if (
+        !(square instanceof HTMLElement) ||
+        !(plate instanceof HTMLElement) ||
+        !(headline instanceof HTMLElement) ||
+        !(info instanceof HTMLElement)
+      ) {
         return null;
       }
       const squareBox = square.getBoundingClientRect();
-      const tailBox = tail.getBoundingClientRect();
+      const plateBox = plate.getBoundingClientRect();
+      const headlineBox = headline.getBoundingClientRect();
+      const infoBox = info.getBoundingClientRect();
       return {
-        squareCenterX: squareBox.left + squareBox.width / 2,
-        tailCenterX: tailBox.left + tailBox.width / 2,
+        rightGap: Math.abs(squareBox.right - plateBox.right),
+        leftPad: headlineBox.left - plateBox.left,
+        topPad: headlineBox.top - plateBox.top,
+        bottomPad: plateBox.bottom - infoBox.bottom,
+        squareCenterY: squareBox.top + squareBox.height / 2,
+        plateCenterY: plateBox.top + plateBox.height / 2,
+        panelBorder: getComputedStyle(square).borderWidth,
       };
     });
-    expect(alignment).not.toBeNull();
-    expect(
-      Math.abs(alignment!.tailCenterX - alignment!.squareCenterX),
-    ).toBeLessThan(2);
+    expect(layout).not.toBeNull();
+    expect(layout!.rightGap).toBeLessThan(2);
+    expect(layout!.leftPad).toBeGreaterThan(8);
+    expect(layout!.leftPad).toBeLessThan(40);
+    expect(layout!.topPad).toBeGreaterThan(12);
+    expect(layout!.bottomPad).toBeGreaterThan(12);
+    expect(Math.abs(layout!.plateCenterY - layout!.squareCenterY)).toBeLessThan(
+      2,
+    );
+    expect(layout!.panelBorder).toBe('0px');
+  });
+
+  test('writing panel locks dichrom media and panel-bg knobs', async ({
+    page,
+  }) => {
+    await page.goto('/writing');
+
+    const mediaImg = page.locator(
+      '.route-maintenance-page .page-buttons-panel__media img',
+    );
+    await expect(mediaImg).toBeAttached();
+    await expect
+      .poll(async () =>
+        mediaImg.evaluate((el) => {
+          const img = el as HTMLImageElement;
+          return img.complete && img.naturalWidth > 0;
+        }),
+      )
+      .toBe(true);
+
+    const src = await mediaImg.evaluate((el) => {
+      const img = el as HTMLImageElement;
+      return img.currentSrc || img.getAttribute('src') || '';
+    });
+    expect(src).toContain(MAINTENANCE_PANEL_BG_STEM);
+
+    const knobs = await page.evaluate(() => {
+      const pageEl = document.querySelector('.route-maintenance-page');
+      if (!(pageEl instanceof HTMLElement)) return null;
+      const cs = getComputedStyle(pageEl);
+      return {
+        zoom: cs.getPropertyValue('--panel-bg-zoom').trim(),
+        opacity: cs.getPropertyValue('--panel-bg-layer-opacity').trim(),
+        posX: cs.getPropertyValue('--panel-bg-pos-x').trim(),
+        posY: cs.getPropertyValue('--panel-bg-pos-y').trim(),
+        nudgeX: cs.getPropertyValue('--panel-bg-nudge-x').trim(),
+        nudgeY: cs.getPropertyValue('--panel-bg-nudge-y').trim(),
+        saturation: cs.getPropertyValue('--panel-bg-saturation').trim(),
+        brightness: cs.getPropertyValue('--panel-bg-brightness').trim(),
+        contrast: cs.getPropertyValue('--panel-bg-contrast').trim(),
+        rotate: cs.getPropertyValue('--panel-bg-rotate').trim(),
+      };
+    });
+    expect(knobs).toEqual({
+      zoom: MAINTENANCE_PANEL_BG.zoom,
+      opacity: MAINTENANCE_PANEL_BG.layerOpacity,
+      posX: MAINTENANCE_PANEL_BG.posX,
+      posY: MAINTENANCE_PANEL_BG.posY,
+      nudgeX: MAINTENANCE_PANEL_BG.nudgeX,
+      nudgeY: MAINTENANCE_PANEL_BG.nudgeY,
+      saturation: MAINTENANCE_PANEL_BG.saturation,
+      brightness: MAINTENANCE_PANEL_BG.brightness,
+      contrast: MAINTENANCE_PANEL_BG.contrast,
+      rotate: MAINTENANCE_PANEL_BG.rotate,
+    });
+
+    const imgBox = await mediaImg.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return {
+        opacity: cs.opacity,
+        widthPx: (el as HTMLElement).getBoundingClientRect().width,
+        panelWidthPx:
+          el.closest('.route-maintenance-panel')?.getBoundingClientRect()
+            .width ?? 0,
+      };
+    });
+    expect(Number.parseFloat(imgBox.opacity)).toBeCloseTo(
+      Number.parseFloat(MAINTENANCE_PANEL_BG.layerOpacity),
+      2,
+    );
+    expect(imgBox.widthPx).toBeGreaterThan(imgBox.panelWidthPx * 1.05);
+  });
+
+  test('writing Whoops panel visual snapshot', async ({ page }) => {
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.goto('/writing');
+    const panel = page.locator('.route-maintenance-panel');
+    await expect(panel).toBeVisible();
+    await expect
+      .poll(async () =>
+        page
+          .locator('.route-maintenance-page .page-buttons-panel__media img')
+          .evaluate((el) => {
+            const img = el as HTMLImageElement;
+            return img.complete && img.naturalWidth > 0;
+          }),
+      )
+      .toBe(true);
+    await page.waitForTimeout(80);
+    await expect(panel).toHaveScreenshot('route-maintenance-panel.png', {
+      animations: 'disabled',
+      maxDiffPixels: 6000,
+    });
   });
 
   test('exact /contact is unavailable but /contact/form stays live', async ({
