@@ -1,3 +1,32 @@
+/*
+ * Maintenance mode — use exactly one of these shapes (do not mix fields).
+ *
+ * 1) Site open (default):
+ *    { "mode": "off" }
+ *
+ * 2) Whole site unavailable (home shows “Website under maintenance”;
+ *    every other URL redirects to /):
+ *    {
+ *      "mode": "global",
+ *      "started": "2026-08-07"
+ *    }
+ *
+ * 3) Selected routes only (Whoops + square notice; header/footer stay):
+ *    {
+ *      "mode": "routes",
+ *      "routes": [
+ *        { "path": "/writing", "started": "2026-08-07", "match": "prefix" },
+ *        { "path": "/contact/form", "started": "2026-08-08", "match": "exact" }
+ *      ]
+ *    }
+ *
+ * Notes:
+ * - `started` must be YYYY-MM-DD (shown as YY.MM.DD.).
+ * - `match`: "prefix" also covers nested paths (/contact → /contact/form);
+ *   "exact" locks a single URL.
+ * - Invalid or mixed shapes fail `astro build`.
+ * - Comments in this file are allowed (JSONC-style).
+ */
 {
   "mode": "off"
 }

@@ -7,6 +7,7 @@ import {
   isMaintenanceForcedOff,
   loadMaintenanceConfig,
   normalizeRoutePath,
+  parseMaintenanceJson,
   readMaintenanceConfigSource,
   resolveMaintenance,
   type MaintenanceConfigFile,
@@ -152,6 +153,18 @@ describe('maintenance schema (mode discriminated union)', () => {
   it('loads the repo maintenance.json as mode=off', () => {
     const config = loadMaintenanceConfig();
     expect(config).toEqual({ mode: 'off' });
+  });
+
+  it('parses JSONC comments in maintenance config text', () => {
+    const source = parseMaintenanceJson(`
+      /* block */
+      // line
+      { "mode": "global", "started": "2026-08-07" }
+    `);
+    expect(loadMaintenanceConfig(source)).toEqual({
+      mode: 'global',
+      started: '2026-08-07',
+    });
   });
 });
 

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import maintenanceConfig from '../../config/maintenance.json';
+import maintenanceConfigRaw from '../../config/maintenance.json?raw';
 
 export type MaintenanceMatchMode = 'exact' | 'prefix';
 
@@ -39,6 +39,20 @@ const ROUTE_FIELD_KEYS = ['path', 'started', 'match'] as const;
 const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 type EnvLike = Record<string, string | undefined>;
+
+/** Allows // and /* *\/ comments in maintenance.json (JSONC-style). */
+export function parseMaintenanceJson(raw: string): unknown {
+  const withoutBlockComments = raw.replace(/\/\*[\s\S]*?\*\//g, '');
+  const withoutLineComments = withoutBlockComments.replace(
+    /^\s*\/\/.*$/gm,
+    '',
+  );
+  return JSON.parse(withoutLineComments) as unknown;
+}
+
+function readMaintenanceJsonFile(filePath: string): unknown {
+  return parseMaintenanceJson(readFileSync(filePath, 'utf8'));
+}
 
 function readProcessEnv(): EnvLike {
   return (globalThis as { process?: { env?: EnvLike } }).process?.env ?? {};
@@ -183,9 +197,11 @@ export function readMaintenanceConfigSource(
   const jsonRaw = env[MAINTENANCE_CONFIG_JSON_ENV];
   if (jsonRaw !== undefined && jsonRaw !== '') {
     try {
-      return JSON.parse(jsonRaw) as unknown;
+      return parseMaintenanceJson(jsonRaw);
     } catch {
-      throw new Error(`${MAINTENANCE_CONFIG_JSON_ENV} must be valid JSON`);
+      throw new Error(
+        `${MAINTENANCE_CONFIG_JSON_ENV} must be valid JSON (comments allowed)`,
+      );
     }
   }
   const pathRaw = env[MAINTENANCE_CONFIG_PATH_ENV];
@@ -193,9 +209,9 @@ export function readMaintenanceConfigSource(
     const absolute = path.isAbsolute(pathRaw)
       ? pathRaw
       : path.resolve(process.cwd(), pathRaw);
-    return JSON.parse(readFileSync(absolute, 'utf8')) as unknown;
+    return readMaintenanceJsonFile(absolute);
   }
-  return maintenanceConfig;
+  return parseMaintenanceJson(maintenanceConfigRaw);
 }
 
 export function loadMaintenanceConfig(
