@@ -34,6 +34,16 @@
   pointer-events: none;
 }
 
+.route-maintenance-page
+  .page-buttons-panel__media.route-maintenance-panel__media--pending {
+  opacity: 0;
+}
+
+.route-maintenance-page
+  .page-buttons-panel__media.route-maintenance-panel__media--visible {
+  opacity: 1;
+}
+
 .route-maintenance-page .page-buttons-panel__media picture {
   display: block;
   width: 100%;

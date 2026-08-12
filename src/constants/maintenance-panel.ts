@@ -6,8 +6,18 @@ export const MAINTENANCE_PANEL_BG_STEM =
   '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom' as const;
 
 /** Values written as custom props on `.route-maintenance-page` in maintenance.css. */
+export const MAINTENANCE_LAYOUT = {
+  revealFallbackMs: 2500,
+} as const;
+
 export const MAINTENANCE_SELECTORS = {
   panel: '.route-maintenance-page .page-buttons-panel',
+  panelMedia: '.route-maintenance-page .page-buttons-panel__media',
+} as const;
+
+export const MAINTENANCE_CLASSES = {
+  panelMediaPending: 'route-maintenance-panel__media--pending',
+  panelMediaVisible: 'route-maintenance-panel__media--visible',
 } as const;
 
 export const MAINTENANCE_PANEL_BG = {

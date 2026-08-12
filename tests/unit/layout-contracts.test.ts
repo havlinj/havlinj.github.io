@@ -469,6 +469,8 @@ describe('layout contracts: route maintenance panel look', () => {
     const astro = readRepoFile('src/components/RouteMaintenanceNotice.astro');
     expect(astro).toContain('MAINTENANCE_PANEL_BG_STEM');
     expect(astro).toContain('page-buttons-panel__media');
+    expect(astro).toContain('route-maintenance-panel__media--pending');
+    expect(astro).toContain('maintenance-panel-edge.ts');
     expect(astro).toContain('ResponsiveDichromPicture');
     expect(MAINTENANCE_PANEL_BG_STEM).toContain('/assets/pages/maintenance/');
     expect(MAINTENANCE_PANEL_BG_STEM).toMatch(/_dichrom$/);
@@ -488,6 +490,12 @@ describe('layout contracts: route maintenance panel look', () => {
     );
     expect(css).toMatch(
       /\.route-maintenance-panel__copy::before\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
+    );
+    expect(css).toMatch(
+      /\.route-maintenance-panel__media--pending\s*\{[\s\S]*?opacity:\s*0;/,
+    );
+    expect(css).toMatch(
+      /\.route-maintenance-panel__media--visible\s*\{[\s\S]*?opacity:\s*1;/,
     );
   });
 });

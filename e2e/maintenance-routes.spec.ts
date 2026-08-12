@@ -198,6 +198,39 @@ test.describe('maintenance routes fixture', () => {
     expect(beforeDisplay).toBe('none');
   });
 
+  test('panel media reveals after edge sync (no background shift flash)', async ({
+    page,
+  }) => {
+    await page.goto('/writing');
+    const media = page.locator(
+      '.route-maintenance-page .page-buttons-panel__media',
+    );
+    await expect(media).toBeAttached();
+    await expect
+      .poll(
+        async () =>
+          media.evaluate((el) => ({
+            pending: el.classList.contains(
+              'route-maintenance-panel__media--pending',
+            ),
+            visible: el.classList.contains(
+              'route-maintenance-panel__media--visible',
+            ),
+            opacity: getComputedStyle(el).opacity,
+          })),
+        { timeout: 1200 },
+      )
+      .toEqual({ pending: false, visible: true, opacity: '1' });
+
+    const edgePx = await page.evaluate(() => {
+      const panel = document.querySelector('.route-maintenance-panel');
+      if (!(panel instanceof HTMLElement)) return 0;
+      const edge = panel.style.getPropertyValue('--route-maintenance-panel-edge');
+      return Number.parseFloat(edge);
+    });
+    expect(edgePx).toBeGreaterThan(320);
+  });
+
   test('writing panel locks dichrom media and panel-bg knobs', async ({
     page,
   }) => {
@@ -280,13 +313,18 @@ test.describe('maintenance routes fixture', () => {
     await expect
       .poll(async () =>
         page
-          .locator('.route-maintenance-page .page-buttons-panel__media img')
-          .evaluate((el) => {
-            const img = el as HTMLImageElement;
-            return img.complete && img.naturalWidth > 0;
-          }),
+          .locator('.route-maintenance-page .page-buttons-panel__media')
+          .evaluate((el) => ({
+            imageReady: (() => {
+              const img = el.querySelector('img') as HTMLImageElement | null;
+              return !!img && img.complete && img.naturalWidth > 0;
+            })(),
+            visible: el.classList.contains(
+              'route-maintenance-panel__media--visible',
+            ),
+          })),
       )
-      .toBe(true);
+      .toEqual({ imageReady: true, visible: true });
     await page.waitForTimeout(80);
     await expect(panel).toHaveScreenshot('route-maintenance-panel.png', {
       animations: 'disabled',

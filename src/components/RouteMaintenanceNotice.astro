@@ -24,7 +24,10 @@ const maintenanceBg = buildDichromResponsive(MAINTENANCE_PANEL_BG_STEM);
   <h1 class="page-title">Whoops</h1>
   <div class="page-buttons-zone">
     <div class="page-buttons-panel route-maintenance-panel content-panel">
-      <div class="page-buttons-panel__media" aria-hidden="true">
+      <div
+        class="page-buttons-panel__media route-maintenance-panel__media--pending"
+        aria-hidden="true"
+      >
         <ResponsiveDichromPicture
           sources={maintenanceBg}
           width={2736}
@@ -52,6 +55,15 @@ const maintenanceBg = buildDichromResponsive(MAINTENANCE_PANEL_BG_STEM);
     </div>
   </div>
 </article>
+
+<noscript>
+  <style>
+    .route-maintenance-page
+      .page-buttons-panel__media.route-maintenance-panel__media--pending {
+      opacity: 1 !important;
+    }
+  </style>
+</noscript>
 
 <script>
   import '../scripts/maintenance-panel-edge.ts';
