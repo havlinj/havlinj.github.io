@@ -168,6 +168,113 @@ describe('layout contracts: content panel selectors (constants ↔ e2e)', () => 
   });
 });
 
+/*
+ * The vertical skeleton (nav → page title → content panel → footer) has exactly one
+ * definition. Per-page overrides previously drifted to 1.1rem / 1.3rem / 1.35rem / 1.5rem
+ * and needed a masking strip on hero, which put panel edges and footer at three heights.
+ */
+describe('layout contracts: unified content panel skeleton', () => {
+  const CONTENT_PANEL_MARKUP: readonly [string, string][] = [
+    ['src/components/HomeHero.astro', 'hero content-panel'],
+    [
+      'src/components/WritingPageBody.astro',
+      'page-buttons-panel content-panel',
+    ],
+    [
+      'src/components/ContactPageBody.astro',
+      'page-buttons-panel content-panel',
+    ],
+    [
+      'src/components/RouteMaintenanceNotice.astro',
+      'route-maintenance-panel content-panel',
+    ],
+    ['src/content/pages/profile.md', 'profile-section content-panel'],
+  ];
+
+  const CONTENT_PANEL_PAGE_MARKUP: readonly string[] = [
+    'src/components/HomeHero.astro',
+    'src/components/ProfilePageBody.astro',
+    'src/components/WritingPageBody.astro',
+    'src/components/ContactPageBody.astro',
+    'src/components/RouteMaintenanceNotice.astro',
+  ];
+
+  const ROUTE_STYLESHEETS: readonly string[] = [
+    'src/styles/pages/hero.css',
+    'src/styles/pages/profile.css',
+    'src/styles/pages/writing.css',
+    'src/styles/pages/contact.css',
+    'src/styles/pages/maintenance.css',
+  ];
+
+  it('content-panel.css owns the title gap and the square geometry', async () => {
+    const { CONTENT_PANEL_CLASS, CONTENT_PANEL_PAGE_CLASS } =
+      await import('../../src/constants/content-panel');
+    const css = readRepoFile('src/styles/content-panel.css');
+    const global = readRepoFile('src/styles/global.css');
+
+    expect(css).toContain(`.${CONTENT_PANEL_PAGE_CLASS} > h1.page-title`);
+    expect(css).toContain('margin-bottom: var(--content-panel-title-gap)');
+    expect(css).toMatch(
+      new RegExp(
+        `\\.${CONTENT_PANEL_CLASS}\\s*\\{[^}]*height:\\s*100cqw[^}]*margin:\\s*0`,
+      ),
+    );
+    expect(cssCustomProp(global, '--content-panel-title-gap')).toBe('1.35rem');
+    expect(cssCustomProp(global, '--page-nav-margin-bottom')).toBe('1rem');
+  });
+
+  it('Layout.astro loads content-panel.css after page-buttons.css', () => {
+    const layout = readRepoFile('src/layouts/Layout.astro');
+    expect(
+      layout.indexOf("import '../styles/content-panel.css'"),
+    ).toBeGreaterThan(layout.indexOf("import '../styles/page-buttons.css'"));
+  });
+
+  it('both navigations share --page-nav-margin-bottom', () => {
+    expect(readRepoFile('src/styles/site-header.css')).toContain(
+      'margin-bottom: var(--page-nav-margin-bottom)',
+    );
+    expect(readRepoFile('src/styles/pages/hero.css')).toContain(
+      'margin-bottom: var(--page-nav-margin-bottom)',
+    );
+  });
+
+  it('every route marks up its page wrapper and content panel', () => {
+    for (const relPath of CONTENT_PANEL_PAGE_MARKUP) {
+      expect(readRepoFile(relPath), relPath).toContain('content-panel-page');
+    }
+    for (const [relPath, classes] of CONTENT_PANEL_MARKUP) {
+      expect(readRepoFile(relPath), relPath).toContain(classes);
+    }
+  });
+
+  it('no route stylesheet redefines the title gap or the panel square', () => {
+    for (const relPath of ROUTE_STYLESHEETS) {
+      const css = readRepoFile(relPath);
+      expect(css, relPath).not.toContain('--page-title-margin-bottom');
+      expect(css, relPath).not.toContain('aspect-ratio: 1 / 1');
+      expect(css, relPath).not.toContain('height: 100cqw');
+    }
+  });
+
+  it('hero no longer masks the top of its content panel', () => {
+    const css = readRepoFile('src/styles/pages/hero.css');
+    expect(css).not.toContain('hero-top-edge');
+    expect(css).not.toContain('hero-wrap');
+    expect(readRepoFile('src/components/HomeHero.astro')).not.toContain(
+      'hero-top-edge',
+    );
+  });
+
+  it('profile critical head CSS only hides, it does not re-declare geometry', () => {
+    const astro = readRepoFile('src/components/layout/ProfileLayoutHead.astro');
+    expect(astro).toContain('.profile-section--loading');
+    expect(astro).not.toContain('height: 100cqw');
+    expect(astro).not.toContain('margin-top');
+  });
+});
+
 describe('layout contracts: contact panel typography (constants ↔ contact.css)', () => {
   const css = readRepoFile('src/styles/pages/contact.css');
 

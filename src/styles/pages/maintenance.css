@@ -1,7 +1,6 @@
 /* Route + global maintenance surfaces — site tokens only (#111 / #e0f7fa, Inter). */
 
 .route-maintenance-page {
-  --page-title-margin-bottom: 1.35rem;
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
   --panel-bg-layer-opacity: 1;
@@ -14,14 +13,11 @@
   --panel-bg-rotate: 0deg;
 }
 
-.route-maintenance-page .page-buttons-zone,
-.route-maintenance-page .page-buttons-panel {
+.route-maintenance-page .page-buttons-zone {
   flex: 0 0 auto;
 }
 
 .route-maintenance-page .page-buttons-panel.route-maintenance-panel {
-  aspect-ratio: 1 / 1;
-  width: 100%;
   background-color: var(--color-page-bg);
   padding: 0;
   overflow: hidden;

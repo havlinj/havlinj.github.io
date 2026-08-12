@@ -1,20 +1,9 @@
-/* Wrapper: same width as hero so footer aligns to hero’s right edge */
-.hero-wrap {
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
+/* Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css. */
 .hero {
-  position: relative;
-  width: 100%;
   /* Legacy ~1.1 scale on BG was translate+scale; oversampled tiers use sizing only (see .hero-bg__image). */
   --hero-bg-zoom: 1.1;
-  /* Keep hero background square: height = content width */
-  height: 100cqw;
   /* Tagline sizing should follow hero width (not viewport) */
   container-type: inline-size;
-  overflow: hidden;
   /* Composition anchor offsets (default: exact center of the square) */
   --hero-composition-offset-x: 0%;
   --hero-composition-offset-y: -0.5%;
@@ -114,7 +103,7 @@
 }
 
 .hero-header {
-  margin-bottom: 1.1rem;
+  margin-bottom: var(--page-nav-margin-bottom);
 }
 
 .hero-header__inner {
@@ -152,34 +141,6 @@
   position: relative;
   z-index: 1;
   display: inline-block;
-}
-
-/*
- * Vertical rhythm: "Hi there" → start of *visible* hero photo (~1.35rem total)
- *
- * 1) index.astro sets --page-title-margin-bottom: 1.1rem on this page’s h1.page-title.
- * 2) h1 + .hero-wrap margin-top: 1.1rem (below) must stay the SAME value as (1).
- *    The two margins collapse, so the gap from the title margin box to the top of
- *    .hero is 1.1rem — not their sum.
- * 3) .hero-top-edge is 0.25rem tall, same color as the page background, and sits on
- *    top of the image at the hero’s top — it masks the photo but reads as “more air”.
- *
- * Perceived distance before you see the image: 1.1rem + 0.25rem ≈ 1.35rem.
- */
-h1 + .hero-wrap {
-  margin-top: var(--hero-title-gap, 1.1rem);
-}
-
-.hero-top-edge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* Part of the ~1.35rem visual gap; see block comment above */
-  height: 0.25rem;
-  background-color: var(--hero-highlight-bg);
-  z-index: 1;
-  pointer-events: none;
 }
 
 .hero-name::before {

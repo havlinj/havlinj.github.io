@@ -18,9 +18,27 @@ This document records the unified design decisions for the site. Keep it as the 
 
 ## Content panel
 
-The **content panel** is the large ~1:1 main content block below the page title on hero, profile, writing, and contact. Width tracks `main.content`; height is typically tied to that width (`100cqw`, `aspect-ratio: 1 / 1`).
+The **content panel** is the large ~1:1 main content block below the page title on hero, profile, writing, and contact.
 
-**DOM hooks** (class names stay historical):
+### Unified page skeleton
+
+Every content panel route uses the same vertical skeleton, and each step has exactly one definition:
+
+```
+nav (.site-header | .hero-header)      margin-bottom: var(--page-nav-margin-bottom)
+article.content-panel-page
+  h1.page-title                        margin-bottom: var(--content-panel-title-gap)
+  [optional transparent wrapper]
+  .content-panel                       width: 100%; height: 100cqw; margin: 0
+footer.site-footer                      directly follows the panel; its own padding is the gap
+```
+
+- `src/styles/content-panel.css` is the **single source** of the panel square and the title→panel gap. Tokens live in `global.css` (`--page-nav-margin-bottom`, `--content-panel-title-gap`).
+- Panels carry **no vertical margin**: the title's `margin-bottom` is the whole distance on every route. Do not add per-page `--page-title-margin-bottom`, panel margins, `aspect-ratio: 1 / 1`, or a second `height: 100cqw` — that drift is what put panel edges and footer at three different heights.
+- Never fake air with a masking strip in the page background colour. Hero used to do this (`.hero-top-edge`, 0.25rem) to stretch a 1.1rem gap into a perceived 1.35rem; the photo now fills the panel from its top edge.
+- Guarded by `e2e/content-panel-rhythm.spec.ts` (all routes share nav / title / panel / footer offsets) and the "unified content panel skeleton" contracts in `tests/unit/layout-contracts.test.ts`.
+
+**DOM hooks** (class names stay historical; each panel also carries `.content-panel`, each page wrapper `.content-panel-page`):
 
 | Route | Selector |
 |-------|----------|
@@ -33,6 +51,14 @@ The **content panel** is the large ~1:1 main content block below the page title 
 Use **content panel** in comments, tests, and cross-page layout logic. Shared selectors live in `src/constants/content-panel.ts`. Do not rename CSS classes unless migrating explicitly.
 
 **Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-composition-offset-*` (text positioning inside the hero panel).
+
+### Deliberate per-route differences
+
+These are design decisions, not drift — leave them alone:
+
+- **Left optical inset**: hero and profile cover the leftmost `--hero-optical-offset` (0.1em) of their photo with page background (`.hero::after`, `.profile-section::after`); profile tiles anchor to it. Writing and contact have no such inset.
+- **Nav distribution**: `.hero-header__inner` is a 3-column grid (middle link truly centred), `.site-header__inner` is `space-between`. Both are one baseline-aligned row, so nav height matches.
+- **Inner padding**: writing and contact drive content inset from `--panel-padding-*`; hero centres its composition on the square; profile positions tiles in %.
 
 ---
 

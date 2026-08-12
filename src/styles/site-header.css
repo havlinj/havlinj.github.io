@@ -3,7 +3,7 @@
 ================================ */
 
 .site-header {
-  margin-bottom: 1rem;
+  margin-bottom: var(--page-nav-margin-bottom);
 }
 
 .site-header__inner {

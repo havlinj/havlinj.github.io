@@ -3,7 +3,7 @@ title: 'Profile'
 ---
 
 <div
-  class="profile-section profile-section--loading"
+  class="profile-section content-panel profile-section--loading"
   style="
     /* Edge-anchored controls: independent Y offsets in % of the content panel */
     /* Shared vertical reference from the bottom edge of the content panel */

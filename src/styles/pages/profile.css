@@ -22,10 +22,6 @@ article.has-buttons-panel {
   overflow: hidden;
 }
 
-article.has-buttons-panel > h1.page-title {
-  --page-title-margin-bottom: 1.3rem;
-}
-
 /*
  * Unified insets (inline on .profile-section):
  *   --profile-inner-gutter      -> base portrait horizontal inset (column width - 2x gutter)
@@ -37,15 +33,10 @@ article.has-buttons-panel > h1.page-title {
  *   CSS px — phones are often 360–430px wide, so the first step is min-width: 360px (not 480px).
  * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (single value for both axes).
  * --profile-tile-label-font-size is set by profile-tile-type-fit.ts
+ * Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css.
  */
 .profile-section {
-  position: relative;
   display: block;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  /* Main content panel: same square sizing logic as hero */
-  height: 100cqw;
-  overflow: hidden;
   /* Reveal fade — same contract as Hero (.hero-content), Writing (--visible), Contact (--visible). */
   transition: opacity 0.18s ease-out;
   --profile-tile-text-inset-anchor-x: 10%;
@@ -266,11 +257,6 @@ article.has-buttons-panel > h1.page-title {
   z-index: 3;
   pointer-events: auto;
   border-left-width: var(--profile-stitched-seam-thickness);
-}
-
-/* When profile-section is the last block in the article, avoid extra gap before footer */
-article .profile-section:last-child {
-  margin-bottom: 0;
 }
 
 /* Hidden until portrait + type-fit (Layout also inlines this in <head> so it

@@ -34,8 +34,9 @@
   --panel-row-min-h: 1.8rem;
   --panel-row-max-h: 2.8rem;
   --panel-row-gap: clamp(0.35rem, 1.8cqi, 0.8rem);
-  --composition-min-inline-size: 22rem;
-  --composition-lock-inline-size: 42rem;
+  /* Vertical rhythm shared by every route: nav → page title → content panel → footer. */
+  --page-nav-margin-bottom: 1rem;
+  --content-panel-title-gap: 1.35rem;
   --hero-highlight-bg: var(--color-page-bg);
   --hero-optical-offset: 0.1em;
   /* Hero photo: avoid heavy saturate() defaults (uneven on some color paths). */
@@ -152,9 +153,6 @@ main,
    */
   --page-title-font-size: clamp(1.9rem, min(2.7vw, 5.75cqi), 2.12rem);
 }
-
-/* Keep content panels naturally aligned to content/header width.
-   Zoom freeze logic handles extremes; do not force extra minimum inline size here. */
 
 /* ===============================
    PARAGRAPHS AND HEADINGS

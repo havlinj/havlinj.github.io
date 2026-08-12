@@ -12,11 +12,11 @@ const linksTopFallbackPct =
   (1 - CONTACT_LAYOUT.linksCenterFromBottomRatio) * 100;
 ---
 
-<article class="contact-page">
+<article class="contact-page content-panel-page">
   <h1 class="page-title">Contact</h1>
   <div class="page-buttons-zone">
     <div
-      class="page-buttons-panel"
+      class="page-buttons-panel content-panel"
       style={`--contact-links-top-px: ${linksTopFallbackPct}%;`}
     >
       <div
@@ -91,8 +91,7 @@ const linksTopFallbackPct =
 
 <noscript>
   <style>
-    .contact-page
-      .contact-page__fit-content.contact-page__fit-content--pending,
+    .contact-page .contact-page__fit-content.contact-page__fit-content--pending,
     .contact-page
       .page-buttons-panel__media.contact-page__panel-media--pending {
       opacity: 1 !important;

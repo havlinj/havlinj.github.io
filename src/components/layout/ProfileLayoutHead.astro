@@ -13,17 +13,14 @@ const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
 {
   /* Profile grid must stay invisible until portrait + type-fit. The hide rule
      lives in profile.css (applied early via head-append script). Without this
-     head snippet, page-button min/max-height paints thin outlines first. */
+     head snippet, page-button min/max-height paints thin outlines first.
+     Panel height needs no reservation here: `.content-panel` ships in the
+     render-blocking Layout bundle, so the square is sized on first paint. */
 }
 <style is:inline>
   .profile-section--loading {
     opacity: 0 !important;
     visibility: hidden !important;
-    /* Reserve content panel height so the page does not jump when profile.css arrives */
-    height: 100cqw;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
   }
   .profile-section--loading .page-button.prof-tile {
     max-height: none !important;

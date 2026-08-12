@@ -1,7 +1,6 @@
 /* Writing index (post list) + blog article (.blog-post) */
 
 .writing-page {
-  --page-title-margin-bottom: 1.35rem;
   --panel-bg-pos-x: calc(50% + 0px);
   --panel-bg-pos-y: calc(50% + 0px);
   --panel-bg-layer-opacity: 0.94;
@@ -303,7 +302,6 @@ ul.post-list > li::before {
  * reapplied on `.page-buttons`. Top inset matches the buttons' left inset.
  */
 .writing-page .page-buttons-panel {
-  aspect-ratio: 1 / 1;
   background-color: var(--color-page-bg);
   padding-top: var(--panel-padding-left, 10%);
   padding-left: 0;

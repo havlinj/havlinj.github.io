@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  --page-title-margin-bottom: 1.35rem;
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
   --panel-bg-layer-opacity: 0.98;
@@ -29,14 +28,12 @@
   --contact-link-pad-block: 0.46em;
 }
 
-.contact-page .page-buttons-zone,
-.contact-page .page-buttons-panel {
+.contact-page .page-buttons-zone {
   width: 100%;
   max-width: 100%;
 }
 
 .contact-page .page-buttons-panel {
-  aspect-ratio: 1 / 1;
   background-color: var(--color-page-bg);
   --contact-panel-edge: 320px;
   --contact-stack-top-px: 16px;
@@ -75,13 +72,11 @@
   pointer-events: none;
 }
 
-.contact-page
-  .page-buttons-panel__media.contact-page__panel-media--pending {
+.contact-page .page-buttons-panel__media.contact-page__panel-media--pending {
   opacity: 0;
 }
 
-.contact-page
-  .page-buttons-panel__media.contact-page__panel-media--visible {
+.contact-page .page-buttons-panel__media.contact-page__panel-media--visible {
   opacity: 1;
 }
 

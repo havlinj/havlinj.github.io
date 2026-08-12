@@ -17,17 +17,9 @@ const { sources: heroBg }: Props = Astro.props;
     <a href="/contact" class="site-header__item site-nav__link">Contact</a>
   </div>
 </nav>
-<!-- Spacing below "Hi there": must match `h1 + .hero-wrap` in hero.css (1.1rem).
-     With `.hero-top-edge` (0.25rem) the perceived gap to visible photo ≈ 1.35rem. -->
-<h1
-  class="page-title"
-  style="--page-title-margin-bottom: 1.1rem; --hero-title-gap: 1.1rem"
->
-  Hi there
-</h1>
-<div class="hero-wrap">
-  <section class="hero">
-    <div class="hero-top-edge" aria-hidden="true"></div>
+<article class="content-panel-page">
+  <h1 class="page-title">Hi there</h1>
+  <section class="hero content-panel">
     <figure class="hero-figure">
       <div class="hero-bg" aria-hidden="true">
         <ResponsiveDichromPicture
@@ -59,7 +51,7 @@ const { sources: heroBg }: Props = Astro.props;
       </p>
     </div>
   </section>
-</div>
+</article>
 <script is:inline>
   (function () {
     'use strict';

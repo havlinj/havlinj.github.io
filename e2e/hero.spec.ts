@@ -103,13 +103,13 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('main.content')).toBeVisible();
   });
 
-  test('hero wrap contains hero section; site footer shows copyright', async ({
+  test('content panel page contains hero section; site footer shows copyright', async ({
     page,
   }) => {
     await waitForHeroLoaded(page);
-    const wrap = page.locator('.hero-wrap');
-    await expect(wrap).toBeVisible();
-    await expect(wrap.locator('section.hero')).toBeVisible();
+    const panelPage = page.locator('article.content-panel-page');
+    await expect(panelPage).toBeVisible();
+    await expect(panelPage.locator('section.hero.content-panel')).toBeVisible();
     await expect(page.locator('footer.site-footer')).toContainText(
       '© 2026 Jan Havlín',
     );
@@ -152,11 +152,26 @@ test.describe('Hero page (/)', () => {
     await expect(preload).toHaveAttribute('imagesizes', '100vw');
   });
 
-  test('has hero-top-edge strip and no photo credit caption', async ({
+  /*
+   * The hero photo used to be pushed down by a page-coloured strip masking the top of
+   * the square. That gap is now the shared --content-panel-title-gap, so the photo must
+   * fill the panel from its very top edge.
+   */
+  test('hero photo fills the panel with no masking strip and no photo credit caption', async ({
     page,
   }) => {
-    await expect(page.locator('.hero-top-edge')).toBeVisible();
+    await waitForHeroLoaded(page);
+    await expect(page.locator('.hero-top-edge')).toHaveCount(0);
     await expect(page.locator('.hero-caption')).toHaveCount(0);
+
+    const heroBox = await mustBox(page.locator('section.hero'));
+    const figureBox = await mustBox(page.locator('.hero-figure'));
+    expect(Math.abs(figureBox.y - heroBox.y)).toBeLessThanOrEqual(
+      LAYOUT_TOLERANCE,
+    );
+    expect(
+      Math.abs(figureBox.y + figureBox.height - (heroBox.y + heroBox.height)),
+    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
   test('tagline visible text layer present', async ({ page }) => {

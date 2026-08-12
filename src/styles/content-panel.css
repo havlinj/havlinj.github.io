@@ -1,0 +1,27 @@
+/* ===============================
+   CONTENT PANEL
+   Shared skeleton for hero / profile / writing / contact (+ route maintenance):
+   site nav → page title → content panel → footer.
+   Selectors: src/constants/content-panel.ts. See .cursor/rules/general_notes.mdc
+================================ */
+
+/*
+ * The gap between page title and content panel lives here only. Panels carry no
+ * vertical margin, so this margin is the whole distance on every route — no
+ * margin-collapse pairs and no masking strips to fake extra air.
+ */
+.content-panel-page > h1.page-title {
+  margin-bottom: var(--content-panel-title-gap);
+}
+
+.content-panel {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  /* Square, tracking the width of `main.content` (its inline-size container). */
+  height: 100cqw;
+  margin: 0;
+  /* Never let a flex parent stretch or shrink the square. */
+  flex: 0 0 auto;
+  overflow: hidden;
+}
