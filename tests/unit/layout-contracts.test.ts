@@ -258,6 +258,22 @@ describe('layout contracts: unified content panel skeleton', () => {
     }
   });
 
+  it('page-buttons.css disables ink defaults on photo panels before page CSS loads', () => {
+    const css = readRepoFile('src/styles/page-buttons.css');
+    expect(css).toMatch(
+      /\.page-buttons-panel:has\(> \.page-buttons-panel__media\)\s*\{[^}]*background-color:\s*var\(--color-page-bg\)/,
+    );
+    expect(css).toMatch(
+      /\.page-buttons-panel:has\(> \.page-buttons-panel__media\)::before[\s\S]*?content:\s*none/,
+    );
+    expect(css).toMatch(
+      /\.page-buttons-panel:has\(> \.page-buttons-panel__media\) > \.page-buttons-panel__media\s*\{[^}]*inset:\s*-1px/,
+    );
+    expect(readRepoFile('src/styles/content-panel.css')).toMatch(
+      /\.route-maintenance-panel\.content-panel\s*\{[^}]*padding:\s*0/,
+    );
+  });
+
   it('hero no longer masks the top of its content panel', () => {
     const css = readRepoFile('src/styles/pages/hero.css');
     expect(css).not.toContain('hero-top-edge');
@@ -452,7 +468,13 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(css).toContain('var(--panel-bg-nudge-y, 0)');
     expect(css).toContain('opacity: var(--panel-bg-layer-opacity, 1)');
     expect(css).toMatch(
-      /\.route-maintenance-panel__copy\s*\{[\s\S]*?right:\s*0;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
+      /\.route-maintenance-page \.page-buttons-panel\.route-maintenance-panel\s*\{[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
+    );
+    expect(css).toMatch(
+      /\.route-maintenance-panel__copy\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*transparent;/,
+    );
+    expect(css).toMatch(
+      /\.route-maintenance-panel__copy::before\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
     );
   });
 });

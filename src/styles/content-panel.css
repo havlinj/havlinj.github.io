@@ -25,3 +25,10 @@
   flex: 0 0 auto;
   overflow: hidden;
 }
+
+/*
+ * Maintenance panel: no inner padding (writing/contact keep theirs in page CSS).
+ */
+.route-maintenance-panel.content-panel {
+  padding: 0;
+}

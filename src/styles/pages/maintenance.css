@@ -19,21 +19,16 @@
 
 .route-maintenance-page .page-buttons-panel.route-maintenance-panel {
   background-color: var(--color-page-bg);
-  padding: 0;
-  overflow: hidden;
-  border: none;
   --route-maintenance-panel-edge: 320px;
 }
 
-.route-maintenance-page .page-buttons-panel.route-maintenance-panel::before,
-.route-maintenance-page .page-buttons-panel.route-maintenance-panel::after {
+.route-maintenance-page .page-buttons-panel::before,
+.route-maintenance-page .page-buttons-panel::after {
   content: none;
-  display: none;
 }
 
 .route-maintenance-page .page-buttons-panel__media {
   position: absolute;
-  inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -78,7 +73,7 @@
   --route-maintenance-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
   position: absolute;
   top: 50%;
-  right: 0;
+  right: -1px;
   left: auto;
   transform: translateY(-50%);
   z-index: 1;
@@ -89,8 +84,20 @@
   padding: var(--route-maintenance-band-pad-y)
     var(--route-maintenance-band-pad-x-right)
     var(--route-maintenance-band-pad-y) var(--route-maintenance-band-pad-x-left);
-  background-color: var(--color-page-bg);
+  background-color: transparent;
   text-align: left;
+}
+
+.route-maintenance-panel__copy::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: 0;
+  z-index: -1;
+  background-color: var(--color-page-bg);
+  pointer-events: none;
 }
 
 .route-maintenance-panel__headline {

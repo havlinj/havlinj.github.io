@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { RGB_PAGE_BG } from '../src/constants/colors';
+import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import {
   MAINTENANCE_PANEL_BG,
   MAINTENANCE_PANEL_BG_STEM,
@@ -35,7 +35,7 @@ test.describe('maintenance routes fixture', () => {
     const band = page.locator('.route-maintenance-panel__copy');
     await expect(band).toBeVisible();
     const bandBg = await band.evaluate(
-      (el) => getComputedStyle(el).backgroundColor,
+      (el) => getComputedStyle(el, '::before').backgroundColor,
     );
     expect(bandBg).toBe(RGB_PAGE_BG);
 
@@ -59,7 +59,8 @@ test.describe('maintenance routes fixture', () => {
       const headlineBox = headline.getBoundingClientRect();
       const infoBox = info.getBoundingClientRect();
       return {
-        rightGap: Math.abs(panelBox.right - plateBox.right),
+        rightGap: panelBox.right - plateBox.right,
+        rightBleedPx: plateBox.right - panelBox.right,
         leftPad: headlineBox.left - plateBox.left,
         topPad: headlineBox.top - plateBox.top,
         bottomPad: plateBox.bottom - infoBox.bottom,
@@ -70,14 +71,131 @@ test.describe('maintenance routes fixture', () => {
     });
     expect(layout).not.toBeNull();
     expect(layout!.rightGap).toBeLessThan(2);
+    expect(layout!.rightBleedPx).toBeGreaterThanOrEqual(-1);
+    expect(layout!.rightBleedPx).toBeLessThan(2);
     expect(layout!.leftPad).toBeGreaterThan(8);
     expect(layout!.leftPad).toBeLessThan(40);
     expect(layout!.topPad).toBeGreaterThan(12);
     expect(layout!.bottomPad).toBeGreaterThan(12);
-    expect(Math.abs(layout!.plateCenterY - layout!.contentPanelCenterY)).toBeLessThan(
-      2,
-    );
+    expect(
+      Math.abs(layout!.plateCenterY - layout!.contentPanelCenterY),
+    ).toBeLessThan(2);
     expect(layout!.panelBorder).toBe('0px');
+  });
+
+  test('writing panel edge styles stay page-bg during doc zoom (no ink ring)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/writing');
+    await page.locator('.route-maintenance-panel').waitFor();
+
+    for (const z of [1, 1.25, 1.5, 1.75, 2, 2.3, 2.5]) {
+      await page.evaluate((zoom) => {
+        document.documentElement.style.zoom = String(zoom);
+        window.dispatchEvent(new Event('resize'));
+      }, z);
+      await page.waitForTimeout(120);
+
+      const styles = await page.evaluate(({ ink, pageBg }) => {
+        const panel = document.querySelector('.route-maintenance-panel');
+        if (!(panel instanceof HTMLElement)) return null;
+        const cs = getComputedStyle(panel);
+        const before = getComputedStyle(panel, '::before');
+        return {
+          panelBg: cs.backgroundColor,
+          paddingTop: cs.paddingTop,
+          beforeDisplay: before.display,
+          beforeBg: before.backgroundColor,
+          beforeOpacity: before.opacity,
+          inkMatch: cs.backgroundColor === ink,
+          pageBgMatch: cs.backgroundColor === pageBg,
+        };
+      }, { ink: RGB_INK, pageBg: RGB_PAGE_BG });
+
+      expect(styles, `zoom=${z}`).not.toBeNull();
+      expect(styles!.inkMatch, `zoom=${z} panel bg`).toBe(false);
+      expect(styles!.pageBgMatch, `zoom=${z} panel bg`).toBe(true);
+      expect(styles!.paddingTop, `zoom=${z} padding`).toBe('0px');
+      expect(styles!.beforeDisplay, `zoom=${z} ::before`).toBe('none');
+
+      const mediaInset = await page.evaluate(() => {
+        const media = document.querySelector(
+          '.route-maintenance-page .page-buttons-panel__media',
+        );
+        if (!(media instanceof HTMLElement)) return null;
+        const cs = getComputedStyle(media);
+        return {
+          top: cs.top,
+          bg: cs.backgroundColor,
+        };
+      });
+      expect(mediaInset?.top, `zoom=${z} media overscan`).toBe('-1px');
+      expect(mediaInset?.bg, `zoom=${z} media underlay`).toBe(RGB_PAGE_BG);
+
+      const copyEdge = await page.evaluate(() => {
+        const panel = document.querySelector('.route-maintenance-panel');
+        const copy = document.querySelector('.route-maintenance-panel__copy');
+        if (!(panel instanceof HTMLElement) || !(copy instanceof HTMLElement)) {
+          return null;
+        }
+        const panelBox = panel.getBoundingClientRect();
+        const copyBox = copy.getBoundingClientRect();
+        return {
+          rightGap: panelBox.right - copyBox.right,
+          rightBleedPx: copyBox.right - panelBox.right,
+          beforeBg: getComputedStyle(copy, '::before').backgroundColor,
+        };
+      });
+      expect(copyEdge, `zoom=${z} copy edge`).not.toBeNull();
+      expect(copyEdge!.rightGap, `zoom=${z} copy right gap`).toBeLessThan(2);
+      expect(
+        copyEdge!.rightBleedPx,
+        `zoom=${z} copy right bleed`,
+      ).toBeGreaterThanOrEqual(-1);
+      expect(copyEdge!.beforeBg, `zoom=${z} copy fill`).toBe(RGB_PAGE_BG);
+    }
+
+    await page.mouse.wheel(0, -120);
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, -120);
+    await page.keyboard.up('Control');
+    await page.waitForTimeout(200);
+
+    const afterWheel = await page.evaluate(({ ink, pageBg }) => {
+      const panel = document.querySelector('.route-maintenance-panel');
+      if (!(panel instanceof HTMLElement)) return null;
+      const cs = getComputedStyle(panel);
+      const before = getComputedStyle(panel, '::before');
+      return {
+        panelBg: cs.backgroundColor,
+        beforeDisplay: before.display,
+        inkMatch: cs.backgroundColor === ink,
+        pageBgMatch: cs.backgroundColor === pageBg,
+      };
+    }, { ink: RGB_INK, pageBg: RGB_PAGE_BG });
+    expect(afterWheel?.inkMatch).toBe(false);
+    expect(afterWheel?.pageBgMatch).toBe(true);
+    expect(afterWheel?.beforeDisplay).toBe('none');
+  });
+
+  test('writing panel uses page background on first paint (no ink flash)', async ({
+    page,
+  }) => {
+    await page.goto('/writing', { waitUntil: 'domcontentloaded' });
+
+    const panel = page.locator('.route-maintenance-panel');
+    await expect(panel).toBeAttached();
+
+    const bg = await panel.evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+    expect(bg).toBe(RGB_PAGE_BG);
+
+    const beforeDisplay = await panel.evaluate((el) =>
+      getComputedStyle(el, '::before').display,
+    );
+    expect(beforeDisplay).toBe('none');
   });
 
   test('writing panel locks dichrom media and panel-bg knobs', async ({

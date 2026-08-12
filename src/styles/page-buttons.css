@@ -28,6 +28,26 @@
   overflow: hidden; /* clip background/grain layers */
 }
 
+/*
+ * Photo panels paint via `.page-buttons-panel__media` (<picture>), not the ink
+ * ::before layer used for CSS background-image buttons. Without this, the ink
+ * default (and its ::before fill) can flash as a thin ring during zoom reflow.
+ */
+.page-buttons-panel:has(> .page-buttons-panel__media) {
+  background-color: var(--color-page-bg);
+}
+
+.page-buttons-panel:has(> .page-buttons-panel__media)::before,
+.page-buttons-panel:has(> .page-buttons-panel__media)::after {
+  content: none;
+  display: none;
+}
+
+.page-buttons-panel:has(> .page-buttons-panel__media) > .page-buttons-panel__media {
+  inset: -1px;
+  background-color: var(--color-page-bg);
+}
+
 /* Panel image on its own layer so only it gets the color filter, not the buttons */
 .page-buttons-panel::before {
   content: '';
