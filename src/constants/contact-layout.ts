@@ -30,6 +30,7 @@ export const CONTACT_LAYOUT = {
 
 export const CONTACT_SELECTORS = {
   panel: '.contact-page .page-buttons-panel',
+  panelMedia: '.contact-page .page-buttons-panel__media',
   fitContent: '.contact-page .contact-page__fit-content',
   introRect: '.contact-page__inset-rect--intro',
   linksRect: '.contact-page__inset-rect--links',
@@ -40,4 +41,6 @@ export const CONTACT_SELECTORS = {
 export const CONTACT_CLASSES = {
   fitPending: 'contact-page__fit-content--pending',
   fitVisible: 'contact-page__fit-content--visible',
+  panelMediaPending: 'contact-page__panel-media--pending',
+  panelMediaVisible: 'contact-page__panel-media--visible',
 } as const;

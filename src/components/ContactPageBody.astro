@@ -19,7 +19,10 @@ const linksTopFallbackPct =
       class="page-buttons-panel"
       style={`--contact-links-top-px: ${linksTopFallbackPct}%;`}
     >
-      <div class="page-buttons-panel__media" aria-hidden="true">
+      <div
+        class="page-buttons-panel__media contact-page__panel-media--pending"
+        aria-hidden="true"
+      >
         <ResponsiveDichromPicture
           sources={contactBg}
           width={2736}
@@ -89,7 +92,9 @@ const linksTopFallbackPct =
 <noscript>
   <style>
     .contact-page
-      .contact-page__fit-content.contact-page__fit-content--pending {
+      .contact-page__fit-content.contact-page__fit-content--pending,
+    .contact-page
+      .page-buttons-panel__media.contact-page__panel-media--pending {
       opacity: 1 !important;
       pointer-events: auto !important;
     }

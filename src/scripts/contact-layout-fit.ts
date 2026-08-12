@@ -18,6 +18,7 @@ type NeededContent = {
 
 function startContactInsetFit(): void {
   const panel = document.querySelector(CONTACT_SELECTORS.panel);
+  const panelMedia = document.querySelector(CONTACT_SELECTORS.panelMedia);
   const fitContent = document.querySelector(CONTACT_SELECTORS.fitContent);
   const linksRect = document.querySelector(CONTACT_SELECTORS.linksRect);
   const zone = document.querySelector(CONTACT_SELECTORS.zone);
@@ -27,6 +28,7 @@ function startContactInsetFit(): void {
     return;
   }
   const panelEl = panel;
+  const panelMediaEl = panelMedia instanceof HTMLElement ? panelMedia : null;
   const fitContentEl = fitContent instanceof HTMLElement ? fitContent : null;
   const linksRectEl = linksRect;
   const cssVarCache = new Map<string, string>();
@@ -44,15 +46,21 @@ function startContactInsetFit(): void {
   }
 
   function forceReveal(): void {
-    if (revealed || !fitContentEl) return;
+    if (revealed) return;
     revealed = true;
-    fitContentEl.classList.remove(CONTACT_CLASSES.fitPending);
-    fitContentEl.classList.add(CONTACT_CLASSES.fitVisible);
-    fitContentEl.removeAttribute('aria-busy');
+    if (panelMediaEl) {
+      panelMediaEl.classList.remove(CONTACT_CLASSES.panelMediaPending);
+      panelMediaEl.classList.add(CONTACT_CLASSES.panelMediaVisible);
+    }
+    if (fitContentEl) {
+      fitContentEl.classList.remove(CONTACT_CLASSES.fitPending);
+      fitContentEl.classList.add(CONTACT_CLASSES.fitVisible);
+      fitContentEl.removeAttribute('aria-busy');
+    }
   }
 
   function revealAfterStableLayout(): void {
-    if (revealed || !fitContentEl) return;
+    if (revealed) return;
     forceReveal();
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
