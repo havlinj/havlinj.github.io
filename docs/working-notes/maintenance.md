@@ -52,7 +52,7 @@ Every required field must be present with a real value — `null` / omitted keys
 - `MAINTENANCE_CONFIG_JSON` — inline JSON string (wins over path).
 - `MAINTENANCE_FORCE_OFF=1` — ignore config (CI default).
 
-Per-route pages keep the normal site header/footer, use the **Whoops** page title, and show the notice inside the usual square panel (global page background, no photo).
+Per-route pages keep the normal site header/footer, use the **Whoops** page title, and show the notice inside the usual content panel (global page background, no photo).
 
 ## Local development while a route is listed
 

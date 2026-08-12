@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
-import { readSquareContainment } from './helpers';
+import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
+import { readContentPanelContainment } from './helpers';
 
 const MATRIX = [
   { viewport: { width: 1440, height: 900 }, zooms: [1, 1.5, 2, 2.3] },
@@ -11,7 +12,7 @@ const CASES = [
   {
     name: 'hero',
     path: '/',
-    squareSelector: '.hero',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.hero,
     headerSelector: '.hero-header__inner',
     leftAnchorSelector: '.hero-header__inner a[href="/profile"]',
     rightAnchorSelector: '.hero-header__inner a[href="/contact"]',
@@ -25,7 +26,7 @@ const CASES = [
   {
     name: 'profile',
     path: '/profile',
-    squareSelector: '.profile-section',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.profile,
     headerSelector: '.site-header__inner',
     leftAnchorSelector: '.site-header__inner a[href="/profile"]',
     rightAnchorSelector: '.site-header__inner a[href="/contact"]',
@@ -39,7 +40,7 @@ const CASES = [
   {
     name: 'writing',
     path: '/writing',
-    squareSelector: '.writing-page .page-buttons-panel',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.writing,
     headerSelector: '.site-header__inner',
     leftAnchorSelector: '.site-header__inner a[href="/profile"]',
     rightAnchorSelector: '.site-header__inner a[href="/contact"]',
@@ -51,7 +52,7 @@ const CASES = [
   {
     name: 'contact',
     path: '/contact',
-    squareSelector: '.contact-page .page-buttons-panel',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.contact,
     headerSelector: '.site-header__inner',
     leftAnchorSelector: '.site-header__inner a[href="/profile"]',
     rightAnchorSelector: '.site-header__inner a[href="/contact"]',
@@ -78,9 +79,9 @@ async function applyZoomWithRetry(page: Page, zoom: number): Promise<void> {
   }
 }
 
-test.describe('Square layout containment matrix', () => {
+test.describe('Content panel containment matrix', () => {
   for (const c of CASES) {
-    test(`${c.name}: square stays aligned inside content across viewport/zoom matrix`, async ({
+    test(`${c.name}: content panel stays aligned inside main.content across viewport/zoom matrix`, async ({
       page,
       browserName,
     }) => {
@@ -96,8 +97,8 @@ test.describe('Square layout containment matrix', () => {
         for (const zoom of entry.zooms) {
           await applyZoomWithRetry(page, zoom);
 
-          const result = await readSquareContainment(page.locator('body'), {
-            squareSelector: c.squareSelector,
+          const result = await readContentPanelContainment(page.locator('body'), {
+            contentPanelSelector: c.contentPanelSelector,
             containerSelector: 'main.content',
             tolerancePx: 3,
           });
@@ -110,18 +111,20 @@ test.describe('Square layout containment matrix', () => {
 
           const inside = await page.evaluate(
             (cfg: {
-              squareSelector: string;
+              contentPanelSelector: string;
               requiredInsideSelectors: readonly string[];
             }) => {
-              const square = document.querySelector(cfg.squareSelector);
-              if (!(square instanceof HTMLElement)) {
+              const contentPanel = document.querySelector(
+                cfg.contentPanelSelector,
+              );
+              if (!(contentPanel instanceof HTMLElement)) {
                 return {
                   ok: false,
-                  reason: 'missing square',
+                  reason: 'missing content panel',
                   missing: [] as string[],
                 };
               }
-              const s = square.getBoundingClientRect();
+              const panelRect = contentPanel.getBoundingClientRect();
               const tol = 3;
               const missing: string[] = [];
               const overflowing: string[] = [];
@@ -134,10 +137,10 @@ test.describe('Square layout containment matrix', () => {
                 }
                 const r = el.getBoundingClientRect();
                 const within =
-                  r.left >= s.left - tol &&
-                  r.right <= s.right + tol &&
-                  r.top >= s.top - tol &&
-                  r.bottom <= s.bottom + tol;
+                  r.left >= panelRect.left - tol &&
+                  r.right <= panelRect.right + tol &&
+                  r.top >= panelRect.top - tol &&
+                  r.bottom <= panelRect.bottom + tol;
                 if (!within) overflowing.push(sel);
               }
 
@@ -148,7 +151,7 @@ test.describe('Square layout containment matrix', () => {
               };
             },
             {
-              squareSelector: c.squareSelector,
+              contentPanelSelector: c.contentPanelSelector,
               requiredInsideSelectors: c.requiredInsideSelectors,
             },
           );
@@ -189,19 +192,21 @@ test.describe('Square layout containment matrix', () => {
 
           const edge = await page.evaluate(
             (cfg: {
-              squareSelector: string;
+              contentPanelSelector: string;
               headerSelector: string;
               leftAnchorSelector: string;
               rightAnchorSelector: string;
             }) => {
-              const square = document.querySelector(cfg.squareSelector);
+              const contentPanel = document.querySelector(
+                cfg.contentPanelSelector,
+              );
               const header = document.querySelector(cfg.headerSelector);
               const leftAnchor = document.querySelector(cfg.leftAnchorSelector);
               const rightAnchor = document.querySelector(
                 cfg.rightAnchorSelector,
               );
               if (
-                !(square instanceof HTMLElement) ||
+                !(contentPanel instanceof HTMLElement) ||
                 !(header instanceof HTMLElement) ||
                 !(leftAnchor instanceof HTMLElement) ||
                 !(rightAnchor instanceof HTMLElement)
@@ -211,12 +216,12 @@ test.describe('Square layout containment matrix', () => {
                   reason: 'missing edge nodes',
                 };
               }
-              const s = square.getBoundingClientRect();
-              const l = leftAnchor.getBoundingClientRect();
-              const r = rightAnchor.getBoundingClientRect();
+              const panelRect = contentPanel.getBoundingClientRect();
+              const leftRect = leftAnchor.getBoundingClientRect();
+              const rightRect = rightAnchor.getBoundingClientRect();
               const tol = 5;
-              const leftDelta = Math.abs(s.left - l.left);
-              const rightDelta = Math.abs(s.right - r.right);
+              const leftDelta = Math.abs(panelRect.left - leftRect.left);
+              const rightDelta = Math.abs(panelRect.right - rightRect.right);
               return {
                 ok: leftDelta <= tol && rightDelta <= tol,
                 leftDelta,
@@ -224,13 +229,13 @@ test.describe('Square layout containment matrix', () => {
               };
             },
             {
-              squareSelector: c.squareSelector,
+              contentPanelSelector: c.contentPanelSelector,
               headerSelector: c.headerSelector,
               leftAnchorSelector: c.leftAnchorSelector,
               rightAnchorSelector: c.rightAnchorSelector,
             },
           );
-          /* documentElement zoom + narrow viewport: Chromium often skews header anchors vs square. */
+          /* documentElement zoom + narrow viewport: Chromium often skews header anchors vs content panel. */
           const extremeMobileHeaderZoomDrift =
             entry.viewport.width <= 430 && zoom >= 2;
           const edgeDeltas = edge as {

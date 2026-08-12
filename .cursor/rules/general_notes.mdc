@@ -16,6 +16,26 @@ This document records the unified design decisions for the site. Keep it as the 
 
 ---
 
+## Content panel
+
+The **content panel** is the large ~1:1 main content block below the page title on hero, profile, writing, and contact. Width tracks `main.content`; height is typically tied to that width (`100cqw`, `aspect-ratio: 1 / 1`).
+
+**DOM hooks** (class names stay historical):
+
+| Route | Selector |
+|-------|----------|
+| Hero | `.hero` |
+| Profile | `.profile-section` |
+| Writing | `.writing-page .page-buttons-panel` |
+| Contact | `.contact-page .page-buttons-panel` |
+| Route maintenance | `.route-maintenance-panel` (variant on `.page-buttons-panel`) |
+
+Use **content panel** in comments, tests, and cross-page layout logic. Shared selectors live in `src/constants/content-panel.ts`. Do not rename CSS classes unless migrating explicitly.
+
+**Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-composition-offset-*` (text positioning inside the hero panel).
+
+---
+
 ## Unified body-button style
 
 A recurring element across all non-hero pages: **body buttons** (and article labels that act as buttons). These are distinct from clickable labels in the header navigation. The style ties the hero's strong colour to the rest of the site by reusing the same visual language (photo underlay, gradient overlay, halo text).

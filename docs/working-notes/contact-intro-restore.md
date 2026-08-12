@@ -145,7 +145,7 @@ Still present:
 
 - `e2e/pages.spec.ts` — intro visibility + copy; fit overflow for intro+links;
   layout ratios (`linksWidthFrac ≈ 0.38`, intro→links gap &lt; intro height)
-- `e2e/square-containment.spec.ts` + `e2e/helpers/zoom-guard.ts` —
+- `e2e/content-panel-containment.spec.ts` + `e2e/helpers/zoom-guard.ts` —
   add `.contact-page__inset-rect--intro` back to `requiredInsideSelectors`
 - Unit: `computeIntroLinksGapPx` already covered in `tests/unit/contact-layout-math.test.ts`
 - Contracts: re-add intro weight test in `tests/unit/layout-contracts.test.ts`
@@ -180,4 +180,4 @@ Import `computeIntroLinksGapPx` again. Read panel `padding-top` for `topPad`
 6. Re-add e2e assertions for intro + intro→links gap.
 7. Confirm `CONTACT_LAYOUT` intro gap tokens unchanged.
 8. Run: `npm run test:unit -- tests/unit/contact-layout-math.test.ts tests/unit/layout-contracts.test.ts`
-9. Run contact e2e: landing fit / square-containment / pages contact tests.
+9. Run contact e2e: landing fit / content-panel-containment / pages contact tests.

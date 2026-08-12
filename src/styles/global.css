@@ -115,7 +115,7 @@ body {
   overflow-x: auto;
 }
 
-/* Zoom freeze mode (composition-heavy pages):
+/* Zoom freeze mode (content panel pages):
    Above threshold we keep visual scale fixed and let browser viewport continue to pan. */
 body.zoom-threshold-exceeded {
   overflow-x: auto;
@@ -153,7 +153,7 @@ main,
   --page-title-font-size: clamp(1.9rem, min(2.7vw, 5.75cqi), 2.12rem);
 }
 
-/* Keep composition blocks naturally aligned to content/header width.
+/* Keep content panels naturally aligned to content/header width.
    Zoom freeze logic handles extremes; do not force extra minimum inline size here. */
 
 /* ===============================

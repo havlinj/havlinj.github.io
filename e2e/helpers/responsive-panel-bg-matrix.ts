@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 /**
- * Reusable viewport matrix for pages whose panel (or hero) background uses
+ * Reusable viewport matrix for pages whose content panel (or hero) background uses
  * `<picture>` / `srcset` with oversampled tiers (`*_720.png`, `*_1080.png`, …).
  *
  * Each case spins up a fresh browser context so `viewport` + `deviceScaleFactor`

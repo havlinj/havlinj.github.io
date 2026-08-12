@@ -16,6 +16,7 @@ import {
   parseZoomFreezeBaselineJson,
   parseZoomGuardStateJson,
 } from '../utils/zoom-guard-storage';
+import { documentHasContentPanel } from '../constants/content-panel';
 
 const MAX_SAFE_ZOOM = ZOOM_GUARD_MAX_SAFE_ZOOM;
 const ZOOM_EXIT_HYSTERESIS = ZOOM_GUARD_EXIT_HYSTERESIS;
@@ -35,12 +36,8 @@ export function initZoomGuard(): void {
   const body = document.body;
   if (!body) return;
 
-  const hasComposition =
-    !!document.querySelector('.hero') ||
-    !!document.querySelector('.profile-section') ||
-    !!document.querySelector('.writing-page .page-buttons-panel') ||
-    !!document.querySelector('.contact-page .page-buttons-panel');
-  if (!hasComposition) return;
+  const hasContentPanel = documentHasContentPanel(document);
+  if (!hasContentPanel) return;
 
   installed = true;
 

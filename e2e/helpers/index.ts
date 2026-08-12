@@ -12,16 +12,22 @@ export {
 } from './profile-frame-gutters';
 export { countRevealRasterSignature } from './foundations-reveal-raster';
 export { waitTwoFrames } from './raf';
-export { mustBox, readSquareContainment } from './geometry';
+export {
+  mustBox,
+  readContentPanelContainment,
+  type ContentPanelContainmentInput,
+  type ContentPanelContainmentResult,
+} from './geometry';
 export { applyExtremeZoom } from './zoom';
 export {
-  ZOOM_COMPOSITION_CASES,
+  CONTENT_PANEL_CASES,
   applyDocZoom,
-  assertCompositionLayout,
+  assertContentPanelLayout,
   readZoomGuardSnapshot,
   resetDocZoom,
   waitContactFitVisible,
   waitWritingGroupsVisible,
+  type ContentPanelCase,
 } from './zoom-guard';
 export {
   CONTACT_API_ERROR_RESETS_TURNSTILE,

@@ -17,7 +17,7 @@ const CONTACT_BG_STEM = 'guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom';
 const HERO_BG_STEM = 'altumcode-oZ61KFUQsus-unsplash_dichrom';
 const PROFILE_BG_STEM = 'evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom';
 
-/** Same breakpoints as Writing `<picture>` — intrinsic `w` descriptors align across panel pages. */
+/** Same breakpoints as Writing `<picture>` — intrinsic `w` descriptors align across content panel pages. */
 const SHARED_PANEL_BG_TIERS = [
   /* `(max-width: 767px)` + low slot → 1620w candidate */
   { tierLabel: '720', viewport: { width: 375, height: 740 } },
@@ -37,7 +37,7 @@ function tierCasesForUrlStem(stem: string): ResponsivePanelBgCase[] {
 }
 
 declareResponsivePanelBgMatrix({
-  suiteTitle: 'Writing (/writing) responsive panel background tiers',
+  suiteTitle: 'Writing (/writing) responsive content panel background tiers',
   path: '/writing',
   imgSelector: '.writing-page .page-buttons-panel__media img',
   waitForReady: async (page) => {
@@ -59,7 +59,7 @@ declareResponsivePanelBgMatrix({
 });
 
 declareResponsivePanelBgMatrix({
-  suiteTitle: 'Profile (/profile) responsive canvas background tiers',
+  suiteTitle: 'Profile (/profile) responsive content panel background tiers',
   path: '/profile',
   imgSelector: '.profile-section__media img',
   waitForReady: async (page) => {
@@ -71,7 +71,7 @@ declareResponsivePanelBgMatrix({
 });
 
 declareResponsivePanelBgMatrix({
-  suiteTitle: 'Contact (/contact) responsive panel background tiers',
+  suiteTitle: 'Contact (/contact) responsive content panel background tiers',
   path: '/contact',
   imgSelector: '.contact-page .page-buttons-panel__media img',
   waitForReady: async (page) => {

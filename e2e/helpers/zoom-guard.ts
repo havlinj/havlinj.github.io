@@ -1,20 +1,23 @@
 import { expect, type Page } from '@playwright/test';
-import { readSquareContainment } from './geometry';
+import { CONTENT_PANEL_SELECTORS } from '../../src/constants/content-panel';
+import { readContentPanelContainment } from './geometry';
 import { waitTwoFrames } from './raf';
 
-export type CompositionCase = {
-  name: string;
+export type ContentPanelCase = {
+  name: ContentPanelRouteName;
   path: string;
-  squareSelector: string;
+  contentPanelSelector: string;
   requiredInsideSelectors: readonly string[];
 };
 
-/** Same composition targets as `square-containment.spec.ts` (hero / profile / writing / contact). */
-export const ZOOM_COMPOSITION_CASES: readonly CompositionCase[] = [
+type ContentPanelRouteName = keyof typeof CONTENT_PANEL_SELECTORS;
+
+/** Same content-panel routes as `content-panel-containment.spec.ts`. */
+export const CONTENT_PANEL_CASES: readonly ContentPanelCase[] = [
   {
     name: 'hero',
     path: '/',
-    squareSelector: '.hero',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.hero,
     requiredInsideSelectors: [
       '.hero-content',
       '.hero-grid',
@@ -25,7 +28,7 @@ export const ZOOM_COMPOSITION_CASES: readonly CompositionCase[] = [
   {
     name: 'profile',
     path: '/profile',
-    squareSelector: '.profile-section',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.profile,
     requiredInsideSelectors: [
       'a[href="/why-this"]',
       'a[href="/what-i-do"]',
@@ -36,7 +39,7 @@ export const ZOOM_COMPOSITION_CASES: readonly CompositionCase[] = [
   {
     name: 'writing',
     path: '/writing',
-    squareSelector: '.writing-page .page-buttons-panel',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.writing,
     requiredInsideSelectors: [
       '.writing-page .writing-groups',
       '.writing-page .page-buttons',
@@ -45,7 +48,7 @@ export const ZOOM_COMPOSITION_CASES: readonly CompositionCase[] = [
   {
     name: 'contact',
     path: '/contact',
-    squareSelector: '.contact-page .page-buttons-panel',
+    contentPanelSelector: CONTENT_PANEL_SELECTORS.contact,
     requiredInsideSelectors: [
       '.contact-page__fit-content',
       '.contact-page__inset-rect--links',
@@ -114,11 +117,11 @@ type InsideResult = {
 };
 
 /**
- * Geometry-only layout check (no screenshots): square in `main.content`, key nodes inside square.
+ * Geometry-only layout check (no screenshots): content panel in `main.content`, key nodes inside.
  */
-export async function assertCompositionLayout(
+export async function assertContentPanelLayout(
   page: Page,
-  c: CompositionCase,
+  c: ContentPanelCase,
   opts?: { tolerancePx?: number; label?: string },
 ): Promise<void> {
   const tol = opts?.tolerancePx ?? 6;
@@ -131,28 +134,28 @@ export async function assertCompositionLayout(
     await waitContactFitVisible(page);
   }
 
-  const containment = await readSquareContainment(page.locator('body'), {
-    squareSelector: c.squareSelector,
+  const containment = await readContentPanelContainment(page.locator('body'), {
+    contentPanelSelector: c.contentPanelSelector,
     containerSelector: 'main.content',
     tolerancePx: tol,
   });
   expect(
     containment.ok,
-    `${label}: square containment ${JSON.stringify(containment)}`,
+    `${label}: content panel containment ${JSON.stringify(containment)}`,
   ).toBe(true);
 
   const inside = await page.evaluate(
     (cfg: {
-      squareSelector: string;
+      contentPanelSelector: string;
       selectors: readonly string[];
       tolerancePx: number;
     }): InsideResult => {
       const t = cfg.tolerancePx;
-      const square = document.querySelector(cfg.squareSelector);
-      if (!(square instanceof HTMLElement)) {
-        return { ok: false, missing: ['(square)'], overflowing: [] };
+      const contentPanel = document.querySelector(cfg.contentPanelSelector);
+      if (!(contentPanel instanceof HTMLElement)) {
+        return { ok: false, missing: ['(content panel)'], overflowing: [] };
       }
-      const s = square.getBoundingClientRect();
+      const panelRect = contentPanel.getBoundingClientRect();
       const missing: string[] = [];
       const overflowing: string[] = [];
 
@@ -164,10 +167,10 @@ export async function assertCompositionLayout(
         }
         const r = el.getBoundingClientRect();
         const within =
-          r.left >= s.left - t &&
-          r.right <= s.right + t &&
-          r.top >= s.top - t &&
-          r.bottom <= s.bottom + t;
+          r.left >= panelRect.left - t &&
+          r.right <= panelRect.right + t &&
+          r.top >= panelRect.top - t &&
+          r.bottom <= panelRect.bottom + t;
         if (!within) overflowing.push(sel);
       }
 
@@ -178,7 +181,7 @@ export async function assertCompositionLayout(
       };
     },
     {
-      squareSelector: c.squareSelector,
+      contentPanelSelector: c.contentPanelSelector,
       selectors: c.requiredInsideSelectors,
       tolerancePx: tol,
     },

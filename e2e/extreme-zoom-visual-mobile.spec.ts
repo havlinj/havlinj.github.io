@@ -9,7 +9,7 @@ import { applyExtremeZoom } from './helpers';
 test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('hero square visual snapshot on mobile webkit', async ({
+  test('hero content panel visual snapshot on mobile webkit', async ({
     page,
     browserName,
   }) => {
@@ -27,7 +27,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     );
   });
 
-  test('writing square visual snapshot on mobile webkit', async ({
+  test('writing content panel visual snapshot on mobile webkit', async ({
     page,
     browserName,
   }) => {
@@ -46,7 +46,7 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     });
   });
 
-  test('contact square visual snapshot on mobile webkit', async ({
+  test('contact content panel visual snapshot on mobile webkit', async ({
     page,
     browserName,
   }) => {

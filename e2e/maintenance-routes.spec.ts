@@ -6,7 +6,7 @@ import {
 } from '../src/constants/maintenance-panel';
 
 test.describe('maintenance routes fixture', () => {
-  test('writing shows Whoops notice inside the square panel', async ({
+  test('writing shows Whoops notice inside the content panel', async ({
     page,
   }) => {
     await page.goto('/writing');
@@ -40,32 +40,32 @@ test.describe('maintenance routes fixture', () => {
     expect(bandBg).toBe(RGB_PAGE_BG);
 
     const layout = await page.evaluate(() => {
-      const square = document.querySelector('.route-maintenance-panel');
+      const contentPanel = document.querySelector('.route-maintenance-panel');
       const plate = document.querySelector('.route-maintenance-panel__copy');
       const headline = document.querySelector(
         '.route-maintenance-panel__headline',
       );
       const info = document.querySelector('.route-maintenance-panel__info');
       if (
-        !(square instanceof HTMLElement) ||
+        !(contentPanel instanceof HTMLElement) ||
         !(plate instanceof HTMLElement) ||
         !(headline instanceof HTMLElement) ||
         !(info instanceof HTMLElement)
       ) {
         return null;
       }
-      const squareBox = square.getBoundingClientRect();
+      const panelBox = contentPanel.getBoundingClientRect();
       const plateBox = plate.getBoundingClientRect();
       const headlineBox = headline.getBoundingClientRect();
       const infoBox = info.getBoundingClientRect();
       return {
-        rightGap: Math.abs(squareBox.right - plateBox.right),
+        rightGap: Math.abs(panelBox.right - plateBox.right),
         leftPad: headlineBox.left - plateBox.left,
         topPad: headlineBox.top - plateBox.top,
         bottomPad: plateBox.bottom - infoBox.bottom,
-        squareCenterY: squareBox.top + squareBox.height / 2,
+        contentPanelCenterY: panelBox.top + panelBox.height / 2,
         plateCenterY: plateBox.top + plateBox.height / 2,
-        panelBorder: getComputedStyle(square).borderWidth,
+        panelBorder: getComputedStyle(contentPanel).borderWidth,
       };
     });
     expect(layout).not.toBeNull();
@@ -74,7 +74,7 @@ test.describe('maintenance routes fixture', () => {
     expect(layout!.leftPad).toBeLessThan(40);
     expect(layout!.topPad).toBeGreaterThan(12);
     expect(layout!.bottomPad).toBeGreaterThan(12);
-    expect(Math.abs(layout!.plateCenterY - layout!.squareCenterY)).toBeLessThan(
+    expect(Math.abs(layout!.plateCenterY - layout!.contentPanelCenterY)).toBeLessThan(
       2,
     );
     expect(layout!.panelBorder).toBe('0px');

@@ -5,8 +5,8 @@ title: 'Profile'
 <div
   class="profile-section profile-section--loading"
   style="
-    /* Edge-anchored controls: independent Y offsets in % of the big square */
-    /* Shared vertical reference from the bottom edge of the big box */
+    /* Edge-anchored controls: independent Y offsets in % of the content panel */
+    /* Shared vertical reference from the bottom edge of the content panel */
     --profile-groups-reference-from-bottom: 0%;
     --profile-why-offset-from-reference: 60%;
     --profile-what-offset-from-reference: 6%;

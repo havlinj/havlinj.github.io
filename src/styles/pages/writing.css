@@ -299,7 +299,7 @@ ul.post-list > li::before {
 }
 
 /*
- * Writing: square panel; wash behind pool photo. Left inset removed here and
+ * Writing content panel; wash behind pool photo. Left inset removed here and
  * reapplied on `.page-buttons`. Top inset matches the buttons' left inset.
  */
 .writing-page .page-buttons-panel {

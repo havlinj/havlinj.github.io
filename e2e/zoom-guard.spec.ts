@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import {
-  ZOOM_COMPOSITION_CASES,
+  CONTENT_PANEL_CASES,
   applyDocZoom,
-  assertCompositionLayout,
+  assertContentPanelLayout,
   readZoomGuardSnapshot,
   resetDocZoom,
 } from './helpers/zoom-guard';
@@ -11,7 +11,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
   test.beforeEach(({ browserName }) => {
     test.skip(
       browserName !== 'chromium',
-      'Uses documentElement.style.zoom; same scope as square-containment matrix.',
+      'Uses documentElement.style.zoom; same scope as content-panel-containment matrix.',
     );
   });
 
@@ -35,8 +35,8 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
           timeout: 4000,
         })
         .toBe(true);
-      const c = ZOOM_COMPOSITION_CASES.find((x) => x.path === path)!;
-      await assertCompositionLayout(page, c, {
+      const c = CONTENT_PANEL_CASES.find((x) => x.path === path)!;
+      await assertContentPanelLayout(page, c, {
         label: `${c.name} (narrow nav)`,
         tolerancePx: 8,
       });
@@ -83,14 +83,14 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       })
       .toBe(true);
 
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile after re-squeeze',
     });
     await page.setViewportSize({ width: 1200, height: 900 });
     await resetDocZoom(page);
   });
 
-  test('reload at narrow viewport: freeze + composition layout survives', async ({
+  test('reload at narrow viewport: freeze + content panel layout survives', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -109,7 +109,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       })
       .toBe(true);
 
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[3], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[3], {
       label: 'contact after reload narrow',
       tolerancePx: 8,
     });
@@ -140,7 +140,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       })
       .toBe(false);
 
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile after stale-guard clear',
     });
 
@@ -152,7 +152,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
         timeout: 4000,
       })
       .toBe(true);
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile narrow after stale clear',
       tolerancePx: 8,
     });
@@ -160,16 +160,16 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     await resetDocZoom(page);
   });
 
-  test('document zoom ramp on each composition page: containment at each step', async ({
+  test('document zoom ramp on each content panel page: containment at each step', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 900 });
 
-    for (const c of ZOOM_COMPOSITION_CASES) {
+    for (const c of CONTENT_PANEL_CASES) {
       await page.goto(c.path);
       for (const z of [1, 1.5, 2, 2.5, 3] as const) {
         await applyDocZoom(page, z);
-        await assertCompositionLayout(page, c, {
+        await assertContentPanelLayout(page, c, {
           label: `${c.name} docZoom=${z}`,
           tolerancePx: z >= 2.5 ? 10 : 8,
         });
@@ -187,7 +187,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     await applyDocZoom(page, 1);
     expect((await readZoomGuardSnapshot(page)).frozen).toBe(false);
     await applyDocZoom(page, 2.5);
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile docZoom=2.5',
       tolerancePx: 10,
     });
@@ -203,7 +203,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     const s1 = parseFloat(frozenOnce.freezeScale || '0');
     expect(s1).toBeGreaterThan(0);
     expect(s1).toBeLessThanOrEqual(1);
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile narrow frozen',
       tolerancePx: 8,
     });
@@ -222,7 +222,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       })
       .toBe(true);
 
-    await assertCompositionLayout(page, ZOOM_COMPOSITION_CASES[1], {
+    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile narrow re-frozen',
       tolerancePx: 8,
     });
@@ -279,12 +279,12 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     expect(snap).toMatchObject({ frozen: expect.any(Boolean) });
   });
 
-  test('main content does not explode past viewport width (doc zoom 3, all composition)', async ({
+  test('main content does not explode past viewport width (doc zoom 3, all content panels)', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 900, height: 900 });
 
-    for (const c of ZOOM_COMPOSITION_CASES) {
+    for (const c of CONTENT_PANEL_CASES) {
       await page.goto(c.path);
       await applyDocZoom(page, 3);
       const overflow = await page.evaluate(() => {

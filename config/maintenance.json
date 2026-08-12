@@ -11,7 +11,7 @@
  *      "started": "2026-08-07"
  *    }
  *
- * 3) Selected routes only (Whoops + square notice; header/footer stay):
+ * 3) Selected routes only (Whoops + content panel notice; header/footer stay):
  *    {
  *      "mode": "routes",
  *      "routes": [

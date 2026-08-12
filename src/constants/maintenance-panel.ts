@@ -1,5 +1,5 @@
 /**
- * Route-maintenance square panel look — CSS on `.route-maintenance-page`
+ * Route-maintenance content panel look — CSS on `.route-maintenance-page`
  * must stay aligned (see layout-contracts + maintenance e2e).
  */
 export const MAINTENANCE_PANEL_BG_STEM =

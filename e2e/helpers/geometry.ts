@@ -8,63 +8,64 @@ export async function mustBox(
   return box!;
 }
 
-type SquareContainmentInput = {
-  squareSelector: string;
+export type ContentPanelContainmentInput = {
+  contentPanelSelector: string;
   containerSelector?: string;
   tolerancePx?: number;
 };
 
-type SquareContainmentResult = {
+export type ContentPanelContainmentResult = {
   ok: boolean;
-  squarePresent: boolean;
+  contentPanelPresent: boolean;
   containerPresent: boolean;
-  squareWidth: number;
-  squareHeight: number;
+  contentPanelWidth: number;
+  contentPanelHeight: number;
   withinLeft: boolean;
   withinRight: boolean;
   widthMatchesHeight: boolean;
 };
 
-export async function readSquareContainment(
+export async function readContentPanelContainment(
   locator: Locator,
-  input: SquareContainmentInput,
-): Promise<SquareContainmentResult> {
+  input: ContentPanelContainmentInput,
+): Promise<ContentPanelContainmentResult> {
   return locator.evaluate(
-    (root, cfg: SquareContainmentInput): SquareContainmentResult => {
+    (root, cfg: ContentPanelContainmentInput): ContentPanelContainmentResult => {
       const tol = cfg.tolerancePx ?? 2;
-      const square = root.querySelector(cfg.squareSelector);
+      const contentPanel = root.querySelector(cfg.contentPanelSelector);
       const container = root.querySelector(
         cfg.containerSelector ?? 'main.content',
       );
       if (
-        !(square instanceof HTMLElement) ||
+        !(contentPanel instanceof HTMLElement) ||
         !(container instanceof HTMLElement)
       ) {
         return {
           ok: false,
-          squarePresent: square instanceof HTMLElement,
+          contentPanelPresent: contentPanel instanceof HTMLElement,
           containerPresent: container instanceof HTMLElement,
-          squareWidth: 0,
-          squareHeight: 0,
+          contentPanelWidth: 0,
+          contentPanelHeight: 0,
           withinLeft: false,
           withinRight: false,
           widthMatchesHeight: false,
         };
       }
 
-      const s = square.getBoundingClientRect();
-      const c = container.getBoundingClientRect();
-      const squareWidth = s.width;
-      const squareHeight = s.height;
-      const widthMatchesHeight = Math.abs(squareWidth - squareHeight) <= tol;
-      const withinLeft = s.left >= c.left - tol;
-      const withinRight = s.right <= c.right + tol;
+      const panelRect = contentPanel.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const contentPanelWidth = panelRect.width;
+      const contentPanelHeight = panelRect.height;
+      const widthMatchesHeight =
+        Math.abs(contentPanelWidth - contentPanelHeight) <= tol;
+      const withinLeft = panelRect.left >= containerRect.left - tol;
+      const withinRight = panelRect.right <= containerRect.right + tol;
       return {
         ok: widthMatchesHeight && withinLeft && withinRight,
-        squarePresent: true,
+        contentPanelPresent: true,
         containerPresent: true,
-        squareWidth,
-        squareHeight,
+        contentPanelWidth,
+        contentPanelHeight,
         withinLeft,
         withinRight,
         widthMatchesHeight,

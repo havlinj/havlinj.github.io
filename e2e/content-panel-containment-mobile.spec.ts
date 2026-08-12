@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { readSquareContainment } from './helpers';
+import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
+import { readContentPanelContainment } from './helpers';
 
-test.describe('Square containment (mobile)', () => {
-  test('profile square and key tiles stay inside on mobile webkit', async ({
+test.describe('Content panel containment (mobile)', () => {
+  test('profile content panel and key tiles stay inside on mobile webkit', async ({
     page,
     browserName,
   }) => {
@@ -10,22 +11,24 @@ test.describe('Square containment (mobile)', () => {
 
     const tol = browserName === 'webkit' ? 8 : 3;
 
-    const result = await readSquareContainment(page.locator('body'), {
-      squareSelector: '.profile-section',
+    const result = await readContentPanelContainment(page.locator('body'), {
+      contentPanelSelector: CONTENT_PANEL_SELECTORS.profile,
       containerSelector: 'main.content',
       tolerancePx: tol,
     });
     expect(
       result.ok,
-      `profile square containment failed: ${JSON.stringify(result)}`,
+      `profile content panel containment failed: ${JSON.stringify(result)}`,
     ).toBe(true);
 
     const inside = await page.evaluate((pixelTol: number) => {
-      const square = document.querySelector('.profile-section');
-      if (!(square instanceof HTMLElement)) {
-        return { ok: false, reason: 'missing square' };
+      const contentPanel = document.querySelector(
+        '.profile-section',
+      );
+      if (!(contentPanel instanceof HTMLElement)) {
+        return { ok: false, reason: 'missing content panel' };
       }
-      const s = square.getBoundingClientRect();
+      const panelRect = contentPanel.getBoundingClientRect();
       const selectors = [
         'a[href="/why-this"]',
         'a[href="/what-i-do"]',
@@ -34,7 +37,7 @@ test.describe('Square containment (mobile)', () => {
       ];
       const missing: string[] = [];
       const overflowing: string[] = [];
-      const tol = pixelTol;
+      const tolerance = pixelTol;
       for (const sel of selectors) {
         const el = document.querySelector(sel);
         if (!(el instanceof HTMLElement)) {
@@ -43,10 +46,10 @@ test.describe('Square containment (mobile)', () => {
         }
         const r = el.getBoundingClientRect();
         const within =
-          r.left >= s.left - tol &&
-          r.right <= s.right + tol &&
-          r.top >= s.top - tol &&
-          r.bottom <= s.bottom + tol;
+          r.left >= panelRect.left - tolerance &&
+          r.right <= panelRect.right + tolerance &&
+          r.top >= panelRect.top - tolerance &&
+          r.bottom <= panelRect.bottom + tolerance;
         if (!within) overflowing.push(sel);
       }
       return {

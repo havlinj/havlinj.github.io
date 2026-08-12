@@ -10,7 +10,7 @@ import { applyExtremeZoom } from './helpers';
 test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('hero square visual snapshot at extreme zoom', async ({
+  test('hero content panel visual snapshot at extreme zoom', async ({
     page,
     browserName,
   }) => {
@@ -32,7 +32,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     );
   });
 
-  test('writing square visual snapshot at extreme zoom', async ({
+  test('writing content panel visual snapshot at extreme zoom', async ({
     page,
     browserName,
   }) => {
@@ -55,7 +55,7 @@ test.describe('Extreme zoom visuals @extreme-zoom-visual', () => {
     });
   });
 
-  test('contact square visual snapshot at extreme zoom', async ({
+  test('contact content panel visual snapshot at extreme zoom', async ({
     page,
     browserName,
   }) => {

@@ -147,6 +147,27 @@ describe('layout contracts: profile reveal (TS ↔ CSS calc)', () => {
   });
 });
 
+describe('layout contracts: content panel selectors (constants ↔ e2e)', () => {
+  it('CONTENT_PANEL_SELECTORS match CONTENT_PANEL_CASES routes', async () => {
+    const { CONTENT_PANEL_SELECTORS } =
+      await import('../../src/constants/content-panel');
+    const { CONTENT_PANEL_CASES } =
+      await import('../../e2e/helpers/zoom-guard');
+
+    expect(CONTENT_PANEL_CASES.map((c) => c.name)).toEqual([
+      'hero',
+      'profile',
+      'writing',
+      'contact',
+    ]);
+    for (const routeCase of CONTENT_PANEL_CASES) {
+      expect(routeCase.contentPanelSelector).toBe(
+        CONTENT_PANEL_SELECTORS[routeCase.name],
+      );
+    }
+  });
+});
+
 describe('layout contracts: contact panel typography (constants ↔ contact.css)', () => {
   const css = readRepoFile('src/styles/pages/contact.css');
 

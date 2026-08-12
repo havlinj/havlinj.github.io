@@ -43,7 +43,7 @@ article.has-buttons-panel > h1.page-title {
   display: block;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-  /* Main canvas: same square logic as hero */
+  /* Main content panel: same square sizing logic as hero */
   height: 100cqw;
   overflow: hidden;
   /* Reveal fade — same contract as Hero (.hero-content), Writing (--visible), Contact (--visible). */

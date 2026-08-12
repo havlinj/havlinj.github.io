@@ -1,5 +1,5 @@
 /**
- * Shared content-reveal fade on main panel pages (Hero / Writing / Contact / Profile).
+ * Shared content-reveal fade on content panel pages (Hero / Writing / Contact / Profile).
  * Keep CSS `transition: opacity …` on those routes aligned with these values.
  */
 export const PAGE_REVEAL_OPACITY_DURATION_S = 0.18;
