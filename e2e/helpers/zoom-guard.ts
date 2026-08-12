@@ -237,9 +237,7 @@ export async function assertContentPanelLayout(
     } else if (isExtremeMobileContact) {
       insideOk =
         inside.missing.length === 0 &&
-        inside.overflowing.every((sel) =>
-          contactInsetOverflowAllowed.has(sel),
-        );
+        inside.overflowing.every((sel) => contactInsetOverflowAllowed.has(sel));
     }
   }
 

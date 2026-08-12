@@ -22,9 +22,7 @@ test.describe('Content panel containment (mobile)', () => {
     ).toBe(true);
 
     const inside = await page.evaluate((pixelTol: number) => {
-      const contentPanel = document.querySelector(
-        '.profile-section',
-      );
+      const contentPanel = document.querySelector('.profile-section');
       if (!(contentPanel instanceof HTMLElement)) {
         return { ok: false, reason: 'missing content panel' };
       }

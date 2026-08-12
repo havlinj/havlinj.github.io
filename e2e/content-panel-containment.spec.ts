@@ -97,11 +97,14 @@ test.describe('Content panel containment matrix', () => {
         for (const zoom of entry.zooms) {
           await applyZoomWithRetry(page, zoom);
 
-          const result = await readContentPanelContainment(page.locator('body'), {
-            contentPanelSelector: c.contentPanelSelector,
-            containerSelector: 'main.content',
-            tolerancePx: 3,
-          });
+          const result = await readContentPanelContainment(
+            page.locator('body'),
+            {
+              contentPanelSelector: c.contentPanelSelector,
+              containerSelector: 'main.content',
+              tolerancePx: 3,
+            },
+          );
           expect(
             result.ok,
             `${c.name} failed at ${entry.viewport.width}x${entry.viewport.height}, zoom ${zoom}: ${JSON.stringify(

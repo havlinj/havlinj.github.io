@@ -97,21 +97,24 @@ test.describe('maintenance routes fixture', () => {
       }, z);
       await page.waitForTimeout(120);
 
-      const styles = await page.evaluate(({ ink, pageBg }) => {
-        const panel = document.querySelector('.route-maintenance-panel');
-        if (!(panel instanceof HTMLElement)) return null;
-        const cs = getComputedStyle(panel);
-        const before = getComputedStyle(panel, '::before');
-        return {
-          panelBg: cs.backgroundColor,
-          paddingTop: cs.paddingTop,
-          beforeDisplay: before.display,
-          beforeBg: before.backgroundColor,
-          beforeOpacity: before.opacity,
-          inkMatch: cs.backgroundColor === ink,
-          pageBgMatch: cs.backgroundColor === pageBg,
-        };
-      }, { ink: RGB_INK, pageBg: RGB_PAGE_BG });
+      const styles = await page.evaluate(
+        ({ ink, pageBg }) => {
+          const panel = document.querySelector('.route-maintenance-panel');
+          if (!(panel instanceof HTMLElement)) return null;
+          const cs = getComputedStyle(panel);
+          const before = getComputedStyle(panel, '::before');
+          return {
+            panelBg: cs.backgroundColor,
+            paddingTop: cs.paddingTop,
+            beforeDisplay: before.display,
+            beforeBg: before.backgroundColor,
+            beforeOpacity: before.opacity,
+            inkMatch: cs.backgroundColor === ink,
+            pageBgMatch: cs.backgroundColor === pageBg,
+          };
+        },
+        { ink: RGB_INK, pageBg: RGB_PAGE_BG },
+      );
 
       expect(styles, `zoom=${z}`).not.toBeNull();
       expect(styles!.inkMatch, `zoom=${z} panel bg`).toBe(false);
@@ -162,18 +165,21 @@ test.describe('maintenance routes fixture', () => {
     await page.keyboard.up('Control');
     await page.waitForTimeout(200);
 
-    const afterWheel = await page.evaluate(({ ink, pageBg }) => {
-      const panel = document.querySelector('.route-maintenance-panel');
-      if (!(panel instanceof HTMLElement)) return null;
-      const cs = getComputedStyle(panel);
-      const before = getComputedStyle(panel, '::before');
-      return {
-        panelBg: cs.backgroundColor,
-        beforeDisplay: before.display,
-        inkMatch: cs.backgroundColor === ink,
-        pageBgMatch: cs.backgroundColor === pageBg,
-      };
-    }, { ink: RGB_INK, pageBg: RGB_PAGE_BG });
+    const afterWheel = await page.evaluate(
+      ({ ink, pageBg }) => {
+        const panel = document.querySelector('.route-maintenance-panel');
+        if (!(panel instanceof HTMLElement)) return null;
+        const cs = getComputedStyle(panel);
+        const before = getComputedStyle(panel, '::before');
+        return {
+          panelBg: cs.backgroundColor,
+          beforeDisplay: before.display,
+          inkMatch: cs.backgroundColor === ink,
+          pageBgMatch: cs.backgroundColor === pageBg,
+        };
+      },
+      { ink: RGB_INK, pageBg: RGB_PAGE_BG },
+    );
     expect(afterWheel?.inkMatch).toBe(false);
     expect(afterWheel?.pageBgMatch).toBe(true);
     expect(afterWheel?.beforeDisplay).toBe('none');
@@ -192,8 +198,8 @@ test.describe('maintenance routes fixture', () => {
     );
     expect(bg).toBe(RGB_PAGE_BG);
 
-    const beforeDisplay = await panel.evaluate((el) =>
-      getComputedStyle(el, '::before').display,
+    const beforeDisplay = await panel.evaluate(
+      (el) => getComputedStyle(el, '::before').display,
     );
     expect(beforeDisplay).toBe('none');
   });
@@ -225,7 +231,9 @@ test.describe('maintenance routes fixture', () => {
     const edgePx = await page.evaluate(() => {
       const panel = document.querySelector('.route-maintenance-panel');
       if (!(panel instanceof HTMLElement)) return 0;
-      const edge = panel.style.getPropertyValue('--route-maintenance-panel-edge');
+      const edge = panel.style.getPropertyValue(
+        '--route-maintenance-panel-edge',
+      );
       return Number.parseFloat(edge);
     });
     expect(edgePx).toBeGreaterThan(320);

@@ -43,7 +43,8 @@
   display: none;
 }
 
-.page-buttons-panel:has(> .page-buttons-panel__media) > .page-buttons-panel__media {
+.page-buttons-panel:has(> .page-buttons-panel__media)
+  > .page-buttons-panel__media {
   inset: -1px;
   background-color: var(--color-page-bg);
 }

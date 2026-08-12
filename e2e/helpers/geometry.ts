@@ -30,7 +30,10 @@ export async function readContentPanelContainment(
   input: ContentPanelContainmentInput,
 ): Promise<ContentPanelContainmentResult> {
   return locator.evaluate(
-    (root, cfg: ContentPanelContainmentInput): ContentPanelContainmentResult => {
+    (
+      root,
+      cfg: ContentPanelContainmentInput,
+    ): ContentPanelContainmentResult => {
       const tol = cfg.tolerancePx ?? 2;
       const contentPanel = root.querySelector(cfg.contentPanelSelector);
       const container = root.querySelector(

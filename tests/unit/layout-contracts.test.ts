@@ -173,7 +173,9 @@ describe('layout contracts: content panel selectors (constants ↔ e2e)', () => 
     const { MAINTENANCE_CONTENT_PANEL_CASE } =
       await import('../../e2e/helpers/zoom-guard');
 
-    expect(CONTENT_PANEL_SELECTORS.maintenance).toBe('.route-maintenance-panel');
+    expect(CONTENT_PANEL_SELECTORS.maintenance).toBe(
+      '.route-maintenance-panel',
+    );
     expect(MAINTENANCE_CONTENT_PANEL_CASE.contentPanelSelector).toBe(
       CONTENT_PANEL_SELECTORS.maintenance,
     );
@@ -280,7 +282,7 @@ describe('layout contracts: unified content panel skeleton', () => {
       /\.page-buttons-panel:has\(> \.page-buttons-panel__media\)::before[\s\S]*?content:\s*none/,
     );
     expect(css).toMatch(
-      /\.page-buttons-panel:has\(> \.page-buttons-panel__media\) > \.page-buttons-panel__media\s*\{[^}]*inset:\s*-1px/,
+      /\.page-buttons-panel:has\(> \.page-buttons-panel__media\)[\s\S]*?>\s*\.page-buttons-panel__media\s*\{[\s\S]*?inset:\s*-1px/,
     );
     expect(readRepoFile('src/styles/content-panel.css')).toMatch(
       /\.route-maintenance-panel\.content-panel\s*\{[^}]*padding:\s*0/,
