@@ -22,7 +22,7 @@ const webServerCommand = skipBuild
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: /maintenance-(routes|global)\.spec\.ts/,
+  testMatch: /maintenance-(routes|global|zoom-guard)\.spec\.ts/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

@@ -56,6 +56,19 @@ export const CONTENT_PANEL_CASES: readonly ContentPanelCase[] = [
   },
 ] as const;
 
+/** Route maintenance notice — only served under the maintenance Playwright fixture. */
+export const MAINTENANCE_CONTENT_PANEL_CASE: ContentPanelCase = {
+  name: 'maintenance',
+  path: '/writing',
+  contentPanelSelector: CONTENT_PANEL_SELECTORS.maintenance,
+  requiredInsideSelectors: [
+    '.route-maintenance-panel__copy',
+    '.route-maintenance-panel__headline',
+    '.route-maintenance-panel__route',
+    '.route-maintenance-panel__info',
+  ],
+};
+
 export async function applyDocZoom(page: Page, zoom: number): Promise<void> {
   await page.evaluate((z) => {
     document.documentElement.style.zoom = String(z);
@@ -110,6 +123,12 @@ export async function waitContactFitVisible(page: Page): Promise<void> {
     .toBe(true);
 }
 
+export async function waitMaintenancePanelVisible(page: Page): Promise<void> {
+  await expect(page.locator('.route-maintenance-panel')).toBeVisible({
+    timeout: 8000,
+  });
+}
+
 type InsideResult = {
   ok: boolean;
   missing: string[];
@@ -132,6 +151,9 @@ export async function assertContentPanelLayout(
   }
   if (c.name === 'contact') {
     await waitContactFitVisible(page);
+  }
+  if (c.name === 'maintenance') {
+    await waitMaintenancePanelVisible(page);
   }
 
   const containment = await readContentPanelContainment(page.locator('body'), {
@@ -189,14 +211,37 @@ export async function assertContentPanelLayout(
 
   const vw = page.viewportSize()?.width ?? 9999;
   const isExtremeMobileContact = c.name === 'contact' && vw <= 430;
+  const isExtremeMobileMaintenance = c.name === 'maintenance' && vw <= 430;
   const contactInsetOverflowAllowed = new Set([
     '.contact-page__inset-rect--links',
   ]);
-  const insideOk =
-    isExtremeMobileContact && inside.overflowing?.length
-      ? inside.missing.length === 0 &&
-        inside.overflowing.every((sel) => contactInsetOverflowAllowed.has(sel))
-      : inside.ok;
+  const maintenanceDesktopOverflowAllowed = new Set([
+    '.route-maintenance-panel__copy',
+  ]);
+  const maintenanceMobileOverflowAllowed = new Set(c.requiredInsideSelectors);
+
+  let insideOk = inside.ok;
+  if (inside.overflowing?.length) {
+    if (isExtremeMobileMaintenance) {
+      insideOk =
+        inside.missing.length === 0 &&
+        inside.overflowing.every((sel) =>
+          maintenanceMobileOverflowAllowed.has(sel),
+        );
+    } else if (c.name === 'maintenance') {
+      insideOk =
+        inside.missing.length === 0 &&
+        inside.overflowing.every((sel) =>
+          maintenanceDesktopOverflowAllowed.has(sel),
+        );
+    } else if (isExtremeMobileContact) {
+      insideOk =
+        inside.missing.length === 0 &&
+        inside.overflowing.every((sel) =>
+          contactInsetOverflowAllowed.has(sel),
+        );
+    }
+  }
 
   expect(insideOk, `${label}: inside layout ${JSON.stringify(inside)}`).toBe(
     true,

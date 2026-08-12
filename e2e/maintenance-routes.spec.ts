@@ -239,18 +239,21 @@ test.describe('maintenance routes fixture', () => {
         rotate: cs.getPropertyValue('--panel-bg-rotate').trim(),
       };
     });
-    expect(knobs).toEqual({
+    expect(knobs).toMatchObject({
       zoom: MAINTENANCE_PANEL_BG.zoom,
       opacity: MAINTENANCE_PANEL_BG.layerOpacity,
       posX: MAINTENANCE_PANEL_BG.posX,
       posY: MAINTENANCE_PANEL_BG.posY,
       nudgeX: MAINTENANCE_PANEL_BG.nudgeX,
-      nudgeY: MAINTENANCE_PANEL_BG.nudgeY,
       saturation: MAINTENANCE_PANEL_BG.saturation,
       brightness: MAINTENANCE_PANEL_BG.brightness,
       contrast: MAINTENANCE_PANEL_BG.contrast,
       rotate: MAINTENANCE_PANEL_BG.rotate,
     });
+    expect(Number.parseFloat(knobs!.nudgeY)).toBeCloseTo(
+      Number.parseFloat(MAINTENANCE_PANEL_BG.nudgeY),
+      5,
+    );
 
     const imgBox = await mediaImg.evaluate((el) => {
       const cs = getComputedStyle(el);

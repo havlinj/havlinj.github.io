@@ -166,6 +166,19 @@ describe('layout contracts: content panel selectors (constants ↔ e2e)', () => 
       );
     }
   });
+
+  it('maintenance content panel selector is wired for zoom guard', async () => {
+    const { CONTENT_PANEL_SELECTORS } =
+      await import('../../src/constants/content-panel');
+    const { MAINTENANCE_CONTENT_PANEL_CASE } =
+      await import('../../e2e/helpers/zoom-guard');
+
+    expect(CONTENT_PANEL_SELECTORS.maintenance).toBe('.route-maintenance-panel');
+    expect(MAINTENANCE_CONTENT_PANEL_CASE.contentPanelSelector).toBe(
+      CONTENT_PANEL_SELECTORS.maintenance,
+    );
+    expect(MAINTENANCE_CONTENT_PANEL_CASE.path).toBe('/writing');
+  });
 });
 
 /*
