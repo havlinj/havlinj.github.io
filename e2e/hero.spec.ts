@@ -56,7 +56,6 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('h1.page-title')).toHaveText('Jan Havlín');
     await expect(page.locator('section.hero')).toBeVisible();
     await waitForHeroLoaded(page);
-    await expect(page.locator('.hero-name')).toHaveCount(0);
   });
 
   test('hero-header links point to correct pages', async ({ page }) => {
@@ -111,8 +110,6 @@ test.describe('Hero page (/)', () => {
       '© 2026 Jan Havlín',
     );
     await expect(page.locator('h1.page-title')).toHaveText('Jan Havlín');
-    await expect(page.locator('.hero-name')).toHaveCount(0);
-    await expect(page.locator('.hero-role')).toHaveCount(0);
     const tagline = page.locator('.tagline:not(.tagline--sub)');
     await expect(tagline).toBeVisible();
     await expect(tagline).toContainText('Making sense of');
@@ -168,12 +165,12 @@ test.describe('Hero page (/)', () => {
     ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
-  test('tagline visible text layer present', async ({ page }) => {
+  test('tagline copy is visible', async ({ page }) => {
     await waitForHeroLoaded(page);
-    const leadText = page.locator('.tagline:not(.tagline--sub) .tagline__text');
+    const leadText = page.locator('.tagline:not(.tagline--sub)');
     await expect(leadText).toBeVisible();
     await expect(leadText).toContainText('the craft');
-    const subText = page.locator('.tagline--sub .tagline__text');
+    const subText = page.locator('.tagline--sub');
     await expect(subText).toBeVisible();
     await expect(subText).toContainText(
       'As I build software systems…',
@@ -200,11 +197,6 @@ test.describe('Hero page (/)', () => {
         { timeout: 2500, intervals: [80, 140, 220] },
       )
       .toBeLessThanOrEqual(2);
-  });
-
-  test('hero-role is not present', async ({ page }) => {
-    await waitForHeroLoaded(page);
-    await expect(page.locator('.hero-role')).toHaveCount(0);
   });
 
   test('hero section - last screenshot matches', async ({ page }) => {

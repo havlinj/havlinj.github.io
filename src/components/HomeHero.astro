@@ -20,32 +20,20 @@ const { sources: heroBg }: Props = Astro.props;
 <article class="content-panel-page">
   <h1 class="page-title">Jan Havlín</h1>
   <section class="hero content-panel">
-    <figure class="hero-figure">
-      <div class="hero-bg" aria-hidden="true">
-        <ResponsiveDichromPicture
-          sources={heroBg}
-          width={2736}
-          height={3420}
-          alt="Hero background"
-          class="hero-bg__image"
-          fetchpriority="high"
-        />
-      </div>
+    <figure class="hero-figure" aria-hidden="true">
+      <ResponsiveDichromPicture
+        sources={heroBg}
+        width={2736}
+        height={3420}
+        alt="Hero background"
+        class="hero-bg__image"
+        fetchpriority="high"
+      />
     </figure>
 
     <div class="hero-content">
-      <div class="hero-taglines">
-        <p class="tagline tagline--sub">
-          <span class="tagline__text"
-            >As I build software systems…</span
-          >
-        </p>
-        <p class="tagline">
-          <span class="tagline__text"
-            >Making sense of<br />the craft</span
-          >
-        </p>
-      </div>
+      <p class="tagline tagline--sub">As I build software systems…</p>
+      <p class="tagline">Making sense of<br />the craft</p>
     </div>
   </section>
 </article>

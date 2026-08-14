@@ -11,11 +11,6 @@
    * Typography and spacing as fractions of hero edge (100cqw),
    * calibrated from the original 100% layout.
    */
-  --hero-name-font-size: clamp(0.78rem, 4.55cqw, 2.30rem);
-  --hero-name-font-weight: 500;
-  --hero-name-letter-spacing: 0.08em;
-  --hero-name-line-height: 1.05;
-  --hero-name-highlight-outset: calc(0.1 * var(--hero-name-font-size));
   --hero-tagline-font-size: clamp(1.84rem, 10.82cqw, 5.47rem);
   --hero-tagline-font-weight: 700;
   --hero-tagline-letter-spacing: -0.042em;
@@ -25,7 +20,6 @@
   --hero-tagline-sub-letter-spacing: 0.018em;
   --hero-tagline-sub-line-height: 1.04;
   --hero-tagline-stack-gap: clamp(0.28rem, 1.55cqw, 0.78rem);
-  --hero-name-to-taglines-gap: clamp(2.27rem, 12.77cqw, 6.38rem);
   --hero-tagline-pad-y: clamp(0.24rem, 1.05cqw, 0.55rem);
   --hero-tagline-pad-x-right: clamp(0.52rem, 1.72cqw, 1.12rem);
   --hero-tagline-pad-x-left: clamp(0.16rem, 0.24cqw, 0.28rem);
@@ -43,13 +37,7 @@
   margin: 0;
 }
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-bg picture {
+.hero-figure picture {
   display: block;
   position: absolute;
   inset: 0;
@@ -93,6 +81,10 @@
   z-index: 2;
   opacity: 0;
   transition: opacity 0.18s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--hero-tagline-stack-gap);
   hyphens: none;
   font-kerning: normal;
   font-feature-settings: 'kern' 1, 'liga' 1;
@@ -128,44 +120,6 @@
   justify-self: end;
 }
 
-.hero-name-box {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  margin-block-start: calc(
-    var(--hero-name-to-taglines-gap) + var(--hero-name-highlight-outset)
-  );
-}
-
-.hero-name {
-  margin: 0;
-  font-size: var(--hero-name-font-size);
-  font-weight: var(--hero-name-font-weight);
-  line-height: var(--hero-name-line-height);
-  letter-spacing: var(--hero-name-letter-spacing);
-  text-transform: uppercase;
-  white-space: nowrap;
-  padding-block-start: 0.14em;
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-}
-
-.hero-name::before {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--hero-name-highlight-outset));
-  background-color: var(--hero-highlight-bg);
-  z-index: -1;
-}
-
-.hero-taglines {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--hero-tagline-stack-gap);
-}
-
 .tagline {
   font-size: var(--hero-tagline-font-size);
   font-weight: var(--hero-tagline-font-weight);
@@ -190,11 +144,4 @@
   padding-block: calc(var(--hero-tagline-pad-y) * 0.85);
   max-width: none;
   white-space: nowrap;
-}
-
-/* Tagline text: solid var(--color-ink) on top, no shadow */
-.tagline__text {
-  position: relative;
-  z-index: 1;
-  color: var(--color-ink);
 }
