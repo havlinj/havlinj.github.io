@@ -20,7 +20,6 @@ export const CONTENT_PANEL_CASES: readonly ContentPanelCase[] = [
     contentPanelSelector: CONTENT_PANEL_SELECTORS.hero,
     requiredInsideSelectors: [
       '.hero-content',
-      '.hero-grid',
       '.hero-name',
       '.tagline',
     ],

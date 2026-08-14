@@ -10,7 +10,7 @@ Born in 1993, in the early post-socialist era shortly after the fall of the comm
 
 Historically, without the communist period, would not have been much to catch up to. Up until World War II, we were among the more advanced nations relative to our size. The following decades under Soviet influence caused lasting damage. The post-revolution privatization of state assets, often poorly executed, only reinforced that trajectory.
 
-Even today, it is encouraging to see signs that the Czech Republic is gradually re-emerging and proving again that it has capable and intelligent people. I believe the country is slowly shifting from being the “assembly line of Europe” toward a stronger R&D-oriented economy, including a solid IT sector. In a slightly exaggerated sense, I see my own work as contributing to that direction.
+Even today, it is encouraging to see signs that the Czech Republic is gradually re-emerging and proving again that it has capable and intelligent people. I believe the country is finally shifting from being the “assembly line of Europe” toward a stronger R&D-oriented economy, including a solid IT sector. In a slightly exaggerated sense, I see my own work as contributing to that direction.
 
 ---
 

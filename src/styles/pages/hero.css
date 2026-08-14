@@ -6,23 +6,28 @@
   container-type: inline-size;
   /* Composition anchor offsets (default: exact center of the square) */
   --hero-composition-offset-x: 0%;
-  --hero-composition-offset-y: -0.5%;
+  --hero-composition-offset-y: 3%;
   /*
    * Typography and spacing as fractions of hero edge (100cqw),
    * calibrated from the original 100% layout.
    */
-  --hero-grid-gap: clamp(0.9rem, 5.0314cqw, 2.55rem);
-  --hero-name-font-size: clamp(2.24rem, 10.3714cqw, 5.29rem);
-  --hero-role-font-size: clamp(0.76rem, 2.9146cqw, 1.46rem);
-  --hero-role-row-gap: clamp(0.24rem, 1.0063cqw, 0.58rem);
-  --hero-role-band-pad-inline-start: clamp(0.32rem, 1cqw, 0.55rem);
-  --hero-role-band-pad-inline-end: clamp(0.28rem, 1.65cqw, 0.86rem);
-  --hero-tagline-font-size: clamp(1.46rem, 8.64cqw, 4.37rem);
-  --hero-tagline-sub-font-size: clamp(0.85rem, 3.9cqw, 2rem);
-  --hero-tagline-margin-top: clamp(1.92rem, 11.05cqw, 5.61rem);
-  --hero-tagline-stack-gap: clamp(0.38rem, 2.2cqw, 1.1rem);
-  --hero-tagline-pad-y: clamp(0.22rem, 0.96cqw, 0.5rem);
-  --hero-tagline-pad-x-right: clamp(0.48rem, 1.6cqw, 1.05rem);
+  --hero-name-font-size: clamp(0.78rem, 4.55cqw, 2.30rem);
+  --hero-name-font-weight: 500;
+  --hero-name-letter-spacing: 0.08em;
+  --hero-name-line-height: 1.05;
+  --hero-name-highlight-outset: calc(0.1 * var(--hero-name-font-size));
+  --hero-tagline-font-size: clamp(1.98rem, 11.63cqw, 5.88rem);
+  --hero-tagline-font-weight: 700;
+  --hero-tagline-letter-spacing: -0.042em;
+  --hero-tagline-line-height: 1.06;
+  --hero-tagline-sub-font-size: clamp(0.9rem, 4.56cqw, 2.33rem);
+  --hero-tagline-sub-font-weight: 500;
+  --hero-tagline-sub-letter-spacing: 0.018em;
+  --hero-tagline-sub-line-height: 1.04;
+  --hero-tagline-stack-gap: clamp(0.28rem, 1.55cqw, 0.78rem);
+  --hero-name-to-taglines-gap: clamp(1.89rem, 10.64cqw, 5.32rem);
+  --hero-tagline-pad-y: clamp(0.24rem, 1.05cqw, 0.55rem);
+  --hero-tagline-pad-x-right: clamp(0.52rem, 1.72cqw, 1.12rem);
   --hero-tagline-pad-x-left: clamp(0.16rem, 0.24cqw, 0.28rem);
   --hero-tagline-max-width: min(100%, 21ch);
 }
@@ -79,10 +84,6 @@
 }
 
 .hero-content {
-  /*
-   * Keep the foreground composition (name/role/tagline) centered in the hero square.
-   * Adjustable via --hero-composition-offset-x/y while staying tied to square center.
-   */
   position: absolute;
   left: calc(50% + var(--hero-composition-offset-x));
   top: calc(50% + var(--hero-composition-offset-y));
@@ -92,18 +93,16 @@
   z-index: 2;
   opacity: 0;
   transition: opacity 0.18s ease-out;
+  hyphens: none;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .hero.hero--ready .hero-content {
   opacity: 1;
-}
-
-.hero-grid {
-  margin-top: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: var(--hero-grid-gap);
-  align-items: center;
 }
 
 .hero-header {
@@ -133,15 +132,20 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  margin-block-start: calc(
+    var(--hero-name-to-taglines-gap) + var(--hero-name-highlight-outset)
+  );
 }
 
 .hero-name {
   margin: 0;
   font-size: var(--hero-name-font-size);
-  line-height: 0.92;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: var(--hero-name-font-weight);
+  line-height: var(--hero-name-line-height);
+  letter-spacing: var(--hero-name-letter-spacing);
+  text-transform: uppercase;
   white-space: nowrap;
+  padding-block-start: 0.14em;
   position: relative;
   z-index: 1;
   display: inline-block;
@@ -150,43 +154,7 @@
 .hero-name::before {
   content: '';
   position: absolute;
-  inset-block: -0.12em -0.16em;
-  inset-inline: -0.18em -0.18em;
-  background-color: var(--hero-highlight-bg);
-  z-index: -1;
-}
-
-.hero-role {
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  justify-self: end;
-  width: max-content;
-  gap: var(--hero-role-row-gap);
-}
-
-.hero-role span {
-  min-width: 0;
-  margin: 0;
-  white-space: nowrap;
-  font-size: var(--hero-role-font-size);
-  line-height: 1.1;
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding-inline-start: var(--hero-role-band-pad-inline-start);
-  padding-inline-end: var(--hero-role-band-pad-inline-end);
-  position: relative;
-  z-index: 1;
-}
-
-.hero-role span::before {
-  content: '';
-  position: absolute;
-  inset-block: -0.08em -0.1em;
-  inset-inline: -0.18em -0.18em;
+  inset: calc(-1 * var(--hero-name-highlight-outset));
   background-color: var(--hero-highlight-bg);
   z-index: -1;
 }
@@ -196,15 +164,14 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--hero-tagline-stack-gap);
-  margin-block-start: var(--hero-tagline-margin-top);
 }
 
 .tagline {
   font-size: var(--hero-tagline-font-size);
-  font-weight: 700;
-  line-height: 1.33;
+  font-weight: var(--hero-tagline-font-weight);
+  line-height: var(--hero-tagline-line-height);
   max-width: var(--hero-tagline-max-width);
-  letter-spacing: 0.008em;
+  letter-spacing: var(--hero-tagline-letter-spacing);
   margin: 0;
   padding: var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-right)
     var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-left);
@@ -217,6 +184,10 @@
 
 .tagline--sub {
   font-size: var(--hero-tagline-sub-font-size);
+  font-weight: var(--hero-tagline-sub-font-weight);
+  line-height: var(--hero-tagline-sub-line-height);
+  letter-spacing: var(--hero-tagline-sub-letter-spacing);
+  padding-block: calc(var(--hero-tagline-pad-y) * 0.85);
   max-width: none;
   white-space: nowrap;
 }

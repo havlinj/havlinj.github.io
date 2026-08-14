@@ -50,11 +50,11 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.site-header')).not.toBeVisible();
   });
 
-  test('has hero heading "Hi there" and hero section with name Jan Havlín', async ({
+  test('has hero heading "Collected notes" and hero section with name Jan Havlín', async ({
     page,
   }) => {
     await expect(
-      page.getByRole('heading', { name: 'Hi there', level: 1 }),
+      page.getByRole('heading', { name: 'Collected notes', level: 1 }),
     ).toBeVisible();
     await expect(page.locator('section.hero')).toBeVisible();
     await waitForHeroLoaded(page);
@@ -115,22 +115,17 @@ test.describe('Hero page (/)', () => {
       '© 2026 Jan Havlín',
     );
     await expect(
-      page.getByRole('heading', { name: 'Hi there', level: 1 }),
+      page.getByRole('heading', { name: 'Collected notes', level: 1 }),
     ).toBeVisible();
     await expect(page.locator('.hero-name')).toBeVisible();
-    await expect(page.locator('.hero-role')).toBeVisible();
-    await expect(page.locator('.hero-role')).toContainText('SHAPING');
-    await expect(page.locator('.hero-role')).toContainText(
-      '& DELIVERING SYSTEMS',
-    );
+    await expect(page.locator('.hero-role')).toHaveCount(0);
     const tagline = page.locator('.tagline:not(.tagline--sub)');
     await expect(tagline).toBeVisible();
     await expect(tagline).toContainText('Making sense of');
     await expect(tagline).toContainText('the craft');
     const taglineSub = page.locator('.tagline--sub');
     await expect(taglineSub).toBeVisible();
-    await expect(taglineSub).toContainText('Reliable, fast,');
-    await expect(taglineSub).toContainText('high-impact software');
+    await expect(taglineSub).toContainText('As I build software systems…');
   });
 
   test('hero has figure with background image', async ({ page }) => {
@@ -181,14 +176,14 @@ test.describe('Hero page (/)', () => {
 
   test('tagline visible text layer present', async ({ page }) => {
     await waitForHeroLoaded(page);
-    const leadText = page.locator(
-      `${HERO_TAGLINE_SELECTORS.lead} .tagline__text`,
-    );
+    const leadText = page.locator('.tagline:not(.tagline--sub) .tagline__text');
     await expect(leadText).toBeVisible();
     await expect(leadText).toContainText('the craft');
-    const subText = page.locator(`${HERO_TAGLINE_SELECTORS.sub} .tagline__text`);
+    const subText = page.locator('.tagline--sub .tagline__text');
     await expect(subText).toBeVisible();
-    await expect(subText).toContainText('high-impact software');
+    await expect(subText).toContainText(
+      'As I build software systems…',
+    );
   });
 
   test('sub tagline band width matches the lead tagline band', async ({
@@ -213,16 +208,9 @@ test.describe('Hero page (/)', () => {
       .toBeLessThanOrEqual(2);
   });
 
-  test('hero-role shows two lines (SHAPING, & DELIVERING SYSTEMS)', async ({
-    page,
-  }) => {
+  test('hero-role is not present', async ({ page }) => {
     await waitForHeroLoaded(page);
-    const role = page.locator('.hero-role');
-    await expect(role).toBeVisible();
-    const spans = role.locator('span');
-    await expect(spans).toHaveCount(2);
-    await expect(spans.nth(0)).toHaveText('SHAPING');
-    await expect(spans.nth(1)).toHaveText('& DELIVERING SYSTEMS');
+    await expect(page.locator('.hero-role')).toHaveCount(0);
   });
 
   test('hero section - last screenshot matches', async ({ page }) => {
