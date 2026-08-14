@@ -6,7 +6,7 @@
   container-type: inline-size;
   /* Composition anchor offsets (default: exact center of the square) */
   --hero-composition-offset-x: 0%;
-  --hero-composition-offset-y: 3%;
+  --hero-composition-offset-y: 4%;
   /*
    * Typography and spacing as fractions of hero edge (100cqw),
    * calibrated from the original 100% layout.
@@ -16,7 +16,7 @@
   --hero-name-letter-spacing: 0.08em;
   --hero-name-line-height: 1.05;
   --hero-name-highlight-outset: calc(0.1 * var(--hero-name-font-size));
-  --hero-tagline-font-size: clamp(1.98rem, 11.63cqw, 5.88rem);
+  --hero-tagline-font-size: clamp(1.84rem, 10.82cqw, 5.47rem);
   --hero-tagline-font-weight: 700;
   --hero-tagline-letter-spacing: -0.042em;
   --hero-tagline-line-height: 1.06;
@@ -25,7 +25,7 @@
   --hero-tagline-sub-letter-spacing: 0.018em;
   --hero-tagline-sub-line-height: 1.04;
   --hero-tagline-stack-gap: clamp(0.28rem, 1.55cqw, 0.78rem);
-  --hero-name-to-taglines-gap: clamp(1.89rem, 10.64cqw, 5.32rem);
+  --hero-name-to-taglines-gap: clamp(2.27rem, 12.77cqw, 6.38rem);
   --hero-tagline-pad-y: clamp(0.24rem, 1.05cqw, 0.55rem);
   --hero-tagline-pad-x-right: clamp(0.52rem, 1.72cqw, 1.12rem);
   --hero-tagline-pad-x-left: clamp(0.16rem, 0.24cqw, 0.28rem);

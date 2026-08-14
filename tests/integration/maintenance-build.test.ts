@@ -83,7 +83,7 @@ describe('maintenance build integration', () => {
     expect(home).toContain('global-maintenance-page');
     expect(home).toContain('Started on 26.08.07.');
     expect(home).not.toContain('class="hero-header"');
-    expect(home).not.toContain('Collected notes');
+    expect(home).not.toContain('class="page-title">Jan Havlín');
 
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);

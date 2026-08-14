@@ -18,7 +18,6 @@ const CASES = [
     rightAnchorSelector: '.hero-header__inner a[href="/contact"]',
     requiredInsideSelectors: [
       '.hero-content',
-      '.hero-name',
       '.tagline',
     ],
   },
@@ -179,7 +178,6 @@ test.describe('Content panel containment matrix', () => {
                   insideOverflowing.every((sel) =>
                     [
                       '.hero-content',
-                      '.hero-name',
                       '.tagline',
                     ].includes(sel),
                   )

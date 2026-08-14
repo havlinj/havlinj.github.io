@@ -50,17 +50,13 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.site-header')).not.toBeVisible();
   });
 
-  test('has hero heading "Collected notes" and hero section with name Jan Havlín', async ({
+  test('has hero heading "Jan Havlín" and hero section', async ({
     page,
   }) => {
-    await expect(
-      page.getByRole('heading', { name: 'Collected notes', level: 1 }),
-    ).toBeVisible();
+    await expect(page.locator('h1.page-title')).toHaveText('Jan Havlín');
     await expect(page.locator('section.hero')).toBeVisible();
     await waitForHeroLoaded(page);
-    const heroName = page.locator('.hero-name');
-    await expect(heroName).toBeVisible();
-    await expect(heroName).toContainText('Jan Havlín');
+    await expect(page.locator('.hero-name')).toHaveCount(0);
   });
 
   test('hero-header links point to correct pages', async ({ page }) => {
@@ -114,10 +110,8 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('footer.site-footer')).toContainText(
       '© 2026 Jan Havlín',
     );
-    await expect(
-      page.getByRole('heading', { name: 'Collected notes', level: 1 }),
-    ).toBeVisible();
-    await expect(page.locator('.hero-name')).toBeVisible();
+    await expect(page.locator('h1.page-title')).toHaveText('Jan Havlín');
+    await expect(page.locator('.hero-name')).toHaveCount(0);
     await expect(page.locator('.hero-role')).toHaveCount(0);
     const tagline = page.locator('.tagline:not(.tagline--sub)');
     await expect(tagline).toBeVisible();
