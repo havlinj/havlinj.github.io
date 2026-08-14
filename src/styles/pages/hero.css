@@ -12,11 +12,15 @@
    * calibrated from the original 100% layout.
    */
   --hero-grid-gap: clamp(0.9rem, 5.0314cqw, 2.55rem);
-  --hero-name-font-size: clamp(2.1rem, 9.7202cqw, 4.95rem);
-  --hero-role-font-size: clamp(0.76rem, 2.9161cqw, 1.45rem);
+  --hero-name-font-size: clamp(2.24rem, 10.3714cqw, 5.29rem);
+  --hero-role-font-size: clamp(0.76rem, 2.9146cqw, 1.46rem);
   --hero-role-row-gap: clamp(0.24rem, 1.0063cqw, 0.58rem);
-  --hero-tagline-font-size: clamp(1.35rem, 8cqw, 4.05rem);
-  --hero-tagline-margin-top: clamp(0.95rem, 5.5346cqw, 2.8rem);
+  --hero-role-band-pad-inline-start: clamp(0.32rem, 1cqw, 0.55rem);
+  --hero-role-band-pad-inline-end: clamp(0.28rem, 1.65cqw, 0.86rem);
+  --hero-tagline-font-size: clamp(1.46rem, 8.64cqw, 4.37rem);
+  --hero-tagline-sub-font-size: clamp(0.85rem, 3.9cqw, 2rem);
+  --hero-tagline-margin-top: clamp(1.92rem, 11.05cqw, 5.61rem);
+  --hero-tagline-stack-gap: clamp(0.38rem, 2.2cqw, 1.1rem);
   --hero-tagline-pad-y: clamp(0.22rem, 0.96cqw, 0.5rem);
   --hero-tagline-pad-x-right: clamp(0.48rem, 1.6cqw, 1.05rem);
   --hero-tagline-pad-x-left: clamp(0.16rem, 0.24cqw, 0.28rem);
@@ -158,6 +162,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  justify-self: end;
+  width: max-content;
   gap: var(--hero-role-row-gap);
 }
 
@@ -170,6 +176,8 @@
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  padding-inline-start: var(--hero-role-band-pad-inline-start);
+  padding-inline-end: var(--hero-role-band-pad-inline-end);
   position: relative;
   z-index: 1;
 }
@@ -183,13 +191,21 @@
   z-index: -1;
 }
 
+.hero-taglines {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--hero-tagline-stack-gap);
+  margin-block-start: var(--hero-tagline-margin-top);
+}
+
 .tagline {
   font-size: var(--hero-tagline-font-size);
   font-weight: 700;
   line-height: 1.33;
   max-width: var(--hero-tagline-max-width);
   letter-spacing: 0.008em;
-  margin-block-start: var(--hero-tagline-margin-top);
+  margin: 0;
   padding: var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-right)
     var(--hero-tagline-pad-y) var(--hero-tagline-pad-x-left);
   position: relative;
@@ -197,6 +213,12 @@
   z-index: 1;
   color: var(--color-ink);
   background-color: var(--hero-highlight-bg);
+}
+
+.tagline--sub {
+  font-size: var(--hero-tagline-sub-font-size);
+  max-width: none;
+  white-space: nowrap;
 }
 
 /* Tagline text: solid var(--color-ink) on top, no shadow */

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { LAYOUT_TOLERANCE } from './constants';
+import { HERO_TAGLINE_SELECTORS } from '../src/constants/hero-tagline';
 import {
   hasAstroStylesheetBundle,
   mustBox,
@@ -118,14 +119,18 @@ test.describe('Hero page (/)', () => {
     ).toBeVisible();
     await expect(page.locator('.hero-name')).toBeVisible();
     await expect(page.locator('.hero-role')).toBeVisible();
+    await expect(page.locator('.hero-role')).toContainText('SHAPING');
     await expect(page.locator('.hero-role')).toContainText(
-      'BACKEND ARCHITECTURE',
+      '& DELIVERING SYSTEMS',
     );
-    await expect(page.locator('.hero-role')).toContainText('& SYSTEMS');
-    const tagline = page.locator('.tagline');
+    const tagline = page.locator('.tagline:not(.tagline--sub)');
     await expect(tagline).toBeVisible();
-    await expect(tagline).toContainText('Building reliable');
-    await expect(tagline).toContainText('from the ground up');
+    await expect(tagline).toContainText('Making sense of');
+    await expect(tagline).toContainText('the craft');
+    const taglineSub = page.locator('.tagline--sub');
+    await expect(taglineSub).toBeVisible();
+    await expect(taglineSub).toContainText('Reliable, fast,');
+    await expect(taglineSub).toContainText('high-impact software');
   });
 
   test('hero has figure with background image', async ({ page }) => {
@@ -176,13 +181,39 @@ test.describe('Hero page (/)', () => {
 
   test('tagline visible text layer present', async ({ page }) => {
     await waitForHeroLoaded(page);
-    await expect(page.locator('.tagline__text')).toBeVisible();
-    await expect(page.locator('.tagline__text')).toContainText(
-      'from the ground up',
+    const leadText = page.locator(
+      `${HERO_TAGLINE_SELECTORS.lead} .tagline__text`,
     );
+    await expect(leadText).toBeVisible();
+    await expect(leadText).toContainText('the craft');
+    const subText = page.locator(`${HERO_TAGLINE_SELECTORS.sub} .tagline__text`);
+    await expect(subText).toBeVisible();
+    await expect(subText).toContainText('high-impact software');
   });
 
-  test('hero-role shows two lines (BACKEND ARCHITECTURE, & SYSTEMS)', async ({
+  test('sub tagline band width matches the lead tagline band', async ({
+    page,
+  }) => {
+    await waitForHeroLoaded(page);
+    await expect
+      .poll(
+        async () =>
+          page.evaluate((selectors) => {
+            const lead = document.querySelector(selectors.lead);
+            const sub = document.querySelector(selectors.sub);
+            if (!(lead instanceof HTMLElement) || !(sub instanceof HTMLElement))
+              return Number.POSITIVE_INFINITY;
+            return Math.abs(
+              lead.getBoundingClientRect().width -
+                sub.getBoundingClientRect().width,
+            );
+          }, HERO_TAGLINE_SELECTORS),
+        { timeout: 2500, intervals: [80, 140, 220] },
+      )
+      .toBeLessThanOrEqual(2);
+  });
+
+  test('hero-role shows two lines (SHAPING, & DELIVERING SYSTEMS)', async ({
     page,
   }) => {
     await waitForHeroLoaded(page);
@@ -190,8 +221,8 @@ test.describe('Hero page (/)', () => {
     await expect(role).toBeVisible();
     const spans = role.locator('span');
     await expect(spans).toHaveCount(2);
-    await expect(spans.nth(0)).toHaveText('BACKEND ARCHITECTURE');
-    await expect(spans.nth(1)).toHaveText('& SYSTEMS');
+    await expect(spans.nth(0)).toHaveText('SHAPING');
+    await expect(spans.nth(1)).toHaveText('& DELIVERING SYSTEMS');
   });
 
   test('hero section - last screenshot matches', async ({ page }) => {
