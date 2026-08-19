@@ -16,10 +16,7 @@ const CASES = [
     headerSelector: '.hero-header__inner',
     leftAnchorSelector: '.hero-header__inner a[href="/profile"]',
     rightAnchorSelector: '.hero-header__inner a[href="/contact"]',
-    requiredInsideSelectors: [
-      '.hero-content',
-      '.tagline',
-    ],
+    requiredInsideSelectors: ['.hero-content', '.tagline'],
   },
   {
     name: 'profile',
@@ -176,10 +173,7 @@ test.describe('Content panel containment matrix', () => {
               : isExtremeMobileHeroZoom
                 ? insideMissing.length === 0 &&
                   insideOverflowing.every((sel) =>
-                    [
-                      '.hero-content',
-                      '.tagline',
-                    ].includes(sel),
+                    ['.hero-content', '.tagline'].includes(sel),
                   )
                 : inside.ok;
           expect(
@@ -218,13 +212,19 @@ test.describe('Content panel containment matrix', () => {
               const panelRect = contentPanel.getBoundingClientRect();
               const leftRect = leftAnchor.getBoundingClientRect();
               const rightRect = rightAnchor.getBoundingClientRect();
+              const insetPx = parseFloat(
+                getComputedStyle(contentPanel).marginLeft,
+              );
               const tol = 5;
-              const leftDelta = Math.abs(panelRect.left - leftRect.left);
+              const leftDelta = Math.abs(
+                panelRect.left - leftRect.left - insetPx,
+              );
               const rightDelta = Math.abs(panelRect.right - rightRect.right);
               return {
                 ok: leftDelta <= tol && rightDelta <= tol,
                 leftDelta,
                 rightDelta,
+                insetPx,
               };
             },
             {
@@ -255,6 +255,14 @@ test.describe('Content panel containment matrix', () => {
               edge,
             )}`,
           ).toBe(true);
+
+          if (zoom === 1) {
+            const insetPx = (edge as { insetPx?: number }).insetPx ?? 0;
+            expect(
+              insetPx,
+              `${c.name} --content-panel-left-inset should be > 0 at ${entry.viewport.width}x${entry.viewport.height}`,
+            ).toBeGreaterThan(0);
+          }
         }
       }
 

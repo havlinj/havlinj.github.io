@@ -237,6 +237,12 @@ describe('layout contracts: unified content panel skeleton', () => {
     );
     expect(cssCustomProp(global, '--content-panel-title-gap')).toBe('1.35rem');
     expect(cssCustomProp(global, '--page-nav-margin-bottom')).toBe('1rem');
+    expect(cssCustomProp(global, '--content-panel-left-inset')).toBe(
+      '0.072em',
+    );
+    expect(css).toContain(
+      'margin-left: var(--content-panel-left-inset)',
+    );
   });
 
   it('Layout.astro loads content-panel.css after page-buttons.css', () => {
@@ -296,6 +302,22 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(readRepoFile('src/components/HomeHero.astro')).not.toContain(
       'hero-top-edge',
     );
+  });
+
+  it('hero composition is two taglines over the photo', () => {
+    const astro = readRepoFile('src/components/HomeHero.astro');
+    expect(astro).toContain('tagline tagline--sub');
+    expect(astro).toContain('As I build software systems…');
+    expect(astro).toContain('Making sense of');
+    expect(astro).not.toContain('hero-name');
+    expect(astro).not.toContain('hero-role');
+    expect(astro).not.toContain('hero-taglines');
+    expect(astro).not.toContain('tagline__text');
+    expect(astro).not.toContain('class="hero-bg"');
+    const css = readRepoFile('src/styles/pages/hero.css');
+    expect(css).not.toContain('.hero-name');
+    expect(css).not.toContain('.hero-role');
+    expect(css).not.toContain('.hero-taglines');
   });
 
   it('profile critical head CSS only hides, it does not re-declare geometry', () => {

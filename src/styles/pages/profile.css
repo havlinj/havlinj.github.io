@@ -134,15 +134,7 @@ article.has-buttons-panel {
   opacity: var(--profile-hero-bg-image-opacity);
 }
 
-.profile-section::after {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--profile-hero-optical-offset);
-  background: var(--hero-highlight-bg, var(--color-page-bg));
-  z-index: 1;
-  pointer-events: none;
-}
+
 
 /* Breakpoint px values: keep aligned with e2e/profile-seam-ratios.ts PROFILE_SEAM_MEDIA_MIN_WIDTHS */
 @media (min-width: 360px) {
@@ -171,7 +163,7 @@ article.has-buttons-panel {
 
 .profile-section > a[href='/why-this'] {
   position: absolute;
-  left: var(--profile-hero-optical-offset);
+  left: 0;
   width: min(var(--profile-why-width), 100%);
   height: min(var(--profile-why-height), 100%);
   top: clamp(
@@ -191,7 +183,7 @@ article.has-buttons-panel {
 
 .profile-section > a[href='/what-i-do'] {
   position: absolute;
-  left: var(--profile-hero-optical-offset);
+  left: 0;
   width: min(var(--profile-what-width), 100%);
   height: min(var(--profile-what-height), 100%);
   top: clamp(

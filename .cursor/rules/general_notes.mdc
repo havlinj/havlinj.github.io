@@ -50,13 +50,13 @@ footer.site-footer                      directly follows the panel; its own padd
 
 Use **content panel** in comments, tests, and cross-page layout logic. Shared selectors live in `src/constants/content-panel.ts`. Do not rename CSS classes unless migrating explicitly.
 
-**Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-composition-offset-*` (text positioning inside the hero panel).
+**Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-text-x/y` (text positioning inside the hero panel).
 
 ### Deliberate per-route differences
 
 These are design decisions, not drift — leave them alone:
 
-- **Left optical inset**: hero and profile cover the leftmost `--hero-optical-offset` (0.1em) of their photo with page background (`.hero::after`, `.profile-section::after`); profile tiles anchor to it. Writing and contact have no such inset.
+- **Left optical inset**: all content panels share `--content-panel-left-inset` (margin-left on `.content-panel`). No per-page `::after` overlay strips — left edge is consistent across all routes.
 - **Nav distribution**: `.hero-header__inner` is a 3-column grid (middle link truly centred), `.site-header__inner` is `space-between`. Both are one baseline-aligned row, so nav height matches.
 - **Inner padding**: writing and contact drive content inset from `--panel-padding-*`; hero centres its composition on the square; profile positions tiles in %.
 

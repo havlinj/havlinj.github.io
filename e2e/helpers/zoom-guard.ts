@@ -18,10 +18,7 @@ export const CONTENT_PANEL_CASES: readonly ContentPanelCase[] = [
     name: 'hero',
     path: '/',
     contentPanelSelector: CONTENT_PANEL_SELECTORS.hero,
-    requiredInsideSelectors: [
-      '.hero-content',
-      '.tagline',
-    ],
+    requiredInsideSelectors: ['.hero-content', '.tagline'],
   },
   {
     name: 'profile',

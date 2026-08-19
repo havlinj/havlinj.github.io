@@ -1,17 +1,20 @@
 /* Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css. */
 .hero {
   /* Legacy ~1.1 scale on BG was translate+scale; oversampled tiers use sizing only (see .hero-bg__image). */
-  --hero-bg-zoom: 1.1;
+  --hero-bg-zoom: 2;
+  --hero-bg-image-opacity: 1;
   /* Tagline sizing should follow hero width (not viewport) */
   container-type: inline-size;
-  /* Composition anchor offsets (default: exact center of the square) */
-  --hero-composition-offset-x: 0%;
-  --hero-composition-offset-y: 4%;
+  --hero-bg-nudge-x: 0.0;
+  --hero-bg-nudge-y: 0.0;
+  /* Text anchor: 0% = left/top edge, 50% = center, 100% = right/bottom edge */
+  --hero-text-x: 50%;
+  --hero-text-y: 40%;
   /*
    * Typography and spacing as fractions of hero edge (100cqw),
    * calibrated from the original 100% layout.
    */
-  --hero-tagline-font-size: clamp(1.84rem, 10.82cqw, 5.47rem);
+  --hero-tagline-font-size: clamp(1.78rem, 10.45cqw, 5.28rem);
   --hero-tagline-font-weight: 700;
   --hero-tagline-letter-spacing: -0.042em;
   --hero-tagline-line-height: 1.06;
@@ -28,10 +31,7 @@
 
 .hero-figure {
   position: absolute;
-  top: 0;
-  right: -15%;
-  bottom: 0;
-  left: -20%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   margin: 0;
@@ -45,16 +45,6 @@
   height: 100%;
 }
 
-/* Left overlay (page background), width: --hero-optical-offset */
-.hero::after {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--hero-optical-offset);
-  background: var(--hero-highlight-bg);
-  z-index: 1;
-  pointer-events: none;
-}
 
 .hero-bg__image {
   position: absolute;
@@ -64,7 +54,8 @@
   width: calc(100% * var(--hero-bg-zoom, 1.1));
   height: calc(100% * var(--hero-bg-zoom, 1.1));
   object-fit: cover;
-  object-position: center;
+  object-position: calc(50% + var(--hero-bg-nudge-x, 0) * 100cqw)
+    calc(50% + var(--hero-bg-nudge-y, 0) * 100cqw);
   image-rendering: auto;
   filter: brightness(var(--hero-bg-brightness, 0.88))
     saturate(var(--hero-bg-saturate, 1.12));
@@ -73,9 +64,9 @@
 
 .hero-content {
   position: absolute;
-  left: calc(50% + var(--hero-composition-offset-x));
-  top: calc(50% + var(--hero-composition-offset-y));
-  transform: translate(-50%, -50%);
+  left: 0;
+  top: var(--hero-text-y);
+  transform: translateY(-50%);
   width: 100%;
   max-width: 100%;
   z-index: 2;
@@ -87,7 +78,9 @@
   gap: var(--hero-tagline-stack-gap);
   hyphens: none;
   font-kerning: normal;
-  font-feature-settings: 'kern' 1, 'liga' 1;
+  font-feature-settings:
+    'kern' 1,
+    'liga' 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

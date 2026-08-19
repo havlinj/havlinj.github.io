@@ -39,6 +39,7 @@
   --content-panel-title-gap: 1.35rem;
   --hero-highlight-bg: var(--color-page-bg);
   --hero-optical-offset: 0.1em;
+  --content-panel-left-inset: 0.072em;
   /* Hero photo: avoid heavy saturate() defaults (uneven on some color paths). */
   --hero-bg-brightness: 0.88;
   --hero-bg-saturate: 1.12;

@@ -8,9 +8,8 @@ import {
   readStylesheetHrefs,
 } from './helpers';
 
-/** Wait for hero section and background image to be in the DOM. */
 async function waitForHeroLoaded(page: Page) {
-  await page.locator('section.hero').waitFor({ state: 'visible' });
+  await page.locator('section.hero.hero--ready').waitFor({ state: 'visible' });
   await page.locator('.hero-bg__image').waitFor({ state: 'visible' });
 }
 
@@ -50,9 +49,7 @@ test.describe('Hero page (/)', () => {
     await expect(page.locator('.site-header')).not.toBeVisible();
   });
 
-  test('has hero heading "Jan Havlín" and hero section', async ({
-    page,
-  }) => {
+  test('has hero heading "Jan Havlín" and hero section', async ({ page }) => {
     await expect(page.locator('h1.page-title')).toHaveText('Jan Havlín');
     await expect(page.locator('section.hero')).toBeVisible();
     await waitForHeroLoaded(page);
@@ -165,16 +162,22 @@ test.describe('Hero page (/)', () => {
     ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
-  test('tagline copy is visible', async ({ page }) => {
+  test('hero content is two taglines with no name or role', async ({
+    page,
+  }) => {
     await waitForHeroLoaded(page);
-    const leadText = page.locator('.tagline:not(.tagline--sub)');
-    await expect(leadText).toBeVisible();
-    await expect(leadText).toContainText('the craft');
-    const subText = page.locator('.tagline--sub');
-    await expect(subText).toBeVisible();
-    await expect(subText).toContainText(
-      'As I build software systems…',
-    );
+    const content = page.locator('.hero-content');
+    const taglines = content.locator('.tagline');
+    await expect(taglines).toHaveCount(2);
+    await expect(taglines.nth(0)).toHaveClass(/tagline--sub/);
+    await expect(taglines.nth(0)).toHaveText('As I build software systems…');
+    await expect(taglines.nth(0).locator('br')).toHaveCount(0);
+    await expect(taglines.nth(1)).toContainText('Making sense of');
+    await expect(taglines.nth(1)).toContainText('the craft');
+    await expect(taglines.nth(1).locator('br')).toHaveCount(1);
+    await expect(page.locator('.hero-name')).toHaveCount(0);
+    await expect(page.locator('.hero-role')).toHaveCount(0);
+    await expect(page.locator('h1')).toHaveCount(1);
   });
 
   test('sub tagline band width matches the lead tagline band', async ({
@@ -197,6 +200,19 @@ test.describe('Hero page (/)', () => {
         { timeout: 2500, intervals: [80, 140, 220] },
       )
       .toBeLessThanOrEqual(2);
+
+    const sizes = await page.evaluate((selectors) => {
+      const lead = document.querySelector(selectors.lead);
+      const sub = document.querySelector(selectors.sub);
+      if (!(lead instanceof HTMLElement) || !(sub instanceof HTMLElement))
+        return { lead: 0, sub: 0 };
+      return {
+        lead: parseFloat(getComputedStyle(lead).fontSize),
+        sub: parseFloat(getComputedStyle(sub).fontSize),
+      };
+    }, HERO_TAGLINE_SELECTORS);
+    expect(sizes.sub).toBeGreaterThan(0);
+    expect(sizes.sub).toBeLessThan(sizes.lead);
   });
 
   test('hero section - last screenshot matches', async ({ page }) => {

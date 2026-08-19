@@ -57,10 +57,7 @@ function queryFitState(): TaglineFitState | null {
 }
 
 export function initHeroTaglineWidthFit(): void {
-  function boot(): void {
-    const state = queryFitState();
-    if (!state) return;
-
+  function startWidthFit(state: TaglineFitState): void {
     let raf = 0;
     function scheduleFit(): void {
       if (raf !== 0) return;
@@ -77,6 +74,12 @@ export function initHeroTaglineWidthFit(): void {
     observer.observe(state.hero);
     observer.observe(state.lead);
     window.addEventListener('resize', scheduleFit);
+  }
+
+  function boot(): void {
+    const state = queryFitState();
+    if (!state) return;
+    startWidthFit(state);
   }
 
   void waitForFonts().then(() => {

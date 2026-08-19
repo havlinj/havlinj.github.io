@@ -16,11 +16,12 @@
 
 .content-panel {
   position: relative;
-  width: 100%;
-  max-width: 100%;
+  width: calc(100% - var(--content-panel-left-inset));
+  max-width: calc(100% - var(--content-panel-left-inset));
   /* Square, tracking the width of `main.content` (its inline-size container). */
   height: 100cqw;
   margin: 0;
+  margin-left: var(--content-panel-left-inset);
   /* Never let a flex parent stretch or shrink the square. */
   flex: 0 0 auto;
   overflow: hidden;
