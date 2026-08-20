@@ -1,7 +1,7 @@
 /* Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css. */
 .hero {
   /* Legacy ~1.1 scale on BG was translate+scale; oversampled tiers use sizing only (see .hero-bg__image). */
-  --hero-bg-zoom: 2;
+  --hero-bg-zoom: 1.5;
   --hero-bg-image-opacity: 1;
   /* Tagline sizing should follow hero width (not viewport) */
   container-type: inline-size;
