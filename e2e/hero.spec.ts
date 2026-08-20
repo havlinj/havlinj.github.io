@@ -69,7 +69,7 @@ test.describe('Hero page (/)', () => {
     await expect(page).toHaveURL(/\/profile$/);
   });
 
-  test('hero-header: Profile left, Writing center, Contact right', async ({
+  test('hero-header: Profile left, Writing between, Contact right (space-between)', async ({
     page,
   }) => {
     const inner = page.locator('.hero-header__inner');
@@ -81,15 +81,51 @@ test.describe('Hero page (/)', () => {
     const pBox = await mustBox(profile);
     const wBox = await mustBox(writing);
     const cBox = await mustBox(contact);
+    expect(pBox.x).toBeLessThanOrEqual(box.x + LAYOUT_TOLERANCE);
     expect(pBox.x).toBeLessThanOrEqual(wBox.x + LAYOUT_TOLERANCE);
     expect(wBox.x).toBeLessThanOrEqual(cBox.x + LAYOUT_TOLERANCE);
-    expect(pBox.x).toBeLessThanOrEqual(box.x + LAYOUT_TOLERANCE);
     expect(cBox.x + cBox.width).toBeGreaterThanOrEqual(
       box.x + box.width - LAYOUT_TOLERANCE,
     );
-    const mid = box.x + box.width / 2;
-    expect(wBox.x + wBox.width / 2).toBeGreaterThanOrEqual(mid - box.width / 3);
-    expect(wBox.x + wBox.width / 2).toBeLessThanOrEqual(mid + box.width / 3);
+  });
+
+  test('hero Writing link matches Profile Writing under the same space-between nav', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
+
+    async function writingOffsetInMain(innerSelector: string) {
+      return page.evaluate((sel) => {
+        const main = document.querySelector('main.content');
+        const link = document.querySelector(`${sel} a[href="/writing"]`);
+        if (!(main instanceof HTMLElement) || !(link instanceof HTMLElement)) {
+          return null;
+        }
+        const mainRect = main.getBoundingClientRect();
+        const linkRect = link.getBoundingClientRect();
+        return {
+          left: linkRect.left - mainRect.left,
+          width: linkRect.width,
+        };
+      }, innerSelector);
+    }
+
+    await page.goto('/');
+    const hero = await writingOffsetInMain('.hero-header__inner');
+    expect(hero).not.toBeNull();
+
+    await page.goto('/profile');
+    const site = await writingOffsetInMain('.site-header__inner');
+    expect(site).not.toBeNull();
+
+    expect(
+      Math.abs(hero!.left - site!.left),
+      `Writing left offset hero=${hero!.left} profile=${site!.left}`,
+    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
+    expect(
+      Math.abs(hero!.width - site!.width),
+      `Writing width hero=${hero!.width} profile=${site!.width}`,
+    ).toBeLessThanOrEqual(LAYOUT_TOLERANCE);
   });
 
   test('content is in container with class content', async ({ page }) => {

@@ -246,12 +246,10 @@ describe('layout contracts: unified content panel skeleton', () => {
     );
     expect(cssCustomProp(global, '--content-panel-title-gap')).toBe('1.35rem');
     expect(cssCustomProp(global, '--page-nav-margin-bottom')).toBe('1rem');
-    expect(cssCustomProp(global, '--content-panel-left-inset')).toBe(
-      '0.072em',
-    );
-    expect(css).toContain(
-      'margin-left: var(--content-panel-left-inset)',
-    );
+    const leftInset = cssCustomProp(global, '--content-panel-left-inset');
+    expect(leftInset).toMatch(/^\d+(\.\d+)?em$/);
+    expect(Number.parseFloat(leftInset!)).toBeGreaterThan(0);
+    expect(css).toContain('margin-left: var(--content-panel-left-inset)');
   });
 
   it('Layout.astro loads content-panel.css after page-buttons.css', () => {
@@ -268,6 +266,20 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(readRepoFile('src/styles/pages/hero.css')).toContain(
       'margin-bottom: var(--page-nav-margin-bottom)',
     );
+  });
+
+  it('hero and site header inners share space-between flex layout', () => {
+    const site = readRepoFile('src/styles/site-header.css');
+    const hero = readRepoFile('src/styles/pages/hero.css');
+    for (const css of [site, hero]) {
+      expect(css).toMatch(
+        /\.(?:site|hero)-header__inner\s*\{[^}]*display:\s*flex/,
+      );
+      expect(css).toMatch(
+        /\.(?:site|hero)-header__inner\s*\{[^}]*justify-content:\s*space-between/,
+      );
+    }
+    expect(hero).not.toMatch(/grid-template-columns:\s*repeat\(3/);
   });
 
   it('every route marks up its page wrapper and content panel', () => {

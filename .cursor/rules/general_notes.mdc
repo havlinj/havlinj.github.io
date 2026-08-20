@@ -57,7 +57,7 @@ Use **content panel** in comments, tests, and cross-page layout logic. Shared se
 These are design decisions, not drift — leave them alone:
 
 - **Left optical inset**: all content panels share `--content-panel-left-inset` (margin-left on `.content-panel`). No per-page `::after` overlay strips — left edge is consistent across all routes.
-- **Nav distribution**: `.hero-header__inner` is a 3-column grid (middle link truly centred), `.site-header__inner` is `space-between`. Both are one baseline-aligned row, so nav height matches.
+- **Nav distribution**: `.hero-header__inner` and `.site-header__inner` both use `display: flex; justify-content: space-between; align-items: baseline` so Profile / Writing / Contact land in the same places on every route.
 - **Inner padding**: writing and contact drive content inset from `--panel-padding-*`; hero centres its composition on the square; profile positions tiles in %.
 
 ---

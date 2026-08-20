@@ -134,8 +134,6 @@ article.has-buttons-panel {
   opacity: var(--profile-hero-bg-image-opacity);
 }
 
-
-
 /* Breakpoint px values: keep aligned with e2e/profile-seam-ratios.ts PROFILE_SEAM_MEDIA_MIN_WIDTHS */
 @media (min-width: 360px) {
   .profile-section {

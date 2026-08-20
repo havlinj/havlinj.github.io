@@ -116,9 +116,7 @@ export async function simulateVisualViewportScale(
         removeEventListener: real
           ? real.removeEventListener.bind(real)
           : () => undefined,
-        dispatchEvent: real
-          ? real.dispatchEvent.bind(real)
-          : () => false,
+        dispatchEvent: real ? real.dispatchEvent.bind(real) : () => false,
       },
     });
     window.dispatchEvent(new Event('resize'));
@@ -147,7 +145,8 @@ export async function readContentWidthChPx(page: Page): Promise<{
     const ch = probe.getBoundingClientRect().width || 8;
     probe.remove();
     const root = getComputedStyle(document.documentElement);
-    const minCh = parseFloat(root.getPropertyValue('--content-min-width')) || 40;
+    const minCh =
+      parseFloat(root.getPropertyValue('--content-min-width')) || 40;
     const maxCh = parseFloat(root.getPropertyValue('--content-width')) || 70;
     return { minChPx: minCh * ch, maxChPx: maxCh * ch };
   });
