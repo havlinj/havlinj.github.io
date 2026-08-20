@@ -128,6 +128,12 @@ main.content.zoom-freeze-active {
   transform-origin: top left;
   transform: scale(var(--zoom-freeze-scale, 1));
   width: calc(100% / var(--zoom-freeze-scale, 1));
+  /* Pair scale with max/min so visual column stays ≈ 70ch / 40ch, not 70ch×scale. */
+  max-width: calc(var(--content-width) / var(--zoom-freeze-scale, 1));
+  min-width: min(
+    calc(var(--content-min-width) / var(--zoom-freeze-scale, 1)),
+    100%
+  );
 }
 
 /* ===============================

@@ -3,29 +3,59 @@ import {
   CONTENT_PANEL_CASES,
   applyDocZoom,
   assertContentPanelLayout,
+  readContentWidthChPx,
+  readMainVisualWidthPx,
   readZoomGuardSnapshot,
   resetDocZoom,
+  simulateVisualViewportScale,
 } from './helpers/zoom-guard';
 
 test.describe('ZoomGuard regression @zoom-guard', () => {
   test.beforeEach(({ browserName }) => {
     test.skip(
       browserName !== 'chromium',
-      'Uses documentElement.style.zoom; same scope as content-panel-containment matrix.',
+      'Uses documentElement.style.zoom / visualViewport mocks; Chromium-only.',
     );
   });
 
-  test('viewport squeeze: freeze stays on across hero → profile → writing → contact → hero', async ({
+  test('viewport squeeze does not freeze; profile width matches credits', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/profile');
+    await page.setViewportSize({ width: 390, height: 900 });
+
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(false);
+
+    const profileW = await readMainVisualWidthPx(page);
+
+    await page.goto('/credits');
+    const creditsW = await readMainVisualWidthPx(page);
+
+    expect(
+      Math.abs(profileW - creditsW),
+      `profile ${profileW}px vs credits ${creditsW}px at 390`,
+    ).toBeLessThanOrEqual(8);
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+  });
+
+  test('viewport squeeze: layout stays valid across panel routes without freeze', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/');
     await page.setViewportSize({ width: 360, height: 900 });
+
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
-      .toBe(true);
+      .toBe(false);
 
     const order = ['/', '/profile', '/writing', '/contact', '/'] as const;
     for (const path of order) {
@@ -34,90 +64,91 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
         .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
           timeout: 4000,
         })
-        .toBe(true);
+        .toBe(false);
       const c = CONTENT_PANEL_CASES.find((x) => x.path === path)!;
       await assertContentPanelLayout(page, c, {
-        label: `${c.name} (narrow nav)`,
+        label: `${c.name} (narrow, unfrozen)`,
         tolerancePx: 8,
       });
-      const snap = await readZoomGuardSnapshot(page);
-      const scale = parseFloat(snap.freezeScale || '1');
-      expect(Number.isFinite(scale), `freezeScale: ${snap.freezeScale}`).toBe(
-        true,
-      );
-      expect(scale).toBeGreaterThan(0);
-      expect(scale).toBeLessThanOrEqual(1);
     }
 
     await page.setViewportSize({ width: 1200, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(false);
     await resetDocZoom(page);
   });
 
-  test('viewport squeeze: hysteresis — freeze → wide exit → narrow re-entry', async ({
+  test('pinch-scale mock freezes; freeze CSS keeps visual width ≈ 70ch', async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.setViewportSize({ width: 1024, height: 900 });
     await page.goto('/profile');
-    await page.setViewportSize({ width: 360, height: 900 });
+
+    await simulateVisualViewportScale(page, 3);
     await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen)
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
       .toBe(true);
 
-    const safeWidth = 900;
-    await page.setViewportSize({ width: safeWidth, height: 900 });
+    const snap = await readZoomGuardSnapshot(page);
+    const scale = parseFloat(snap.freezeScale || '1');
+    expect(scale).toBeGreaterThan(0);
+    expect(scale).toBeLessThan(1);
+
+    const visualW = await readMainVisualWidthPx(page);
+    const { maxChPx } = await readContentWidthChPx(page);
+    expect(
+      Math.abs(visualW - Math.min(maxChPx, 1024)),
+      `frozen visual ${visualW} vs ~70ch ${maxChPx}`,
+    ).toBeLessThanOrEqual(24);
+
+    await simulateVisualViewportScale(page, 1);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
       .toBe(false);
-
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(true);
-
-    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
-      label: 'profile after re-squeeze',
-    });
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await resetDocZoom(page);
   });
 
-  test('reload at narrow viewport: freeze + content panel layout survives', async ({
+  test('forced freeze DOM: visual width stays near 70ch (not 70ch×scale)', async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await page.goto('/contact');
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(true);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/profile');
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 6000,
-      })
-      .toBe(true);
+    const { visualW, maxChPx } = await page.evaluate(() => {
+      const main = document.querySelector('main.content');
+      if (!(main instanceof HTMLElement)) {
+        return { visualW: 0, maxChPx: 0 };
+      }
+      const probe = document.createElement('div');
+      probe.style.cssText =
+        'position:absolute;visibility:hidden;font:inherit;width:1ch';
+      document.body.appendChild(probe);
+      const ch = probe.getBoundingClientRect().width || 8;
+      probe.remove();
+      const maxCh =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            '--content-width',
+          ),
+        ) || 70;
+      const maxChPx = maxCh * ch;
 
-    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[3], {
-      label: 'contact after reload narrow',
-      tolerancePx: 8,
+      document.body.classList.add('zoom-threshold-exceeded');
+      main.classList.add('zoom-freeze-active');
+      main.style.setProperty('--zoom-freeze-scale', '0.55');
+      const visualW = main.getBoundingClientRect().width;
+      return { visualW, maxChPx };
     });
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await resetDocZoom(page);
+
+    expect(
+      visualW,
+      `visual ${visualW} must not collapse to ~70ch×0.55 (${maxChPx * 0.55})`,
+    ).toBeGreaterThan(maxChPx * 0.75);
+    expect(Math.abs(visualW - maxChPx)).toBeLessThanOrEqual(24);
   });
 
-  test('stale persisted freeze at safe zoom (duplicated-tab class): clears and layout is valid', async ({
+  test('stale persisted freeze at safe zoom clears; squeeze still does not freeze', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -144,14 +175,12 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       label: 'profile after stale-guard clear',
     });
 
-    // html.style.zoom does not drive the same metrics as ZoomGuard (see getZoomRatio
-    // in Layout.astro); assert freeze via viewport squeeze like real pinch/narrow.
     await page.setViewportSize({ width: 360, height: 900 });
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
-      .toBe(true);
+      .toBe(false);
     await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
       label: 'profile narrow after stale clear',
       tolerancePx: 8,
@@ -178,44 +207,31 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
     }
   });
 
-  test('profile: doc zoom layout smoke + viewport-based freeze hysteresis', async ({
+  test('pinch-scale freeze hysteresis: enter → exit → re-enter', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 900 });
     await page.goto('/profile');
 
-    await applyDocZoom(page, 1);
-    expect((await readZoomGuardSnapshot(page)).frozen).toBe(false);
-    await applyDocZoom(page, 2.5);
-    await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
-      label: 'profile docZoom=2.5',
-      tolerancePx: 10,
-    });
-    await resetDocZoom(page);
-
-    await page.setViewportSize({ width: 360, height: 900 });
+    await simulateVisualViewportScale(page, 3);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
       .toBe(true);
-    const frozenOnce = await readZoomGuardSnapshot(page);
-    const s1 = parseFloat(frozenOnce.freezeScale || '0');
-    expect(s1).toBeGreaterThan(0);
-    expect(s1).toBeLessThanOrEqual(1);
     await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
-      label: 'profile narrow frozen',
-      tolerancePx: 8,
+      label: 'profile pinch frozen',
+      tolerancePx: 10,
     });
 
-    await page.setViewportSize({ width: 1200, height: 900 });
+    await simulateVisualViewportScale(page, 1);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
       .toBe(false);
 
-    await page.setViewportSize({ width: 360, height: 900 });
+    await simulateVisualViewportScale(page, 3);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
@@ -223,16 +239,13 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       .toBe(true);
 
     await assertContentPanelLayout(page, CONTENT_PANEL_CASES[1], {
-      label: 'profile narrow re-frozen',
-      tolerancePx: 8,
+      label: 'profile pinch re-frozen',
+      tolerancePx: 10,
     });
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await resetDocZoom(page);
+    await simulateVisualViewportScale(page, 1);
   });
 
-  test('rapid viewport alternation settles to frozen then unfrozen', async ({
-    page,
-  }) => {
+  test('rapid viewport alternation settles unfrozen', async ({ page }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/writing');
     await expect(
@@ -250,7 +263,7 @@ test.describe('ZoomGuard regression @zoom-guard', () => {
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 6000,
       })
-      .toBe(true);
+      .toBe(false);
 
     await page.setViewportSize({ width: 1200, height: 900 });
     await expect

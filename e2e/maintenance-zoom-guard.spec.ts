@@ -7,6 +7,7 @@ import {
   assertContentPanelLayout,
   readZoomGuardSnapshot,
   resetDocZoom,
+  simulateVisualViewportScale,
 } from './helpers/zoom-guard';
 
 const MAINTENANCE_CASE = MAINTENANCE_CONTENT_PANEL_CASE;
@@ -41,7 +42,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     );
   });
 
-  test('viewport squeeze: freeze stays on across maintenance → profile → maintenance', async ({
+  test('viewport squeeze does not freeze across maintenance → profile → maintenance', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -51,7 +52,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
-      .toBe(true);
+      .toBe(false);
 
     for (const path of ['/writing', '/profile', '/writing'] as const) {
       await page.goto(path);
@@ -59,65 +60,21 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
         .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
           timeout: 4000,
         })
-        .toBe(true);
+        .toBe(false);
 
       if (path === '/writing') {
         await assertContentPanelLayout(page, MAINTENANCE_CASE, {
-          label: 'maintenance (narrow nav)',
+          label: 'maintenance (narrow, unfrozen)',
           tolerancePx: 8,
         });
       }
-
-      const snap = await readZoomGuardSnapshot(page);
-      const scale = parseFloat(snap.freezeScale || '1');
-      expect(Number.isFinite(scale), `freezeScale: ${snap.freezeScale}`).toBe(
-        true,
-      );
-      expect(scale).toBeGreaterThan(0);
-      expect(scale).toBeLessThanOrEqual(1);
     }
 
     await page.setViewportSize({ width: 1200, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(false);
     await resetDocZoom(page);
   });
 
-  test('viewport squeeze: hysteresis — freeze → wide exit → narrow re-entry', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await page.goto('/writing');
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen)
-      .toBe(true);
-
-    await page.setViewportSize({ width: 900, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(false);
-
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(true);
-
-    await assertContentPanelLayout(page, MAINTENANCE_CASE, {
-      label: 'maintenance after re-squeeze',
-    });
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await resetDocZoom(page);
-  });
-
-  test('reload at narrow viewport: freeze + content panel layout survives', async ({
+  test('reload at narrow viewport: stays unfrozen with valid layout', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -127,14 +84,14 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
-      .toBe(true);
+      .toBe(false);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 6000,
       })
-      .toBe(true);
+      .toBe(false);
 
     await assertContentPanelLayout(page, MAINTENANCE_CASE, {
       label: 'maintenance after reload narrow',
@@ -144,7 +101,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     await resetDocZoom(page);
   });
 
-  test('stale persisted freeze at safe zoom (duplicated-tab class): clears and layout is valid', async ({
+  test('stale persisted freeze at safe zoom clears; squeeze still does not freeze', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
@@ -176,7 +133,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
-      .toBe(true);
+      .toBe(false);
     await assertContentPanelLayout(page, MAINTENANCE_CASE, {
       label: 'maintenance narrow after stale clear',
       tolerancePx: 8,
@@ -199,7 +156,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     await resetDocZoom(page);
   });
 
-  test('doc zoom layout smoke + viewport-based freeze hysteresis', async ({
+  test('pinch-scale freeze hysteresis on maintenance panel', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1024, height: 900 });
@@ -214,7 +171,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     });
     await resetDocZoom(page);
 
-    await page.setViewportSize({ width: 360, height: 900 });
+    await simulateVisualViewportScale(page, 3);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
@@ -225,18 +182,18 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     expect(freezeScale).toBeGreaterThan(0);
     expect(freezeScale).toBeLessThanOrEqual(1);
     await assertContentPanelLayout(page, MAINTENANCE_CASE, {
-      label: 'maintenance narrow frozen',
-      tolerancePx: 8,
+      label: 'maintenance pinch frozen',
+      tolerancePx: 10,
     });
 
-    await page.setViewportSize({ width: 1200, height: 900 });
+    await simulateVisualViewportScale(page, 1);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
       })
       .toBe(false);
 
-    await page.setViewportSize({ width: 360, height: 900 });
+    await simulateVisualViewportScale(page, 3);
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,
@@ -244,16 +201,13 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       .toBe(true);
 
     await assertContentPanelLayout(page, MAINTENANCE_CASE, {
-      label: 'maintenance narrow re-frozen',
-      tolerancePx: 8,
+      label: 'maintenance pinch re-frozen',
+      tolerancePx: 10,
     });
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await resetDocZoom(page);
+    await simulateVisualViewportScale(page, 1);
   });
 
-  test('rapid viewport alternation settles to frozen then unfrozen', async ({
-    page,
-  }) => {
+  test('rapid viewport alternation settles unfrozen', async ({ page }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/writing');
     await expect(page.locator('.route-maintenance-panel')).toBeVisible({
@@ -271,7 +225,7 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 6000,
       })
-      .toBe(true);
+      .toBe(false);
 
     await page.setViewportSize({ width: 1200, height: 900 });
     await expect
@@ -322,44 +276,12 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
     await resetDocZoom(page);
   });
 
-  test('zoom freeze activates after viewport squeeze', async ({ page }) => {
-    await page.setViewportSize({ width: 1200, height: 900 });
-    await page.goto('/writing');
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(true);
-  });
-
-  test('zoom freeze exits when viewport returns to safe range', async ({
+  test('viewport squeeze does not activate freeze on maintenance', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/writing');
-    const baselineWidth = await page.evaluate(() => {
-      const raw = window.sessionStorage.getItem('zoomFreezeBaselineV2');
-      if (!raw) return window.innerWidth;
-      try {
-        const parsed = JSON.parse(raw);
-        return Number.isFinite(parsed?.innerWidth)
-          ? parsed.innerWidth
-          : window.innerWidth;
-      } catch {
-        return window.innerWidth;
-      }
-    });
-
     await page.setViewportSize({ width: 360, height: 900 });
-    await expect
-      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
-        timeout: 4000,
-      })
-      .toBe(true);
-
-    const safeWidth = Math.max(700, Math.ceil(baselineWidth / 1.8));
-    await page.setViewportSize({ width: safeWidth, height: 900 });
     await expect
       .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
         timeout: 4000,

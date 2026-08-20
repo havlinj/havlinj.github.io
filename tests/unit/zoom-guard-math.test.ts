@@ -10,6 +10,7 @@ import {
   isAbsurdStoredBaselineInnerWidth,
   shouldCancelWarmStart,
   shouldKeepFreeze,
+  shouldResetZoomFreezeBaseline,
 } from '../../src/utils/zoom-guard-math';
 
 describe('computeZoomRatio', () => {
@@ -136,6 +137,51 @@ describe('shouldCancelWarmStart', () => {
       shouldCancelWarmStart(
         ZOOM_GUARD_MAX_SAFE_ZOOM * ZOOM_GUARD_WARM_CANCEL_RATIO - 0.001,
       ),
+    ).toBe(false);
+  });
+});
+
+describe('shouldResetZoomFreezeBaseline', () => {
+  const stable = {
+    baselineDpr: 1,
+    baselineVvScale: 1,
+    baselineInnerWidth: 1200,
+    currentDpr: 1,
+    currentVvScale: 1,
+    currentInnerWidth: 1200,
+  };
+
+  it('is false when viewport class matches baseline', () => {
+    expect(shouldResetZoomFreezeBaseline(stable)).toBe(false);
+  });
+
+  it('is true for desktop→narrow resize (squeeze is not zoom)', () => {
+    expect(
+      shouldResetZoomFreezeBaseline({
+        ...stable,
+        currentInnerWidth: 390,
+      }),
+    ).toBe(true);
+  });
+
+  it('is true when width expands past baseline', () => {
+    expect(
+      shouldResetZoomFreezeBaseline({
+        ...stable,
+        baselineInnerWidth: 400,
+        currentInnerWidth: 500,
+      }),
+    ).toBe(true);
+  });
+
+  it('is false for pinch-like vvScale rise at same width', () => {
+    expect(
+      shouldResetZoomFreezeBaseline({
+        ...stable,
+        baselineInnerWidth: 390,
+        currentInnerWidth: 390,
+        currentVvScale: 3,
+      }),
     ).toBe(false);
   });
 });

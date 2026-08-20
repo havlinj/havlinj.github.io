@@ -104,6 +104,15 @@ describe('layout contracts: global content width (CSS ↔ e2e/constants.ts)', ()
       `${MAX_CONTENT_WIDTH_CH}ch`,
     );
   });
+
+  it('zoom-freeze-active compensates max/min-width by freeze scale', () => {
+    expect(css).toMatch(
+      /main\.content\.zoom-freeze-active\s*\{[^}]*max-width:\s*calc\(\s*var\(--content-width\)\s*\/\s*var\(--zoom-freeze-scale/,
+    );
+    expect(css).toMatch(
+      /main\.content\.zoom-freeze-active\s*\{[^}]*min-width:\s*min\(\s*calc\(\s*var\(--content-min-width\)\s*\/\s*var\(--zoom-freeze-scale/,
+    );
+  });
 });
 
 describe('layout contracts: why layout (constants ↔ Astro ↔ why-box-scroll ↔ e2e)', () => {

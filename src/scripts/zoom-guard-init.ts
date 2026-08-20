@@ -6,9 +6,9 @@ import {
   computeOverflowHealScale,
   computeTargetFreezeScale,
   computeZoomRatio,
-  isAbsurdStoredBaselineInnerWidth,
   shouldCancelWarmStart,
   shouldKeepFreeze,
+  shouldResetZoomFreezeBaseline,
 } from '../utils/zoom-guard-math';
 import {
   type ZoomFreezeBaselineV2,
@@ -24,8 +24,6 @@ const FREEZE_SCALE_UPDATE_EPSILON = 0.01;
 
 const BASELINE_KEY = 'zoomFreezeBaselineV2';
 const GUARD_STATE_KEY = 'zoomFreezeGuardStateV2';
-const DPR_BASELINE_MISMATCH_RATIO = 1.12;
-const DESKTOP_BASELINE_INNER_WIDTH_MIN = 640;
 
 let installed = false;
 
@@ -76,50 +74,28 @@ export function initZoomGuard(): void {
     /* ignore */
   }
 
-  const shouldSkipBaselineResetWarm = persistedGuardActiveWarm === true;
-
-  function shouldResetBaseline(baseline: Baseline): boolean {
-    if (!hasValidZoomFreezeBaseline(baseline)) return true;
-
-    const innerWidthNow = window.innerWidth || 0;
-    const dprNow = window.devicePixelRatio || 1;
-    const vvNow =
-      window.visualViewport && window.visualViewport.scale
-        ? window.visualViewport.scale
-        : 1;
-
-    const dprBaselineMismatch =
-      Math.max(dprNow, baseline.dpr) / Math.min(dprNow, baseline.dpr) >
-      DPR_BASELINE_MISMATCH_RATIO;
-
-    const scaleDropped =
-      dprNow < baseline.dpr * 0.9 || vvNow < baseline.vvScale * 0.9;
-
-    const widthExpanded = innerWidthNow > baseline.innerWidth * 1.15;
-
-    const likelyNarrowViewportZoomContext = innerWidthNow <= 520;
-    const narrowButBaselineLooksDesktop =
-      likelyNarrowViewportZoomContext &&
-      baseline.innerWidth >= DESKTOP_BASELINE_INNER_WIDTH_MIN &&
-      baseline.innerWidth > innerWidthNow * 1.25;
-
-    const absurdStoredInnerWidth = isAbsurdStoredBaselineInnerWidth(
-      baseline.innerWidth,
-      innerWidthNow,
-    );
-
-    return (
-      dprBaselineMismatch ||
-      scaleDropped ||
-      widthExpanded ||
-      narrowButBaselineLooksDesktop ||
-      absurdStoredInnerWidth
-    );
-  }
-
   function currentVisualViewportScale(): number {
     const vv = window.visualViewport;
     return vv && vv.scale ? vv.scale : 0;
+  }
+
+  function baselineResetInput(baseline: Baseline) {
+    return {
+      baselineDpr: baseline.dpr,
+      baselineVvScale: baseline.vvScale,
+      baselineInnerWidth: baseline.innerWidth,
+      currentDpr: window.devicePixelRatio || 1,
+      currentVvScale:
+        window.visualViewport && window.visualViewport.scale
+          ? window.visualViewport.scale
+          : 1,
+      currentInnerWidth: window.innerWidth || 0,
+    };
+  }
+
+  function shouldResetBaseline(baseline: Baseline): boolean {
+    if (!hasValidZoomFreezeBaseline(baseline)) return true;
+    return shouldResetZoomFreezeBaseline(baselineResetInput(baseline));
   }
 
   function zoomRatioForBaseline(bd: number, bv: number, biw: number): number {
@@ -148,9 +124,32 @@ export function initZoomGuard(): void {
     }
   }
 
+  function clearPersistedGuardState(): void {
+    try {
+      window.sessionStorage.removeItem(GUARD_STATE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function captureCurrentBaseline(): Baseline {
+    return {
+      dpr: window.devicePixelRatio || 1,
+      vvScale:
+        window.visualViewport && window.visualViewport.scale
+          ? window.visualViewport.scale
+          : 1,
+      innerWidth: window.innerWidth || 0,
+    };
+  }
+
+  /*
+   * Always reset when viewport class changed (desktop→narrow, etc.).
+   * Warm freeze must not skip that — otherwise squeeze looks like zoom forever.
+   */
   if (
     !hasValidZoomFreezeBaseline(storedBaseline) ||
-    (!shouldSkipBaselineResetWarm && shouldResetBaseline(storedBaseline))
+    shouldResetBaseline(storedBaseline)
   ) {
     storedBaseline = {
       dpr: currentDpr,
@@ -176,17 +175,9 @@ export function initZoomGuard(): void {
   ) {
     persistedGuardActiveWarm = false;
     persistedFreezeScaleWarm = 1;
-    storedBaseline = {
-      dpr: currentDpr,
-      vvScale: currentVvScale,
-      innerWidth: currentInnerWidth,
-    };
+    storedBaseline = captureCurrentBaseline();
     persistBaseline(storedBaseline);
-    try {
-      window.sessionStorage.removeItem(GUARD_STATE_KEY);
-    } catch {
-      /* ignore */
-    }
+    clearPersistedGuardState();
     baselineDpr = storedBaseline.dpr;
     baselineVvScale = storedBaseline.vvScale;
     baselineInnerWidth = storedBaseline.innerWidth;
@@ -233,6 +224,29 @@ export function initZoomGuard(): void {
     }
   }
 
+  function applyFreezeToDom(nextActive: boolean, nextScale: number): void {
+    body.classList.toggle('zoom-threshold-exceeded', nextActive);
+    if (mainContent instanceof HTMLElement) {
+      mainContent.style.setProperty('--zoom-freeze-scale', String(nextScale));
+      mainContent.classList.toggle('zoom-freeze-active', nextActive);
+    }
+  }
+
+  function resetBaselineFromCurrentViewport(): void {
+    const next = captureCurrentBaseline();
+    baselineDpr = next.dpr;
+    baselineVvScale = next.vvScale;
+    baselineInnerWidth = next.innerWidth;
+    persistBaseline(next);
+    freezeActive = false;
+    freezeScale = 1;
+    healLockFrames = 0;
+    clearPersistedGuardState();
+    lastPersistedActive = false;
+    lastPersistedFreezeScale = 1;
+    applyFreezeToDom(false, 1);
+  }
+
   function getZoomRatio(): number {
     return zoomRatioForBaseline(
       baselineDpr,
@@ -242,6 +256,15 @@ export function initZoomGuard(): void {
   }
 
   function updateZoomGuard(): void {
+    const liveBaseline: Baseline = {
+      dpr: baselineDpr,
+      vvScale: baselineVvScale,
+      innerWidth: baselineInnerWidth,
+    };
+    if (shouldResetBaseline(liveBaseline)) {
+      resetBaselineFromCurrentViewport();
+    }
+
     const ratio = getZoomRatio();
     const exceeded = shouldKeepFreeze({
       ratio,
@@ -294,11 +317,7 @@ export function initZoomGuard(): void {
     if (healLockFrames > 0 && !didOverflowHeal) healLockFrames -= 1;
 
     persistGuardState(freezeActive, freezeScale);
-    body.classList.toggle('zoom-threshold-exceeded', freezeActive);
-    if (mainContent instanceof HTMLElement) {
-      mainContent.style.setProperty('--zoom-freeze-scale', String(freezeScale));
-      mainContent.classList.toggle('zoom-freeze-active', freezeActive);
-    }
+    applyFreezeToDom(freezeActive, freezeScale);
   }
 
   function runZoomGuardBurst(): void {

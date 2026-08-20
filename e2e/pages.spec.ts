@@ -701,7 +701,7 @@ test.describe('Contact page (/contact)', () => {
     );
   });
 
-  test('zoom freeze activates on profile and contact after viewport squeeze', async ({
+  test('viewport squeeze does not freeze profile or contact', async ({
     page,
   }) => {
     const frozen = () =>
@@ -713,50 +713,36 @@ test.describe('Contact page (/contact)', () => {
             ?.classList.contains('zoom-freeze-active') === true,
       );
 
-    /* Full navigation + narrow baseline guard can clear freeze across routes; assert each page independently. */
     for (const path of ['/profile', '/contact'] as const) {
       await page.setViewportSize({ width: 1200, height: 900 });
       await page.goto(path);
       await page.setViewportSize({ width: 360, height: 900 });
-      await expect.poll(frozen, { timeout: 2500 }).toBe(true);
+      await expect.poll(frozen, { timeout: 2500 }).toBe(false);
     }
   });
 
-  test('zoom freeze exits when viewport returns to safe range', async ({
+  test('zoom freeze exits when pinch-scale mock returns to 1', async ({
     page,
   }) => {
-    const isFrozen = () =>
-      page.evaluate(
-        () =>
-          document.body.classList.contains('zoom-threshold-exceeded') &&
-          document
-            .querySelector('main.content')
-            ?.classList.contains('zoom-freeze-active') === true,
-      );
+    const { simulateVisualViewportScale, readZoomGuardSnapshot } =
+      await import('./helpers/zoom-guard');
 
-    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.setViewportSize({ width: 1024, height: 900 });
     await page.goto('/profile');
-    const baselineWidth = await page.evaluate(() => {
-      const raw = window.sessionStorage.getItem('zoomFreezeBaselineV2');
-      if (!raw) return window.innerWidth;
-      try {
-        const parsed = JSON.parse(raw);
-        return Number.isFinite(parsed?.innerWidth)
-          ? parsed.innerWidth
-          : window.innerWidth;
-      } catch {
-        return window.innerWidth;
-      }
-    });
 
-    // Enter freeze zone (well above guard threshold).
-    await page.setViewportSize({ width: 360, height: 900 });
-    await expect.poll(isFrozen, { timeout: 1500 }).toBe(true);
+    await simulateVisualViewportScale(page, 3);
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(true);
 
-    // Exit once viewport is safely below guard pressure.
-    const safeWidth = Math.max(700, Math.ceil(baselineWidth / 1.8));
-    await page.setViewportSize({ width: safeWidth, height: 900 });
-    await expect.poll(isFrozen, { timeout: 1500 }).toBe(false);
+    await simulateVisualViewportScale(page, 1);
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(false);
   });
 
   test('zoom guard does not freeze from stale stored baseline alone', async ({

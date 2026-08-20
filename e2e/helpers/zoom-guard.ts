@@ -76,6 +76,98 @@ export async function resetDocZoom(page: Page): Promise<void> {
   await applyDocZoom(page, 1);
 }
 
+/**
+ * Raise visualViewport.scale without changing innerWidth — simulates pinch zoom
+ * for ZoomGuard (viewport squeeze alone must not freeze).
+ */
+export async function simulateVisualViewportScale(
+  page: Page,
+  scale: number,
+): Promise<void> {
+  await page.evaluate((s) => {
+    const real = window.visualViewport;
+    Object.defineProperty(window, 'visualViewport', {
+      configurable: true,
+      value: {
+        get scale() {
+          return s;
+        },
+        get width() {
+          return real?.width ?? window.innerWidth;
+        },
+        get height() {
+          return real?.height ?? window.innerHeight;
+        },
+        get offsetLeft() {
+          return real?.offsetLeft ?? 0;
+        },
+        get offsetTop() {
+          return real?.offsetTop ?? 0;
+        },
+        get pageLeft() {
+          return real?.pageLeft ?? 0;
+        },
+        get pageTop() {
+          return real?.pageTop ?? 0;
+        },
+        addEventListener: real
+          ? real.addEventListener.bind(real)
+          : () => undefined,
+        removeEventListener: real
+          ? real.removeEventListener.bind(real)
+          : () => undefined,
+        dispatchEvent: real
+          ? real.dispatchEvent.bind(real)
+          : () => false,
+      },
+    });
+    window.dispatchEvent(new Event('resize'));
+    real?.dispatchEvent(new Event('resize'));
+  }, scale);
+  await waitTwoFrames(page);
+}
+
+export async function readMainVisualWidthPx(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const main = document.querySelector('main.content');
+    if (!(main instanceof HTMLElement)) return 0;
+    return main.getBoundingClientRect().width;
+  });
+}
+
+export async function readContentWidthChPx(page: Page): Promise<{
+  minChPx: number;
+  maxChPx: number;
+}> {
+  return page.evaluate(() => {
+    const probe = document.createElement('div');
+    probe.style.cssText =
+      'position:absolute;visibility:hidden;font:inherit;width:1ch';
+    document.body.appendChild(probe);
+    const ch = probe.getBoundingClientRect().width || 8;
+    probe.remove();
+    const root = getComputedStyle(document.documentElement);
+    const minCh = parseFloat(root.getPropertyValue('--content-min-width')) || 40;
+    const maxCh = parseFloat(root.getPropertyValue('--content-width')) || 70;
+    return { minChPx: minCh * ch, maxChPx: maxCh * ch };
+  });
+}
+
+export async function forceZoomFreezeDom(
+  page: Page,
+  freezeScale: number,
+): Promise<void> {
+  await page.evaluate((s) => {
+    const main = document.querySelector('main.content');
+    document.body.classList.add('zoom-threshold-exceeded');
+    if (main instanceof HTMLElement) {
+      main.classList.add('zoom-freeze-active');
+      main.style.setProperty('--zoom-freeze-scale', String(s));
+    }
+  }, freezeScale);
+  await waitTwoFrames(page);
+}
+
 export async function readZoomGuardSnapshot(page: Page): Promise<{
   frozen: boolean;
   freezeScale: string;

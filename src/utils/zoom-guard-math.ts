@@ -86,3 +86,70 @@ export function shouldCancelWarmStart(
 ): boolean {
   return ratio > maxSafe * factor;
 }
+
+/** Sync with `src/scripts/zoom-guard-init.ts`. */
+export const ZOOM_GUARD_DPR_BASELINE_MISMATCH_RATIO = 1.12;
+export const ZOOM_GUARD_DESKTOP_BASELINE_INNER_WIDTH_MIN = 640;
+export const ZOOM_GUARD_NARROW_VIEWPORT_MAX = 520;
+
+export type ZoomFreezeBaselineResetInput = {
+  baselineDpr: number;
+  baselineVvScale: number;
+  baselineInnerWidth: number;
+  currentDpr: number;
+  currentVvScale: number;
+  currentInnerWidth: number;
+};
+
+/**
+ * True when the stored baseline no longer describes this viewport class
+ * (e.g. desktop → phone resize). Caller must reset baseline and clear freeze;
+ * plain viewport squeeze must not be treated as pinch zoom.
+ */
+export function shouldResetZoomFreezeBaseline(
+  m: ZoomFreezeBaselineResetInput,
+): boolean {
+  if (
+    !(
+      Number.isFinite(m.baselineDpr) &&
+      m.baselineDpr > 0 &&
+      Number.isFinite(m.baselineVvScale) &&
+      m.baselineVvScale > 0 &&
+      Number.isFinite(m.baselineInnerWidth) &&
+      m.baselineInnerWidth > 0
+    )
+  ) {
+    return true;
+  }
+
+  const dprBaselineMismatch =
+    Math.max(m.currentDpr, m.baselineDpr) /
+      Math.min(m.currentDpr, m.baselineDpr) >
+    ZOOM_GUARD_DPR_BASELINE_MISMATCH_RATIO;
+
+  const scaleDropped =
+    m.currentDpr < m.baselineDpr * 0.9 ||
+    m.currentVvScale < m.baselineVvScale * 0.9;
+
+  const widthExpanded = m.currentInnerWidth > m.baselineInnerWidth * 1.15;
+
+  const likelyNarrowViewportZoomContext =
+    m.currentInnerWidth <= ZOOM_GUARD_NARROW_VIEWPORT_MAX;
+  const narrowButBaselineLooksDesktop =
+    likelyNarrowViewportZoomContext &&
+    m.baselineInnerWidth >= ZOOM_GUARD_DESKTOP_BASELINE_INNER_WIDTH_MIN &&
+    m.baselineInnerWidth > m.currentInnerWidth * 1.25;
+
+  const absurdStoredInnerWidth = isAbsurdStoredBaselineInnerWidth(
+    m.baselineInnerWidth,
+    m.currentInnerWidth,
+  );
+
+  return (
+    dprBaselineMismatch ||
+    scaleDropped ||
+    widthExpanded ||
+    narrowButBaselineLooksDesktop ||
+    absurdStoredInnerWidth
+  );
+}
