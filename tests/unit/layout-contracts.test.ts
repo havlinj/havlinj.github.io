@@ -2,7 +2,7 @@
  * Contract tests: TS constants ↔ CSS literals ↔ e2e helpers must stay aligned.
  * When changing one side, update the paired source and this file if needed.
  */
-import { readFileSync } from 'node:fs';
+import { globSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -44,6 +44,15 @@ const repoRoot = path.join(fileURLToPath(new URL('../..', import.meta.url)));
 
 function readRepoFile(relPath: string): string {
   return readFileSync(path.join(repoRoot, relPath), 'utf8');
+}
+
+function cssRuleBody(css: string, selector: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = css.match(
+    new RegExp(`(?:^|\\})\\s*${escaped}\\s*\\{([^}]+)\\}`),
+  );
+  expect(match, `expected a standalone ${selector} rule`).toBeTruthy();
+  return match![1];
 }
 
 function cssCustomProp(css: string, name: string): string | null {
@@ -542,5 +551,46 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(css).toMatch(
       /\.route-maintenance-panel__media--visible\s*\{[\s\S]*?opacity:\s*1;/,
     );
+  });
+});
+
+describe('layout contracts: statement typography presets', () => {
+  const STATEMENT_SELECTOR = /\.statement-(plain|soft|emphasis|hero)\b/;
+  const styleSheets = globSync('src/styles/**/*.css', { cwd: repoRoot }).sort();
+
+  it('statement class rules live only in special-typography.css', () => {
+    const hits = styleSheets.filter((relPath) =>
+      STATEMENT_SELECTOR.test(readRepoFile(relPath)),
+    );
+    expect(hits).toEqual(['src/styles/special-typography.css']);
+  });
+
+  it('statement presets keep authored spacing and are not restyled in @media', () => {
+    const css = readRepoFile('src/styles/special-typography.css');
+
+    expect(cssRuleBody(css, '.statement-plain')).toContain('margin-top: 1.4rem');
+    expect(cssRuleBody(css, '.statement-plain')).toContain(
+      'margin-bottom: 1.4rem',
+    );
+    expect(cssRuleBody(css, '.statement-soft')).toContain(
+      'margin: 1.7rem 0 1.85rem 0.01em',
+    );
+    expect(cssRuleBody(css, '.statement-soft')).toContain('line-height: 1.58');
+    expect(cssRuleBody(css, '.statement-emphasis')).toContain(
+      'margin: 1.9em 1.8em 2em 0.01em',
+    );
+    expect(cssRuleBody(css, '.statement-emphasis')).toContain(
+      'line-height: 1.6',
+    );
+    expect(cssRuleBody(css, '.statement-hero')).toContain(
+      'margin: 2.3em 1.5em 2.4em 0.01em',
+    );
+    expect(cssRuleBody(css, '.statement-hero')).toContain('line-height: 1.62');
+
+    for (const relPath of styleSheets) {
+      for (const mediaChunk of readRepoFile(relPath).split('@media').slice(1)) {
+        expect(mediaChunk, relPath).not.toMatch(STATEMENT_SELECTOR);
+      }
+    }
   });
 });
