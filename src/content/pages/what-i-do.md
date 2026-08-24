@@ -2,7 +2,7 @@
 title: 'What I do'
 ---
 
-If you've read Why This, you already know I think of myself as an engineer.
+If you've read "Why this", you already know I think of myself as an engineer.
 
 I build software.
 
@@ -20,27 +20,29 @@ Finding software answered one question.
 
 The next has proved considerably more difficult—and, I suspect, considerably more universal.
 
-<p class="statement-emphasis">
-     What is worth building?
-</p>
+<p class="statement-emphasis">What is worth building?</p>
 
 ## Building Systems
 
-That question gradually shifted my attention away from individual technologies and toward systems.
+Trying to answer that gradually shifted my attention away from individual technologies and toward composition.
 
-Not necessarily larger systems.
+Software often creates more value in combination than in isolation. Composition also amplifies complexity.
 
-Systems that remain understandable as they evolve. Systems whose complexity is intentional rather than accidental. Systems where architecture isn't an afterthought but a natural consequence of taking software seriously.
+The critical trade-off is making a system's usefulness grow faster than the complexity required to sustain it.
 
-The more experience I gain, the more convinced I become that software engineering isn't really about writing code.
+In practice, that means building systems that can evolve without becoming progressively harder to reason about. Systems whose complexity is intentional rather than accidental. Systems where architecture isn't an afterthought but a consequence of thinking seriously about how the software will evolve.
 
-It's about making good decisions before, during, and long after the code exists.
+The more experience I gain, the less I see producing code as the defining skill of software engineering.
+
+What really matters is taking responsibility for decisions that may shape a system for years.
+
+A programming language ultimately turns many of those decisions into something concrete: code that machines can execute and people can understand, maintain, and evolve.
 
 ## Technology
 
-Languages, databases, cloud platforms, messaging systems, AI—I've invested a great deal of time in all of them, and I don't expect that to change. It demands an unusual amount of time and energy. I still believe it's one of the best investments I can make.
+Languages, databases, cloud platforms, messaging systems, AI—I've invested a great deal of time in all of them, and I don't expect that to change.
 
-Every technology changes the range of systems we're capable of building.
+Every technology changes what we're capable of building.
 
 That's why understanding them matters.
 
@@ -50,11 +52,11 @@ I don't expect my professional identity to revolve around a particular language,
 
 ## Architecture
 
-The longer I work in software, the less I think of architecture as a discipline sitting somewhere above engineering.
+Architecture isn't what happens after engineering. It starts where implementation alone stops being enough.
 
-It feels more like what software engineering naturally grows into.
+AI is making that boundary harder to ignore. Implementation can increasingly be delegated; responsibility cannot.
 
-Once writing the code is no longer the difficult part, different questions take over.
+That shifts more of the engineer's work toward framing the problem, shaping the system, directing implementation, and verifying the result.
 
 Where should responsibilities live?
 
@@ -64,36 +66,32 @@ Which trade-offs are worth making?
 
 How do we keep changing a system without gradually working against it?
 
-In this profession, it is code that creates reality. That's why I have no ambition to become someone who only designs systems. Building them is part of understanding them.
+Architecture belongs naturally in that work—not above engineering, but as part of owning the system.
+
+Code still creates reality. I have no ambition to become someone who only designs systems. Building them remains part of understanding them, even when I no longer need to write every line myself.
 
 ## The Problems Worth Solving
 
-You usually hear about distributed systems, platform engineering, cloud infrastructure, messaging, observability, or developer experience as separate disciplines.
+The most interesting system problems tend to surface at the boundaries.
 
-I've gradually stopped looking at them that way.
+Where components coordinate. Where failures propagate. Where infrastructure constrains change. Where observability separates operation from guesswork.
 
-To me, they all circle around the same question:
+Distributed systems, messaging, cloud infrastructure, platform engineering, observability, developer experience—different disciplines, one recurring problem.
 
-<p class="statement-hero">
-     How do we keep building systems that remain understandable as&nbsp;complexity quietly keeps stacking the odds against us?
-</p>
+<p class="statement-emphasis"> How do we make independent parts behave like one dependable whole? </p>
 
-That's the part I keep coming back to.
+The goal isn't sophistication.
 
-Not because complexity deserves admiration.
-
-Because people using the software shouldn't have to carry its weight.
+It's to absorb complexity within the system rather than pass it on to those who build, operate, or depend on it.
 
 ## Looking Ahead
 
-I don't see architecture as the destination of my career.
+Architecture matters to me, but I want to stay close to the process of building systems.
 
-Broader engineering ownership feels like a much better description.
+I want to take an ambitious, ambiguous problem from framing to a working system—and stay responsible for how it evolves.
 
-Taking an ambiguous problem—preferably an ambitious one—understanding it, shaping it into a system, building it, and remaining responsible for how it evolves afterwards.
+The best systems are rarely the work of one engineer. They emerge from good engineers challenging assumptions, refining ideas, and building together.
 
-That's the direction I'm deliberately moving in.
+I value working in teams where good decisions, clear direction, and shared responsibility reinforce one another—and with people who care as much about what we build as how we build it.
 
-Fortunately, it doesn't feel like a lonely road.
-
-This profession is full of remarkable engineers, and almost everything worth building has always been the result of people thinking together rather than alone.
+Ultimately, I want my work to serve a real purpose and make a difference I can stand behind.

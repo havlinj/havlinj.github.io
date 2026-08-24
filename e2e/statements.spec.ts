@@ -74,28 +74,8 @@ test.describe('Blog statement styles (desktop)', () => {
     expect(emphasisMetrics!.marginLeftOverFont).toBeGreaterThanOrEqual(0);
     expect(emphasisMetrics!.marginLeftOverFont).toBeLessThan(0.04);
 
-    // Hero is used on content pages (e.g. What I do), not this blog post.
-    // Prefer an unstyled instance so inline margins do not skew CSS assertions.
     await page.goto('/what-i-do', { waitUntil: 'domcontentloaded' });
-    const hero = page.locator('.statement-hero:not([style])').first();
-    await expect(hero).toBeVisible();
-
-    const heroMetrics = await page.evaluate(
-      readStatementMetrics,
-      '.statement-hero:not([style])',
-    );
-    expect(heroMetrics).not.toBeNull();
-
-    expect(heroMetrics!.lineHeightRatio).toBeGreaterThan(1.6);
-    expect(heroMetrics!.lineHeightRatio).toBeLessThan(1.64);
-    expect(heroMetrics!.marginTopOverFont).toBeGreaterThan(2.27);
-    expect(heroMetrics!.marginTopOverFont).toBeLessThan(2.33);
-    expect(heroMetrics!.marginRightOverFont).toBeGreaterThan(1.47);
-    expect(heroMetrics!.marginRightOverFont).toBeLessThan(1.53);
-    expect(heroMetrics!.marginBottomOverFont).toBeGreaterThan(2.37);
-    expect(heroMetrics!.marginBottomOverFont).toBeLessThan(2.43);
-    expect(heroMetrics!.marginLeftOverFont).toBeGreaterThanOrEqual(0);
-    expect(heroMetrics!.marginLeftOverFont).toBeLessThan(0.04);
+    await expect(page.locator('.statement-emphasis')).toHaveCount(2);
   });
 
   test('statement-plain baseline spacing is present on blog content', async ({
