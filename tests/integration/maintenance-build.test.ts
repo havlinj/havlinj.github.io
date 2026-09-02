@@ -58,13 +58,13 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('page-buttons-panel__media');
     expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(writing).toContain('/writing');
-    expect(writing).toContain('Started on 26.08.07.');
+    expect(writing).toContain('Content will return soon.');
     expect(writing).toContain('site-header');
     expect(writing).not.toContain('writing-category-picker');
 
     const contactExact = readDist('contact/index.html');
     expect(contactExact).toContain('Whoops');
-    expect(contactExact).toContain('Started on 26.08.08.');
+    expect(contactExact).toContain('Content will return soon.');
 
     const contactForm = readDist('contact/form/index.html');
     expect(contactForm).not.toContain('route-maintenance-page');
@@ -81,7 +81,7 @@ describe('maintenance build integration', () => {
     const home = readDist('index.html');
     expect(home).toContain('Website under maintenance');
     expect(home).toContain('global-maintenance-page');
-    expect(home).toContain('Started on 26.08.07.');
+    expect(home).toContain('Content will return soon.');
     expect(home).not.toContain('class="hero-header"');
     expect(home).not.toContain('class="page-title">Jan Havlín');
 

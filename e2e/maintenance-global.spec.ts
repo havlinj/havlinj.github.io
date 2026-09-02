@@ -8,9 +8,7 @@ test.describe('maintenance global fixture', () => {
     await expect(
       page.getByRole('heading', { name: 'Website under maintenance' }),
     ).toBeVisible();
-    await expect(page.locator('.global-maintenance-page__date')).toHaveText(
-      'Started on 26.08.07.',
-    );
+    await expect(page.getByText('Content will return soon.')).toBeVisible();
     await expect(page.locator('.hero-header')).toHaveCount(0);
 
     await page.goto('/profile');

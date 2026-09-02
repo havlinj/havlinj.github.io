@@ -568,7 +568,9 @@ describe('layout contracts: statement typography presets', () => {
   it('statement presets keep authored spacing and are not restyled in @media', () => {
     const css = readRepoFile('src/styles/special-typography.css');
 
-    expect(cssRuleBody(css, '.statement-plain')).toContain('margin-top: 1.4rem');
+    expect(cssRuleBody(css, '.statement-plain')).toContain(
+      'margin-top: 1.4rem',
+    );
     expect(cssRuleBody(css, '.statement-plain')).toContain(
       'margin-bottom: 1.4rem',
     );

@@ -1,19 +1,10 @@
 ---
-import { formatMaintenanceStartedDate } from '../utils/maintenance';
 import '../styles/pages/maintenance.css';
-
-interface Props {
-  started: string;
-}
-
-const { started }: Props = Astro.props;
-const startedLabel = formatMaintenanceStartedDate(started);
 ---
 
 <article class="global-maintenance-page">
   <h1 class="global-maintenance-page__title">Website under maintenance</h1>
   <div class="global-maintenance-page__info">
-    <p class="global-maintenance-page__date">Started on {startedLabel}</p>
     <p>Content will return soon.</p>
   </div>
 </article>

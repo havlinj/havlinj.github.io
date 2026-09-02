@@ -20,9 +20,6 @@ test.describe('maintenance routes fixture', () => {
     await expect(page.locator('.route-maintenance-panel__route')).toHaveText(
       '/writing',
     );
-    await expect(page.locator('.route-maintenance-panel__date')).toHaveText(
-      'Started on 26.08.07.',
-    );
     await expect(page.getByText('Content will return soon.')).toBeVisible();
 
     await expect(page.locator('.writing-category-picker')).toHaveCount(0);
@@ -347,9 +344,6 @@ test.describe('maintenance routes fixture', () => {
     await expect(page.getByRole('heading', { name: 'Whoops' })).toBeVisible();
     await expect(page.locator('.route-maintenance-panel__route')).toHaveText(
       '/contact',
-    );
-    await expect(page.locator('.route-maintenance-panel__date')).toHaveText(
-      'Started on 26.08.08.',
     );
 
     await page.goto('/contact/form');

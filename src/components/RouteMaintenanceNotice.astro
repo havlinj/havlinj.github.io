@@ -2,10 +2,7 @@
 import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
 import { MAINTENANCE_PANEL_BG_STEM } from '../constants/maintenance-panel';
-import {
-  formatMaintenanceStartedDate,
-  type MaintenanceDecision,
-} from '../utils/maintenance';
+import type { MaintenanceDecision } from '../utils/maintenance';
 import '../styles/pages/maintenance.css';
 
 interface Props {
@@ -13,7 +10,6 @@ interface Props {
 }
 
 const { decision }: Props = Astro.props;
-const startedLabel = formatMaintenanceStartedDate(decision.started);
 const routeLabel = decision.displayPath;
 const headlineTail = 'is under maintenance.';
 
@@ -46,9 +42,6 @@ const maintenanceBg = buildDichromResponsive(MAINTENANCE_PANEL_BG_STEM);
           >
         </p>
         <div class="route-maintenance-panel__info">
-          <p class="route-maintenance-panel__date">
-            Started on {startedLabel}
-          </p>
           <p>Content will return soon.</p>
         </div>
       </div>
