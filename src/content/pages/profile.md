@@ -7,15 +7,15 @@ title: 'Profile'
     <picture>
       <source
         media="(max-width: 767px)"
-        srcset="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_720.png 1620w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1080.png 2160w"
+        srcset="/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_720.png 1800w, /assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_1080.png 2430w"
         sizes="100vw"
       />
       <img
-        src="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1440.png"
-        srcset="/assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1080.png 2160w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1440.png 2736w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_1920.png 3360w, /assets/pages/profile/evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom_2400.png 3840w"
+        src="/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_1440.png"
+        srcset="/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_1080.png 2430w, /assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_1440.png 2880w, /assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_1920.png 3456w, /assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom_2400.png 3840w"
         sizes="100vw"
-        width="2736"
-        height="4082"
+        width="2880"
+        height="1920"
         alt=""
         decoding="async"
         fetchpriority="high"

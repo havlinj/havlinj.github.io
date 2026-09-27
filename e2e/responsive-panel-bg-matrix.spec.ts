@@ -15,7 +15,7 @@ import {
 const WRITING_BG_STEM = 'weichao-deng-k0JQkPtfN3s-unsplash_dichrom';
 const CONTACT_BG_STEM = 'guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom';
 import { HERO_BG_FILE_STEM } from '../src/constants/hero-layout';
-const PROFILE_BG_STEM = 'evgeni-tcherkasski-oH31ggeurFc-unsplash_dichrom';
+import { PROFILE_PANEL_BG_FILE_STEM } from '../src/constants/profile-layout';
 
 /** Same breakpoints as Writing `<picture>` — intrinsic `w` descriptors align across content panel pages. */
 const SHARED_PANEL_BG_TIERS = [
@@ -67,7 +67,7 @@ declareResponsivePanelBgMatrix({
       page.locator('.profile-section:not(.profile-section--loading)'),
     ).toBeVisible({ timeout: 15_000 });
   },
-  cases: tierCasesForUrlStem(PROFILE_BG_STEM),
+  cases: tierCasesForUrlStem(PROFILE_PANEL_BG_FILE_STEM),
 });
 
 declareResponsivePanelBgMatrix({

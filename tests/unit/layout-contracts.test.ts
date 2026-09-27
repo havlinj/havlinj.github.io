@@ -207,11 +207,18 @@ describe('layout contracts: profile image-tile dichrom', () => {
       PROFILE_DICHROM_TILE_SIZES,
       PROFILE_FOUNDATIONS_BG,
       PROFILE_FOUNDATIONS_BG_STEM,
+      PROFILE_PANEL_BG,
+      PROFILE_PANEL_BG_FILE_STEM,
+      PROFILE_PANEL_BG_HEIGHT,
       PROFILE_WHY_BG,
       PROFILE_WHY_BG_STEM,
     } = await import('../../src/constants/profile-layout');
-    const { dichromTileDesktopSrcset, dichromTileMobileSrcset } =
-      await import('../../src/constants/dichrom-responsive');
+    const {
+      dichromDesktopSrcset,
+      dichromMobileSrcset,
+      dichromTileDesktopSrcset,
+      dichromTileMobileSrcset,
+    } = await import('../../src/constants/dichrom-responsive');
 
     const md = readRepoFile('src/content/pages/profile.md');
     const css = readRepoFile('src/styles/pages/profile.css');
@@ -225,6 +232,17 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(cssCustomProp(css, '--profile-tile-4-zoom')).toBe('0.45');
     expect(css).toContain('var(--tile-nudge-x, 0) * 100cqw');
     expect(css).toContain('.prof-tile--why .profile-media-surface__paint');
+
+    expect(md).toContain(PROFILE_PANEL_BG_FILE_STEM);
+    expect(md).toContain(dichromMobileSrcset(PROFILE_PANEL_BG));
+    expect(md).toContain(dichromDesktopSrcset(PROFILE_PANEL_BG));
+    expect(md).toContain(`src="${PROFILE_PANEL_BG.w1440.href}"`);
+    expect(md).toContain(`width="${PROFILE_PANEL_BG.w1440.w}"`);
+    expect(md).toContain(`height="${PROFILE_PANEL_BG_HEIGHT}"`);
+    expect(md).not.toContain('evgeni-tcherkasski');
+
+    const matrix = readRepoFile('e2e/responsive-panel-bg-matrix.spec.ts');
+    expect(matrix).toContain('PROFILE_PANEL_BG_FILE_STEM');
 
     expect(md).toContain(PROFILE_WHY_BG_STEM);
     expect(md).toContain(dichromTileMobileSrcset(PROFILE_WHY_BG));

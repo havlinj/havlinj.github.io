@@ -19,6 +19,10 @@ export const DICHROM_INTRINSIC_WIDTHS = {
 
 export type DichromTier = keyof typeof DICHROM_INTRINSIC_WIDTHS;
 
+export type DichromIntrinsicWidths = {
+  readonly [K in DichromTier]: number;
+};
+
 export interface DichromSource {
   href: string;
   w: number;
@@ -47,27 +51,30 @@ function formatDichromSrcset(entries: readonly DichromSource[]): string {
 }
 
 /** Build href + intrinsic `w` entries from a path stem (no trailing `_720` suffix). */
-export function buildDichromResponsive(stem: string): DichromResponsiveSet {
+export function buildDichromResponsive(
+  stem: string,
+  widths: DichromIntrinsicWidths = DICHROM_INTRINSIC_WIDTHS,
+): DichromResponsiveSet {
   return {
     w720: {
       href: `${stem}_720.png`,
-      w: DICHROM_INTRINSIC_WIDTHS.w720,
+      w: widths.w720,
     },
     w1080: {
       href: `${stem}_1080.png`,
-      w: DICHROM_INTRINSIC_WIDTHS.w1080,
+      w: widths.w1080,
     },
     w1440: {
       href: `${stem}_1440.png`,
-      w: DICHROM_INTRINSIC_WIDTHS.w1440,
+      w: widths.w1440,
     },
     w1920: {
       href: `${stem}_1920.png`,
-      w: DICHROM_INTRINSIC_WIDTHS.w1920,
+      w: widths.w1920,
     },
     w2400: {
       href: `${stem}_2400.png`,
-      w: DICHROM_INTRINSIC_WIDTHS.w2400,
+      w: widths.w2400,
     },
   };
 }

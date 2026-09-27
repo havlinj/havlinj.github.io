@@ -23,8 +23,8 @@ All Unsplash media listed below are used according to the
   - Edits: dichromatic treatment, noise
 
 - **Profile page background image**
-  - Author: [Evgeni Tcherkasski](https://unsplash.com/@evgenit)
-  - Source: [Unsplash](https://unsplash.com/photos/oH31ggeurFc)
+  - Author: [JieSuang Ng](https://unsplash.com/@ngjiesuang94)
+  - Source: [Unsplash](https://unsplash.com/photos/WKL3Q906OR4)
   - Edits: dichromatic treatment, noise
 
 - **Writing page background image**

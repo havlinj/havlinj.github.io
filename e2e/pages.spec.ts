@@ -497,7 +497,7 @@ test.describe('Credits page (/credits)', () => {
     ).toBeVisible();
     await expect(page.getByText('vackground.com')).toBeVisible();
     await expect(page.getByText('Tommy')).toBeVisible();
-    await expect(page.getByText('Evgeni Tcherkasski')).toBeVisible();
+    await expect(page.getByText('JieSuang Ng')).toBeVisible();
     await expect(page.getByText('Weichao Deng')).toBeVisible();
     await expect(page.getByText('Guillaume Didelet')).toBeVisible();
     await expect(page.getByText('Frankie Cordoba')).toBeVisible();

@@ -1,9 +1,38 @@
 /** Assets preloaded on /profile for faster veil + tile paint (Layout head). */
 
-import { buildDichromTileResponsive } from './dichrom-responsive';
+import {
+  buildDichromResponsive,
+  buildDichromTileResponsive,
+} from './dichrom-responsive';
 
 export const PROFILE_PORTRAIT_HREF =
   '/assets/pages/profile/portrait_bayer16_style.png';
+
+/**
+ * Panel background. Filename suffix is the display tier; these are PNG IHDR widths.
+ * They differ from `DICHROM_INTRINSIC_WIDTHS` (other pages' Bayer sets).
+ */
+export const PROFILE_PANEL_BG_FILE_STEM =
+  'jiesuang-ng-WKL3Q906OR4-unsplash_dichrom';
+
+export const PROFILE_PANEL_BG_STEM =
+  `/assets/pages/profile/${PROFILE_PANEL_BG_FILE_STEM}`;
+
+export const PROFILE_PANEL_BG_INTRINSIC_WIDTHS = {
+  w720: 1800,
+  w1080: 2430,
+  w1440: 2880,
+  w1920: 3456,
+  w2400: 3840,
+} as const;
+
+export const PROFILE_PANEL_BG = buildDichromResponsive(
+  PROFILE_PANEL_BG_STEM,
+  PROFILE_PANEL_BG_INTRINSIC_WIDTHS,
+);
+
+/** Bitmap height of the `w1440` file, used as the `<img width/height>` pair. */
+export const PROFILE_PANEL_BG_HEIGHT = 1920;
 
 /**
  * Paint box is the overscanned image-tile surface (~2.3× tile).
