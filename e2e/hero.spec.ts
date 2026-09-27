@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { LAYOUT_TOLERANCE } from './constants';
 import { HERO_TAGLINE_SELECTORS } from '../src/constants/hero-tagline';
+import { HERO_BG_FILE_STEM, HERO_BG_STEM } from '../src/constants/hero-layout';
 import {
   hasAstroStylesheetBundle,
   mustBox,
@@ -165,13 +166,10 @@ test.describe('Hero page (/)', () => {
   }) => {
     const preload = page.locator('link[rel="preload"][as="image"]');
     await expect(preload).toHaveCount(1);
-    await expect(preload).toHaveAttribute(
-      'href',
-      '/assets/hero/altumcode-oZ61KFUQsus-unsplash_dichrom_720.png',
-    );
+    await expect(preload).toHaveAttribute('href', `${HERO_BG_STEM}_720.png`);
     await expect(preload).toHaveAttribute(
       'imagesrcset',
-      /altumcode-oZ61KFUQsus-unsplash_dichrom_720\.png 1620w,.*_1080\.png 2160w/,
+      new RegExp(`${HERO_BG_FILE_STEM}_720\\.png 1620w,.*_1080\\.png 2160w`),
     );
     await expect(preload).toHaveAttribute('imagesizes', '100vw');
   });

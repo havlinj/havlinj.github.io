@@ -23,15 +23,9 @@ article.has-buttons-panel {
 }
 
 /*
- * Unified insets (inline on .profile-section):
- *   --profile-inner-gutter      -> base portrait horizontal inset (column width - 2x gutter)
- *   --profile-inner-gutter-x    -> optional horizontal override (left + right)
- *   --profile-inner-gutter-y    -> reserved
- *   --profile-photo-inset-bottom -> portrait square bottom edge (0 = touches tile below)
- *   --profile-photo-inset-right  -> portrait square right offset (0 = fully right)
- *   Shared seam ratio (tune --profile-shared-edge-ratio-* together). Breakpoints use layout viewport
- *   CSS px — phones are often 360–430px wide, so the first step is min-width: 360px (not 480px).
- * Fallback: legacy --portrait-gap-left / --portrait-gap-bottom (single value for both axes).
+ * Composition knobs live here (same pattern as `.hero` in hero.css), not inline in profile.md.
+ * Shared seam ratio: tune --profile-shared-edge-ratio-* together. Breakpoints use layout viewport
+ * CSS px — phones are often 360–430px wide, so the first step is min-width: 360px (not 480px).
  * --profile-tile-label-font-size is set by profile-tile-type-fit.ts
  * Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css.
  */
@@ -39,30 +33,64 @@ article.has-buttons-panel {
   display: block;
   /* Reveal fade — same contract as Hero (.hero-content), Writing (--visible), Contact (--visible). */
   transition: opacity 0.18s ease-out;
-  --profile-tile-text-inset-anchor-x: 10%;
-  --profile-tile-text-inset-far-x: 6%;
+  --profile-groups-reference-from-bottom: 0%;
+  --profile-why-offset-from-reference: 60%;
+  --profile-what-offset-from-reference: 6%;
+  --profile-foundations-offset-from-reference: 9.5%;
+  --profile-portrait-y: 26%;
+  --profile-foundations-y: 72%;
+  --profile-why-width: 41%;
+  --profile-why-height: 34%;
+  --profile-what-width: 47%;
+  --profile-what-height: 45%;
+  --profile-foundations-width: 40%;
+  --profile-foundations-height: 30%;
+  --profile-portrait-size: 31%;
+  --profile-what-frame-padding: 4%;
+  --profile-what-frame-padding-left-multiplier: 1.16;
+  --profile-portrait-frame-anchor-extension: 2%;
+  --profile-tile-text-inset-anchor-x: 22%;
+  --profile-tile-text-inset-far-x: 17%;
   --profile-top-label-strip-ratio: 80.5;
   --profile-tile-text-inset-x: var(--profile-tile-text-inset-anchor-x);
-  --profile-reveal-text-inset-x: 10%;
-  --profile-photo-frame-size: 0px;
-  --profile-why-width: 25%;
-  --profile-why-height: 25%;
-  --profile-what-width: 25%;
-  --profile-what-height: 25%;
-  --profile-foundations-width: 25%;
-  --profile-foundations-height: 25%;
-  --profile-groups-reference-from-bottom: 14%;
-  --profile-why-offset-from-reference: 49.5%;
-  --profile-what-offset-from-reference: 0%;
-  --profile-foundations-offset-from-reference: -1%;
-  --profile-portrait-y: 24%;
-  --profile-foundations-y: 72%;
-  --profile-portrait-size: 25%;
-  --profile-what-frame-padding: 7%;
-  --profile-what-frame-padding-left-multiplier: 1;
-  --profile-background-pan-x: 0%;
+  --profile-reveal-text-inset-x: 8%;
+  --panel-padding-top: 10%;
+  --profile-background-pan-x: 15%;
   --profile-background-pan-y: 0%;
-  --profile-portrait-frame-anchor-extension: 0%;
+  --portrait-pos-x: 40%;
+  --portrait-pos-y: 62%;
+  --portrait-zoom: 1.12;
+  --portrait-brightness: 1.08;
+  --portrait-contrast: 1;
+  --portrait-opacity: 0.95;
+  --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
+  --profile-tile-1-pos-x: 50%;
+  --profile-tile-1-pos-y: 60%;
+  --profile-tile-1-pan-x: 0%;
+  --profile-tile-1-pan-y: 0%;
+  --profile-tile-1-zoom: 0.5;
+  --profile-tile-1-brightness: 1;
+  --profile-tile-1-contrast: 1.2;
+  --profile-tile-1-opacity: 0.9;
+  --profile-tile-3-pos-x: 50%;
+  --profile-tile-3-pos-y: 50%;
+  --profile-tile-3-pan-x: 10%;
+  --profile-tile-3-pan-y: 5%;
+  --profile-tile-3-zoom: 1.39;
+  --profile-tile-3-brightness: 1.1;
+  --profile-tile-3-contrast: 1;
+  --profile-tile-3-opacity: 0.8;
+  --profile-tile-4-bg: url('/assets/pages/profile/uve-sanchez-9DRX_cW48RQ-unsplashdichrom.png');
+  --profile-tile-4-pos-x: 50%;
+  --profile-tile-4-pos-y: 80%;
+  --profile-tile-4-pan-x: 0%;
+  --profile-tile-4-pan-y: 0%;
+  --profile-tile-4-zoom: 0.5;
+  --profile-tile-4-brightness: 1;
+  --profile-tile-4-contrast: 1;
+  --profile-tile-4-opacity: 0.95;
+  --profile-reveal-text-scale: 1.5;
+  --profile-photo-frame-size: 0px;
   --profile-hero-optical-offset: var(--hero-optical-offset, 0.1em);
   --profile-hero-bg-brightness: var(--hero-bg-brightness, 0.88);
   --profile-hero-bg-saturate: var(--hero-bg-saturate, 1.12);
@@ -232,6 +260,15 @@ article.has-buttons-panel {
   right: 0;
   width: min(var(--profile-foundations-width), 100%);
   height: min(var(--profile-foundations-height), 100%);
+  --tile-bg: var(--profile-tile-4-bg);
+  --tile-pos-x: var(--profile-tile-4-pos-x);
+  --tile-pos-y: var(--profile-tile-4-pos-y);
+  --tile-pan-x: var(--profile-tile-4-pan-x);
+  --tile-pan-y: var(--profile-tile-4-pan-y);
+  --tile-zoom: var(--profile-tile-4-zoom);
+  --tile-brightness: var(--profile-tile-4-brightness);
+  --tile-contrast: var(--profile-tile-4-contrast);
+  --tile-image-opacity: var(--profile-tile-4-opacity);
   top: clamp(
     0%,
     calc(
@@ -313,9 +350,29 @@ article.has-buttons-panel {
   background-color: var(--color-page-bg);
 }
 
+.profile-section > a.profile-image-tile {
+  --tile-bg: var(--profile-tile-1-bg);
+  --tile-pos-x: var(--profile-tile-1-pos-x);
+  --tile-pos-y: var(--profile-tile-1-pos-y);
+  --tile-pan-x: var(--profile-tile-1-pan-x);
+  --tile-pan-y: var(--profile-tile-1-pan-y);
+  --tile-zoom: var(--profile-tile-1-zoom);
+  --tile-brightness: var(--profile-tile-1-brightness);
+  --tile-contrast: var(--profile-tile-1-contrast);
+  --tile-image-opacity: var(--profile-tile-1-opacity);
+}
+
 .profile-gif-tile {
   position: relative;
   background-color: var(--color-page-bg);
+  --tile-pos-x: var(--profile-tile-3-pos-x, 50%);
+  --tile-pos-y: var(--profile-tile-3-pos-y, 50%);
+  --tile-pan-x: var(--profile-tile-3-pan-x, 0%);
+  --tile-pan-y: var(--profile-tile-3-pan-y, 0%);
+  --tile-zoom: var(--profile-tile-3-zoom, 1);
+  --tile-brightness: var(--profile-tile-3-brightness, 1);
+  --tile-contrast: var(--profile-tile-3-contrast, 1);
+  --tile-image-opacity: var(--profile-tile-3-opacity, 1);
 }
 
 .profile-gif-tile .page-button__bg,

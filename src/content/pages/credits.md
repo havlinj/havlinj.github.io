@@ -8,8 +8,8 @@ All Unsplash media listed below are used according to the
 [Unsplash License](https://unsplash.com/license).
 
 - **Hero image (homepage)**
-  - Author: [AltumCode](https://unsplash.com/@altumcode)
-  - Source: [Unsplash](https://unsplash.com/photos/oZ61KFUQsus)
+  - Author: [vackground.com](https://unsplash.com/@vackground)
+  - Source: [Unsplash](https://unsplash.com/photos/agUC-v_D1iI)
   - Edits: dichromatic treatment, noise, grid effect
 
 - **Profile tile image (Why this)**

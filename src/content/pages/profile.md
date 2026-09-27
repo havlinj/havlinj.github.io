@@ -2,68 +2,7 @@
 title: 'Profile'
 ---
 
-<div
-  class="profile-section content-panel profile-section--loading"
-  style="
-    /* Edge-anchored controls: independent Y offsets in % of the content panel */
-    /* Shared vertical reference from the bottom edge of the content panel */
-    --profile-groups-reference-from-bottom: 0%;
-    --profile-why-offset-from-reference: 60%;
-    --profile-what-offset-from-reference: 6%;
-    --profile-foundations-offset-from-reference: 9.5%;
-    --profile-portrait-y: 26%;
-    --profile-why-width: 41%;
-    --profile-why-height: 34%;
-    --profile-what-width: 47%;
-    --profile-what-height: 45%;
-    --profile-foundations-width: 40%;
-    --profile-foundations-height:30%;
-    --profile-portrait-size: 31%;
-    /* Frame gutters: % only on What I do; JS → --profile-frame-gutter-*-px for portrait + other tiles. */
-    --profile-what-frame-padding: 4%;
-    --profile-what-frame-padding-left-multiplier: 1.16;
-    --profile-portrait-frame-anchor-extension:2%;
-    --profile-tile-text-inset-anchor-x: 22%;
-    --profile-tile-text-inset-far-x: 17%;
-    --profile-reveal-text-inset-x: 8%;
-    --panel-padding-top: 10%;
-    --profile-background-pan-x: 15%;
-    --profile-background-pan-y: 0%;
-    --portrait-pos-x: 40%;
-    --portrait-pos-y: 62%;
-    --portrait-zoom: 1.12;
-    --portrait-brightness: 1.08;
-    --portrait-contrast: 1;
-    --portrait-opacity: 0.95;
-    --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
-    --profile-tile-1-pos-x: 50%;
-    --profile-tile-1-pos-y: 60%;
-    --profile-tile-1-pan-x: 0%;
-    --profile-tile-1-pan-y: 0%;
-    --profile-tile-1-zoom: 0.5;
-    --profile-tile-1-brightness: 1;
-    --profile-tile-1-contrast: 1.2;
-    --profile-tile-1-opacity: 0.9;
-    --profile-tile-3-pos-x: 50%;
-    --profile-tile-3-pos-y: 50%;
-    --profile-tile-3-pan-x: 10%;
-    --profile-tile-3-pan-y: 5%;
-    --profile-tile-3-zoom: 1.39;
-    --profile-tile-3-brightness: 1.1;
-    --profile-tile-3-contrast: 1;
-    --profile-tile-3-opacity: 0.8;
-    --profile-tile-4-bg: url('/assets/pages/profile/uve-sanchez-9DRX_cW48RQ-unsplashdichrom.png');
-    --profile-tile-4-pos-x: 50%;
-    --profile-tile-4-pos-y: 80%;
-    --profile-tile-4-pan-x: 0%;
-    --profile-tile-4-pan-y: 0%;
-    --profile-tile-4-zoom: 0.5;
-    --profile-tile-4-brightness: 1;
-    --profile-tile-4-contrast: 1;
-    --profile-tile-4-opacity: 0.95;
-    --profile-reveal-text-scale: 1.5;
-  "
->
+<div class="profile-section content-panel profile-section--loading">
   <div class="profile-section__media" aria-hidden="true">
     <picture>
       <source
@@ -86,17 +25,6 @@ title: 'Profile'
   <a
     href="/why-this"
     class="profile-tile profile-image-tile page-button prof-tile"
-    style="
-      --tile-bg: var(--profile-tile-1-bg);
-      --tile-pos-x: var(--profile-tile-1-pos-x);
-      --tile-pos-y: var(--profile-tile-1-pos-y);
-      --tile-pan-x: var(--profile-tile-1-pan-x);
-      --tile-pan-y: var(--profile-tile-1-pan-y);
-      --tile-zoom: var(--profile-tile-1-zoom);
-      --tile-brightness: var(--profile-tile-1-brightness);
-      --tile-contrast: var(--profile-tile-1-contrast);
-      --tile-image-opacity: var(--profile-tile-1-opacity);
-    "
     aria-label="Why this"
   >
     <span class="profile-media-surface" aria-hidden="true">
@@ -114,16 +42,6 @@ title: 'Profile'
   <a
     href="/what-i-do"
     class="profile-tile profile-gif-tile page-button prof-tile"
-    style="
-      --tile-pos-x: var(--profile-tile-3-pos-x, 50%);
-      --tile-pos-y: var(--profile-tile-3-pos-y, 50%);
-      --tile-pan-x: var(--profile-tile-3-pan-x, 0%);
-      --tile-pan-y: var(--profile-tile-3-pan-y, 0%);
-      --tile-zoom: var(--profile-tile-3-zoom, 1);
-      --tile-brightness: var(--profile-tile-3-brightness, 1);
-      --tile-contrast: var(--profile-tile-3-contrast, 1);
-      --tile-image-opacity: var(--profile-tile-3-opacity, 1);
-    "
     aria-label="What I do"
   >
     <div class="profile-media-surface" aria-hidden="true">
@@ -179,17 +97,6 @@ title: 'Profile'
     <a
       href="/foundations"
       class="profile-tile profile-image-tile page-button prof-tile prof-tile--foundations"
-      style="
-        --tile-bg: var(--profile-tile-4-bg);
-        --tile-pos-x: var(--profile-tile-4-pos-x);
-        --tile-pos-y: var(--profile-tile-4-pos-y);
-        --tile-pan-x: var(--profile-tile-4-pan-x);
-        --tile-pan-y: var(--profile-tile-4-pan-y);
-        --tile-zoom: var(--profile-tile-4-zoom);
-        --tile-brightness: var(--profile-tile-4-brightness);
-        --tile-contrast: var(--profile-tile-4-contrast);
-        --tile-image-opacity: var(--profile-tile-4-opacity);
-      "
       aria-label="Foundations"
     >
     <span class="profile-media-surface" aria-hidden="true">

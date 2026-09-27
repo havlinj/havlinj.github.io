@@ -300,6 +300,29 @@ describe('layout contracts: unified content panel skeleton', () => {
     }
   });
 
+  it('profile composition knobs live on .profile-section in CSS, not inline in markdown', () => {
+    const md = readRepoFile('src/content/pages/profile.md');
+    const css = readRepoFile('src/styles/pages/profile.css');
+    expect(md).not.toMatch(/\sstyle="/);
+    expect(cssCustomProp(css, '--profile-why-width')).toBe('41%');
+    expect(cssCustomProp(css, '--profile-what-height')).toBe('45%');
+    expect(cssCustomProp(css, '--portrait-zoom')).toBe('1.12');
+    expect(cssCustomProp(css, '--profile-background-pan-x')).toBe('15%');
+    expect(css).toContain('--tile-bg: var(--profile-tile-1-bg)');
+    expect(css).toContain('--tile-bg: var(--profile-tile-4-bg)');
+  });
+
+  it('hero background stem is shared between the homepage and e2e', () => {
+    const index = readRepoFile('src/pages/index.astro');
+    const matrix = readRepoFile('e2e/responsive-panel-bg-matrix.spec.ts');
+    const heroSpec = readRepoFile('e2e/hero.spec.ts');
+    expect(index).toContain('HERO_BG_STEM');
+    expect(matrix).toContain('HERO_BG_FILE_STEM');
+    expect(heroSpec).toContain('HERO_BG_STEM');
+    expect(index).not.toContain('altumcode');
+    expect(heroSpec).not.toContain('altumcode');
+  });
+
   it('no route stylesheet redefines the title gap or the panel square', () => {
     for (const relPath of ROUTE_STYLESHEETS) {
       const css = readRepoFile(relPath);

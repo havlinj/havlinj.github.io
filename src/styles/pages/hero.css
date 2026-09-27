@@ -1,12 +1,12 @@
 /* Outer geometry (square, no margins) comes from `.content-panel` in content-panel.css. */
 .hero {
   /* Legacy ~1.1 scale on BG was translate+scale; oversampled tiers use sizing only (see .hero-bg__image). */
-  --hero-bg-zoom: 1.8;
-  --hero-bg-image-opacity: 0.87;
+  --hero-bg-zoom: 1.35;
+  --hero-bg-image-opacity: 0.81;
   /* Tagline sizing should follow hero width (not viewport) */
   container-type: inline-size;
-  --hero-bg-nudge-x: -0.3;
-  --hero-bg-nudge-y: -0.05;
+  --hero-bg-nudge-x: -0.22;
+  --hero-bg-nudge-y: 0.01;
   /* Text anchor: 0% = left/top edge, 50% = center, 100% = right/bottom edge */
   --hero-text-x: 50%;
   --hero-text-y: 40%;

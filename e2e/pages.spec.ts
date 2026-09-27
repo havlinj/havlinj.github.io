@@ -494,7 +494,7 @@ test.describe('Credits page (/credits)', () => {
     await expect(
       page.getByRole('heading', { name: 'Videos', level: 3 }),
     ).toBeVisible();
-    await expect(page.getByText('AltumCode')).toBeVisible();
+    await expect(page.getByText('vackground.com')).toBeVisible();
     await expect(page.getByText('Tommy')).toBeVisible();
     await expect(page.getByText('Evgeni Tcherkasski')).toBeVisible();
     await expect(page.getByText('Weichao Deng')).toBeVisible();
