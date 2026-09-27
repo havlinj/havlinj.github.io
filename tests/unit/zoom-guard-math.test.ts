@@ -1,56 +1,45 @@
 import { describe, expect, it } from 'vitest';
+import { ZOOM_SIGNAL_STABLE_MAX } from '../../src/utils/zoom-signals';
 import {
   ZOOM_GUARD_EXIT_HYSTERESIS,
+  ZOOM_GUARD_FREEZE_ENTER_RATIO,
   ZOOM_GUARD_MAX_SAFE_ZOOM,
   ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD,
+  ZOOM_GUARD_VEIL_ARM_RATIO,
+  ZOOM_GUARD_VEIL_LOOKAHEAD,
   ZOOM_GUARD_WARM_CANCEL_RATIO,
   computeOverflowHealScale,
   computeTargetFreezeScale,
-  computeZoomRatio,
   isAbsurdStoredBaselineInnerWidth,
+  shouldApplyOverflowHeal,
+  shouldArmFreezeVeil,
+  shouldShowFreezeVeil,
   shouldCancelWarmStart,
   shouldKeepFreeze,
-  shouldResetZoomFreezeBaseline,
 } from '../../src/utils/zoom-guard-math';
 
-describe('computeZoomRatio', () => {
-  it('uses max of vv, dpr, and innerWidth ratio', () => {
-    const r = computeZoomRatio({
-      baselineDpr: 1,
-      baselineVvScale: 1,
-      baselineInnerWidth: 1200,
-      currentDpr: 1,
-      currentVvScale: 1,
-      currentInnerWidth: 400,
-    });
-    expect(r).toBeCloseTo(3, 5);
-  });
-
-  it('treats vv scale 0 as 1 for ratio branches', () => {
-    const r = computeZoomRatio({
-      baselineDpr: 1,
-      baselineVvScale: 1,
-      baselineInnerWidth: 800,
-      currentDpr: 1,
-      currentVvScale: 0,
-      currentInnerWidth: 800,
-    });
-    expect(r).toBe(1);
-  });
-});
-
 describe('shouldKeepFreeze', () => {
-  it('enters freeze when ratio exceeds max and not active', () => {
+  it('enters freeze only after the enter threshold, not at max-safe', () => {
+    expect(ZOOM_GUARD_FREEZE_ENTER_RATIO).toBeLessThan(
+      ZOOM_GUARD_MAX_SAFE_ZOOM,
+    );
     expect(
       shouldKeepFreeze({
-        ratio: 2.4,
+        ratio: ZOOM_GUARD_FREEZE_ENTER_RATIO,
+        freezeActive: false,
+        healLockFrames: 0,
+      }),
+    ).toBe(false);
+    expect(
+      shouldKeepFreeze({
+        ratio: ZOOM_GUARD_FREEZE_ENTER_RATIO + 0.001,
         freezeActive: false,
         healLockFrames: 0,
       }),
     ).toBe(true);
     expect(
       shouldKeepFreeze({
-        ratio: 2.29,
+        ratio: 2.14,
         freezeActive: false,
         healLockFrames: 0,
       }),
@@ -88,6 +77,16 @@ describe('shouldKeepFreeze', () => {
 });
 
 describe('computeTargetFreezeScale', () => {
+  it('stays 1 between freeze-enter and max-safe (no shrink until past the wall)', () => {
+    expect(computeTargetFreezeScale(ZOOM_GUARD_FREEZE_ENTER_RATIO + 0.01)).toBe(
+      1,
+    );
+    expect(computeTargetFreezeScale(ZOOM_GUARD_MAX_SAFE_ZOOM)).toBe(1);
+    expect(
+      computeTargetFreezeScale(ZOOM_GUARD_MAX_SAFE_ZOOM + 0.01),
+    ).toBeLessThan(1);
+  });
+
   it('clamps to MAX_SAFE_ZOOM / ratio', () => {
     expect(computeTargetFreezeScale(4.6)).toBeCloseTo(0.5, 5);
     expect(computeTargetFreezeScale(2.3)).toBe(1);
@@ -126,6 +125,119 @@ describe('isAbsurdStoredBaselineInnerWidth', () => {
   });
 });
 
+describe('shouldArmFreezeVeil', () => {
+  it('arms from current ratio at the veil threshold', () => {
+    expect(ZOOM_GUARD_VEIL_ARM_RATIO).toBeLessThan(
+      ZOOM_GUARD_FREEZE_ENTER_RATIO,
+    );
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: false,
+        freezeSettling: false,
+        lastPublishedRatio: 1,
+        currentRatio: ZOOM_GUARD_VEIL_ARM_RATIO,
+      }),
+    ).toBe(true);
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: false,
+        freezeSettling: false,
+        lastPublishedRatio: 1,
+        currentRatio: ZOOM_GUARD_VEIL_ARM_RATIO - 0.01,
+      }),
+    ).toBe(false);
+  });
+
+  it('arms from last published ratio one lookahead tick early', () => {
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: false,
+        freezeSettling: false,
+        lastPublishedRatio:
+          ZOOM_GUARD_VEIL_ARM_RATIO - ZOOM_GUARD_VEIL_LOOKAHEAD,
+        currentRatio: 1.5,
+      }),
+    ).toBe(true);
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: false,
+        freezeSettling: false,
+        lastPublishedRatio:
+          ZOOM_GUARD_VEIL_ARM_RATIO - ZOOM_GUARD_VEIL_LOOKAHEAD - 0.01,
+        currentRatio: 1.5,
+      }),
+    ).toBe(false);
+  });
+
+  it('does not arm while already frozen or settling', () => {
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: true,
+        freezeSettling: false,
+        lastPublishedRatio: 3,
+        currentRatio: 3,
+      }),
+    ).toBe(false);
+    expect(
+      shouldArmFreezeVeil({
+        freezeActive: false,
+        freezeSettling: true,
+        lastPublishedRatio: 3,
+        currentRatio: 3,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('shouldShowFreezeVeil', () => {
+  it('does not cover the page at rest, including the approach band', () => {
+    expect(
+      shouldShowFreezeVeil({ freezeSettling: false }),
+    ).toBe(false);
+  });
+
+  it('covers freeze-pending, then hides after freeze has settled', () => {
+    expect(
+      shouldShowFreezeVeil({ freezeSettling: true }),
+    ).toBe(true);
+    expect(
+      shouldShowFreezeVeil({ freezeSettling: false }),
+    ).toBe(false);
+  });
+});
+
+describe('shouldApplyOverflowHeal', () => {
+  it('is false while freeze is already active', () => {
+    expect(shouldApplyOverflowHeal({ freezeActive: true, zoomRatio: 1 })).toBe(
+      false,
+    );
+  });
+
+  it('is false during page or pinch zoom', () => {
+    expect(
+      shouldApplyOverflowHeal({ freezeActive: false, zoomRatio: 1.5 }),
+    ).toBe(false);
+  });
+
+  it('is true only when unfrozen and zoom is still ~1 (same ceiling as signal stable-max)', () => {
+    expect(shouldApplyOverflowHeal({ freezeActive: false, zoomRatio: 1 })).toBe(
+      true,
+    );
+    expect(
+      shouldApplyOverflowHeal({
+        freezeActive: false,
+        zoomRatio: ZOOM_SIGNAL_STABLE_MAX,
+      }),
+    ).toBe(true);
+    expect(
+      shouldApplyOverflowHeal({
+        freezeActive: false,
+        zoomRatio: ZOOM_SIGNAL_STABLE_MAX + 0.001,
+      }),
+    ).toBe(false);
+  });
+});
+
 describe('shouldCancelWarmStart', () => {
   it('is true above warm-cancel factor of max safe zoom', () => {
     expect(
@@ -137,51 +249,6 @@ describe('shouldCancelWarmStart', () => {
       shouldCancelWarmStart(
         ZOOM_GUARD_MAX_SAFE_ZOOM * ZOOM_GUARD_WARM_CANCEL_RATIO - 0.001,
       ),
-    ).toBe(false);
-  });
-});
-
-describe('shouldResetZoomFreezeBaseline', () => {
-  const stable = {
-    baselineDpr: 1,
-    baselineVvScale: 1,
-    baselineInnerWidth: 1200,
-    currentDpr: 1,
-    currentVvScale: 1,
-    currentInnerWidth: 1200,
-  };
-
-  it('is false when viewport class matches baseline', () => {
-    expect(shouldResetZoomFreezeBaseline(stable)).toBe(false);
-  });
-
-  it('is true for desktop→narrow resize (squeeze is not zoom)', () => {
-    expect(
-      shouldResetZoomFreezeBaseline({
-        ...stable,
-        currentInnerWidth: 390,
-      }),
-    ).toBe(true);
-  });
-
-  it('is true when width expands past baseline', () => {
-    expect(
-      shouldResetZoomFreezeBaseline({
-        ...stable,
-        baselineInnerWidth: 400,
-        currentInnerWidth: 500,
-      }),
-    ).toBe(true);
-  });
-
-  it('is false for pinch-like vvScale rise at same width', () => {
-    expect(
-      shouldResetZoomFreezeBaseline({
-        ...stable,
-        baselineInnerWidth: 390,
-        currentInnerWidth: 390,
-        currentVvScale: 3,
-      }),
     ).toBe(false);
   });
 });

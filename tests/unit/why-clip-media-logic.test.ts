@@ -5,11 +5,11 @@ describe('pathnameOfMediaSrc', () => {
   it('prefers currentSrc over src', () => {
     expect(
       pathnameOfMediaSrc(
-        '/assets/pages/profile/why/desktop/x.mp4',
+        '/assets/pages/profile/why-this/desktop/x.mp4',
         '',
         'https://example.com/why/',
       ),
-    ).toBe('/assets/pages/profile/why/desktop/x.mp4');
+    ).toBe('/assets/pages/profile/why-this/desktop/x.mp4');
   });
 
   it('falls back to src when currentSrc empty', () => {

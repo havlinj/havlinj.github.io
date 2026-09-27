@@ -1,35 +1,40 @@
 /**
  * SessionStorage JSON for zoom-guard-init.ts — parsed shape only, no DOM.
  */
+import { snapshotLooksValid, type ZoomViewportSnapshot } from './zoom-signals';
 
-export type ZoomFreezeBaselineV2 = {
-  dpr: number;
-  vvScale: number;
-  innerWidth: number;
-};
+export const ZOOM_FREEZE_BASELINE_STORAGE_KEY = 'zoomFreezeBaselineV3';
+export const ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY = 'zoomFreezeGuardStateV2';
+
+export type ZoomFreezeBaselineV3 = ZoomViewportSnapshot;
 
 export function hasValidZoomFreezeBaseline(
-  baseline: ZoomFreezeBaselineV2 | null | undefined,
-): baseline is ZoomFreezeBaselineV2 {
-  return (
-    !!baseline &&
-    Number.isFinite(baseline.dpr) &&
-    baseline.dpr > 0 &&
-    Number.isFinite(baseline.vvScale) &&
-    baseline.vvScale > 0 &&
-    Number.isFinite(baseline.innerWidth) &&
-    baseline.innerWidth > 0
-  );
+  baseline: ZoomFreezeBaselineV3 | null | undefined,
+): baseline is ZoomFreezeBaselineV3 {
+  return !!baseline && snapshotLooksValid(baseline);
 }
 
 export function parseZoomFreezeBaselineJson(
   raw: string | null,
-): ZoomFreezeBaselineV2 | null {
+): ZoomFreezeBaselineV3 | null {
   if (!raw) return null;
   try {
-    const parsed = JSON.parse(raw) as ZoomFreezeBaselineV2;
-    if (!hasValidZoomFreezeBaseline(parsed)) return null;
-    return parsed;
+    const parsed = JSON.parse(raw) as Partial<ZoomFreezeBaselineV3>;
+    const dpr = parsed.dpr;
+    const vvScale = parsed.vvScale;
+    const innerWidth = parsed.innerWidth;
+    const outerWidth =
+      Number.isFinite(parsed.outerWidth) && (parsed.outerWidth as number) >= 0
+        ? (parsed.outerWidth as number)
+        : 0;
+    const snapshot: ZoomFreezeBaselineV3 = {
+      dpr: dpr as number,
+      vvScale: vvScale as number,
+      innerWidth: innerWidth as number,
+      outerWidth,
+    };
+    if (!hasValidZoomFreezeBaseline(snapshot)) return null;
+    return snapshot;
   } catch {
     return null;
   }

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import { CONTACT_LAYOUT } from '../src/constants/contact-layout';
+import { ZOOM_FREEZE_BASELINE_STORAGE_KEY } from '../src/utils/zoom-guard-storage';
 import { LAYOUT_TOLERANCE, MIN_GAP, MAX_GAP } from './constants';
 import {
   expectNavLinkActive,
@@ -750,16 +751,24 @@ test.describe('Contact page (/contact)', () => {
   }) => {
     await page.setViewportSize({ width: 900, height: 900 });
     await page.goto('/contact');
-    await page.evaluate(() => {
-      window.sessionStorage.setItem(
-        'zoomFreezeBaselineV2',
-        JSON.stringify({ dpr: 1, vvScale: 1, innerWidth: 3000 }),
-      );
-    });
+    await page.evaluate(
+      ({ baselineKey }) => {
+        window.sessionStorage.setItem(
+          baselineKey,
+          JSON.stringify({
+            dpr: 1,
+            vvScale: 1,
+            innerWidth: 3000,
+            outerWidth: 3000,
+          }),
+        );
+      },
+      { baselineKey: ZOOM_FREEZE_BASELINE_STORAGE_KEY },
+    );
     await page.reload({ waitUntil: 'domcontentloaded' });
 
-    const state = await page.evaluate(() => {
-      const baselineRaw = window.sessionStorage.getItem('zoomFreezeBaselineV2');
+    const state = await page.evaluate((baselineKey) => {
+      const baselineRaw = window.sessionStorage.getItem(baselineKey);
       const baseline = baselineRaw ? JSON.parse(baselineRaw) : null;
       return {
         baseline,
@@ -770,7 +779,7 @@ test.describe('Contact page (/contact)', () => {
             ?.classList.contains('zoom-freeze-active') === true,
         innerWidth: window.innerWidth,
       };
-    });
+    }, ZOOM_FREEZE_BASELINE_STORAGE_KEY);
 
     expect(state.baseline).not.toBeNull();
     expect(state.frozen).toBe(false);

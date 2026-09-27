@@ -1,10 +1,12 @@
 ---
 import interLatin700Woff2 from '@fontsource/inter/files/inter-latin-700-normal.woff2?url';
+import { dichromTileMobileSrcset } from '../../constants/dichrom-responsive';
 import {
+  PROFILE_DICHROM_TILE_SIZES,
+  PROFILE_FOUNDATIONS_BG,
   PROFILE_PORTRAIT_HREF,
-  PROFILE_TILE_BG_FOUNDATIONS,
-  PROFILE_TILE_BG_WHY,
   PROFILE_WHAT_I_DO_FALLBACK_HREF,
+  PROFILE_WHY_BG,
 } from '../../constants/profile-layout';
 
 const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
@@ -41,6 +43,18 @@ const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
   href={PROFILE_PORTRAIT_HREF}
   fetchpriority="high"
 />
-<link rel="preload" as="image" href={PROFILE_TILE_BG_WHY} />
-<link rel="preload" as="image" href={PROFILE_TILE_BG_FOUNDATIONS} />
+<link
+  rel="preload"
+  as="image"
+  href={PROFILE_WHY_BG.w160.href}
+  imagesrcset={dichromTileMobileSrcset(PROFILE_WHY_BG)}
+  imagesizes={PROFILE_DICHROM_TILE_SIZES}
+/>
+<link
+  rel="preload"
+  as="image"
+  href={PROFILE_FOUNDATIONS_BG.w160.href}
+  imagesrcset={dichromTileMobileSrcset(PROFILE_FOUNDATIONS_BG)}
+  imagesizes={PROFILE_DICHROM_TILE_SIZES}
+/>
 <link rel="preload" as="image" href={PROFILE_WHAT_I_DO_FALLBACK_HREF} />

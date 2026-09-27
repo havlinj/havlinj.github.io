@@ -25,6 +25,8 @@ export {
   assertContentPanelLayout,
   readZoomGuardSnapshot,
   resetDocZoom,
+  simulateDevicePixelRatioOnly,
+  simulatePageZoom,
   waitContactFitVisible,
   waitWritingGroupsVisible,
   type ContentPanelCase,

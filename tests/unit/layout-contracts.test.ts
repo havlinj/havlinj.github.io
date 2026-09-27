@@ -201,6 +201,52 @@ describe('layout contracts: content panel selectors (constants ↔ e2e)', () => 
   });
 });
 
+describe('layout contracts: profile image-tile dichrom', () => {
+  it('profile.md picture srcsets match tile builders + sizes constant', async () => {
+    const {
+      PROFILE_DICHROM_TILE_SIZES,
+      PROFILE_FOUNDATIONS_BG,
+      PROFILE_FOUNDATIONS_BG_STEM,
+      PROFILE_WHY_BG,
+      PROFILE_WHY_BG_STEM,
+    } = await import('../../src/constants/profile-layout');
+    const { dichromTileDesktopSrcset, dichromTileMobileSrcset } =
+      await import('../../src/constants/dichrom-responsive');
+
+    const md = readRepoFile('src/content/pages/profile.md');
+    const css = readRepoFile('src/styles/pages/profile.css');
+    expect(md).not.toContain('tommy-RCA--h6cmcU-unsplash_dichrom.png');
+    expect(md).not.toContain('--profile-tile-1-bg');
+    expect(md).not.toContain('--profile-tile-4-bg');
+    expect(md).toContain('prof-tile--why');
+    expect(css).toContain('--profile-tile-1-nudge-x');
+    expect(css).toContain('--profile-tile-4-nudge-x');
+    expect(cssCustomProp(css, '--profile-tile-4-nudge-y')).toBe('0.1');
+    expect(cssCustomProp(css, '--profile-tile-4-zoom')).toBe('0.45');
+    expect(css).toContain('var(--tile-nudge-x, 0) * 100cqw');
+    expect(css).toContain('.prof-tile--why .profile-media-surface__paint');
+
+    expect(md).toContain(PROFILE_WHY_BG_STEM);
+    expect(md).toContain(dichromTileMobileSrcset(PROFILE_WHY_BG));
+    expect(md).toContain(dichromTileDesktopSrcset(PROFILE_WHY_BG));
+    expect(md).toContain(`src="${PROFILE_WHY_BG.w320.href}"`);
+
+    expect(md).toContain(PROFILE_FOUNDATIONS_BG_STEM);
+    expect(md).toContain(dichromTileMobileSrcset(PROFILE_FOUNDATIONS_BG));
+    expect(md).toContain(dichromTileDesktopSrcset(PROFILE_FOUNDATIONS_BG));
+    expect(md).toContain(`src="${PROFILE_FOUNDATIONS_BG.w320.href}"`);
+    expect(md).toContain(`sizes="${PROFILE_DICHROM_TILE_SIZES}"`);
+    expect(md).toContain(`width="${PROFILE_FOUNDATIONS_BG.w320.w}"`);
+
+    const head = readRepoFile('src/components/layout/ProfileLayoutHead.astro');
+    expect(head).toContain('dichromTileMobileSrcset(PROFILE_WHY_BG)');
+    expect(head).toContain('PROFILE_WHY_BG.w160.href');
+    expect(head).toContain('dichromTileMobileSrcset(PROFILE_FOUNDATIONS_BG)');
+    expect(head).toContain('PROFILE_FOUNDATIONS_BG.w160.href');
+    expect(head).toContain('imagesizes={PROFILE_DICHROM_TILE_SIZES}');
+  });
+});
+
 /*
  * The vertical skeleton (nav → page title → content panel → footer) has exactly one
  * definition. Per-page overrides previously drifted to 1.1rem / 1.3rem / 1.35rem / 1.5rem

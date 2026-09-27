@@ -1,5 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
+import {
+  ZOOM_FREEZE_BASELINE_STORAGE_KEY,
+  ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY,
+} from '../src/utils/zoom-guard-storage';
 import { readContentPanelContainment } from './helpers';
 import {
   MAINTENANCE_CONTENT_PANEL_CASE,
@@ -7,6 +11,7 @@ import {
   assertContentPanelLayout,
   readZoomGuardSnapshot,
   resetDocZoom,
+  simulatePageZoom,
   simulateVisualViewportScale,
 } from './helpers/zoom-guard';
 
@@ -106,16 +111,27 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
   }) => {
     await page.setViewportSize({ width: 1200, height: 900 });
     await page.goto('/writing');
-    await page.evaluate(() => {
-      window.sessionStorage.setItem(
-        'zoomFreezeBaselineV2',
-        JSON.stringify({ dpr: 1, vvScale: 1, innerWidth: 1200 }),
-      );
-      window.sessionStorage.setItem(
-        'zoomFreezeGuardStateV2',
-        JSON.stringify({ active: true, freezeScale: 0.52, ts: 0 }),
-      );
-    });
+    await page.evaluate(
+      ({ baselineKey, stateKey }) => {
+        window.sessionStorage.setItem(
+          baselineKey,
+          JSON.stringify({
+            dpr: 1,
+            vvScale: 1,
+            innerWidth: 1200,
+            outerWidth: 1200,
+          }),
+        );
+        window.sessionStorage.setItem(
+          stateKey,
+          JSON.stringify({ active: true, freezeScale: 0.52, ts: 0 }),
+        );
+      },
+      {
+        baselineKey: ZOOM_FREEZE_BASELINE_STORAGE_KEY,
+        stateKey: ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY,
+      },
+    );
     await page.reload({ waitUntil: 'domcontentloaded' });
 
     await expect
@@ -154,6 +170,34 @@ test.describe('maintenance zoom guard @zoom-guard', () => {
       });
     }
     await resetDocZoom(page);
+  });
+
+  test('browser page zoom (DPR up + innerWidth down) freezes past max safe', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1200, height: 900 });
+    await page.goto('/writing');
+
+    await simulatePageZoom(page, 1.5);
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(false);
+
+    await simulatePageZoom(page, 3);
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(true);
+
+    await simulatePageZoom(page, 1);
+    await expect
+      .poll(async () => (await readZoomGuardSnapshot(page)).frozen, {
+        timeout: 4000,
+      })
+      .toBe(false);
   });
 
   test('pinch-scale freeze hysteresis on maintenance panel', async ({

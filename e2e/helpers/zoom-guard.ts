@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 import { CONTENT_PANEL_SELECTORS } from '../../src/constants/content-panel';
 import { readContentPanelContainment } from './geometry';
 import { waitTwoFrames } from './raf';
+import { ZOOM_FREEZE_VEIL_CLASS } from '../../src/utils/zoom-guard-math';
 
 export type ContentPanelCase = {
   name: ContentPanelRouteName;
@@ -74,6 +75,77 @@ export async function applyDocZoom(page: Page, zoom: number): Promise<void> {
 
 export async function resetDocZoom(page: Page): Promise<void> {
   await applyDocZoom(page, 1);
+}
+
+/**
+ * Ctrl/Cmd page zoom: innerWidth shrinks while outerWidth stays. Chrome/Firefox
+ * also raise devicePixelRatio; Safari Cmd+/- does not (`dprTracksZoom: false`).
+ * CSS `documentElement.style.zoom` does not model this.
+ */
+export async function simulatePageZoom(
+  page: Page,
+  factor: number,
+  opts?: { dprTracksZoom?: boolean },
+): Promise<void> {
+  const dprTracksZoom = opts?.dprTracksZoom !== false;
+  await page.evaluate(
+    ({ z, dprTracks }) => {
+      const w = window as Window & {
+        __zoomGuardPageZoomOrig?: {
+          dpr: number;
+          innerWidth: number;
+          scrollWidth: number;
+        };
+      };
+      if (w.__zoomGuardPageZoomOrig == null) {
+        w.__zoomGuardPageZoomOrig = {
+          dpr: window.devicePixelRatio || 1,
+          innerWidth: window.innerWidth || 1,
+          scrollWidth:
+            document.documentElement.scrollWidth || window.innerWidth || 1,
+        };
+      }
+      const orig = w.__zoomGuardPageZoomOrig;
+      const nextInnerWidth = Math.max(1, Math.round(orig.innerWidth / z));
+      const nextScrollWidth = Math.max(1, Math.round(orig.scrollWidth / z));
+      const nextDpr = dprTracks ? orig.dpr * z : orig.dpr;
+      Object.defineProperty(window, 'devicePixelRatio', {
+        configurable: true,
+        get: () => nextDpr,
+      });
+      Object.defineProperty(window, 'innerWidth', {
+        configurable: true,
+        get: () => nextInnerWidth,
+      });
+      Object.defineProperty(document.documentElement, 'scrollWidth', {
+        configurable: true,
+        get: () => nextScrollWidth,
+      });
+      window.dispatchEvent(new Event('resize'));
+      window.visualViewport?.dispatchEvent(new Event('resize'));
+    },
+    { z: factor, dprTracks: dprTracksZoom },
+  );
+  await waitTwoFrames(page);
+}
+
+/**
+ * Fast Ctrl-wheel first paint: devicePixelRatio jumps before innerWidth shrinks.
+ * Must not recapture the freeze baseline (that reset is what let freeze miss).
+ */
+export async function simulateDevicePixelRatioOnly(
+  page: Page,
+  dpr: number,
+): Promise<void> {
+  await page.evaluate((nextDpr) => {
+    Object.defineProperty(window, 'devicePixelRatio', {
+      configurable: true,
+      get: () => nextDpr,
+    });
+    window.dispatchEvent(new Event('resize'));
+    window.visualViewport?.dispatchEvent(new Event('resize'));
+  }, dpr);
+  await waitTwoFrames(page);
 }
 
 /**
@@ -170,8 +242,9 @@ export async function forceZoomFreezeDom(
 export async function readZoomGuardSnapshot(page: Page): Promise<{
   frozen: boolean;
   freezeScale: string;
+  veil: boolean;
 }> {
-  return page.evaluate(() => {
+  return page.evaluate((veilClass) => {
     const main = document.querySelector('main.content');
     const cs = main instanceof HTMLElement ? getComputedStyle(main) : null;
     return {
@@ -179,8 +252,9 @@ export async function readZoomGuardSnapshot(page: Page): Promise<{
         document.body.classList.contains('zoom-threshold-exceeded') &&
         main?.classList.contains('zoom-freeze-active') === true,
       freezeScale: cs?.getPropertyValue('--zoom-freeze-scale').trim() ?? '',
+      veil: document.body.classList.contains(veilClass),
     };
-  });
+  }, ZOOM_FREEZE_VEIL_CLASS);
 }
 
 export async function waitWritingGroupsVisible(page: Page): Promise<void> {
@@ -233,6 +307,14 @@ export async function assertContentPanelLayout(
   const label = opts?.label ?? c.name;
 
   if (c.name === 'writing') {
+    const maintenanceOnWriting = await page
+      .locator('.route-maintenance-panel')
+      .count();
+    if (maintenanceOnWriting > 0) {
+      throw new Error(
+        'Expected live /writing, got the maintenance panel. Playwright starts webServer with MAINTENANCE_FORCE_OFF=1; a reused `npm run dev` without that env will fail this check.',
+      );
+    }
     await waitWritingGroupsVisible(page);
   }
   if (c.name === 'contact') {

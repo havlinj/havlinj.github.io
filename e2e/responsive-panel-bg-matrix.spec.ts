@@ -95,3 +95,53 @@ declareResponsivePanelBgMatrix({
   },
   cases: tierCasesForUrlStem(CONTACT_BG_STEM),
 });
+
+const FOUNDATIONS_BG_STEM =
+  'andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage';
+const WHY_BG_STEM = 't-RCA--h6cmcU-unsplash_dichrom_collage';
+
+declareResponsivePanelBgMatrix({
+  suiteTitle: 'Profile Foundations tile responsive Bayer PNG tiers',
+  path: '/profile',
+  imgSelector: '.prof-tile--foundations .profile-media-surface__paint img',
+  waitForReady: async (page) => {
+    await expect(
+      page.locator('.profile-section:not(.profile-section--loading)'),
+    ).toBeVisible({ timeout: 15_000 });
+  },
+  cases: [
+    {
+      tierLabel: '160',
+      viewport: { width: 375, height: 740 },
+      urlMatcher: new RegExp(`${FOUNDATIONS_BG_STEM}_160\\.png`),
+    },
+    {
+      tierLabel: '240',
+      viewport: { width: 900, height: 700 },
+      urlMatcher: new RegExp(`${FOUNDATIONS_BG_STEM}_240\\.png`),
+    },
+  ],
+});
+
+declareResponsivePanelBgMatrix({
+  suiteTitle: 'Profile Why this tile responsive Bayer PNG tiers',
+  path: '/profile',
+  imgSelector: '.prof-tile--why .profile-media-surface__paint img',
+  waitForReady: async (page) => {
+    await expect(
+      page.locator('.profile-section:not(.profile-section--loading)'),
+    ).toBeVisible({ timeout: 15_000 });
+  },
+  cases: [
+    {
+      tierLabel: '160',
+      viewport: { width: 375, height: 740 },
+      urlMatcher: new RegExp(`${WHY_BG_STEM}_160\\.png`),
+    },
+    {
+      tierLabel: '240',
+      viewport: { width: 900, height: 700 },
+      urlMatcher: new RegExp(`${WHY_BG_STEM}_240\\.png`),
+    },
+  ],
+});

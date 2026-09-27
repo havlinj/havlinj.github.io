@@ -63,9 +63,11 @@ article.has-buttons-panel {
   --portrait-brightness: 1.08;
   --portrait-contrast: 1;
   --portrait-opacity: 0.95;
-  --profile-tile-1-bg: url('/assets/pages/profile/tommy-RCA--h6cmcU-unsplash_dichrom.png');
+  --profile-tile-1-bg: none;
   --profile-tile-1-pos-x: 50%;
   --profile-tile-1-pos-y: 60%;
+  --profile-tile-1-nudge-x: 0;
+  --profile-tile-1-nudge-y: 0;
   --profile-tile-1-pan-x: 0%;
   --profile-tile-1-pan-y: 0%;
   --profile-tile-1-zoom: 0.5;
@@ -80,12 +82,14 @@ article.has-buttons-panel {
   --profile-tile-3-brightness: 1.1;
   --profile-tile-3-contrast: 1;
   --profile-tile-3-opacity: 0.8;
-  --profile-tile-4-bg: url('/assets/pages/profile/uve-sanchez-9DRX_cW48RQ-unsplashdichrom.png');
+  --profile-tile-4-bg: none;
   --profile-tile-4-pos-x: 50%;
   --profile-tile-4-pos-y: 80%;
+  --profile-tile-4-nudge-x: 0;
+  --profile-tile-4-nudge-y: 0.1;
   --profile-tile-4-pan-x: 0%;
   --profile-tile-4-pan-y: 0%;
-  --profile-tile-4-zoom: 0.5;
+  --profile-tile-4-zoom: 0.45;
   --profile-tile-4-brightness: 1;
   --profile-tile-4-contrast: 1;
   --profile-tile-4-opacity: 0.95;
@@ -263,6 +267,8 @@ article.has-buttons-panel {
   --tile-bg: var(--profile-tile-4-bg);
   --tile-pos-x: var(--profile-tile-4-pos-x);
   --tile-pos-y: var(--profile-tile-4-pos-y);
+  --tile-nudge-x: var(--profile-tile-4-nudge-x, 0);
+  --tile-nudge-y: var(--profile-tile-4-nudge-y, 0);
   --tile-pan-x: var(--profile-tile-4-pan-x);
   --tile-pan-y: var(--profile-tile-4-pan-y);
   --tile-zoom: var(--profile-tile-4-zoom);
@@ -354,6 +360,8 @@ article.has-buttons-panel {
   --tile-bg: var(--profile-tile-1-bg);
   --tile-pos-x: var(--profile-tile-1-pos-x);
   --tile-pos-y: var(--profile-tile-1-pos-y);
+  --tile-nudge-x: var(--profile-tile-1-nudge-x, 0);
+  --tile-nudge-y: var(--profile-tile-1-nudge-y, 0);
   --tile-pan-x: var(--profile-tile-1-pan-x);
   --tile-pan-y: var(--profile-tile-1-pan-y);
   --tile-zoom: var(--profile-tile-1-zoom);
@@ -461,6 +469,33 @@ article.has-buttons-panel {
   backface-visibility: hidden;
   will-change: transform;
   pointer-events: none;
+}
+
+.prof-tile--why .profile-media-surface__paint,
+.prof-tile--foundations .profile-media-surface__paint {
+  background-image: none;
+  overflow: hidden;
+}
+
+.prof-tile--why .profile-media-surface__paint picture,
+.prof-tile--why .profile-media-surface__paint img,
+.prof-tile--foundations .profile-media-surface__paint picture,
+.prof-tile--foundations .profile-media-surface__paint img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.prof-tile--why .profile-media-surface__paint img,
+.prof-tile--foundations .profile-media-surface__paint img {
+  object-fit: cover;
+  object-position: calc(
+      var(--tile-pos-x, 50%) + var(--tile-nudge-x, 0) * 100cqw
+    )
+    calc(var(--tile-pos-y, 50%) + var(--tile-nudge-y, 0) * 100cqw);
+  max-width: none;
 }
 
 .profile-gif-tile__media {

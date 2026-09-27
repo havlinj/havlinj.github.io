@@ -24,12 +24,29 @@ title: 'Profile'
   </div>
   <a
     href="/why-this"
-    class="profile-tile profile-image-tile page-button prof-tile"
+    class="profile-tile profile-image-tile page-button prof-tile prof-tile--why"
     aria-label="Why this"
   >
     <span class="profile-media-surface" aria-hidden="true">
       <span class="profile-media-surface__layer" aria-hidden="true">
-        <span class="profile-media-surface__paint" aria-hidden="true"></span>
+        <span class="profile-media-surface__paint" aria-hidden="true">
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset="/assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_160.png 480w, /assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_240.png 720w"
+              sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+            />
+            <img
+              src="/assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_320.png"
+              srcset="/assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_240.png 720w, /assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_320.png 880w, /assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_480.png 1200w, /assets/pages/profile/why-this/t-RCA--h6cmcU-unsplash_dichrom_collage_640.png 1440w"
+              sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+              width="880"
+              height="1320"
+              alt=""
+              decoding="async"
+            />
+          </picture>
+        </span>
       </span>
     </span>
     <span class="page-button__bg" aria-hidden="true"></span>
@@ -101,7 +118,24 @@ title: 'Profile'
     >
     <span class="profile-media-surface" aria-hidden="true">
       <span class="profile-media-surface__layer" aria-hidden="true">
-        <span class="profile-media-surface__paint" aria-hidden="true"></span>
+        <span class="profile-media-surface__paint" aria-hidden="true">
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_160.png 480w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_240.png 720w"
+              sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+            />
+            <img
+              src="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_320.png"
+              srcset="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_240.png 720w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_320.png 880w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_480.png 1200w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_640.png 1440w"
+              sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+              width="880"
+              height="1325"
+              alt=""
+              decoding="async"
+            />
+          </picture>
+        </span>
       </span>
     </span>
     <span class="page-button__bg" aria-hidden="true"></span>

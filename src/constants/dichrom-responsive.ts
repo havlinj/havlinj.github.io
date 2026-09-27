@@ -26,6 +26,26 @@ export interface DichromSource {
 
 export type DichromResponsiveSet = Record<DichromTier, DichromSource>;
 
+/**
+ * Smaller Bayer tiles. Filename suffix is intended display CSS px; `w` is the
+ * real bitmap width (identify / file).
+ */
+export const DICHROM_TILE_INTRINSIC_WIDTHS = {
+  w160: 480,
+  w240: 720,
+  w320: 880,
+  w480: 1200,
+  w640: 1440,
+} as const;
+
+export type DichromTileTier = keyof typeof DICHROM_TILE_INTRINSIC_WIDTHS;
+
+export type DichromTileResponsiveSet = Record<DichromTileTier, DichromSource>;
+
+function formatDichromSrcset(entries: readonly DichromSource[]): string {
+  return entries.map((s) => `${s.href} ${s.w}w`).join(', ');
+}
+
 /** Build href + intrinsic `w` entries from a path stem (no trailing `_720` suffix). */
 export function buildDichromResponsive(stem: string): DichromResponsiveSet {
   return {
@@ -54,10 +74,62 @@ export function buildDichromResponsive(stem: string): DichromResponsiveSet {
 
 /** `<source media="(max-width: 767px)">` srcset — 720 + 1080 tiers. */
 export function dichromMobileSrcset(sources: DichromResponsiveSet): string {
-  return `${sources.w720.href} ${sources.w720.w}w, ${sources.w1080.href} ${sources.w1080.w}w`;
+  return formatDichromSrcset([sources.w720, sources.w1080]);
 }
 
 /** Default `<img>` srcset — 1080 through 2400 tiers; `src` uses w1440. */
 export function dichromDesktopSrcset(sources: DichromResponsiveSet): string {
-  return `${sources.w1080.href} ${sources.w1080.w}w, ${sources.w1440.href} ${sources.w1440.w}w, ${sources.w1920.href} ${sources.w1920.w}w, ${sources.w2400.href} ${sources.w2400.w}w`;
+  return formatDichromSrcset([
+    sources.w1080,
+    sources.w1440,
+    sources.w1920,
+    sources.w2400,
+  ]);
+}
+
+/** Build href + intrinsic `w` entries from a tile stem (no trailing `_160` suffix). */
+export function buildDichromTileResponsive(
+  stem: string,
+): DichromTileResponsiveSet {
+  return {
+    w160: {
+      href: `${stem}_160.png`,
+      w: DICHROM_TILE_INTRINSIC_WIDTHS.w160,
+    },
+    w240: {
+      href: `${stem}_240.png`,
+      w: DICHROM_TILE_INTRINSIC_WIDTHS.w240,
+    },
+    w320: {
+      href: `${stem}_320.png`,
+      w: DICHROM_TILE_INTRINSIC_WIDTHS.w320,
+    },
+    w480: {
+      href: `${stem}_480.png`,
+      w: DICHROM_TILE_INTRINSIC_WIDTHS.w480,
+    },
+    w640: {
+      href: `${stem}_640.png`,
+      w: DICHROM_TILE_INTRINSIC_WIDTHS.w640,
+    },
+  };
+}
+
+/** `<source media="(max-width: 767px)">` srcset — 160 + 240 tiers. */
+export function dichromTileMobileSrcset(
+  sources: DichromTileResponsiveSet,
+): string {
+  return formatDichromSrcset([sources.w160, sources.w240]);
+}
+
+/** Default `<img>` srcset — 240 through 640 tiers; `src` uses w320. */
+export function dichromTileDesktopSrcset(
+  sources: DichromTileResponsiveSet,
+): string {
+  return formatDichromSrcset([
+    sources.w240,
+    sources.w320,
+    sources.w480,
+    sources.w640,
+  ]);
 }

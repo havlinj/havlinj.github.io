@@ -7,12 +7,26 @@ import {
 
 describe('zoom-guard-storage', () => {
   it('parseZoomFreezeBaselineJson accepts valid JSON', () => {
-    const raw = JSON.stringify({ dpr: 2, vvScale: 1, innerWidth: 800 });
+    const raw = JSON.stringify({
+      dpr: 2,
+      vvScale: 1,
+      innerWidth: 800,
+      outerWidth: 980,
+    });
     expect(parseZoomFreezeBaselineJson(raw)).toEqual({
       dpr: 2,
       vvScale: 1,
       innerWidth: 800,
+      outerWidth: 980,
     });
+  });
+
+  it('parseZoomFreezeBaselineJson fills missing outerWidth as 0', () => {
+    expect(
+      parseZoomFreezeBaselineJson(
+        JSON.stringify({ dpr: 1, vvScale: 1, innerWidth: 800 }),
+      ),
+    ).toEqual({ dpr: 1, vvScale: 1, innerWidth: 800, outerWidth: 0 });
   });
 
   it('parseZoomFreezeBaselineJson rejects invalid or malformed', () => {
@@ -29,7 +43,12 @@ describe('zoom-guard-storage', () => {
   it('hasValidZoomFreezeBaseline mirrors init guard', () => {
     expect(hasValidZoomFreezeBaseline(null)).toBe(false);
     expect(
-      hasValidZoomFreezeBaseline({ dpr: 1, vvScale: 1, innerWidth: 400 }),
+      hasValidZoomFreezeBaseline({
+        dpr: 1,
+        vvScale: 1,
+        innerWidth: 400,
+        outerWidth: 400,
+      }),
     ).toBe(true);
   });
 

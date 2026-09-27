@@ -5,11 +5,11 @@
 
 /** Shared /why clip asset for desktop + mobile. */
 export const WHY_CLIP_VIDEO =
-  '/assets/pages/profile/why/deconjpa_12374260_1920_1440_60fps_pexels_inversed_pingpong_smoothered.mp4';
+  '/assets/pages/profile/why-this/deconjpa_12374260_1920_1440_60fps_pexels_inversed_pingpong_smoothered.mp4';
 
 /** Shared /why clip fallback image for poster and errors. */
 export const WHY_CLIP_FALLBACK_IMAGE =
-  '/assets/pages/profile/why/deconjpa_12374259_1440_1080_60fps_pexels_fallback_image_desktop.jpg';
+  '/assets/pages/profile/why-this/deconjpa_12374259_1440_1080_60fps_pexels_fallback_image_desktop.jpg';
 
 /** Horizontal CTA anchor: fraction of `.why-box` width from the left (arrow center; CSS uses translateX(-50%)). */
 export const WHY_CTA_BOX_WIDTH_FRAC = 0.5;

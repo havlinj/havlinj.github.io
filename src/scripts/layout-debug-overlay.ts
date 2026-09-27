@@ -6,6 +6,8 @@
  *
  * Never enable by URL alone on prod without the env token — avoids accidental exposure.
  */
+import { ZOOM_FREEZE_BASELINE_STORAGE_KEY } from '../utils/zoom-guard-storage';
+
 const TOKEN = import.meta.env.PUBLIC_LAYOUT_DEBUG_TOKEN ?? '';
 
 function layoutDebugAllowed(param: string | null): boolean {
@@ -18,7 +20,10 @@ function layoutDebugAllowed(param: string | null): boolean {
 
 function readBaseline(): string {
   try {
-    return window.sessionStorage.getItem('zoomFreezeBaselineV2') ?? '(none)';
+    return (
+      window.sessionStorage.getItem(ZOOM_FREEZE_BASELINE_STORAGE_KEY) ??
+      '(none)'
+    );
   } catch {
     return '(sessionStorage blocked)';
   }
@@ -72,7 +77,7 @@ function formatLines(): string {
     `body.zoom-threshold-exceeded: ${document.body.classList.contains('zoom-threshold-exceeded')}`,
     `main.zoom-freeze-active: ${main?.classList.contains('zoom-freeze-active') ?? false}`,
     `--zoom-freeze-scale: ${freezeScale}`,
-    `baseline (zoomFreezeBaselineV2): ${baseline}`,
+    `baseline (${ZOOM_FREEZE_BASELINE_STORAGE_KEY}): ${baseline}`,
     contactLines,
   ]
     .filter(Boolean)

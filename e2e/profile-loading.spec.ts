@@ -40,17 +40,63 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
       'portrait preload',
     ).toBe(true);
     expect(
-      hrefs.some((h) => h.includes('tommy-RCA--h6cmcU-unsplash_dichrom')),
+      hrefs.some((h) =>
+        h.includes('why-this/t-RCA--h6cmcU-unsplash_dichrom_collage'),
+      ),
       'Why tile bg preload',
     ).toBe(true);
     expect(
-      hrefs.some((h) => h.includes('uve-sanchez-9DRX_cW48RQ-unsplashdichrom')),
+      hrefs.some((h) =>
+        h.includes(
+          'foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage',
+        ),
+      ),
       'Foundations tile bg preload',
     ).toBe(true);
     expect(
       hrefs.some((h) => h.includes('what-i-do/fallback_desktop')),
       'What I do fallback poster preload',
     ).toBe(true);
+  });
+
+  test('Foundations tile loads a responsive collage tier', async ({ page }) => {
+    await gotoProfileWhenReady(page);
+    const img = page.locator(
+      '.prof-tile--foundations .profile-media-surface__paint img',
+    );
+    await expect(img).toBeAttached();
+    await expect
+      .poll(
+        async () =>
+          img.evaluate((el) => {
+            const image = el as HTMLImageElement;
+            return image.complete && image.naturalWidth > 0
+              ? image.currentSrc
+              : '';
+          }),
+        { timeout: 10_000 },
+      )
+      .toMatch(/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_\d+\.png/);
+  });
+
+  test('Why this tile loads a responsive collage tier', async ({ page }) => {
+    await gotoProfileWhenReady(page);
+    const img = page.locator(
+      '.prof-tile--why .profile-media-surface__paint img',
+    );
+    await expect(img).toBeAttached();
+    await expect
+      .poll(
+        async () =>
+          img.evaluate((el) => {
+            const image = el as HTMLImageElement;
+            return image.complete && image.naturalWidth > 0
+              ? image.currentSrc
+              : '';
+          }),
+        { timeout: 10_000 },
+      )
+      .toMatch(/t-RCA--h6cmcU-unsplash_dichrom_collage_\d+\.png/);
   });
 
   test('grid geometry and type-fit vars stay stable after reveal', async ({

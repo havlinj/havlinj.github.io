@@ -3,27 +3,39 @@ import {
   ZOOM_GUARD_EXIT_HYSTERESIS,
   ZOOM_GUARD_OVERFLOW_HEAL_THRESHOLD,
   ZOOM_GUARD_WARM_CANCEL_RATIO,
+  ZOOM_GUARD_FREEZE_ENTER_RATIO,
+  ZOOM_FREEZE_VEIL_CLASS,
+  ZOOM_FREEZE_PENDING_CLASS,
   computeOverflowHealScale,
   computeTargetFreezeScale,
-  computeZoomRatio,
+  shouldApplyOverflowHeal,
+  shouldArmFreezeVeil,
+  shouldShowFreezeVeil,
   shouldCancelWarmStart,
   shouldKeepFreeze,
-  shouldResetZoomFreezeBaseline,
 } from '../utils/zoom-guard-math';
 import {
-  type ZoomFreezeBaselineV2,
+  ZOOM_SIGNAL_STABLE_MAX,
+  computeEffectiveZoomRatio,
+  readZoomViewportSnapshot,
+  shouldResetZoomFreezeBaseline,
+  type ZoomViewportSnapshot,
+} from '../utils/zoom-signals';
+import {
+  ZOOM_FREEZE_BASELINE_STORAGE_KEY,
+  ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY,
+  type ZoomFreezeBaselineV3,
   hasValidZoomFreezeBaseline,
   parseZoomFreezeBaselineJson,
   parseZoomGuardStateJson,
 } from '../utils/zoom-guard-storage';
-import { documentHasContentPanel } from '../constants/content-panel';
 
 const MAX_SAFE_ZOOM = ZOOM_GUARD_MAX_SAFE_ZOOM;
 const ZOOM_EXIT_HYSTERESIS = ZOOM_GUARD_EXIT_HYSTERESIS;
 const FREEZE_SCALE_UPDATE_EPSILON = 0.01;
 
-const BASELINE_KEY = 'zoomFreezeBaselineV2';
-const GUARD_STATE_KEY = 'zoomFreezeGuardStateV2';
+const BASELINE_KEY = ZOOM_FREEZE_BASELINE_STORAGE_KEY;
+const GUARD_STATE_KEY = ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY;
 
 let installed = false;
 
@@ -34,17 +46,13 @@ export function initZoomGuard(): void {
   const body = document.body;
   if (!body) return;
 
-  const hasContentPanel = documentHasContentPanel(document);
-  if (!hasContentPanel) return;
-
   installed = true;
 
-  const currentDpr = window.devicePixelRatio || 1;
-  const currentVvScale =
-    window.visualViewport && window.visualViewport.scale
-      ? window.visualViewport.scale
-      : 1;
-  const currentInnerWidth = window.innerWidth || 0;
+  type Baseline = ZoomFreezeBaselineV3;
+
+  function readSnapshot(): ZoomViewportSnapshot {
+    return readZoomViewportSnapshot(window);
+  }
 
   let storedBaselineRaw: string | null = null;
   try {
@@ -53,7 +61,6 @@ export function initZoomGuard(): void {
     storedBaselineRaw = null;
   }
 
-  type Baseline = ZoomFreezeBaselineV2;
   let storedBaseline: Baseline | null =
     parseZoomFreezeBaselineJson(storedBaselineRaw);
 
@@ -74,51 +81,9 @@ export function initZoomGuard(): void {
     /* ignore */
   }
 
-  function currentVisualViewportScale(): number {
-    const vv = window.visualViewport;
-    return vv && vv.scale ? vv.scale : 0;
-  }
-
-  function baselineResetInput(baseline: Baseline) {
-    return {
-      baselineDpr: baseline.dpr,
-      baselineVvScale: baseline.vvScale,
-      baselineInnerWidth: baseline.innerWidth,
-      currentDpr: window.devicePixelRatio || 1,
-      currentVvScale:
-        window.visualViewport && window.visualViewport.scale
-          ? window.visualViewport.scale
-          : 1,
-      currentInnerWidth: window.innerWidth || 0,
-    };
-  }
-
-  function shouldResetBaseline(baseline: Baseline): boolean {
-    if (!hasValidZoomFreezeBaseline(baseline)) return true;
-    return shouldResetZoomFreezeBaseline(baselineResetInput(baseline));
-  }
-
-  function zoomRatioForBaseline(bd: number, bv: number, biw: number): number {
-    return computeZoomRatio({
-      baselineDpr: bd,
-      baselineVvScale: bv,
-      baselineInnerWidth: biw,
-      currentDpr: window.devicePixelRatio || 1,
-      currentVvScale: currentVisualViewportScale(),
-      currentInnerWidth: window.innerWidth || biw || 1,
-    });
-  }
-
   function persistBaseline(baseline: Baseline): void {
     try {
-      window.sessionStorage.setItem(
-        BASELINE_KEY,
-        JSON.stringify({
-          dpr: baseline.dpr,
-          vvScale: baseline.vvScale,
-          innerWidth: baseline.innerWidth,
-        }),
-      );
+      window.sessionStorage.setItem(BASELINE_KEY, JSON.stringify(baseline));
     } catch {
       /* ignore */
     }
@@ -132,55 +97,27 @@ export function initZoomGuard(): void {
     }
   }
 
-  function captureCurrentBaseline(): Baseline {
-    return {
-      dpr: window.devicePixelRatio || 1,
-      vvScale:
-        window.visualViewport && window.visualViewport.scale
-          ? window.visualViewport.scale
-          : 1,
-      innerWidth: window.innerWidth || 0,
-    };
-  }
-
-  /*
-   * Always reset when viewport class changed (desktop→narrow, etc.).
-   * Warm freeze must not skip that — otherwise squeeze looks like zoom forever.
-   */
+  const opening = readSnapshot();
   if (
     !hasValidZoomFreezeBaseline(storedBaseline) ||
-    shouldResetBaseline(storedBaseline)
+    shouldResetZoomFreezeBaseline(storedBaseline, opening)
   ) {
-    storedBaseline = {
-      dpr: currentDpr,
-      vvScale: currentVvScale,
-      innerWidth: currentInnerWidth,
-    };
+    storedBaseline = opening;
     persistBaseline(storedBaseline);
   }
 
-  const sb = storedBaseline as Baseline;
-  let baselineDpr = sb.dpr;
-  let baselineVvScale = sb.vvScale;
-  let baselineInnerWidth = sb.innerWidth;
+  let baseline: Baseline = storedBaseline;
 
-  const provisionalRatio = zoomRatioForBaseline(
-    baselineDpr,
-    baselineVvScale,
-    baselineInnerWidth,
-  );
+  const provisionalRatio = computeEffectiveZoomRatio(baseline, opening);
   if (
     persistedGuardActiveWarm &&
     provisionalRatio <= MAX_SAFE_ZOOM - ZOOM_EXIT_HYSTERESIS
   ) {
     persistedGuardActiveWarm = false;
     persistedFreezeScaleWarm = 1;
-    storedBaseline = captureCurrentBaseline();
-    persistBaseline(storedBaseline);
+    baseline = opening;
+    persistBaseline(baseline);
     clearPersistedGuardState();
-    baselineDpr = storedBaseline.dpr;
-    baselineVvScale = storedBaseline.vvScale;
-    baselineInnerWidth = storedBaseline.innerWidth;
   }
 
   const mainContent = document.querySelector('main.content');
@@ -232,12 +169,64 @@ export function initZoomGuard(): void {
     }
   }
 
+  let freezeRevealGeneration = 0;
+  let freezeSettling = false;
+  let lastPublishedRatio = 1;
+
+  function setFreezeVeil(on: boolean): void {
+    body.classList.toggle(ZOOM_FREEZE_VEIL_CLASS, on);
+  }
+
+  function syncFreezeVeil(): void {
+    setFreezeVeil(shouldShowFreezeVeil({ freezeSettling }));
+  }
+
+  function hideMainUntilFreezeSettles(): void {
+    freezeSettling = true;
+    setFreezeVeil(true);
+    if (mainContent instanceof HTMLElement) {
+      mainContent.classList.add(ZOOM_FREEZE_PENDING_CLASS);
+    }
+  }
+
+  function clearFreezePending(): void {
+    freezeRevealGeneration += 1;
+    freezeSettling = false;
+    if (mainContent instanceof HTMLElement) {
+      mainContent.classList.remove(ZOOM_FREEZE_PENDING_CLASS);
+    }
+  }
+
+  function revealMainAfterFreezeSettles(): void {
+    const generation = freezeRevealGeneration;
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () {
+        if (generation !== freezeRevealGeneration) return;
+        freezeSettling = false;
+        setFreezeVeil(false);
+        if (mainContent instanceof HTMLElement) {
+          mainContent.classList.remove(ZOOM_FREEZE_PENDING_CLASS);
+        }
+      });
+    });
+  }
+
+  function armVeilIfApproachingWall(): void {
+    if (
+      shouldArmFreezeVeil({
+        freezeActive,
+        freezeSettling,
+        lastPublishedRatio,
+        currentRatio: getZoomRatio(),
+      })
+    ) {
+      setFreezeVeil(true);
+    }
+  }
+
   function resetBaselineFromCurrentViewport(): void {
-    const next = captureCurrentBaseline();
-    baselineDpr = next.dpr;
-    baselineVvScale = next.vvScale;
-    baselineInnerWidth = next.innerWidth;
-    persistBaseline(next);
+    baseline = readSnapshot();
+    persistBaseline(baseline);
     freezeActive = false;
     freezeScale = 1;
     healLockFrames = 0;
@@ -245,27 +234,27 @@ export function initZoomGuard(): void {
     lastPersistedActive = false;
     lastPersistedFreezeScale = 1;
     applyFreezeToDom(false, 1);
+    lastPublishedRatio = 1;
+    clearFreezePending();
+    syncFreezeVeil();
   }
 
   function getZoomRatio(): number {
-    return zoomRatioForBaseline(
-      baselineDpr,
-      baselineVvScale,
-      baselineInnerWidth,
-    );
+    return computeEffectiveZoomRatio(baseline, readSnapshot());
   }
 
   function updateZoomGuard(): void {
-    const liveBaseline: Baseline = {
-      dpr: baselineDpr,
-      vvScale: baselineVvScale,
-      innerWidth: baselineInnerWidth,
-    };
-    if (shouldResetBaseline(liveBaseline)) {
+    const current = readSnapshot();
+    if (shouldResetZoomFreezeBaseline(baseline, current)) {
       resetBaselineFromCurrentViewport();
     }
 
+    const wasFrozen = freezeActive;
     const ratio = getZoomRatio();
+    if (!wasFrozen && ratio > ZOOM_GUARD_FREEZE_ENTER_RATIO) {
+      setFreezeVeil(true);
+    }
+
     const exceeded = shouldKeepFreeze({
       ratio,
       freezeActive,
@@ -273,20 +262,13 @@ export function initZoomGuard(): void {
       maxSafe: MAX_SAFE_ZOOM,
       hysteresis: ZOOM_EXIT_HYSTERESIS,
     });
-    const skipRatioDrivenScale = healLockFrames > 0;
     if (exceeded) {
-      if (!skipRatioDrivenScale) {
-        const targetFreezeScale = computeTargetFreezeScale(
-          ratio,
-          MAX_SAFE_ZOOM,
-        );
-        if (
-          !freezeActive ||
-          Math.abs(targetFreezeScale - freezeScale) >=
-            FREEZE_SCALE_UPDATE_EPSILON
-        ) {
-          freezeScale = Math.round(targetFreezeScale * 1000) / 1000;
-        }
+      const targetFreezeScale = computeTargetFreezeScale(ratio, MAX_SAFE_ZOOM);
+      if (
+        !freezeActive ||
+        Math.abs(targetFreezeScale - freezeScale) >= FREEZE_SCALE_UPDATE_EPSILON
+      ) {
+        freezeScale = Math.round(targetFreezeScale * 1000) / 1000;
       }
     } else {
       freezeScale = 1;
@@ -295,7 +277,11 @@ export function initZoomGuard(): void {
 
     let didOverflowHeal = false;
     if (
-      !freezeActive &&
+      shouldApplyOverflowHeal({
+        freezeActive,
+        zoomRatio: ratio,
+        stableMax: ZOOM_SIGNAL_STABLE_MAX,
+      }) &&
       mainContent instanceof HTMLElement &&
       healLockFrames <= 0
     ) {
@@ -316,8 +302,20 @@ export function initZoomGuard(): void {
 
     if (healLockFrames > 0 && !didOverflowHeal) healLockFrames -= 1;
 
+    if (!wasFrozen && freezeActive) {
+      hideMainUntilFreezeSettles();
+    }
+
     persistGuardState(freezeActive, freezeScale);
     applyFreezeToDom(freezeActive, freezeScale);
+    lastPublishedRatio = ratio;
+
+    if (!wasFrozen && freezeActive) {
+      revealMainAfterFreezeSettles();
+    } else if (!freezeActive) {
+      clearFreezePending();
+    }
+    syncFreezeVeil();
   }
 
   function runZoomGuardBurst(): void {
@@ -337,10 +335,9 @@ export function initZoomGuard(): void {
     });
   }
 
-  const ratioAfterReconcile = zoomRatioForBaseline(
-    baselineDpr,
-    baselineVvScale,
-    baselineInnerWidth,
+  const ratioAfterReconcile = computeEffectiveZoomRatio(
+    baseline,
+    readSnapshot(),
   );
   const warmStartDelayMs =
     freezeActive && ratioAfterReconcile > MAX_SAFE_ZOOM - ZOOM_EXIT_HYSTERESIS
@@ -351,14 +348,26 @@ export function initZoomGuard(): void {
     updateZoomGuard();
   }
 
-  window.addEventListener('resize', runZoomGuardBurst, { passive: true });
+  window.addEventListener(
+    'resize',
+    function () {
+      armVeilIfApproachingWall();
+      runZoomGuardBurst();
+    },
+    { passive: true, capture: true },
+  );
   window.addEventListener('orientationchange', runZoomGuardBurst, {
     passive: true,
   });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', runZoomGuardBurst, {
-      passive: true,
-    });
+    window.visualViewport.addEventListener(
+      'resize',
+      function () {
+        armVeilIfApproachingWall();
+        runZoomGuardBurst();
+      },
+      { passive: true, capture: true },
+    );
     window.visualViewport.addEventListener(
       'scroll',
       function () {
@@ -370,13 +379,30 @@ export function initZoomGuard(): void {
   window.addEventListener(
     'wheel',
     function (e: WheelEvent) {
-      if (e && e.ctrlKey) runZoomGuardBurst();
+      if (e && (e.ctrlKey || e.metaKey)) {
+        armVeilIfApproachingWall();
+        runZoomGuardBurst();
+      }
     },
-    { passive: true },
+    { passive: true, capture: true },
+  );
+  window.addEventListener(
+    'keydown',
+    function (e: KeyboardEvent) {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (e.key !== '+' && e.key !== '=' && e.key !== '-' && e.key !== '0') {
+        return;
+      }
+      armVeilIfApproachingWall();
+    },
+    { capture: true },
   );
 
   function loopZoomGuard(): void {
     const ratioNow = getZoomRatio();
+    if (!freezeActive && ratioNow > ZOOM_GUARD_FREEZE_ENTER_RATIO) {
+      setFreezeVeil(true);
+    }
     const cancelWarm = shouldCancelWarmStart(
       ratioNow,
       MAX_SAFE_ZOOM,
