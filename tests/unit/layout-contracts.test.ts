@@ -231,8 +231,8 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(md).toContain('prof-tile--why');
     expect(css).toContain('--profile-tile-1-nudge-x');
     expect(css).toContain('--profile-tile-4-nudge-x');
-    expect(cssCustomProp(css, '--profile-tile-4-nudge-y')).toBe('0.1');
-    expect(cssCustomProp(css, '--profile-tile-4-zoom')).toBe('0.45');
+    expect(cssCustomProp(css, '--profile-tile-4-nudge-y')).toBe('0');
+    expect(cssCustomProp(css, '--profile-tile-4-zoom')).toBe('0.3');
     expect(css).toContain('var(--tile-nudge-x, 0) * 100cqw');
     expect(css).toContain('.prof-tile--why .profile-media-surface__paint');
 
@@ -383,7 +383,7 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(md).not.toMatch(/\sstyle="/);
     expect(cssCustomProp(css, '--profile-why-width')).toBe('41%');
     expect(cssCustomProp(css, '--profile-what-height')).toBe('45%');
-    expect(cssCustomProp(css, '--portrait-zoom')).toBe('1.12');
+    expect(cssCustomProp(css, '--portrait-zoom')).toBe('1');
     expect(cssCustomProp(css, '--profile-background-pan-x')).toBe('15%');
     expect(css).toContain('--tile-bg: var(--profile-tile-1-bg)');
     expect(css).toContain('--tile-bg: var(--profile-tile-4-bg)');

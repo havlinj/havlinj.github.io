@@ -42,8 +42,8 @@ export const PROFILE_PANEL_BG = buildDichromResponsive(
 export const PROFILE_PANEL_BG_HEIGHT = 1920;
 
 /**
- * Paint box is the overscanned image-tile surface (~2.3× tile).
- * Keep in sync with the `<picture>` `sizes` on Why / Foundations tiles in profile.md.
+ * Conservative `sizes` for Why / Foundations / portrait tile `<picture>`s.
+ * Keep in sync with the `<picture>` `sizes` in profile.md.
  */
 export const PROFILE_DICHROM_TILE_SIZES =
   '(max-width: 767px) 92vw, min(70ch, 92vw)';

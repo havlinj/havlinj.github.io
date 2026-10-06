@@ -8,8 +8,9 @@
  *   --profile-stitched-seam-thickness (breakpoints below must match TS constants).
  * - Type fit (JS): --profile-tile-label-font-size, --profile-reveal-font-size,
  *   --foundations-reveal-uniform-scale (Foundations reveal stanza).
- * - Image tile media: --tile-bg-size-w / --tile-bg-size-h, --tile-bg-overscan (__layer);
- *   pan/zoom on .profile-media-surface__paint (__layer = filter only, avoids filter+transform bug).
+ * - Image tile media: Why / Foundations `<img>` is the full bitmap, sized to cover the
+ *   tile; --tile-zoom 1 = fill, >1 crops in (clamped at 1). Pan/zoom on __paint;
+ *   __layer = filter only (avoids filter+transform bug).
  * - Frame gutters: author --profile-what-frame-padding + --profile-what-frame-padding-left-multiplier
  *   (% on What I do tile only). profile-frame-gutters.ts measures used px on that tile’s
  *   .profile-media-surface → --profile-frame-gutter-block-px / --profile-frame-gutter-side-px;
@@ -70,9 +71,9 @@ article.has-buttons-panel {
   --profile-tile-1-nudge-y: 0;
   --profile-tile-1-pan-x: 0%;
   --profile-tile-1-pan-y: 0%;
-  --profile-tile-1-zoom: 0.5;
-  --profile-tile-1-brightness: 1;
-  --profile-tile-1-contrast: 1.2;
+  --profile-tile-1-zoom: 1.15;
+  --profile-tile-1-brightness: 0.9;
+  --profile-tile-1-contrast: 1.1;
   --profile-tile-1-opacity: 0.9;
   --profile-tile-3-pos-x: 50%;
   --profile-tile-3-pos-y: 50%;
@@ -88,8 +89,8 @@ article.has-buttons-panel {
   --profile-tile-4-nudge-x: 0;
   --profile-tile-4-nudge-y: 0;
   --profile-tile-4-pan-x: 0%;
-  --profile-tile-4-pan-y: 0%;
-  --profile-tile-4-zoom: 0.45;
+  --profile-tile-4-pan-y: -10%;
+  --profile-tile-4-zoom: 0.3;
   --profile-tile-4-brightness: 1;
   --profile-tile-4-contrast: 1;
   --profile-tile-4-opacity: 0.95;
@@ -116,10 +117,8 @@ article.has-buttons-panel {
   /* Film grain: keep low — high opacity + overlay reads as mud/banding on weak paths. */
   --profile-grain-opacity: 0.11;
   --profile-grain-blend-mode: soft-light;
-  /* Image tiles: oversize vs cover + overscan for pan; tune per page on .profile-section. */
   --tile-bg-size-w: auto;
   --tile-bg-size-h: 168%;
-  --tile-bg-overscan: -65%;
   /* Matches legacy ::before scale(1.1); applied via width/height only (see .profile-section__media img). */
   --profile-bg-zoom: 1.1;
 }
@@ -439,13 +438,13 @@ article.has-buttons-panel {
 }
 
 /*
- * Image tiles: outer surface clips. __layer = overscan box + filter only (no transform).
- * __paint = background + translate/scale — avoids filter+transform on one node (broken pan in
- * Chromium-family compositing). Pan % is relative to __paint’s own box (fill of __layer).
+ * Image tiles: outer surface clips to the frame. __layer = tile box + filter only.
+ * __paint = pan/zoom (scale never below 1, so the frame stays filled). Filter and
+ * transform stay on separate nodes (Chromium-family compositing).
  */
 .profile-image-tile .profile-media-surface__layer {
   position: absolute;
-  inset: var(--tile-bg-overscan, -65%);
+  inset: 0;
   pointer-events: none;
   filter: brightness(var(--tile-brightness, 1))
     contrast(var(--tile-contrast, 1));
@@ -463,7 +462,7 @@ article.has-buttons-panel {
   background-size: var(--tile-bg-size-w, auto) var(--tile-bg-size-h, 168%);
   background-position: var(--tile-pos-x, 50%) var(--tile-pos-y, 50%);
   transform: translateX(var(--tile-pan-x, 0%)) translateY(var(--tile-pan-y, 0%))
-    scale(var(--tile-zoom, 1));
+    scale(max(1, var(--tile-zoom, 1)));
   opacity: var(--tile-image-opacity, 1);
   transform-origin: center;
   backface-visibility: hidden;
@@ -474,28 +473,32 @@ article.has-buttons-panel {
 .prof-tile--why .profile-media-surface__paint,
 .prof-tile--foundations .profile-media-surface__paint {
   background-image: none;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .prof-tile--why .profile-media-surface__paint picture,
-.prof-tile--why .profile-media-surface__paint img,
-.prof-tile--foundations .profile-media-surface__paint picture,
-.prof-tile--foundations .profile-media-surface__paint img {
+.prof-tile--foundations .profile-media-surface__paint picture {
   position: absolute;
   inset: 0;
   display: block;
-  width: 100%;
-  height: 100%;
+  overflow: visible;
 }
 
 .prof-tile--why .profile-media-surface__paint img,
 .prof-tile--foundations .profile-media-surface__paint img {
-  object-fit: cover;
-  object-position: calc(
-      var(--tile-pos-x, 50%) + var(--tile-nudge-x, 0) * 100cqw
-    )
-    calc(var(--tile-pos-y, 50%) + var(--tile-nudge-y, 0) * 100cqw);
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: auto;
   max-width: none;
+  min-width: 100%;
+  min-height: 100%;
+  left: calc(var(--tile-pos-x, 50%) + var(--tile-nudge-x, 0) * 100cqw);
+  top: calc(var(--tile-pos-y, 50%) + var(--tile-nudge-y, 0) * 100cqw);
+  transform: translate(
+    calc(-1 * (var(--tile-pos-x, 50%) + var(--tile-nudge-x, 0) * 100cqw)),
+    calc(-1 * (var(--tile-pos-y, 50%) + var(--tile-nudge-y, 0) * 100cqw))
+  );
 }
 
 .profile-gif-tile__media {
