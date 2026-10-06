@@ -37,7 +37,7 @@ describe('dichrom-responsive', () => {
 
 describe('dichrom tile responsive', () => {
   const stem =
-    '/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage';
+    '/assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage';
   const sources = buildDichromTileResponsive(stem);
 
   it('buildDichromTileResponsive maps measured intrinsic widths to hrefs', () => {

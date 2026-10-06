@@ -4,7 +4,7 @@ import { dichromTileMobileSrcset } from '../../constants/dichrom-responsive';
 import {
   PROFILE_DICHROM_TILE_SIZES,
   PROFILE_FOUNDATIONS_BG,
-  PROFILE_PORTRAIT_HREF,
+  PROFILE_PORTRAIT_BG,
   PROFILE_WHAT_I_DO_FALLBACK_HREF,
   PROFILE_WHY_BG,
 } from '../../constants/profile-layout';
@@ -40,7 +40,9 @@ const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
 <link
   rel="preload"
   as="image"
-  href={PROFILE_PORTRAIT_HREF}
+  href={PROFILE_PORTRAIT_BG.w160.href}
+  imagesrcset={dichromTileMobileSrcset(PROFILE_PORTRAIT_BG)}
+  imagesizes={PROFILE_DICHROM_TILE_SIZES}
   fetchpriority="high"
 />
 <link

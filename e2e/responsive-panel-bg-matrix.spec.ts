@@ -97,8 +97,9 @@ declareResponsivePanelBgMatrix({
 });
 
 const FOUNDATIONS_BG_STEM =
-  'andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage';
+  'museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage';
 const WHY_BG_STEM = 't-RCA--h6cmcU-unsplash_dichrom_collage';
+const PORTRAIT_BG_STEM = 'portrait_dimmed_mirrored_dichrom_collage';
 
 declareResponsivePanelBgMatrix({
   suiteTitle: 'Profile Foundations tile responsive Bayer PNG tiers',
@@ -119,6 +120,29 @@ declareResponsivePanelBgMatrix({
       tierLabel: '240',
       viewport: { width: 900, height: 700 },
       urlMatcher: new RegExp(`${FOUNDATIONS_BG_STEM}_240\\.png`),
+    },
+  ],
+});
+
+declareResponsivePanelBgMatrix({
+  suiteTitle: 'Profile portrait responsive Bayer PNG tiers',
+  path: '/profile',
+  imgSelector: '.profile-photo-frame img',
+  waitForReady: async (page) => {
+    await expect(
+      page.locator('.profile-section:not(.profile-section--loading)'),
+    ).toBeVisible({ timeout: 15_000 });
+  },
+  cases: [
+    {
+      tierLabel: '160',
+      viewport: { width: 375, height: 740 },
+      urlMatcher: new RegExp(`${PORTRAIT_BG_STEM}_160\\.png`),
+    },
+    {
+      tierLabel: '240',
+      viewport: { width: 900, height: 700 },
+      urlMatcher: new RegExp(`${PORTRAIT_BG_STEM}_240\\.png`),
     },
   ],
 });

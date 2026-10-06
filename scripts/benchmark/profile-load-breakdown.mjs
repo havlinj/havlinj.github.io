@@ -135,7 +135,7 @@ async function measureRun(browser) {
     const resources = performance
       .getEntriesByType('resource')
       .filter((e) =>
-        /portrait_bayer|profile\.css|inter-latin-700|fallback_desktop|t-RCA|andrew-charney/.test(
+        /portrait_dimmed_mirrored|profile\.css|inter-latin-700|fallback_desktop|t-RCA|museum-of-new-zealand/.test(
           e.name,
         ),
       )

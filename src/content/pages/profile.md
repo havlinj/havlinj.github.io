@@ -101,12 +101,23 @@ title: 'Profile'
       <div class="profile-photo-shell">
         <div class="profile-photo-box">
           <div class="profile-media-surface">
-            <img
-              src="/assets/pages/profile/portrait_bayer16_style.png"
-              alt="Jan Havlín"
-              fetchpriority="high"
-              decoding="sync"
-            />
+            <picture>
+              <source
+                media="(max-width: 767px)"
+                srcset="/assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_160.png 480w, /assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_240.png 720w"
+                sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+              />
+              <img
+                src="/assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_320.png"
+                srcset="/assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_240.png 720w, /assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_320.png 880w, /assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_480.png 1200w, /assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage_640.png 1440w"
+                sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
+                width="880"
+                height="974"
+                alt="Jan Havlín"
+                fetchpriority="high"
+                decoding="sync"
+              />
+            </picture>
           </div>
         </div>
       </div>
@@ -122,15 +133,15 @@ title: 'Profile'
           <picture>
             <source
               media="(max-width: 767px)"
-              srcset="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_160.png 480w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_240.png 720w"
+              srcset="/assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_160.png 480w, /assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_240.png 720w"
               sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
             />
             <img
-              src="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_320.png"
-              srcset="/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_240.png 720w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_320.png 880w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_480.png 1200w, /assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_640.png 1440w"
+              src="/assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_320.png"
+              srcset="/assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_240.png 720w, /assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_320.png 880w, /assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_480.png 1200w, /assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_640.png 1440w"
               sizes="(max-width: 767px) 92vw, min(70ch, 92vw)"
               width="880"
-              height="1325"
+              height="1043"
               alt=""
               decoding="async"
             />

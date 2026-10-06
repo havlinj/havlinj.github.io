@@ -59,7 +59,7 @@ article.has-buttons-panel {
   --profile-background-pan-y: 0%;
   --portrait-pos-x: 40%;
   --portrait-pos-y: 62%;
-  --portrait-zoom: 1.12;
+  --portrait-zoom: 1;
   --portrait-brightness: 1.08;
   --portrait-contrast: 1;
   --portrait-opacity: 0.95;
@@ -86,7 +86,7 @@ article.has-buttons-panel {
   --profile-tile-4-pos-x: 50%;
   --profile-tile-4-pos-y: 80%;
   --profile-tile-4-nudge-x: 0;
-  --profile-tile-4-nudge-y: 0.1;
+  --profile-tile-4-nudge-y: 0;
   --profile-tile-4-pan-x: 0%;
   --profile-tile-4-pan-y: 0%;
   --profile-tile-4-zoom: 0.45;
@@ -1138,19 +1138,27 @@ article.has-buttons-panel {
   }
 }
 
-.profile-photo-box .profile-media-surface img {
+.profile-photo-box .profile-media-surface picture {
   position: absolute;
   inset: -1px;
   display: block;
   width: calc(100% + 2px);
   height: calc(100% + 2px);
+}
+
+.profile-photo-box .profile-media-surface img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
   object-fit: cover;
   object-position: var(--portrait-pos-x, 45%) var(--portrait-pos-y, 50%);
   filter: brightness(var(--portrait-brightness, 1))
     contrast(var(--portrait-contrast, 1));
   opacity: var(--portrait-opacity, 1);
-  /* Keep center origin with mirror transform to avoid clipping artifacts at right/top anchors */
-  transform: scale(var(--portrait-zoom, 1)) scaleX(-1);
+  transform: scale(var(--portrait-zoom, 1));
   transform-origin: bottom center;
   z-index: 0;
 }

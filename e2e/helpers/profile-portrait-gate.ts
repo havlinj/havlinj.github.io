@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 
 /** Profile portrait that gates the loading veil (`profile-loading-veil.ts`). */
-const PORTRAIT_URL = '**/portrait_bayer16_style.png';
+const PORTRAIT_URL =
+  '**/portrait/portrait_dimmed_mirrored_dichrom_collage_*.png';
 
 /**
  * Delay the profile portrait response until `allow()` is called.

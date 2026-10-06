@@ -210,6 +210,9 @@ describe('layout contracts: profile image-tile dichrom', () => {
       PROFILE_PANEL_BG,
       PROFILE_PANEL_BG_FILE_STEM,
       PROFILE_PANEL_BG_HEIGHT,
+      PROFILE_PORTRAIT_BG,
+      PROFILE_PORTRAIT_BG_HEIGHT,
+      PROFILE_PORTRAIT_BG_STEM,
       PROFILE_WHY_BG,
       PROFILE_WHY_BG_STEM,
     } = await import('../../src/constants/profile-layout');
@@ -244,6 +247,14 @@ describe('layout contracts: profile image-tile dichrom', () => {
     const matrix = readRepoFile('e2e/responsive-panel-bg-matrix.spec.ts');
     expect(matrix).toContain('PROFILE_PANEL_BG_FILE_STEM');
 
+    expect(md).toContain(PROFILE_PORTRAIT_BG_STEM);
+    expect(md).toContain(dichromTileMobileSrcset(PROFILE_PORTRAIT_BG));
+    expect(md).toContain(dichromTileDesktopSrcset(PROFILE_PORTRAIT_BG));
+    expect(md).toContain(`src="${PROFILE_PORTRAIT_BG.w320.href}"`);
+    expect(md).toContain(`width="${PROFILE_PORTRAIT_BG.w320.w}"`);
+    expect(md).toContain(`height="${PROFILE_PORTRAIT_BG_HEIGHT}"`);
+    expect(md).not.toContain('portrait_bayer16_style');
+
     expect(md).toContain(PROFILE_WHY_BG_STEM);
     expect(md).toContain(dichromTileMobileSrcset(PROFILE_WHY_BG));
     expect(md).toContain(dichromTileDesktopSrcset(PROFILE_WHY_BG));
@@ -257,6 +268,8 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(md).toContain(`width="${PROFILE_FOUNDATIONS_BG.w320.w}"`);
 
     const head = readRepoFile('src/components/layout/ProfileLayoutHead.astro');
+    expect(head).toContain('dichromTileMobileSrcset(PROFILE_PORTRAIT_BG)');
+    expect(head).toContain('PROFILE_PORTRAIT_BG.w160.href');
     expect(head).toContain('dichromTileMobileSrcset(PROFILE_WHY_BG)');
     expect(head).toContain('PROFILE_WHY_BG.w160.href');
     expect(head).toContain('dichromTileMobileSrcset(PROFILE_FOUNDATIONS_BG)');

@@ -18,8 +18,8 @@ All Unsplash media listed below are used according to the
   - Edits: dichromatic treatment, noise
 
 - **Profile tile image (Foundations)**
-  - Author: [Uve Sanchez](https://unsplash.com/@uvesanchez)
-  - Source: [Unsplash](https://unsplash.com/photos/9DRX_cW48RQ)
+  - Author: [Museum of New Zealand Te Papa Tongarewa](https://unsplash.com/@tepapa)
+  - Source: [Unsplash](https://unsplash.com/photos/bAdYMC4JXlQ)
   - Edits: dichromatic treatment, noise
 
 - **Profile page background image**

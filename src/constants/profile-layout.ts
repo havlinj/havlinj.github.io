@@ -5,8 +5,15 @@ import {
   buildDichromTileResponsive,
 } from './dichrom-responsive';
 
-export const PROFILE_PORTRAIT_HREF =
-  '/assets/pages/profile/portrait_bayer16_style.png';
+export const PROFILE_PORTRAIT_BG_STEM =
+  '/assets/pages/profile/portrait/portrait_dimmed_mirrored_dichrom_collage';
+
+export const PROFILE_PORTRAIT_BG = buildDichromTileResponsive(
+  PROFILE_PORTRAIT_BG_STEM,
+);
+
+/** Bitmap height of the portrait `w320` file, used as the `<img height>`. */
+export const PROFILE_PORTRAIT_BG_HEIGHT = 974;
 
 /**
  * Panel background. Filename suffix is the display tier; these are PNG IHDR widths.
@@ -47,7 +54,7 @@ export const PROFILE_WHY_BG_STEM =
 export const PROFILE_WHY_BG = buildDichromTileResponsive(PROFILE_WHY_BG_STEM);
 
 export const PROFILE_FOUNDATIONS_BG_STEM =
-  '/assets/pages/profile/foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage';
+  '/assets/pages/profile/foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage';
 
 export const PROFILE_FOUNDATIONS_BG = buildDichromTileResponsive(
   PROFILE_FOUNDATIONS_BG_STEM,

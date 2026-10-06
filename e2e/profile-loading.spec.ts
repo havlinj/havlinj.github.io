@@ -36,7 +36,9 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
       ).map((el) => (el as HTMLLinkElement).href),
     );
     expect(
-      hrefs.some((h) => h.includes('portrait_bayer16_style')),
+      hrefs.some((h) =>
+        h.includes('portrait/portrait_dimmed_mirrored_dichrom_collage'),
+      ),
       'portrait preload',
     ).toBe(true);
     expect(
@@ -48,7 +50,7 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
     expect(
       hrefs.some((h) =>
         h.includes(
-          'foundations/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage',
+          'foundations/museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage',
         ),
       ),
       'Foundations tile bg preload',
@@ -76,7 +78,9 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
           }),
         { timeout: 10_000 },
       )
-      .toMatch(/andrew-charney-e3iwXJhT3Zk-unsplash_dichrom_collage_\d+\.png/);
+      .toMatch(
+        /museum-of-new-zealand-te-papa-tongarewa-bAdYMC4JXlQ-unsplash_dichrom_collage_\d+\.png/,
+      );
   });
 
   test('Why this tile loads a responsive collage tier', async ({ page }) => {
@@ -97,6 +101,24 @@ test.describe('/profile — loading veil, reveal fade, layout stability', () => 
         { timeout: 10_000 },
       )
       .toMatch(/t-RCA--h6cmcU-unsplash_dichrom_collage_\d+\.png/);
+  });
+
+  test('portrait loads a responsive collage tier', async ({ page }) => {
+    await gotoProfileWhenReady(page);
+    const img = page.locator('.profile-photo-frame img');
+    await expect(img).toBeAttached();
+    await expect
+      .poll(
+        async () =>
+          img.evaluate((el) => {
+            const image = el as HTMLImageElement;
+            return image.complete && image.naturalWidth > 0
+              ? image.currentSrc
+              : '';
+          }),
+        { timeout: 10_000 },
+      )
+      .toMatch(/portrait_dimmed_mirrored_dichrom_collage_\d+\.png/);
   });
 
   test('grid geometry and type-fit vars stay stable after reveal', async ({

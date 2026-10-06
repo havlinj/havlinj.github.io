@@ -139,7 +139,7 @@ test.describe('/profile — type fit, Foundations tile, reveal', () => {
           document.querySelectorAll('link[rel="preload"][as="image"]'),
         ).some((el) =>
           ((el as HTMLLinkElement).href || '').includes(
-            'portrait_bayer16_style',
+            'portrait/portrait_dimmed_mirrored_dichrom_collage',
           ),
         ),
       );
