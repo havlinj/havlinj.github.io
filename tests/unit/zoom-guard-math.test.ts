@@ -191,18 +191,12 @@ describe('shouldArmFreezeVeil', () => {
 
 describe('shouldShowFreezeVeil', () => {
   it('does not cover the page at rest, including the approach band', () => {
-    expect(
-      shouldShowFreezeVeil({ freezeSettling: false }),
-    ).toBe(false);
+    expect(shouldShowFreezeVeil({ freezeSettling: false })).toBe(false);
   });
 
   it('covers freeze-pending, then hides after freeze has settled', () => {
-    expect(
-      shouldShowFreezeVeil({ freezeSettling: true }),
-    ).toBe(true);
-    expect(
-      shouldShowFreezeVeil({ freezeSettling: false }),
-    ).toBe(false);
+    expect(shouldShowFreezeVeil({ freezeSettling: true })).toBe(true);
+    expect(shouldShowFreezeVeil({ freezeSettling: false })).toBe(false);
   });
 });
 

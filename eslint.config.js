@@ -1,4 +1,5 @@
 import { FlatCompat } from '@eslint/eslintrc';
+import astro from 'eslint-plugin-astro';
 
 const compat = new FlatCompat({
   baseDirectory: process.cwd(),
@@ -19,7 +20,7 @@ export default [
   // use legacy config via compat layer
   ...compat.extends('eslint:recommended'),
   ...compat.extends('plugin:@typescript-eslint/recommended'),
-  ...compat.extends('plugin:astro/recommended'),
+  ...astro.configs.recommended,
   {
     rules: {
       semi: ['error', 'always'],

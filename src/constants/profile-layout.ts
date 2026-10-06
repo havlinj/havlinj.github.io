@@ -22,8 +22,7 @@ export const PROFILE_PORTRAIT_BG_HEIGHT = 974;
 export const PROFILE_PANEL_BG_FILE_STEM =
   'jiesuang-ng-WKL3Q906OR4-unsplash_dichrom';
 
-export const PROFILE_PANEL_BG_STEM =
-  `/assets/pages/profile/${PROFILE_PANEL_BG_FILE_STEM}`;
+export const PROFILE_PANEL_BG_STEM = `/assets/pages/profile/${PROFILE_PANEL_BG_FILE_STEM}`;
 
 export const PROFILE_PANEL_BG_INTRINSIC_WIDTHS = {
   w720: 1800,

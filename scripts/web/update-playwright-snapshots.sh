@@ -5,8 +5,8 @@
 # Usage:
 #   ./scripts/web/update-playwright-snapshots.sh
 #       → full screenshot set: hero, profile, Credits main, extreme-zoom (desktop chromium +
-#         mobile webkit), mobile Foundations reveal; PW_SERVER_MODE=preview (matches CI /
-#         integration-tests.sh).
+#         mobile webkit), mobile Foundations reveal, maintenance Whoops panel;
+#         PW_SERVER_MODE=preview (matches CI / integration-tests.sh).
 #   ./scripts/web/update-playwright-snapshots.sh e2e/foo.spec.ts
 #   ./scripts/web/update-playwright-snapshots.sh --update-snapshots e2e/
 #       → any extra args are passed to: playwright test --update-snapshots <args...>
@@ -47,7 +47,20 @@ else
     --project=mobile-chromium \
     --grep 'Foundations reveal visual snapshot on mobile' \
     --update-snapshots
-  exec npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts \
+  npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts \
     --project=mobile-webkit \
     --update-snapshots
+
+  echo "Updating maintenance Whoops panel snapshot (isolated fixture build on :4322)..."
+  unset PW_SKIP_BUILD || true
+  PW_REUSE_SERVER=0 \
+    npx playwright test -c playwright.maintenance.config.ts \
+      e2e/maintenance-routes.spec.ts \
+      --grep 'Whoops panel visual snapshot' \
+      --update-snapshots
+
+  if [[ "$PW_SERVER_MODE" == "preview" ]]; then
+    echo "Restoring default dist (maintenance fixture off)..."
+    MAINTENANCE_FORCE_OFF=1 npm run build
+  fi
 fi

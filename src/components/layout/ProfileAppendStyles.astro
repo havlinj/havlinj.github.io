@@ -8,7 +8,7 @@ const { profileStylesUrl } = Astro.props as { profileStylesUrl: string };
 }
 <script is:inline define:vars={{ profileStylesUrl }}>
   (function () {
-    var link = document.createElement('link');
+    const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = profileStylesUrl;
     document.head.appendChild(link);

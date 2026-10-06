@@ -47,12 +47,12 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.11.1",
-    "@eslint/eslintrc": "^3.3.4",
+    "@eslint/eslintrc": "^3.3.7",
     "@playwright/test": "^1.49.0",
-    "@typescript-eslint/eslint-plugin": "^8.56.1",
-    "@typescript-eslint/parser": "^8.56.1",
-    "eslint": "^9.39.3",
-    "eslint-plugin-astro": "^1.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.71.1",
+    "@typescript-eslint/parser": "^8.71.1",
+    "eslint": "^10.12.0",
+    "eslint-plugin-astro": "^3.2.1",
     "lighthouse": "^13.4.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.8.1",
@@ -61,14 +61,17 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "brace-expansion": "5.0.9",
-    "fast-uri": "3.1.7",
+    "brace-expansion": "5.0.12",
+    "fast-uri": "3.1.8",
     "js-yaml": "4.3.2",
     "sharp": "0.35.5",
     "svgo": "4.1.0",
-    "devalue": "5.9.1",
+    "devalue": "5.9.4",
     "nanoid": "3.3.18",
-    "postcss-selector-parser": "7.1.5",
-    "@humanfs/node": "0.16.8"
+    "postcss-selector-parser": "7.1.6",
+    "@humanfs/node": "0.16.8",
+    "http-cache-semantics": "4.3.0",
+    "source-map-js": "1.2.2",
+    "undici": "8.11.2"
   }
 }
