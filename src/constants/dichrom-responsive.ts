@@ -11,8 +11,10 @@
  *
  * That srcset is only the no-JS fallback. `initDichromTierSync` measures the painted box
  * (CSS zoom and transforms already included) and loads the tier whose bitmap-to-device
- * ratio is the closest small integer. `sizes="100vw"` does not know the box, the image
- * zoom, or pinch, and browsers are not required to re-pick on zoom.
+ * ratio is the closest small integer, keeping the lighter file when a heavier one is
+ * only a hair cleaner. `sizes="100vw"` does not know the box, the image zoom, or pinch,
+ * and browsers are not required to re-pick on zoom. The hero skips srcset: a blocking
+ * script beside the image calls the same selector before the first request.
  */
 
 /** PNG IHDR widths for the full-frame sets (hero, writing, contact, maintenance). */

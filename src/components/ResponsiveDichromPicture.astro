@@ -17,6 +17,11 @@ interface Props {
   sizes?: string;
   /** Matches content panel pages: mobile `<source>` breakpoint. */
   mobileMedia?: string;
+  /**
+   * One URL in the document, no srcset. The hero measurement script may
+   * replace it after layout.
+   */
+  initialHref?: string;
 }
 
 const {
@@ -29,20 +34,27 @@ const {
   decoding = 'async',
   sizes = '100vw',
   mobileMedia = '(max-width: 767px)',
+  initialHref,
 }: Props = Astro.props;
+const singleSrc = Boolean(initialHref);
 ---
 
 <picture>
-  <source
-    media={mobileMedia}
-    srcset={dichromMobileSrcset(sources)}
-    sizes={sizes}
-  />
+  {
+    !singleSrc && (
+      <source
+        media={mobileMedia}
+        srcset={dichromMobileSrcset(sources)}
+        sizes={sizes}
+      />
+    )
+  }
   <img
-    src={sources.w1440.href}
-    srcset={dichromDesktopSrcset(sources)}
-    sizes={sizes}
+    src={initialHref ?? sources.w1440.href}
+    srcset={singleSrc ? undefined : dichromDesktopSrcset(sources)}
+    sizes={singleSrc ? undefined : sizes}
     data-dichrom-candidates={dichromCandidateSrcset(sources)}
+    data-dichrom-fallback={singleSrc ? initialHref : undefined}
     width={width}
     height={height}
     alt={alt}

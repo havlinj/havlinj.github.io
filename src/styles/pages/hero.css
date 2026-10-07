@@ -45,6 +45,11 @@
   height: 100%;
 }
 
+/* Hide the empty img's alt text. display:none would zero the box the tier script measures. */
+.hero-bg__image:not([src]) {
+  visibility: hidden;
+}
+
 .hero-bg__image {
   position: absolute;
   display: block;

@@ -1,19 +1,10 @@
+import { readDichromDeviceScale } from '../utils/read-dichrom-device-scale';
 import {
-  dichromDeviceScale,
   neededDichromBitmapWidth,
   parseDichromCandidates,
   selectDichromCandidate,
   type DichromCandidate,
 } from '../utils/dichrom-tier-select';
-import {
-  ZOOM_FREEZE_BASELINE_STORAGE_KEY,
-  parseZoomFreezeBaselineJson,
-} from '../utils/zoom-guard-storage';
-import {
-  computeDprPageZoom,
-  computeWindowChromePageZoom,
-  readZoomViewportSnapshot,
-} from '../utils/zoom-signals';
 
 const CANDIDATES_ATTR = 'data-dichrom-candidates';
 const CHOSEN_WIDTH_ATTR = 'data-dichrom-bitmap-width';
@@ -85,7 +76,7 @@ function syncDichromImage(img: HTMLImageElement): void {
     boxHeightCss: box.height,
     aspectWOverH: imageAspect(img),
     objectFit: getComputedStyle(img).objectFit,
-    deviceScale: deviceScaleNow(),
+    deviceScale: readDichromDeviceScale(window),
   });
   if (!(devicePx > 0)) return;
 
@@ -108,29 +99,6 @@ function imageAspect(img: HTMLImageElement): number {
   const attrHeight = Number(img.getAttribute('height'));
   if (attrWidth > 0 && attrHeight > 0) return attrWidth / attrHeight;
   return 0;
-}
-
-function deviceScaleNow(): number {
-  const current = readZoomViewportSnapshot(window);
-  let dprPageZoom = 1;
-  let cssPageZoom = 1;
-  try {
-    const raw = window.sessionStorage.getItem(ZOOM_FREEZE_BASELINE_STORAGE_KEY);
-    const baseline = parseZoomFreezeBaselineJson(raw);
-    if (baseline) {
-      dprPageZoom = computeDprPageZoom(baseline, current);
-      cssPageZoom = computeWindowChromePageZoom(baseline, current);
-    }
-  } catch {
-    dprPageZoom = 1;
-    cssPageZoom = 1;
-  }
-  return dichromDeviceScale({
-    devicePixelRatio: current.dpr,
-    visualViewportScale: current.vvScale,
-    dprPageZoom,
-    cssPageZoom,
-  });
 }
 
 function currentCandidate(

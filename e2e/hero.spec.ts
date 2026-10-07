@@ -161,17 +161,29 @@ test.describe('Hero page (/)', () => {
     await expect(figure.locator('img[alt="Hero background"]')).toBeVisible();
   });
 
-  test('preloads hero background image with mobile-first srcset', async ({
+  test('loads one hero tier chosen before the first request', async ({
     page,
   }) => {
+    await waitForHeroLoaded(page);
+    await page.waitForLoadState('networkidle');
+    const img = page.locator('img.hero-bg__image');
+    await expect(img).not.toHaveAttribute('srcset');
+    await expect(page.locator('picture source')).toHaveCount(0);
+    const src = await img.getAttribute('src');
+    expect(src).toContain(HERO_BG_STEM);
+    expect(src).toMatch(/_dichrom_\d+\.png$/);
     const preload = page.locator('link[rel="preload"][as="image"]');
     await expect(preload).toHaveCount(1);
-    await expect(preload).toHaveAttribute('href', `${HERO_BG_STEM}_720.png`);
-    await expect(preload).toHaveAttribute(
-      'imagesrcset',
-      new RegExp(`${HERO_BG_FILE_STEM}_720\\.png 1800w,.*_1080\\.png 2430w`),
-    );
-    await expect(preload).toHaveAttribute('imagesizes', '100vw');
+    await expect(preload).toHaveAttribute('href', src ?? '');
+    await expect(preload).not.toHaveAttribute('imagesrcset');
+    const heroPaths = await page.evaluate((stem) => {
+      return performance
+        .getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .filter((name) => name.includes(stem))
+        .map((name) => new URL(name).pathname);
+    }, HERO_BG_FILE_STEM);
+    expect(new Set(heroPaths)).toEqual(new Set([src]));
   });
 
   /*

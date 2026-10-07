@@ -413,6 +413,29 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(heroSpec).not.toContain('altumcode');
   });
 
+  it('hero first request uses the shared tier selector on the painted box', () => {
+    const hero = readRepoFile('src/components/HomeHero.astro');
+    const early = readRepoFile('src/scripts/dichrom-hero-early.ts');
+    const index = readRepoFile('src/pages/index.astro');
+    expect(hero).toContain('initialHref');
+    expect(hero).not.toContain('srcset');
+    expect(index).toContain('selectHeroScannerCandidate');
+    expect(index).not.toContain('imagesrcset');
+    expect(index).not.toContain('DichromPreloadLink');
+    expect(early).toContain('selectDichromCandidate');
+    expect(early).toContain('getBoundingClientRect');
+    expect(early).toContain('readDichromDeviceScale');
+    expect(readRepoFile('src/styles/pages/hero.css')).toContain(
+      '--hero-bg-zoom: 1.35',
+    );
+    expect(readRepoFile('src/utils/dichrom-hero-estimate.ts')).toContain(
+      'HERO_BG_ZOOM = 1.35',
+    );
+    expect(readRepoFile('src/styles/global.css')).toContain(
+      '--content-side-pad-compact: clamp(1.15rem, 6vw, 2rem)',
+    );
+  });
+
   it('no route stylesheet redefines the title gap or the panel square', () => {
     for (const relPath of ROUTE_STYLESHEETS) {
       const css = readRepoFile(relPath);

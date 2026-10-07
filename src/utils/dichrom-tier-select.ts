@@ -21,6 +21,12 @@ const UPSCALE_PENALTY = 0.04;
 /** Stay on the current file until another tier is clearly cleaner. Stops boundary flicker. */
 const TIER_SWITCH_MARGIN = 0.03;
 
+/**
+ * A heavier file must beat the lightest near-best score by more than this
+ * before it is worth the bytes. A hair of extra cleanliness is still the same beat.
+ */
+const HEAVIER_TIER_MARGIN = 0.04;
+
 export function parseDichromCandidates(srcset: string): DichromCandidate[] {
   const candidates: DichromCandidate[] = [];
   for (const part of srcset.split(',')) {
@@ -99,6 +105,27 @@ export function dichromDeviceScale(input: {
   return dpr * pinch * safariExtra;
 }
 
+function lightestCandidateNearBest(
+  candidates: readonly DichromCandidate[],
+  devicePx: number,
+): { candidate: DichromCandidate; score: number } | null {
+  const scored = candidates.map((candidate) => ({
+    candidate,
+    score: dichromTierScore(candidate.w, devicePx),
+  }));
+  let bestScore = Number.POSITIVE_INFINITY;
+  for (const row of scored) {
+    if (row.score < bestScore) bestScore = row.score;
+  }
+
+  let chosen: (typeof scored)[number] | null = null;
+  for (const row of scored) {
+    if (row.score > bestScore + HEAVIER_TIER_MARGIN) continue;
+    if (!chosen || row.candidate.w < chosen.candidate.w) chosen = row;
+  }
+  return chosen;
+}
+
 export function selectDichromCandidate(
   candidates: readonly DichromCandidate[],
   devicePx: number,
@@ -106,22 +133,12 @@ export function selectDichromCandidate(
 ): DichromCandidate | null {
   if (candidates.length === 0 || !(devicePx > 0)) return null;
 
-  let best = candidates[0];
-  if (!best) return null;
-  let bestScore = dichromTierScore(best.w, devicePx);
-  for (const candidate of candidates) {
-    const score = dichromTierScore(candidate.w, devicePx);
-    const cleaner = score < bestScore - 1e-9;
-    const tiePreferSmaller =
-      Math.abs(score - bestScore) <= 1e-9 && candidate.w < best.w;
-    if (cleaner || tiePreferSmaller) {
-      best = candidate;
-      bestScore = score;
-    }
+  const preferred = lightestCandidateNearBest(candidates, devicePx);
+  if (!preferred) return null;
+  if (!current || current.href === preferred.candidate.href) {
+    return preferred.candidate;
   }
-
-  if (!current || current.href === best.href) return best;
   const currentScore = dichromTierScore(current.w, devicePx);
-  if (currentScore - bestScore < TIER_SWITCH_MARGIN) return current;
-  return best;
+  if (currentScore - preferred.score < TIER_SWITCH_MARGIN) return current;
+  return preferred.candidate;
 }

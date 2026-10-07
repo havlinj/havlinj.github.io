@@ -1,13 +1,20 @@
 ---
 import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
 import { buildDichromResponsive } from '../constants/dichrom-responsive';
+import {
+  HERO_BG_BITMAP_HEIGHT,
+  HERO_BG_BITMAP_WIDTH,
+} from '../constants/hero-layout';
+import { dichromHeroEarlyInlineScript } from '../utils/bundle-dichrom-hero-early';
 import '../styles/pages/hero.css';
 
 interface Props {
   sources: ReturnType<typeof buildDichromResponsive>;
+  initialHref: string;
 }
 
-const { sources: heroBg }: Props = Astro.props;
+const { sources: heroBg, initialHref }: Props = Astro.props;
+const heroSrcScript = dichromHeroEarlyInlineScript();
 ---
 
 <nav class="hero-header" aria-label="Main navigation">
@@ -23,12 +30,14 @@ const { sources: heroBg }: Props = Astro.props;
     <figure class="hero-figure" aria-hidden="true">
       <ResponsiveDichromPicture
         sources={heroBg}
-        width={2880}
-        height={1920}
+        width={HERO_BG_BITMAP_WIDTH}
+        height={HERO_BG_BITMAP_HEIGHT}
         alt="Hero background"
         class="hero-bg__image"
         fetchpriority="high"
+        initialHref={initialHref}
       />
+      <script is:inline set:html={heroSrcScript} />
     </figure>
 
     <div class="hero-content">
