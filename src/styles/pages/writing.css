@@ -308,9 +308,8 @@ ul.post-list > li::before {
 }
 
 /*
- * Writing panel BG: responsive Bayer PNG via `<picture>` (writing.astro), not `::before`.
- * Filename suffixes (720, 1080, …) = intended CSS display width, not PNG pixel width; see comment
- * on `buildDichromResponsive` in src/constants/dichrom-responsive.ts. Srcset `w` values are intrinsic bitmap widths.
+ * Writing panel BG: Bayer PNG via `<picture>` (writing.astro), not `::before`.
+ * Which file is shown is chosen in dichrom-tier-sync.ts from the painted box.
  */
 .writing-page .page-buttons-panel::before {
   content: none;

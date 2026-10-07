@@ -4,6 +4,7 @@
  * type-fit starts so the event listener is always registered first.
  */
 
+import { initDichromTierSync } from './dichrom-tier-sync';
 import { TYPE_FIT_EVENT } from './profile-tile-type-fit-constants';
 
 const TYPE_FIT_FALLBACK_TIMEOUT_MS = 8000;
@@ -17,6 +18,7 @@ type ProfileLoadingVeilState = {
 
 /** Entry point — register gates and start portrait wiring. No-op off the profile page. */
 export function initProfileLoadingVeil(): void {
+  initDichromTierSync();
   const section = document.querySelector('.profile-section--loading');
   if (!(section instanceof HTMLElement)) return;
 

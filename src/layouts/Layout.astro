@@ -57,8 +57,10 @@ const showSiteHeader = Boolean(activeSection || showHeader);
       <SiteFooter />
     </main>
     <script>
+      import { initDichromTierSync } from '../scripts/dichrom-tier-sync.ts';
       import { initZoomGuard } from '../scripts/zoom-guard-init.ts';
       initZoomGuard();
+      initDichromTierSync();
     </script>
     <script>
       try {

@@ -169,7 +169,7 @@ test.describe('Hero page (/)', () => {
     await expect(preload).toHaveAttribute('href', `${HERO_BG_STEM}_720.png`);
     await expect(preload).toHaveAttribute(
       'imagesrcset',
-      new RegExp(`${HERO_BG_FILE_STEM}_720\\.png 1620w,.*_1080\\.png 2160w`),
+      new RegExp(`${HERO_BG_FILE_STEM}_720\\.png 1800w,.*_1080\\.png 2430w`),
     );
     await expect(preload).toHaveAttribute('imagesizes', '100vw');
   });

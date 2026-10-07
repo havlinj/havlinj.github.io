@@ -1,5 +1,6 @@
 ---
 import {
+  dichromCandidateSrcset,
   dichromDesktopSrcset,
   dichromMobileSrcset,
   type DichromResponsiveSet,
@@ -41,6 +42,7 @@ const {
     src={sources.w1440.href}
     srcset={dichromDesktopSrcset(sources)}
     sizes={sizes}
+    data-dichrom-candidates={dichromCandidateSrcset(sources)}
     width={width}
     height={height}
     alt={alt}

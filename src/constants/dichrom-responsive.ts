@@ -2,18 +2,25 @@
  * Responsive Bayer PNG tiers (`*_720.png`, `*_1080.png`, …).
  *
  * The numeric suffix in the filename is NOT the bitmap width in pixels. It is the *intended
- * display width* (~CSS px) the asset was authored for. Files are oversampled (e.g. target × ~2.25)
- * so the browser downsamples a high-res Bayer grid → smoother pattern, less moiré.
+ * display width* (~CSS px) the asset was authored for. Files are oversampled (target × 2.5,
+ * 2.25, 2.0, 1.8, 1.6) so a matching display size downsamples the Bayer grid.
  *
- * HTML `srcset` `w` descriptors MUST be each image’s *intrinsic pixel width* (what `identify`
- * reports). Do not use the filename number there — wrong descriptor breaks resource selection.
+ * HTML `srcset` `w` descriptors MUST be each image’s *intrinsic pixel width* (PNG IHDR).
+ * Do not use the filename number there — a stale descriptor makes the tier selector
+ * score a bitmap that is not the file.
+ *
+ * That srcset is only the no-JS fallback. `initDichromTierSync` measures the painted box
+ * (CSS zoom and transforms already included) and loads the tier whose bitmap-to-device
+ * ratio is the closest small integer. `sizes="100vw"` does not know the box, the image
+ * zoom, or pinch, and browsers are not required to re-pick on zoom.
  */
 
+/** PNG IHDR widths for the full-frame sets (hero, writing, contact, maintenance). */
 export const DICHROM_INTRINSIC_WIDTHS = {
-  w720: 1620,
-  w1080: 2160,
-  w1440: 2736,
-  w1920: 3360,
+  w720: 1800,
+  w1080: 2430,
+  w1440: 2880,
+  w1920: 3456,
   w2400: 3840,
 } as const;
 
@@ -48,6 +55,13 @@ export type DichromTileResponsiveSet = Record<DichromTileTier, DichromSource>;
 
 function formatDichromSrcset(entries: readonly DichromSource[]): string {
   return entries.map((s) => `${s.href} ${s.w}w`).join(', ');
+}
+
+/** Every tier, in authored order. The sync script parses this; srcset stays the fallback. */
+export function dichromCandidateSrcset(
+  sources: Record<string, DichromSource>,
+): string {
+  return formatDichromSrcset(Object.values(sources));
 }
 
 /** Build href + intrinsic `w` entries from a path stem (no trailing `_720` suffix). */

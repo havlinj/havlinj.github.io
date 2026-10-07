@@ -217,6 +217,7 @@ describe('layout contracts: profile image-tile dichrom', () => {
       PROFILE_WHY_BG_STEM,
     } = await import('../../src/constants/profile-layout');
     const {
+      dichromCandidateSrcset,
       dichromDesktopSrcset,
       dichromMobileSrcset,
       dichromTileDesktopSrcset,
@@ -239,6 +240,9 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(md).toContain(PROFILE_PANEL_BG_FILE_STEM);
     expect(md).toContain(dichromMobileSrcset(PROFILE_PANEL_BG));
     expect(md).toContain(dichromDesktopSrcset(PROFILE_PANEL_BG));
+    expect(md).toContain(
+      `data-dichrom-candidates="${dichromCandidateSrcset(PROFILE_PANEL_BG)}"`,
+    );
     expect(md).toContain(`src="${PROFILE_PANEL_BG.w1440.href}"`);
     expect(md).toContain(`width="${PROFILE_PANEL_BG.w1440.w}"`);
     expect(md).toContain(`height="${PROFILE_PANEL_BG_HEIGHT}"`);
@@ -250,6 +254,9 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(md).toContain(PROFILE_PORTRAIT_BG_STEM);
     expect(md).toContain(dichromTileMobileSrcset(PROFILE_PORTRAIT_BG));
     expect(md).toContain(dichromTileDesktopSrcset(PROFILE_PORTRAIT_BG));
+    expect(md).toContain(
+      `data-dichrom-candidates="${dichromCandidateSrcset(PROFILE_PORTRAIT_BG)}"`,
+    );
     expect(md).toContain(`src="${PROFILE_PORTRAIT_BG.w320.href}"`);
     expect(md).toContain(`width="${PROFILE_PORTRAIT_BG.w320.w}"`);
     expect(md).toContain(`height="${PROFILE_PORTRAIT_BG_HEIGHT}"`);
@@ -258,11 +265,17 @@ describe('layout contracts: profile image-tile dichrom', () => {
     expect(md).toContain(PROFILE_WHY_BG_STEM);
     expect(md).toContain(dichromTileMobileSrcset(PROFILE_WHY_BG));
     expect(md).toContain(dichromTileDesktopSrcset(PROFILE_WHY_BG));
+    expect(md).toContain(
+      `data-dichrom-candidates="${dichromCandidateSrcset(PROFILE_WHY_BG)}"`,
+    );
     expect(md).toContain(`src="${PROFILE_WHY_BG.w320.href}"`);
 
     expect(md).toContain(PROFILE_FOUNDATIONS_BG_STEM);
     expect(md).toContain(dichromTileMobileSrcset(PROFILE_FOUNDATIONS_BG));
     expect(md).toContain(dichromTileDesktopSrcset(PROFILE_FOUNDATIONS_BG));
+    expect(md).toContain(
+      `data-dichrom-candidates="${dichromCandidateSrcset(PROFILE_FOUNDATIONS_BG)}"`,
+    );
     expect(md).toContain(`src="${PROFILE_FOUNDATIONS_BG.w320.href}"`);
     expect(md).toContain(`sizes="${PROFILE_DICHROM_TILE_SIZES}"`);
     expect(md).toContain(`width="${PROFILE_FOUNDATIONS_BG.w320.w}"`);
@@ -626,6 +639,9 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(astro).toContain('route-maintenance-panel__media--pending');
     expect(astro).toContain('maintenance-panel-edge.ts');
     expect(astro).toContain('ResponsiveDichromPicture');
+    expect(
+      readRepoFile('src/components/ResponsiveDichromPicture.astro'),
+    ).toContain('data-dichrom-candidates');
     expect(MAINTENANCE_PANEL_BG_STEM).toContain('/assets/pages/maintenance/');
     expect(MAINTENANCE_PANEL_BG_STEM).toMatch(/_dichrom$/);
   });

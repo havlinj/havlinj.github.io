@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   buildDichromResponsive,
   buildDichromTileResponsive,
+  dichromCandidateSrcset,
   dichromDesktopSrcset,
   dichromMobileSrcset,
   dichromTileDesktopSrcset,
@@ -24,14 +26,46 @@ describe('dichrom-responsive', () => {
 
   it('dichromMobileSrcset lists 720 and 1080 tiers', () => {
     expect(dichromMobileSrcset(sources)).toBe(
-      `${stem}_720.png 1620w, ${stem}_1080.png 2160w`,
+      `${stem}_720.png 1800w, ${stem}_1080.png 2430w`,
     );
   });
 
   it('dichromDesktopSrcset lists 1080 through 2400 tiers', () => {
     expect(dichromDesktopSrcset(sources)).toBe(
-      `${stem}_1080.png 2160w, ${stem}_1440.png 2736w, ${stem}_1920.png 3360w, ${stem}_2400.png 3840w`,
+      `${stem}_1080.png 2430w, ${stem}_1440.png 2880w, ${stem}_1920.png 3456w, ${stem}_2400.png 3840w`,
     );
+  });
+
+  it('dichromCandidateSrcset lists every tier for the sync script', () => {
+    expect(dichromCandidateSrcset(sources)).toBe(
+      `${stem}_720.png 1800w, ${stem}_1080.png 2430w, ${stem}_1440.png 2880w, ${stem}_1920.png 3456w, ${stem}_2400.png 3840w`,
+    );
+  });
+
+  it('full-frame descriptors match the PNG pixel widths', () => {
+    const files = [
+      'public/assets/hero/vackground-com-agUC-v_D1iI-unsplash_dichrom',
+      'public/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom',
+      'public/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
+      'public/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom',
+      'public/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom',
+    ];
+    const tiers = [
+      ['720', DICHROM_INTRINSIC_WIDTHS.w720],
+      ['1080', DICHROM_INTRINSIC_WIDTHS.w1080],
+      ['1440', DICHROM_INTRINSIC_WIDTHS.w1440],
+      ['1920', DICHROM_INTRINSIC_WIDTHS.w1920],
+      ['2400', DICHROM_INTRINSIC_WIDTHS.w2400],
+    ] as const;
+    for (const stemPath of files) {
+      for (const [suffix, width] of tiers) {
+        const header = readFileSync(`${stemPath}_${suffix}.png`).subarray(
+          16,
+          24,
+        );
+        expect(header.readUInt32BE(0), `${stemPath}_${suffix}`).toBe(width);
+      }
+    }
   });
 });
 

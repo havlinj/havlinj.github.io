@@ -1,108 +1,137 @@
-import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+import { ZOOM_FREEZE_BASELINE_STORAGE_KEY } from '../../src/utils/zoom-guard-storage';
+import {
+  computeDprPageZoom,
+  computeWindowChromePageZoom,
+  type ZoomViewportSnapshot,
+} from '../../src/utils/zoom-signals';
+import {
+  dichromDeviceScale,
+  neededDichromBitmapWidth,
+  parseDichromCandidates,
+  selectDichromCandidate,
+} from '../../src/utils/dichrom-tier-select';
 
-/**
- * Reusable viewport matrix for pages whose content panel (or hero) background uses
- * `<picture>` / `srcset` with oversampled tiers (`*_720.png`, `*_1080.png`, …).
- *
- * Each case spins up a fresh browser context so `viewport` + `deviceScaleFactor`
- * match production-like selection (width × DPR drives `sizes: 100vw` math).
- *
- * Tuning: when markup or asset widths change, adjust viewports/DPR per tier and
- * re-run this suite; comments on each case should record *why* that tuple maps to a tier.
- */
-export type ResponsivePanelBgCase = {
-  /** Filename tier / semantic label (appears in test title). */
-  tierLabel: string;
-  viewport: { width: number; height: number };
-  /** Defaults to 1. Use >1 to exercise higher-density slots without giant viewports. */
-  deviceScaleFactor?: number;
-  /** Checked against `HTMLImageElement.currentSrc` (absolute URL). */
-  urlMatcher: RegExp;
+type PaintedDichrom = {
+  boxWidthCss: number;
+  boxHeightCss: number;
+  aspectWOverH: number;
+  objectFit: string;
+  currentSrc: string;
+  candidates: string;
+  chosenWidth: number;
+  snapshot: ZoomViewportSnapshot;
+  baseline: ZoomViewportSnapshot | null;
 };
 
-export type ResponsivePanelBgMatrixConfig = {
-  suiteTitle: string;
-  path: string;
-  imgSelector: string;
-  cases: ResponsivePanelBgCase[];
-  waitForReady?: (page: Page) => Promise<void>;
-  /**
-   * When set, the whole describe is skipped (pages not yet on `<picture>` + responsive assets).
-   */
-  skipSuiteReason?: string;
-};
+async function readPaintedDichrom(locator: Locator): Promise<PaintedDichrom> {
+  return locator.evaluate((el, storageKey) => {
+    const img = el as HTMLImageElement;
+    const box = img.getBoundingClientRect();
+    const attrWidth = Number(img.getAttribute('width'));
+    const attrHeight = Number(img.getAttribute('height'));
+    const aspect =
+      img.naturalWidth > 0 && img.naturalHeight > 0
+        ? img.naturalWidth / img.naturalHeight
+        : attrWidth > 0 && attrHeight > 0
+          ? attrWidth / attrHeight
+          : 0;
+    const vv = window.visualViewport;
+    let baseline: {
+      dpr: number;
+      vvScale: number;
+      innerWidth: number;
+      outerWidth: number;
+    } | null = null;
+    try {
+      const raw = window.sessionStorage.getItem(storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          dpr?: number;
+          vvScale?: number;
+          innerWidth?: number;
+          outerWidth?: number;
+        };
+        if (
+          typeof parsed.dpr === 'number' &&
+          typeof parsed.vvScale === 'number' &&
+          typeof parsed.innerWidth === 'number' &&
+          typeof parsed.outerWidth === 'number'
+        ) {
+          baseline = {
+            dpr: parsed.dpr,
+            vvScale: parsed.vvScale,
+            innerWidth: parsed.innerWidth,
+            outerWidth: parsed.outerWidth,
+          };
+        }
+      }
+    } catch {
+      baseline = null;
+    }
+    return {
+      boxWidthCss: box.width,
+      boxHeightCss: box.height,
+      aspectWOverH: aspect,
+      objectFit: getComputedStyle(img).objectFit,
+      currentSrc: img.currentSrc || img.getAttribute('src') || '',
+      candidates: img.getAttribute('data-dichrom-candidates') || '',
+      chosenWidth: Number(img.getAttribute('data-dichrom-bitmap-width')) || 0,
+      snapshot: {
+        dpr: window.devicePixelRatio || 1,
+        vvScale: vv && vv.scale ? vv.scale : 1,
+        innerWidth: window.innerWidth || 0,
+        outerWidth: window.outerWidth || 0,
+      },
+      baseline,
+    };
+  }, ZOOM_FREEZE_BASELINE_STORAGE_KEY);
+}
 
-async function readResponsiveImgUrl(
+function expectedHref(painted: PaintedDichrom): string {
+  const dprPageZoom = painted.baseline
+    ? computeDprPageZoom(painted.baseline, painted.snapshot)
+    : 1;
+  const cssPageZoom = painted.baseline
+    ? computeWindowChromePageZoom(painted.baseline, painted.snapshot)
+    : 1;
+  const devicePx = neededDichromBitmapWidth({
+    boxWidthCss: painted.boxWidthCss,
+    boxHeightCss: painted.boxHeightCss,
+    aspectWOverH: painted.aspectWOverH,
+    objectFit: painted.objectFit,
+    deviceScale: dichromDeviceScale({
+      devicePixelRatio: painted.snapshot.dpr,
+      visualViewportScale: painted.snapshot.vvScale,
+      dprPageZoom,
+      cssPageZoom,
+    }),
+  });
+  const candidates = parseDichromCandidates(painted.candidates);
+  const current = candidates.find(
+    (candidate) => candidate.w === painted.chosenWidth,
+  );
+  const chosen = selectDichromCandidate(candidates, devicePx, current);
+  return chosen?.href ?? '';
+}
+
+/** The loaded file matches the painted-size tier, not `sizes` × viewport. */
+export async function expectDichromTierMatchesPaint(
   page: Page,
   imgSelector: string,
-): Promise<string> {
+): Promise<void> {
   const locator = page.locator(imgSelector).first();
   await expect(locator).toBeAttached({ timeout: 15_000 });
   await expect
     .poll(
-      async () =>
-        locator.evaluate((el) => {
-          const img = el as HTMLImageElement;
-          return img.complete && img.naturalWidth > 0;
-        }),
+      async () => {
+        const painted = await readPaintedDichrom(locator);
+        if (!painted.candidates || !(painted.boxWidthCss > 0)) return '';
+        const href = expectedHref(painted);
+        if (!href) return 'no candidate';
+        return painted.currentSrc.includes(href) ? 'ok' : painted.currentSrc;
+      },
       { timeout: 15_000 },
     )
-    .toBe(true);
-
-  return locator.evaluate((el) => {
-    const img = el as HTMLImageElement;
-    return img.currentSrc || img.getAttribute('src') || '';
-  });
-}
-
-function registerCases(config: ResponsivePanelBgMatrixConfig): void {
-  test.describe.configure({ mode: 'parallel' });
-
-  for (const c of config.cases) {
-    const dpr = c.deviceScaleFactor ?? 1;
-    const dprNote = dpr !== 1 ? `, dpr=${dpr}` : '';
-    test(`tier “${c.tierLabel}” @ ${c.viewport.width}×${c.viewport.height}${dprNote}`, async ({
-      browser,
-      baseURL,
-    }) => {
-      const context = await browser.newContext({
-        baseURL,
-        viewport: c.viewport,
-        deviceScaleFactor: dpr,
-      });
-      const page = await context.newPage();
-      try {
-        await page.goto(config.path, { waitUntil: 'domcontentloaded' });
-        await config.waitForReady?.(page);
-        const url = await readResponsiveImgUrl(page, config.imgSelector);
-        expect(url).toMatch(c.urlMatcher);
-      } finally {
-        await context.close();
-      }
-    });
-  }
-}
-
-/** Register one matrix block (five cases typical). Safe to call multiple times per file. */
-export function declareResponsivePanelBgMatrix(
-  config: ResponsivePanelBgMatrixConfig,
-): void {
-  const body = () => {
-    if (config.skipSuiteReason && config.cases.length === 0) {
-      /* Keeps skipped suites visible in `playwright test` summaries (no silent empty describes). */
-      test('matrix cases not registered yet', async () => {});
-      return;
-    }
-    registerCases(config);
-  };
-
-  if (config.skipSuiteReason) {
-    test.describe.skip(
-      `${config.suiteTitle} — ${config.skipSuiteReason}`,
-      body,
-    );
-  } else {
-    test.describe(config.suiteTitle, body);
-  }
+    .toBe('ok');
 }

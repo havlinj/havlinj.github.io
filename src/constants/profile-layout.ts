@@ -3,6 +3,7 @@
 import {
   buildDichromResponsive,
   buildDichromTileResponsive,
+  DICHROM_INTRINSIC_WIDTHS,
 } from './dichrom-responsive';
 
 export const PROFILE_PORTRAIT_BG_STEM =
@@ -16,21 +17,15 @@ export const PROFILE_PORTRAIT_BG = buildDichromTileResponsive(
 export const PROFILE_PORTRAIT_BG_HEIGHT = 974;
 
 /**
- * Panel background. Filename suffix is the display tier; these are PNG IHDR widths.
- * They differ from `DICHROM_INTRINSIC_WIDTHS` (other pages' Bayer sets).
+ * Panel background. Filename suffix is the display tier; widths are the shared
+ * full-frame PNG IHDR widths (same generator profiles as the other pages).
  */
 export const PROFILE_PANEL_BG_FILE_STEM =
   'jiesuang-ng-WKL3Q906OR4-unsplash_dichrom';
 
 export const PROFILE_PANEL_BG_STEM = `/assets/pages/profile/${PROFILE_PANEL_BG_FILE_STEM}`;
 
-export const PROFILE_PANEL_BG_INTRINSIC_WIDTHS = {
-  w720: 1800,
-  w1080: 2430,
-  w1440: 2880,
-  w1920: 3456,
-  w2400: 3840,
-} as const;
+export const PROFILE_PANEL_BG_INTRINSIC_WIDTHS = DICHROM_INTRINSIC_WIDTHS;
 
 export const PROFILE_PANEL_BG = buildDichromResponsive(
   PROFILE_PANEL_BG_STEM,

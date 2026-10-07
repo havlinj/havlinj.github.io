@@ -43,11 +43,7 @@ export {
   readTurnstileResetCount,
   submitContactForm,
 } from './contact';
-export {
-  declareResponsivePanelBgMatrix,
-  type ResponsivePanelBgCase,
-  type ResponsivePanelBgMatrixConfig,
-} from './responsive-panel-bg-matrix';
+export { expectDichromTierMatchesPaint } from './responsive-panel-bg-matrix';
 export { hasAstroStylesheetBundle, readStylesheetHrefs } from './stylesheets';
 export {
   expectWritingCategoryPickerClosed,
