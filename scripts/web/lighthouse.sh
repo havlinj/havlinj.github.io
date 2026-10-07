@@ -15,14 +15,14 @@ SKIP_BUILD="${LIGHTHOUSE_SKIP_BUILD:-0}"
 SKIP_PREVIEW="${LIGHTHOUSE_SKIP_PREVIEW:-0}"
 
 # Homepage thresholds: stricter locally; GitHub Actions sets LH_MAX_* in deploy.yml.
-MIN_PERF_SCORE="${LH_MIN_PERF_SCORE:-0.85}"
+MIN_PERF_SCORE="${LH_MIN_PERF_SCORE:-0.92}"
 MAX_LCP_MS="${LH_MAX_LCP_MS:-3000}"
 MAX_CLS="${LH_MAX_CLS:-0.10}"
 MAX_TBT_MS="${LH_MAX_TBT_MS:-200}"
-# Regression gate around a measured ~6.0s LCP and score 76. The loading veil
-# holds the What I do poster, so this is not the homepage bar.
-PROFILE_MIN_PERF_SCORE="${LH_PROFILE_MIN_PERF_SCORE:-0.70}"
-PROFILE_MAX_LCP_MS="${LH_PROFILE_MAX_LCP_MS:-8000}"
+# Profile is slower because the loading veil holds the What I do poster.
+# Ceilings sit under a measured ~3.9s LCP and score 86, with room for a noisy run.
+PROFILE_MIN_PERF_SCORE="${LH_PROFILE_MIN_PERF_SCORE:-0.80}"
+PROFILE_MAX_LCP_MS="${LH_PROFILE_MAX_LCP_MS:-5000}"
 # Retries help when the machine is busy (e.g. after full Playwright in local.sh / CI).
 ATTEMPTS="${LH_ATTEMPTS:-2}"
 if ! [[ "$ATTEMPTS" =~ ^[1-9][0-9]*$ ]]; then
