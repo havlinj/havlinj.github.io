@@ -1,8 +1,6 @@
 ---
 import {
   dichromCandidateSrcset,
-  dichromDesktopSrcset,
-  dichromMobileSrcset,
   type DichromResponsiveSet,
 } from '../constants/dichrom-responsive';
 
@@ -14,9 +12,6 @@ interface Props {
   class?: string;
   fetchpriority?: 'high' | 'low' | 'auto';
   decoding?: 'async' | 'sync' | 'auto';
-  sizes?: string;
-  /** Matches content panel pages: mobile `<source>` breakpoint. */
-  mobileMedia?: string;
   /**
    * One URL in the document, no srcset. The hero measurement script may
    * replace it after layout.
@@ -32,29 +27,17 @@ const {
   class: className,
   fetchpriority,
   decoding = 'async',
-  sizes = '100vw',
-  mobileMedia = '(max-width: 767px)',
   initialHref,
 }: Props = Astro.props;
 const singleSrc = Boolean(initialHref);
+const fallbackHref = initialHref ?? sources.w1440.href;
 ---
 
 <picture>
-  {
-    !singleSrc && (
-      <source
-        media={mobileMedia}
-        srcset={dichromMobileSrcset(sources)}
-        sizes={sizes}
-      />
-    )
-  }
   <img
-    src={initialHref ?? sources.w1440.href}
-    srcset={singleSrc ? undefined : dichromDesktopSrcset(sources)}
-    sizes={singleSrc ? undefined : sizes}
+    src={singleSrc ? initialHref : undefined}
     data-dichrom-candidates={dichromCandidateSrcset(sources)}
-    data-dichrom-fallback={singleSrc ? initialHref : undefined}
+    data-dichrom-fallback={fallbackHref}
     width={width}
     height={height}
     alt={alt}
@@ -63,3 +46,10 @@ const singleSrc = Boolean(initialHref);
     fetchpriority={fetchpriority}
   />
 </picture>
+{
+  !singleSrc && (
+    <noscript>
+      <img src={fallbackHref} alt={alt} />
+    </noscript>
+  )
+}

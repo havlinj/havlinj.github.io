@@ -9,12 +9,13 @@
  * Do not use the filename number there — a stale descriptor makes the tier selector
  * score a bitmap that is not the file.
  *
- * That srcset is only the no-JS fallback. `initDichromTierSync` measures the painted box
- * (CSS zoom and transforms already included) and loads the tier whose bitmap-to-device
- * ratio is the closest small integer, keeping the lighter file when a heavier one is
- * only a hair cleaner. `sizes="100vw"` does not know the box, the image zoom, or pinch,
- * and browsers are not required to re-pick on zoom. The hero skips srcset: a blocking
- * script beside the image calls the same selector before the first request.
+ * `initDichromTierSync` measures the painted box (CSS zoom and transforms already
+ * included) and loads the tier whose bitmap-to-device ratio is the closest small
+ * integer, keeping the lighter file when a heavier one is only a hair cleaner.
+ * A slight upscale loses to a near-integer reduction: stretching the Bayer cell is
+ * the moiré that stays on a phone. Panel pictures omit srcset so the browser cannot
+ * paint a 100vw guess and then keep it. The hero puts one measured URL in the
+ * document for the same reason. Profile markdown still ships a srcset for no-JS.
  */
 
 /** PNG IHDR widths for the full-frame sets (hero, writing, contact, maintenance). */

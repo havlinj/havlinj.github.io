@@ -75,35 +75,94 @@ describe('dichrom tier score', () => {
     ).toBeCloseTo(248);
   });
 
-  it('picks the 160 tile when the phone paints it near 480 device px', () => {
-    expect(chosenWidth(483, TILE_WIDTHS)).toBe(480);
+  it.each([
+    {
+      name: 'iPhone 13 maintenance: 1800 would upscale, so 3840 downsamples at 2.06',
+      devicePx: 1864,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w2400,
+    },
+    {
+      name: 'Pixel 7 maintenance: sloppy 1:1 loses to an exact 2:1',
+      devicePx: 1727,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1920,
+    },
+    {
+      name: 'iPhone 13 contact cover stays on the near 2:1 file',
+      devicePx: 1458,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1440,
+    },
+    {
+      name: 'Lighthouse hero keeps the lighter file when 3:1 is only a hair cleaner',
+      devicePx: 1285,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'desktop hero at 1280 CSS px and dpr 1',
+      devicePx: 1288,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'phone hero at dpr 3',
+      devicePx: 2101,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'phone full-frame panel near 2:1, not the 1.5 file',
+      devicePx: 1188,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'desktop full-frame panel',
+      devicePx: 768,
+      widths: FULL_WIDTHS,
+      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'phone Why tile stays on 480; the exact 3:1 file must not steal it',
+      devicePx: 483,
+      widths: TILE_WIDTHS,
+      chosen: DICHROM_TILE_INTRINSIC_WIDTHS.w160,
+    },
+  ])('$name', ({ devicePx, widths, chosen }) => {
+    expect(chosenWidth(devicePx, widths)).toBe(chosen);
   });
 
-  it('picks a near 2:1 full-frame tier for a phone panel, not the 1.5x file', () => {
-    expect(chosenWidth(1188, FULL_WIDTHS)).toBe(2430);
-  });
-
-  it('keeps a clean downsample on a desktop-sized panel', () => {
-    expect(chosenWidth(768, FULL_WIDTHS)).toBe(2430);
-  });
-
-  it('prefers the lighter hero file when the heavier one is only a hair cleaner', () => {
-    const devicePx = 1285;
-    expect(dichromTierScore(3840, devicePx)).toBeLessThan(
-      dichromTierScore(2430, devicePx),
+  it('still records that the heavier hero file scores cleaner at the Lighthouse box', () => {
+    expect(dichromTierScore(3840, 1285)).toBeLessThan(
+      dichromTierScore(2430, 1285),
     );
-    expect(chosenWidth(devicePx, FULL_WIDTHS)).toBe(
-      DICHROM_INTRINSIC_WIDTHS.w1080,
-    );
   });
 
-  it('stays on a heavier file until a lighter one is clearly cleaner', () => {
+  it('does not keep an upscaled file just because it is lighter', () => {
     const list = candidatesFrom([1000, 2000]);
     const heavier = list[1];
-    expect(selectDichromCandidate(list, 1400)?.w).toBe(1000);
-    expect(selectDichromCandidate(list, 1400, heavier)?.w).toBe(2000);
+    const lighter = list[0];
+    expect(selectDichromCandidate(list, 1400)?.w).toBe(2000);
+    expect(selectDichromCandidate(list, 1400, lighter)?.w).toBe(2000);
     expect(selectDichromCandidate(list, 1000, heavier)?.w).toBe(1000);
     expect(selectDichromCandidate(list, 1600)?.w).toBe(2000);
+    expect(
+      selectDichromCandidate(candidatesFrom(FULL_WIDTHS), 1285, {
+        href: '/tier-3840.png',
+        w: 3840,
+      })?.w,
+    ).toBe(3840);
+    const showingUpscale = candidatesFrom(FULL_WIDTHS)[0];
+    expect(
+      selectDichromCandidate(candidatesFrom(FULL_WIDTHS), 1864, showingUpscale)
+        ?.w,
+    ).toBe(DICHROM_INTRINSIC_WIDTHS.w2400);
+    expect(
+      selectDichromCandidate(candidatesFrom(FULL_WIDTHS), 1727, showingUpscale)
+        ?.w,
+    ).toBe(DICHROM_INTRINSIC_WIDTHS.w1920);
   });
 
   it('folds Chrome page zoom into DPR and Safari page zoom into the CSS factor', () => {

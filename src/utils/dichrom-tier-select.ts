@@ -27,6 +27,21 @@ const TIER_SWITCH_MARGIN = 0.03;
  */
 const HEAVIER_TIER_MARGIN = 0.04;
 
+/**
+ * A 1:1 file this far from the device grid is the moiré the phone actually shows.
+ * An essentially exact 2:1 or 3:1 downsample replaces it.
+ */
+const SLOPPY_UNITY_ERROR = 0.02;
+
+/** Raw log-distance at which a coarser integer still counts as a clean downsample. */
+const CLEAN_DOWNSAMPLE_ERROR = 0.02;
+
+/**
+ * How much worse a downsample may score than a slight upscale and still replace it.
+ * Upscaling a Bayer cell duplicates columns; a near integer reduction does not.
+ */
+const UPSCALE_SCORE_SLACK = 0.015;
+
 export function parseDichromCandidates(srcset: string): DichromCandidate[] {
   const candidates: DichromCandidate[] = [];
   for (const part of srcset.split(',')) {
@@ -105,6 +120,74 @@ export function dichromDeviceScale(input: {
   return dpr * pinch * safariExtra;
 }
 
+function nearestRatio(
+  bitmapWidth: number,
+  devicePx: number,
+): { step: number; error: number; sourcePerDevice: number } {
+  const sourcePerDevice = bitmapWidth / devicePx;
+  let step: number = RATIO_STEPS[0];
+  let error = Number.POSITIVE_INFINITY;
+  for (const candidateStep of RATIO_STEPS) {
+    const candidateError = Math.abs(Math.log(sourcePerDevice / candidateStep));
+    if (candidateError < error) {
+      error = candidateError;
+      step = candidateStep;
+    }
+  }
+  return { step, error, sourcePerDevice };
+}
+
+/**
+ * The byte rule keeps a slightly small 1:1 file over a heavier exact downsample.
+ * On a phone that stretch is the moiré that stays on screen. An exact coarser
+ * integer replaces a sloppy 1:1, and a near-integer reduction replaces an upscale.
+ */
+function preferReadableBitmap(
+  candidates: readonly DichromCandidate[],
+  devicePx: number,
+  preferred: { candidate: DichromCandidate; score: number },
+): { candidate: DichromCandidate; score: number } {
+  const preferredRatio = nearestRatio(preferred.candidate.w, devicePx);
+
+  if (preferredRatio.step === 1 && preferredRatio.error > SLOPPY_UNITY_ERROR) {
+    let clean: { candidate: DichromCandidate; score: number } | null = null;
+    for (const candidate of candidates) {
+      const ratio = nearestRatio(candidate.w, devicePx);
+      if (ratio.step < 2 || ratio.error > CLEAN_DOWNSAMPLE_ERROR) continue;
+      const candidateScore = dichromTierScore(candidate.w, devicePx);
+      if (
+        !clean ||
+        candidateScore < clean.score ||
+        (candidateScore === clean.score && candidate.w < clean.candidate.w)
+      ) {
+        clean = { candidate, score: candidateScore };
+      }
+    }
+    if (clean) return clean;
+  }
+
+  if (preferredRatio.sourcePerDevice < 1) {
+    let downsample: { candidate: DichromCandidate; score: number } | null =
+      null;
+    for (const candidate of candidates) {
+      if (candidate.w < devicePx) continue;
+      const candidateScore = dichromTierScore(candidate.w, devicePx);
+      if (candidateScore > preferred.score + UPSCALE_SCORE_SLACK) continue;
+      if (
+        !downsample ||
+        candidateScore < downsample.score ||
+        (candidateScore === downsample.score &&
+          candidate.w < downsample.candidate.w)
+      ) {
+        downsample = { candidate, score: candidateScore };
+      }
+    }
+    if (downsample) return downsample;
+  }
+
+  return preferred;
+}
+
 function lightestCandidateNearBest(
   candidates: readonly DichromCandidate[],
   devicePx: number,
@@ -133,12 +216,18 @@ export function selectDichromCandidate(
 ): DichromCandidate | null {
   if (candidates.length === 0 || !(devicePx > 0)) return null;
 
-  const preferred = lightestCandidateNearBest(candidates, devicePx);
-  if (!preferred) return null;
+  const lightest = lightestCandidateNearBest(candidates, devicePx);
+  if (!lightest) return null;
+  const preferred = preferReadableBitmap(candidates, devicePx, lightest);
   if (!current || current.href === preferred.candidate.href) {
     return preferred.candidate;
   }
   const currentScore = dichromTierScore(current.w, devicePx);
-  if (currentScore - preferred.score < TIER_SWITCH_MARGIN) return current;
+  if (currentScore - preferred.score < TIER_SWITCH_MARGIN) {
+    return preferReadableBitmap(candidates, devicePx, {
+      candidate: current,
+      score: currentScore,
+    }).candidate;
+  }
   return preferred.candidate;
 }

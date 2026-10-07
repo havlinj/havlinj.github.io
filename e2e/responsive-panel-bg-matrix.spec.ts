@@ -128,10 +128,14 @@ for (const syncCase of CASES) {
           await page.goto(syncCase.path, { waitUntil: 'domcontentloaded' });
           await syncCase.waitForReady?.(page);
           await expectDichromTierMatchesPaint(page, syncCase.imgSelector);
-          const currentSrc = await page
-            .locator(syncCase.imgSelector)
-            .first()
-            .evaluate((el) => (el as HTMLImageElement).currentSrc);
+          const img = page.locator(syncCase.imgSelector).first();
+          if (syncCase.imgSelector.includes('page-buttons-panel__media')) {
+            await expect(img).not.toHaveAttribute('srcset');
+            await expect(img).toHaveAttribute('data-dichrom-shown', '');
+          }
+          const currentSrc = await img.evaluate(
+            (el) => (el as HTMLImageElement).currentSrc,
+          );
           if (syncCase.path === '/') {
             expect(currentSrc).toContain(HERO_BG_FILE_STEM);
           }

@@ -49,6 +49,12 @@
   background-color: var(--color-page-bg);
 }
 
+/* display:none would zero the box the tier script measures. */
+.page-buttons-panel__media
+  img[data-dichrom-candidates]:not([data-dichrom-shown]) {
+  visibility: hidden;
+}
+
 /* Panel image on its own layer so only it gets the color filter, not the buttons */
 .page-buttons-panel::before {
   content: '';

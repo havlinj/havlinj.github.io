@@ -413,6 +413,34 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(heroSpec).not.toContain('altumcode');
   });
 
+  it('panel pictures wait for the measured file instead of a srcset guess', () => {
+    const picture = readRepoFile(
+      'src/components/ResponsiveDichromPicture.astro',
+    );
+    const sync = readRepoFile('src/scripts/dichrom-tier-sync.ts');
+    const css = readRepoFile('src/styles/page-buttons.css');
+    expect(picture).not.toMatch(/\ssrcset=/);
+    expect(picture).not.toContain('<source');
+    expect(picture).toContain('data-dichrom-fallback');
+    expect(picture).toContain('<noscript>');
+    expect(picture).toContain('initialHref');
+    expect(sync).toContain('img.currentSrc');
+    expect(sync).toContain('data-dichrom-shown');
+    expect(css).toContain(
+      'img[data-dichrom-candidates]:not([data-dichrom-shown])',
+    );
+    expect(css).toContain('visibility: hidden');
+    expect(readRepoFile('src/components/ContactPageBody.astro')).toContain(
+      'ResponsiveDichromPicture',
+    );
+    expect(
+      readRepoFile('src/components/RouteMaintenanceNotice.astro'),
+    ).toContain('ResponsiveDichromPicture');
+    expect(readRepoFile('src/components/WritingPageBody.astro')).toContain(
+      'ResponsiveDichromPicture',
+    );
+  });
+
   it('hero first request uses the shared tier selector on the painted box', () => {
     const hero = readRepoFile('src/components/HomeHero.astro');
     const early = readRepoFile('src/scripts/dichrom-hero-early.ts');

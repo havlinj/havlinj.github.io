@@ -8,6 +8,7 @@ import {
 
 const CANDIDATES_ATTR = 'data-dichrom-candidates';
 const CHOSEN_WIDTH_ATTR = 'data-dichrom-bitmap-width';
+const SHOWN_ATTR = 'data-dichrom-shown';
 
 let listening = false;
 let scheduledFrame = 0;
@@ -87,7 +88,18 @@ function syncDichromImage(img: HTMLImageElement): void {
     current ?? undefined,
   );
   if (!chosen) return;
-  if (current?.href === chosen.href && !pictureSources(img).length) return;
+  const chosenIsVisible =
+    mediaPath(img.currentSrc || '') === mediaPath(chosen.href) &&
+    img.naturalWidth > 0;
+  if (
+    current?.href === chosen.href &&
+    !pictureSources(img).length &&
+    !img.hasAttribute('srcset') &&
+    chosenIsVisible
+  ) {
+    img.setAttribute(SHOWN_ATTR, '');
+    return;
+  }
   showCandidate(img, chosen);
 }
 
@@ -119,13 +131,31 @@ function pictureSources(img: HTMLImageElement): HTMLSourceElement[] {
 }
 
 function showCandidate(img: HTMLImageElement, chosen: DichromCandidate): void {
+  const chosenPath = mediaPath(chosen.href);
+  // Dropping <source> is async: currentSrc can still name that file for a turn,
+  // then fall back to the original src attribute. Always write the chosen URL
+  // when a source or srcset was painting.
+  const sourceWasPainting =
+    pictureSources(img).length > 0 || img.hasAttribute('srcset');
+  for (const source of pictureSources(img)) source.remove();
   img.removeAttribute('srcset');
   img.removeAttribute('sizes');
-  if (mediaPath(img.getAttribute('src') || '') !== mediaPath(chosen.href)) {
+  const visiblePath = mediaPath(img.currentSrc || '');
+  img.setAttribute(CHOSEN_WIDTH_ATTR, String(chosen.w));
+  if (sourceWasPainting || visiblePath !== chosenPath) {
+    img.removeAttribute(SHOWN_ATTR);
+    img.addEventListener('load', () => markShownIfCurrent(img, chosenPath), {
+      once: true,
+    });
     img.src = chosen.href;
   }
-  for (const source of pictureSources(img)) source.remove();
-  img.setAttribute(CHOSEN_WIDTH_ATTR, String(chosen.w));
+  markShownIfCurrent(img, chosenPath);
+}
+
+function markShownIfCurrent(img: HTMLImageElement, chosenPath: string): void {
+  if (mediaPath(img.currentSrc || '') !== chosenPath) return;
+  if (!(img.naturalWidth > 0)) return;
+  img.setAttribute(SHOWN_ATTR, '');
 }
 
 function mediaPath(url: string): string {
