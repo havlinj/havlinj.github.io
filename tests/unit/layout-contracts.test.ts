@@ -430,6 +430,13 @@ describe('layout contracts: unified content panel skeleton', () => {
       'img[data-dichrom-candidates]:not([data-dichrom-shown])',
     );
     expect(css).toContain('visibility: hidden');
+    expect(readRepoFile('src/styles/pages/maintenance.css')).toContain(
+      'scale(var(--dichrom-snap, 1))',
+    );
+    expect(readRepoFile('src/styles/pages/contact.css')).toContain(
+      'scale(var(--dichrom-snap, 1))',
+    );
+    expect(sync).toContain('devicePxClearOfCoarseDecode');
     expect(readRepoFile('src/components/ContactPageBody.astro')).toContain(
       'ResponsiveDichromPicture',
     );

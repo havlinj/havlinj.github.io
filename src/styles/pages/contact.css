@@ -107,7 +107,7 @@
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
   opacity: var(--panel-bg-layer-opacity, 1);
-  transform: rotate(var(--panel-bg-rotate, 0deg));
+  transform: rotate(var(--panel-bg-rotate, 0deg)) scale(var(--dichrom-snap, 1));
 }
 
 .contact-page .page-buttons-panel::after {

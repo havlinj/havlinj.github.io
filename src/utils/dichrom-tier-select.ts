@@ -120,6 +120,31 @@ export function dichromDeviceScale(input: {
   return dpr * pinch * safariExtra;
 }
 
+/**
+ * iOS decodes at 1, 1/2, 1/4, or 1/8. The step is ceil(log2(bitmap / devicePx)),
+ * so a width just under a power of two drops one extra step and that coarse
+ * bitmap is scaled back up. A small pinch crosses the step and the grid locks.
+ * Stretch onto the step when it stays within 6%.
+ */
+const COARSE_DECODE_SNAP_MAX_STRETCH = 1.06;
+
+export function devicePxClearOfCoarseDecode(
+  devicePx: number,
+  bitmapWidth: number,
+): number {
+  if (!(devicePx > 0) || !(bitmapWidth > 0)) return devicePx;
+  const scale = devicePx / bitmapWidth;
+  if (scale >= 1 || scale <= 1 / 8) return devicePx;
+  const level = Math.ceil(Math.log2(1 / scale));
+  if (level < 1) return devicePx;
+  const onStepDevicePx = bitmapWidth / 2 ** (level - 1);
+  const stretch = onStepDevicePx / devicePx;
+  if (!(stretch > 1) || stretch > COARSE_DECODE_SNAP_MAX_STRETCH) {
+    return devicePx;
+  }
+  return onStepDevicePx;
+}
+
 function nearestRatio(
   bitmapWidth: number,
   devicePx: number,

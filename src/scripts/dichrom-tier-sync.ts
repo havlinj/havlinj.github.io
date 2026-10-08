@@ -1,5 +1,6 @@
 import { readDichromDeviceScale } from '../utils/read-dichrom-device-scale';
 import {
+  devicePxClearOfCoarseDecode,
   neededDichromBitmapWidth,
   parseDichromCandidates,
   selectDichromCandidate,
@@ -9,6 +10,8 @@ import {
 const CANDIDATES_ATTR = 'data-dichrom-candidates';
 const CHOSEN_WIDTH_ATTR = 'data-dichrom-bitmap-width';
 const SHOWN_ATTR = 'data-dichrom-shown';
+const SNAP_VAR = '--dichrom-snap';
+const SNAP_EPSILON = 0.001;
 
 let listening = false;
 let scheduledFrame = 0;
@@ -71,10 +74,11 @@ function syncDichromImage(img: HTMLImageElement): void {
   if (candidates.length === 0) return;
   observeImage(img);
 
+  const snap = paintedSnap(img);
   const box = img.getBoundingClientRect();
   const devicePx = neededDichromBitmapWidth({
-    boxWidthCss: box.width,
-    boxHeightCss: box.height,
+    boxWidthCss: box.width / snap,
+    boxHeightCss: box.height / snap,
     aspectWOverH: imageAspect(img),
     objectFit: getComputedStyle(img).objectFit,
     deviceScale: readDichromDeviceScale(window),
@@ -88,6 +92,10 @@ function syncDichromImage(img: HTMLImageElement): void {
     current ?? undefined,
   );
   if (!chosen) return;
+  if (applyDichromSnap(img, devicePx, chosen.w)) {
+    scheduleDichromTierSync();
+    return;
+  }
   const chosenIsVisible =
     mediaPath(img.currentSrc || '') === mediaPath(chosen.href) &&
     img.naturalWidth > 0;
@@ -122,6 +130,39 @@ function currentCandidate(
     return candidates.find((candidate) => candidate.w === stored) ?? null;
   }
   return null;
+}
+
+function readDichromSnap(img: HTMLImageElement): number {
+  const raw = Number(img.style.getPropertyValue(SNAP_VAR));
+  return raw > 0 ? raw : 1;
+}
+
+function paintedSnap(img: HTMLImageElement): number {
+  const declared = readDichromSnap(img);
+  if (!(declared > 1)) return 1;
+  const transform = getComputedStyle(img).transform;
+  if (!transform || transform === 'none') return 1;
+  const matched = /matrix\(([^)]+)\)/.exec(transform);
+  if (!matched) return 1;
+  const parts = matched[1].split(',').map((part) => Number(part));
+  if (parts.length < 4) return 1;
+  const scaleX = Math.hypot(parts[0], parts[1]);
+  if (Math.abs(scaleX - declared) > 0.02) return 1;
+  return declared;
+}
+
+function applyDichromSnap(
+  img: HTMLImageElement,
+  devicePx: number,
+  bitmapWidth: number,
+): boolean {
+  const target = devicePxClearOfCoarseDecode(devicePx, bitmapWidth);
+  const next = target / devicePx;
+  const current = readDichromSnap(img);
+  if (Math.abs(next - current) < SNAP_EPSILON) return false;
+  if (Math.abs(next - 1) < SNAP_EPSILON) img.style.removeProperty(SNAP_VAR);
+  else img.style.setProperty(SNAP_VAR, String(Math.round(next * 10000) / 10000));
+  return true;
 }
 
 function pictureSources(img: HTMLImageElement): HTMLSourceElement[] {

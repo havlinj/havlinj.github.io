@@ -340,6 +340,7 @@ ul.post-list > li::before {
     brightness(var(--panel-bg-brightness, 1))
     contrast(var(--panel-bg-contrast, 1));
   opacity: var(--panel-bg-layer-opacity, 1);
+  transform: scale(var(--dichrom-snap, 1));
 }
 
 .writing-page .writing-groups {

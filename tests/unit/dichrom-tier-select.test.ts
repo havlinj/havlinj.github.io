@@ -9,6 +9,7 @@ import {
   selectHeroScannerCandidate,
 } from '../../src/utils/dichrom-hero-estimate';
 import {
+  devicePxClearOfCoarseDecode,
   dichromDeviceScale,
   dichromTierScore,
   neededDichromBitmapWidth,
@@ -163,6 +164,14 @@ describe('dichrom tier score', () => {
       selectDichromCandidate(candidatesFrom(FULL_WIDTHS), 1727, showingUpscale)
         ?.w,
     ).toBe(DICHROM_INTRINSIC_WIDTHS.w1920);
+  });
+
+  it('stretches a phone panel that sits just under an iOS decode step', () => {
+    expect(devicePxClearOfCoarseDecode(1864, 3840)).toBe(1920);
+    expect(devicePxClearOfCoarseDecode(1727, 3456)).toBe(1728);
+    expect(devicePxClearOfCoarseDecode(1458, 2880)).toBe(1458);
+    expect(devicePxClearOfCoarseDecode(2101, 2430)).toBe(2101);
+    expect(devicePxClearOfCoarseDecode(483, 480)).toBe(483);
   });
 
   it('folds Chrome page zoom into DPR and Safari page zoom into the CSS factor', () => {
