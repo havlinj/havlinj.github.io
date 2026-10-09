@@ -47,7 +47,7 @@ describe('dichrom-responsive', () => {
       'public/assets/hero/vackground-com-agUC-v_D1iI-unsplash_dichrom',
       'public/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom',
       'public/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
-      'public/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_dichrom',
+      'public/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_rotated_slightly_dichrom',
       'public/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom',
     ];
     const tiers = [
