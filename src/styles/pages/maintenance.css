@@ -7,9 +7,9 @@
   --panel-bg-saturation: 1;
   --panel-bg-brightness: 1;
   --panel-bg-contrast: 1;
-  --panel-bg-zoom: 1.2;
+  --panel-bg-zoom: 1.23;
   --panel-bg-nudge-x: 0;
-  --panel-bg-nudge-y: -0.03;
+  --panel-bg-nudge-y: 0;
   --panel-bg-rotate: 0deg;
 }
 

@@ -27,8 +27,8 @@ export const MAINTENANCE_PANEL_BG = {
   saturation: '1',
   brightness: '1',
   contrast: '1',
-  zoom: '1.2',
+  zoom: '1.23',
   nudgeX: '0',
-  nudgeY: '-0.03',
+  nudgeY: '0',
   rotate: '0deg',
 } as const;
