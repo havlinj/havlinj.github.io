@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DICHROM_HERO_INTRINSIC_WIDTHS,
   DICHROM_INTRINSIC_WIDTHS,
   DICHROM_TILE_INTRINSIC_WIDTHS,
 } from '../../src/constants/dichrom-responsive';
@@ -24,6 +25,15 @@ const FULL_WIDTHS = [
   DICHROM_INTRINSIC_WIDTHS.w1440,
   DICHROM_INTRINSIC_WIDTHS.w1920,
   DICHROM_INTRINSIC_WIDTHS.w2400,
+] as const;
+
+const HERO_WIDTHS = [
+  DICHROM_HERO_INTRINSIC_WIDTHS.w720,
+  DICHROM_HERO_INTRINSIC_WIDTHS.w900,
+  DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
+  DICHROM_HERO_INTRINSIC_WIDTHS.w1440,
+  DICHROM_HERO_INTRINSIC_WIDTHS.w1920,
+  DICHROM_HERO_INTRINSIC_WIDTHS.w2400,
 ] as const;
 
 const TILE_WIDTHS = [
@@ -98,20 +108,20 @@ describe('dichrom tier score', () => {
     {
       name: 'Lighthouse hero keeps the lighter file when 3:1 is only a hair cleaner',
       devicePx: 1285,
-      widths: FULL_WIDTHS,
-      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+      widths: HERO_WIDTHS,
+      chosen: DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
     },
     {
       name: 'desktop hero at 1280 CSS px and dpr 1',
       devicePx: 1288,
-      widths: FULL_WIDTHS,
-      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+      widths: HERO_WIDTHS,
+      chosen: DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
     },
     {
-      name: 'phone hero at dpr 3',
+      name: 'phone hero at dpr 3 picks the 900 mid-tier near 1:1',
       devicePx: 2101,
-      widths: FULL_WIDTHS,
-      chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+      widths: HERO_WIDTHS,
+      chosen: DICHROM_HERO_INTRINSIC_WIDTHS.w900,
     },
     {
       name: 'phone full-frame panel near 2:1, not the 1.5 file',
@@ -215,10 +225,14 @@ describe('dichrom tier score', () => {
     const box = estimateHeroPaintBox(412);
     expect(box.width).toBeCloseTo(488.4, 0);
     expect(box.height).toBeCloseTo(489.5, 0);
-    expect(selectHeroScannerCandidate(candidatesFrom(FULL_WIDTHS))?.w).toBe(
-      DICHROM_INTRINSIC_WIDTHS.w1080,
+    expect(selectHeroScannerCandidate(candidatesFrom(HERO_WIDTHS))?.w).toBe(
+      DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
     );
-    expect(chosenWidth(1288, FULL_WIDTHS)).toBe(DICHROM_INTRINSIC_WIDTHS.w1080);
-    expect(chosenWidth(2101, FULL_WIDTHS)).toBe(DICHROM_INTRINSIC_WIDTHS.w1080);
+    expect(chosenWidth(1288, HERO_WIDTHS)).toBe(
+      DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
+    );
+    expect(chosenWidth(2101, HERO_WIDTHS)).toBe(
+      DICHROM_HERO_INTRINSIC_WIDTHS.w900,
+    );
   });
 });

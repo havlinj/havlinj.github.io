@@ -1,6 +1,6 @@
 ---
 import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
-import { buildDichromResponsive } from '../constants/dichrom-responsive';
+import type { DichromHeroResponsiveSet } from '../constants/dichrom-responsive';
 import {
   HERO_BG_BITMAP_HEIGHT,
   HERO_BG_BITMAP_WIDTH,
@@ -9,7 +9,7 @@ import { dichromHeroEarlyInlineScript } from '../utils/bundle-dichrom-hero-early
 import '../styles/pages/hero.css';
 
 interface Props {
-  sources: ReturnType<typeof buildDichromResponsive>;
+  sources: DichromHeroResponsiveSet;
   initialHref: string;
 }
 

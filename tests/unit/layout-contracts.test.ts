@@ -455,6 +455,7 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(hero).toContain('initialHref');
     expect(hero).not.toContain('srcset');
     expect(index).toContain('selectHeroScannerCandidate');
+    expect(index).toContain('buildDichromHeroResponsive');
     expect(index).not.toContain('imagesrcset');
     expect(index).not.toContain('DichromPreloadLink');
     expect(early).toContain('selectDichromCandidate');

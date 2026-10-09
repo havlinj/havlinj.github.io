@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import GlobalMaintenanceNotice from '../components/GlobalMaintenanceNotice.astro';
 import HomeHero from '../components/HomeHero.astro';
 import {
-  buildDichromResponsive,
+  buildDichromHeroResponsive,
   dichromCandidateSrcset,
 } from '../constants/dichrom-responsive';
 import { HERO_BG_STEM } from '../constants/hero-layout';
@@ -13,7 +13,9 @@ import { resolveMaintenance } from '../utils/maintenance';
 
 const maintenance = resolveMaintenance(Astro.url.pathname);
 const heroBg =
-  maintenance.kind === 'global' ? null : buildDichromResponsive(HERO_BG_STEM);
+  maintenance.kind === 'global'
+    ? null
+    : buildDichromHeroResponsive(HERO_BG_STEM);
 const heroScannerCandidate = heroBg
   ? selectHeroScannerCandidate(
       parseDichromCandidates(dichromCandidateSrcset(heroBg)),

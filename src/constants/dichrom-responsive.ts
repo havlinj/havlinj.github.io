@@ -18,7 +18,7 @@
  * document for the same reason. Profile markdown still ships a srcset for no-JS.
  */
 
-/** PNG IHDR widths for the full-frame sets (hero, writing, contact, maintenance). */
+/** PNG IHDR widths for the full-frame sets (writing, contact, maintenance, profile). */
 export const DICHROM_INTRINSIC_WIDTHS = {
   w720: 1800,
   w1080: 2430,
@@ -27,7 +27,21 @@ export const DICHROM_INTRINSIC_WIDTHS = {
   w2400: 3840,
 } as const;
 
+/**
+ * Hero adds a 900 tier (bitmap 2142) between 720 and 1080 so a phone at
+ * `--hero-bg-zoom: 1.35` can land near 1:1 without changing the crop.
+ */
+export const DICHROM_HERO_INTRINSIC_WIDTHS = {
+  w720: 1800,
+  w900: 2142,
+  w1080: 2430,
+  w1440: 2880,
+  w1920: 3456,
+  w2400: 3840,
+} as const;
+
 export type DichromTier = keyof typeof DICHROM_INTRINSIC_WIDTHS;
+export type DichromHeroTier = keyof typeof DICHROM_HERO_INTRINSIC_WIDTHS;
 
 export type DichromIntrinsicWidths = {
   readonly [K in DichromTier]: number;
@@ -39,6 +53,7 @@ export interface DichromSource {
 }
 
 export type DichromResponsiveSet = Record<DichromTier, DichromSource>;
+export type DichromHeroResponsiveSet = Record<DichromHeroTier, DichromSource>;
 
 /**
  * Smaller Bayer tiles. Filename suffix is intended display CSS px; `w` is the
@@ -92,6 +107,42 @@ export function buildDichromResponsive(
     w2400: {
       href: `${stem}_2400.png`,
       w: widths.w2400,
+    },
+  };
+}
+
+/**
+ * Hero stem only — includes the 900 mid-tier the other full-frame sets omit.
+ * If a second page grows a custom count of files, fold both builders into one
+ * that walks a width table instead of listing keys twice.
+ */
+export function buildDichromHeroResponsive(
+  stem: string,
+): DichromHeroResponsiveSet {
+  return {
+    w720: {
+      href: `${stem}_720.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w720,
+    },
+    w900: {
+      href: `${stem}_900.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w900,
+    },
+    w1080: {
+      href: `${stem}_1080.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w1080,
+    },
+    w1440: {
+      href: `${stem}_1440.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w1440,
+    },
+    w1920: {
+      href: `${stem}_1920.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w1920,
+    },
+    w2400: {
+      href: `${stem}_2400.png`,
+      w: DICHROM_HERO_INTRINSIC_WIDTHS.w2400,
     },
   };
 }

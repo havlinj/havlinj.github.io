@@ -1,11 +1,12 @@
 ---
 import {
   dichromCandidateSrcset,
+  type DichromHeroResponsiveSet,
   type DichromResponsiveSet,
 } from '../constants/dichrom-responsive';
 
 interface Props {
-  sources: DichromResponsiveSet;
+  sources: DichromResponsiveSet | DichromHeroResponsiveSet;
   width: number;
   height: number;
   alt?: string;
