@@ -20,7 +20,9 @@ test.describe('maintenance routes fixture', () => {
     await expect(page.locator('.route-maintenance-panel__route')).toHaveText(
       '/writing',
     );
-    await expect(page.getByText('Content will return soon.')).toBeVisible();
+    await expect(
+      page.getByText('Thanks for your patience', { exact: true }),
+    ).toBeVisible();
 
     await expect(page.locator('.writing-category-picker')).toHaveCount(0);
 

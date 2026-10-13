@@ -1,6 +1,7 @@
 /**
  * Content panel — the large ~1:1 main content area below the page title on hero,
- * profile, writing, contact, and route maintenance. Cross-page domain term; DOM class
+ * profile, writing, contact, route maintenance, and whole-site reconstruction.
+ * Cross-page domain term; DOM class
  * names stay historical.
  *
  * Geometry and the gap below the page title live in src/styles/content-panel.css and are
@@ -15,6 +16,7 @@ export const CONTENT_PANEL_SELECTORS = {
   writing: '.writing-page .page-buttons-panel',
   contact: '.contact-page .page-buttons-panel',
   maintenance: '.route-maintenance-panel',
+  reconstruction: '.reconstruction-panel',
 } as const;
 
 export type ContentPanelRoute = keyof typeof CONTENT_PANEL_SELECTORS;

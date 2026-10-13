@@ -1,6 +1,7 @@
 /* Route + global maintenance surfaces — site tokens only (#111 / #e0f7fa, Inter). */
 
-.route-maintenance-page {
+.route-maintenance-page,
+.reconstruction-page {
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
   --panel-bg-layer-opacity: 1;
@@ -196,13 +197,163 @@
   margin-top: 0.2em;
 }
 
+.site-header--reserved {
+  visibility: hidden;
+}
+
+.reconstruction-page .page-buttons-zone {
+  flex: 0 0 auto;
+}
+
+.reconstruction-page .page-buttons-panel.reconstruction-panel {
+  background-color: var(--color-page-bg);
+  --reconstruction-panel-edge: 320px;
+}
+
+.reconstruction-page .page-buttons-panel::before,
+.reconstruction-page .page-buttons-panel::after {
+  content: none;
+}
+
+.reconstruction-page .page-buttons-panel__media {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.reconstruction-page
+  .page-buttons-panel__media.reconstruction-panel__media--pending {
+  opacity: 0;
+}
+
+.reconstruction-page
+  .page-buttons-panel__media.reconstruction-panel__media--visible {
+  opacity: 1;
+}
+
+.reconstruction-page .page-buttons-panel__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.reconstruction-page .page-buttons-panel__media img {
+  position: absolute;
+  display: block;
+  left: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  top: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
+  width: calc(100% * var(--panel-bg-zoom, 1));
+  height: calc(100% * var(--panel-bg-zoom, 1));
+  object-fit: cover;
+  object-position: calc(
+      var(--panel-bg-pos-x, 50%) + var(--panel-bg-nudge-x, 0) *
+        var(--reconstruction-panel-edge, 320px)
+    )
+    calc(
+      var(--panel-bg-pos-y, 50%) + var(--panel-bg-nudge-y, 0) *
+        var(--reconstruction-panel-edge, 320px)
+    );
+  image-rendering: auto;
+  filter: saturate(var(--panel-bg-saturation, 1))
+    brightness(var(--panel-bg-brightness, 1))
+    contrast(var(--panel-bg-contrast, 1));
+  opacity: var(--panel-bg-layer-opacity, 1);
+  transform: rotate(var(--panel-bg-rotate, 0deg)) scale(var(--dichrom-snap, 1));
+}
+
+.reconstruction-panel__copy {
+  --reconstruction-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
+  --reconstruction-headline-tracking: -0.03em;
+  --reconstruction-headline-leading: 1.2;
+  --reconstruction-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
+  --reconstruction-band-pad-x-left: clamp(0.7rem, 2.4cqi, 1.1rem);
+  --reconstruction-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
+  position: absolute;
+  top: 33.333%;
+  right: -1px;
+  left: auto;
+  transform: translateY(-50%);
+  z-index: 1;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100% - var(--panel-padding-left, 2rem));
+  min-width: 0;
+  padding: var(--reconstruction-band-pad-y)
+    var(--reconstruction-band-pad-x-right) var(--reconstruction-band-pad-y)
+    var(--reconstruction-band-pad-x-left);
+  background-color: transparent;
+  text-align: left;
+}
+
+.reconstruction-panel__copy::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: 0;
+  z-index: -1;
+  background-color: var(--color-page-bg);
+  pointer-events: none;
+}
+
+.reconstruction-panel__headline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12em;
+  font-size: var(--reconstruction-headline-size);
+  font-weight: 600;
+  line-height: var(--reconstruction-headline-leading);
+  letter-spacing: var(--reconstruction-headline-tracking);
+  color: var(--color-ink);
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.reconstruction-panel__headline-tail {
+  white-space: nowrap;
+}
+
+.reconstruction-panel__info {
+  margin-top: clamp(1.45rem, 5.5cqi, 2.05rem);
+  max-width: 20rem;
+}
+
+.reconstruction-panel__info p {
+  margin: 0;
+  font-size: clamp(0.9375rem, 2.85cqi, 1rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: rgba(17, 17, 17, 0.68);
+  -webkit-font-smoothing: antialiased;
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+
+.reconstruction-panel__info p + p {
+  margin-top: 0.2em;
+}
+
 @media (max-width: 640px) {
   .route-maintenance-panel__copy {
     --route-maintenance-band-pad-y: clamp(1rem, 6vw, 1.45rem);
     --route-maintenance-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
   }
 
-  .route-maintenance-panel__info p {
+  .reconstruction-panel__copy {
+    --reconstruction-band-pad-y: clamp(1rem, 6vw, 1.45rem);
+    --reconstruction-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
+  }
+
+  .route-maintenance-panel__info p,
+  .reconstruction-panel__info p {
     font-size: 0.9375rem;
   }
 

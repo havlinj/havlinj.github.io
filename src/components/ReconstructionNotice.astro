@@ -1,0 +1,66 @@
+---
+import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
+import { buildDichromHeroResponsive } from '../constants/dichrom-responsive';
+import {
+  RECONSTRUCTION_HEADLINE_TAIL,
+  RECONSTRUCTION_PANEL_BG_STEM,
+  RECONSTRUCTION_RETURN_LINE,
+} from '../constants/maintenance-panel';
+import { LAYOUT_NAV_ITEMS } from '../layouts/layout-nav';
+import '../styles/pages/maintenance.css';
+
+const reconstructionBg = buildDichromHeroResponsive(
+  RECONSTRUCTION_PANEL_BG_STEM,
+);
+---
+
+<div class="site-header site-header--reserved" aria-hidden="true">
+  <div class="site-header__inner">
+    {
+      LAYOUT_NAV_ITEMS.map((item) => (
+        <span class="site-header__item">{item.label}</span>
+      ))
+    }
+  </div>
+</div>
+<article class="reconstruction-page content-panel-page">
+  <div class="page-buttons-zone">
+    <div class="page-buttons-panel reconstruction-panel content-panel">
+      <div
+        class="page-buttons-panel__media reconstruction-panel__media--pending"
+        aria-hidden="true"
+      >
+        <ResponsiveDichromPicture
+          sources={reconstructionBg}
+          width={2880}
+          height={4320}
+          fetchpriority="high"
+        />
+      </div>
+      <div class="reconstruction-panel__copy">
+        <h1 class="reconstruction-panel__headline">
+          <span class="reconstruction-panel__headline-lead">The website</span>
+          <span class="reconstruction-panel__headline-tail">
+            {RECONSTRUCTION_HEADLINE_TAIL}
+          </span>
+        </h1>
+        <div class="reconstruction-panel__info">
+          <p>{RECONSTRUCTION_RETURN_LINE}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<noscript>
+  <style>
+    .reconstruction-page
+      .page-buttons-panel__media.reconstruction-panel__media--pending {
+      opacity: 1 !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  import '../scripts/maintenance-panel-edge.ts';
+</script>

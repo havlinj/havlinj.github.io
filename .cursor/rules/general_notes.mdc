@@ -47,6 +47,7 @@ footer.site-footer                      directly follows the panel; its own padd
 | Writing | `.writing-page .page-buttons-panel` |
 | Contact | `.contact-page .page-buttons-panel` |
 | Route maintenance | `.route-maintenance-panel` (variant on `.page-buttons-panel`) |
+| Reconstruction | `.reconstruction-panel` (whole-site `mode=reconstruction` only; nav text and footer omitted) |
 
 Use **content panel** in comments, tests, and cross-page layout logic. Shared selectors live in `src/constants/content-panel.ts`. Do not rename CSS classes unless migrating explicitly.
 

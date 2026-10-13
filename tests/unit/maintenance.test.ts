@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   assertValidConfig,
   findUnavailableRoute,
-  formatMaintenanceStartedDate,
   gateNonHomeMaintenance,
   isMaintenanceForcedOff,
   loadMaintenanceConfig,
@@ -16,37 +15,25 @@ import {
 const routesConfig: MaintenanceConfigFile = {
   mode: 'routes',
   routes: [
-    { path: '/writing', started: '2026-08-07', match: 'prefix' },
-    { path: '/contact/form', started: '2026-08-08', match: 'exact' },
+    { path: '/writing', match: 'prefix' },
+    { path: '/contact/form', match: 'exact' },
   ],
 };
 
 const globalConfig: MaintenanceConfigFile = {
   mode: 'global',
-  started: '2026-08-07',
 };
 
-describe('maintenance path + date helpers', () => {
+const reconstructionConfig: MaintenanceConfigFile = {
+  mode: 'reconstruction',
+};
+
+describe('maintenance path helpers', () => {
   it('normalizes paths', () => {
     expect(normalizeRoutePath('/writing/')).toBe('/writing');
     expect(normalizeRoutePath('writing')).toBe('/writing');
     expect(normalizeRoutePath('/')).toBe('/');
     expect(normalizeRoutePath('///')).toBe('/');
-  });
-
-  it('formats started dates as YY.MM.DD.', () => {
-    expect(formatMaintenanceStartedDate('2026-08-07')).toBe('26.08.07.');
-    expect(formatMaintenanceStartedDate('1999-12-31')).toBe('99.12.31.');
-  });
-
-  it('rejects invalid started dates', () => {
-    expect(() => formatMaintenanceStartedDate('08/07/2026')).toThrow(
-      /YYYY-MM-DD/,
-    );
-    expect(() => formatMaintenanceStartedDate('')).toThrow(/YYYY-MM-DD/);
-    expect(() => formatMaintenanceStartedDate('2026-8-7')).toThrow(
-      /YYYY-MM-DD/,
-    );
   });
 });
 
@@ -55,18 +42,24 @@ describe('maintenance schema (mode discriminated union)', () => {
     expect(loadMaintenanceConfig({ mode: 'off' })).toEqual({ mode: 'off' });
   });
 
-  it('accepts mode=global with started', () => {
-    expect(
-      loadMaintenanceConfig({ mode: 'global', started: '2026-08-07' }),
-    ).toEqual({ mode: 'global', started: '2026-08-07' });
+  it('accepts mode=global with no other keys', () => {
+    expect(loadMaintenanceConfig({ mode: 'global' })).toEqual({
+      mode: 'global',
+    });
+  });
+
+  it('accepts mode=reconstruction with no other keys', () => {
+    expect(loadMaintenanceConfig(reconstructionConfig)).toEqual({
+      mode: 'reconstruction',
+    });
   });
 
   it('accepts mode=routes with required route fields', () => {
     expect(loadMaintenanceConfig(routesConfig)).toEqual({
       mode: 'routes',
       routes: [
-        { path: '/writing', started: '2026-08-07', match: 'prefix' },
-        { path: '/contact/form', started: '2026-08-08', match: 'exact' },
+        { path: '/writing', match: 'prefix' },
+        { path: '/contact/form', match: 'exact' },
       ],
     });
   });
@@ -80,22 +73,29 @@ describe('maintenance schema (mode discriminated union)', () => {
     ).toThrow(/mode/);
   });
 
-  it('rejects mixing global fields onto routes mode', () => {
+  it('rejects started on routes mode', () => {
     expect(() =>
       assertValidConfig({
         mode: 'routes',
-        started: '2026-08-07',
         routes: [{ path: '/writing', started: '2026-08-07', match: 'prefix' }],
       }),
     ).toThrow(/unknown keys: started/);
+  });
+
+  it('rejects mixing routes onto reconstruction mode', () => {
+    expect(() =>
+      assertValidConfig({
+        mode: 'reconstruction',
+        routes: [{ path: '/writing', match: 'prefix' }],
+      }),
+    ).toThrow(/unknown keys: routes/);
   });
 
   it('rejects mixing routes onto global mode', () => {
     expect(() =>
       assertValidConfig({
         mode: 'global',
-        started: '2026-08-07',
-        routes: [{ path: '/writing', started: '2026-08-07', match: 'prefix' }],
+        routes: [{ path: '/writing', match: 'prefix' }],
       }),
     ).toThrow(/unknown keys: routes/);
   });
@@ -116,32 +116,28 @@ describe('maintenance schema (mode discriminated union)', () => {
   });
 
   it('rejects null or missing required fields', () => {
-    expect(() => assertValidConfig({ mode: 'global', started: null })).toThrow(
-      /started must not be null/,
-    );
-
-    expect(() => assertValidConfig({ mode: 'global' })).toThrow(
-      /started is required/,
-    );
+    expect(() =>
+      assertValidConfig({ mode: 'global', started: '2026-08-07' }),
+    ).toThrow(/unknown keys: started/);
 
     expect(() =>
       assertValidConfig({
         mode: 'routes',
-        routes: [{ path: '/writing', started: '2026-08-07' }],
+        routes: [{ path: '/writing' }],
       }),
     ).toThrow(/routes\[0\]\.match is required/);
 
     expect(() =>
       assertValidConfig({
         mode: 'routes',
-        routes: [{ path: '/writing', started: null, match: 'prefix' }],
+        routes: [{ path: '/writing', match: null }],
       }),
-    ).toThrow(/routes\[0\]\.started must not be null/);
+    ).toThrow(/routes\[0\]\.match must not be null/);
 
     expect(() =>
       assertValidConfig({
         mode: 'routes',
-        routes: [{ path: 'writing', started: '2026-08-07', match: 'prefix' }],
+        routes: [{ path: 'writing', match: 'prefix' }],
       }),
     ).toThrow(/must start with \//);
 
@@ -154,12 +150,9 @@ describe('maintenance schema (mode discriminated union)', () => {
     const source = parseMaintenanceJson(`
       /* block */
       // line
-      { "mode": "global", "started": "2026-08-07" }
+      { "mode": "global" }
     `);
-    expect(loadMaintenanceConfig(source)).toEqual({
-      mode: 'global',
-      started: '2026-08-07',
-    });
+    expect(loadMaintenanceConfig(source)).toEqual({ mode: 'global' });
   });
 });
 
@@ -168,8 +161,8 @@ describe('maintenance route matching', () => {
     const config = loadMaintenanceConfig({
       mode: 'routes',
       routes: [
-        { path: '/contact', started: '2026-08-01', match: 'prefix' },
-        { path: '/contact/form', started: '2026-08-02', match: 'prefix' },
+        { path: '/contact', match: 'prefix' },
+        { path: '/contact/form', match: 'prefix' },
       ],
     });
     expect(findUnavailableRoute('/contact/form', config)?.path).toBe(
@@ -194,17 +187,29 @@ describe('maintenance route matching', () => {
   it('returns null for findUnavailableRoute when not in routes mode', () => {
     expect(findUnavailableRoute('/writing', { mode: 'off' })).toBeNull();
     expect(findUnavailableRoute('/writing', globalConfig)).toBeNull();
+    expect(findUnavailableRoute('/writing', reconstructionConfig)).toBeNull();
   });
 });
 
 describe('resolveMaintenance', () => {
+  it('resolves reconstruction shutdown for every path', () => {
+    expect(
+      resolveMaintenance('/profile', {
+        config: reconstructionConfig,
+        env: {},
+      }),
+    ).toEqual({ kind: 'reconstruction' });
+    expect(
+      resolveMaintenance('/', { config: reconstructionConfig, env: {} }),
+    ).toEqual({ kind: 'reconstruction' });
+  });
+
   it('resolves global shutdown for every path', () => {
     expect(
       resolveMaintenance('/profile', { config: globalConfig, env: {} }),
-    ).toEqual({ kind: 'global', started: '2026-08-07' });
+    ).toEqual({ kind: 'global' });
     expect(resolveMaintenance('/', { config: globalConfig, env: {} })).toEqual({
       kind: 'global',
-      started: '2026-08-07',
     });
   });
 
@@ -215,7 +220,6 @@ describe('resolveMaintenance', () => {
       kind: 'route',
       configPath: '/writing',
       displayPath: '/writing',
-      started: '2026-08-07',
     });
   });
 
@@ -258,6 +262,18 @@ describe('gateNonHomeMaintenance', () => {
     });
   });
 
+  it('signals redirect-home for reconstruction mode', () => {
+    expect(
+      gateNonHomeMaintenance('/contact', {
+        config: reconstructionConfig,
+        env: {},
+      }),
+    ).toEqual({
+      redirectHome: true,
+      decision: { kind: 'none' },
+    });
+  });
+
   it('passes through route and none decisions', () => {
     expect(
       gateNonHomeMaintenance('/writing', { config: routesConfig, env: {} }),
@@ -267,7 +283,6 @@ describe('gateNonHomeMaintenance', () => {
         kind: 'route',
         configPath: '/writing',
         displayPath: '/writing',
-        started: '2026-08-07',
       },
     });
     expect(
@@ -282,15 +297,9 @@ describe('gateNonHomeMaintenance', () => {
 describe('maintenance config source overrides', () => {
   it('reads MAINTENANCE_CONFIG_JSON', () => {
     const source = readMaintenanceConfigSource({
-      MAINTENANCE_CONFIG_JSON: JSON.stringify({
-        mode: 'global',
-        started: '2026-01-02',
-      }),
+      MAINTENANCE_CONFIG_JSON: JSON.stringify({ mode: 'global' }),
     });
-    expect(loadMaintenanceConfig(source)).toEqual({
-      mode: 'global',
-      started: '2026-01-02',
-    });
+    expect(loadMaintenanceConfig(source)).toEqual({ mode: 'global' });
   });
 
   it('rejects invalid MAINTENANCE_CONFIG_JSON', () => {

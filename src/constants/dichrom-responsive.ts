@@ -28,8 +28,8 @@ export const DICHROM_INTRINSIC_WIDTHS = {
 } as const;
 
 /**
- * Hero adds a 900 tier (bitmap 2142) between 720 and 1080 so a phone at
- * `--hero-bg-zoom: 1.35` can land near 1:1 without changing the crop.
+ * Hero and reconstruction add a 900 tier (bitmap 2142) between 720 and 1080
+ * so a phone can land near 1:1 without changing the crop.
  */
 export const DICHROM_HERO_INTRINSIC_WIDTHS = {
   w720: 1800,
@@ -111,11 +111,7 @@ export function buildDichromResponsive(
   };
 }
 
-/**
- * Hero stem only — includes the 900 mid-tier the other full-frame sets omit.
- * If a second page grows a custom count of files, fold both builders into one
- * that walks a width table instead of listing keys twice.
- */
+/** Stems that include the 900 mid-tier (hero, reconstruction). */
 export function buildDichromHeroResponsive(
   stem: string,
 ): DichromHeroResponsiveSet {

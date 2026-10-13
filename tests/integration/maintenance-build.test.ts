@@ -16,6 +16,10 @@ const globalFixture = path.join(
   rootDir,
   'e2e/fixtures/maintenance-global.json',
 );
+const reconstructionFixture = path.join(
+  rootDir,
+  'e2e/fixtures/maintenance-reconstruction.json',
+);
 
 function buildWithMaintenanceConfig(configPath: string): void {
   execFileSync('npm', ['run', 'build'], {
@@ -58,13 +62,13 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('page-buttons-panel__media');
     expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(writing).toContain('/writing');
-    expect(writing).toContain('Content will return soon.');
+    expect(writing).toContain('Thanks for your patience');
     expect(writing).toContain('site-header');
     expect(writing).not.toContain('writing-category-picker');
 
     const contactExact = readDist('contact/index.html');
     expect(contactExact).toContain('Whoops');
-    expect(contactExact).toContain('Content will return soon.');
+    expect(contactExact).toContain('Thanks for your patience');
 
     const contactForm = readDist('contact/form/index.html');
     expect(contactForm).not.toContain('route-maintenance-page');
@@ -81,9 +85,27 @@ describe('maintenance build integration', () => {
     const home = readDist('index.html');
     expect(home).toContain('Website under maintenance');
     expect(home).toContain('global-maintenance-page');
-    expect(home).toContain('Content will return soon.');
+    expect(home).toContain('Thanks for your patience');
     expect(home).not.toContain('class="hero-header"');
     expect(home).not.toContain('class="page-title">Jan Havlín');
+
+    const profile = readDist('profile/index.html');
+    expect(profile).toMatch(/Redirecting|refresh/i);
+    expect(profile).toContain('url=/');
+  }, 120_000);
+
+  it('emits the reconstruction panel on home and redirects other routes', () => {
+    buildWithMaintenanceConfig(reconstructionFixture);
+
+    const home = readDist('index.html');
+    expect(home).toContain('is getting a new look');
+    expect(home).toContain('Let the painters paint…');
+    expect(home).toContain('reconstruction-panel');
+    expect(home).toContain('site-header--reserved');
+    expect(home).toContain('pexels-anastasia-shuraeva-5495064_dichrom_900');
+    expect(home).not.toContain('class="site-footer"');
+    expect(home).not.toContain('class="page-title">Jan Havlín');
+    expect(home).not.toContain('>Profile</a>');
 
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);

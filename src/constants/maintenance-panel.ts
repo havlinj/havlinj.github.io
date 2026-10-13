@@ -5,6 +5,18 @@
 export const MAINTENANCE_PANEL_BG_STEM =
   '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom' as const;
 
+/**
+ * Includes the 900 mid-tier, so the candidate list uses the hero width table.
+ */
+export const RECONSTRUCTION_PANEL_BG_STEM =
+  '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom' as const;
+
+export const MAINTENANCE_RETURN_LINE = 'Thanks for your patience' as const;
+
+export const RECONSTRUCTION_HEADLINE_TAIL = 'is getting a new look' as const;
+
+export const RECONSTRUCTION_RETURN_LINE = 'Let the painters paint…' as const;
+
 /** Values written as custom props on `.route-maintenance-page` in maintenance.css. */
 export const MAINTENANCE_LAYOUT = {
   revealFallbackMs: 2500,
@@ -19,6 +31,19 @@ export const MAINTENANCE_CLASSES = {
   panelMediaPending: 'route-maintenance-panel__media--pending',
   panelMediaVisible: 'route-maintenance-panel__media--visible',
 } as const;
+
+export const RECONSTRUCTION_SELECTORS = {
+  panel: '.reconstruction-page .reconstruction-panel',
+  panelMedia: '.reconstruction-page .page-buttons-panel__media',
+} as const;
+
+export const RECONSTRUCTION_CLASSES = {
+  panelMediaPending: 'reconstruction-panel__media--pending',
+  panelMediaVisible: 'reconstruction-panel__media--visible',
+} as const;
+
+/** Set on the panel from its shorter edge; read by the photo object-position. */
+export const RECONSTRUCTION_PANEL_EDGE_VAR = '--reconstruction-panel-edge';
 
 export const MAINTENANCE_PANEL_BG = {
   posX: '50%',

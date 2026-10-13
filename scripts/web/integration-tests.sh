@@ -163,6 +163,13 @@ PW_REUSE_SERVER=0 \
   npx playwright test -c playwright.maintenance.config.ts e2e/maintenance-global.spec.ts
 
 echo ""
+echo "Running maintenance Playwright (reconstruction fixture on :4322)..."
+PW_REUSE_SERVER=0 \
+  MAINTENANCE_CONFIG_PATH=e2e/fixtures/maintenance-reconstruction.json \
+  PLAYWRIGHT_FORCE_TTY=1 \
+  npx playwright test -c playwright.maintenance.config.ts e2e/maintenance-reconstruction.spec.ts
+
+echo ""
 echo "Restoring default dist for subsequent jobs (Lighthouse)..."
 MAINTENANCE_FORCE_OFF=1 npm run build
 

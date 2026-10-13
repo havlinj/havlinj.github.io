@@ -75,18 +75,25 @@ describe('dichrom-responsive', () => {
     expect(dichromCandidateSrcset(sources)).toBe(
       `${stem}_720.png 1800w, ${stem}_900.png 2142w, ${stem}_1080.png 2430w, ${stem}_1440.png 2880w, ${stem}_1920.png 3456w, ${stem}_2400.png 3840w`,
     );
-    const fileStem =
-      'public/assets/hero/vackground-com-agUC-v_D1iI-unsplash_dichrom';
-    for (const [suffix, width] of [
-      ['720', DICHROM_HERO_INTRINSIC_WIDTHS.w720],
-      ['900', DICHROM_HERO_INTRINSIC_WIDTHS.w900],
-      ['1080', DICHROM_HERO_INTRINSIC_WIDTHS.w1080],
-      ['1440', DICHROM_HERO_INTRINSIC_WIDTHS.w1440],
-      ['1920', DICHROM_HERO_INTRINSIC_WIDTHS.w1920],
-      ['2400', DICHROM_HERO_INTRINSIC_WIDTHS.w2400],
-    ] as const) {
-      const header = readFileSync(`${fileStem}_${suffix}.png`).subarray(16, 24);
-      expect(header.readUInt32BE(0), `${fileStem}_${suffix}`).toBe(width);
+    const fileStems = [
+      'public/assets/hero/vackground-com-agUC-v_D1iI-unsplash_dichrom',
+      'public/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom',
+    ];
+    for (const fileStem of fileStems) {
+      for (const [suffix, width] of [
+        ['720', DICHROM_HERO_INTRINSIC_WIDTHS.w720],
+        ['900', DICHROM_HERO_INTRINSIC_WIDTHS.w900],
+        ['1080', DICHROM_HERO_INTRINSIC_WIDTHS.w1080],
+        ['1440', DICHROM_HERO_INTRINSIC_WIDTHS.w1440],
+        ['1920', DICHROM_HERO_INTRINSIC_WIDTHS.w1920],
+        ['2400', DICHROM_HERO_INTRINSIC_WIDTHS.w2400],
+      ] as const) {
+        const header = readFileSync(`${fileStem}_${suffix}.png`).subarray(
+          16,
+          24,
+        );
+        expect(header.readUInt32BE(0), `${fileStem}_${suffix}`).toBe(width);
+      }
     }
   });
 });

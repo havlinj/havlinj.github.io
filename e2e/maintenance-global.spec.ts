@@ -8,7 +8,9 @@ test.describe('maintenance global fixture', () => {
     await expect(
       page.getByRole('heading', { name: 'Website under maintenance' }),
     ).toBeVisible();
-    await expect(page.getByText('Content will return soon.')).toBeVisible();
+    await expect(
+      page.getByText('Thanks for your patience', { exact: true }),
+    ).toBeVisible();
     await expect(page.locator('.hero-header')).toHaveCount(0);
 
     await page.goto('/profile');

@@ -6,37 +6,41 @@ export type MaintenanceMatchMode = 'exact' | 'prefix';
 
 export type MaintenanceRouteEntry = {
   path: string;
-  started: string;
   match: MaintenanceMatchMode;
 };
 
-/** Discriminated config — global and routes cannot coexist. */
+/** Discriminated config — only one mode, and its fields, at a time. */
 export type MaintenanceConfigFile =
   | { mode: 'off' }
-  | { mode: 'global'; started: string }
+  | { mode: 'global' }
+  | { mode: 'reconstruction' }
   | { mode: 'routes'; routes: MaintenanceRouteEntry[] };
 
 export type MaintenanceDecision =
   | { kind: 'none' }
-  | { kind: 'global'; started: string }
+  | { kind: 'global' }
+  | { kind: 'reconstruction' }
   | {
       kind: 'route';
       configPath: string;
       displayPath: string;
-      started: string;
     };
+
+export type SiteShutdownDecision = Extract<
+  MaintenanceDecision,
+  { kind: 'global' } | { kind: 'reconstruction' }
+>;
 
 export type NonHomeMaintenanceDecision = Exclude<
   MaintenanceDecision,
-  { kind: 'global' }
+  SiteShutdownDecision
 >;
 
 export const MAINTENANCE_FORCE_OFF_ENV = 'MAINTENANCE_FORCE_OFF';
 export const MAINTENANCE_CONFIG_JSON_ENV = 'MAINTENANCE_CONFIG_JSON';
 export const MAINTENANCE_CONFIG_PATH_ENV = 'MAINTENANCE_CONFIG_PATH';
 
-const ROUTE_FIELD_KEYS = ['path', 'started', 'match'] as const;
-const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const ROUTE_FIELD_KEYS = ['path', 'match'] as const;
 
 type EnvLike = Record<string, string | undefined>;
 
@@ -115,23 +119,6 @@ export function normalizeRoutePath(pathname: string): string {
   return trimmed === '' ? '/' : trimmed;
 }
 
-export function formatMaintenanceStartedDate(isoDate: string): string {
-  const match = ISO_DATE_PATTERN.exec(isoDate.trim());
-  if (!match) {
-    throw new Error(
-      `maintenance started date must be YYYY-MM-DD, got: ${JSON.stringify(isoDate)}`,
-    );
-  }
-  const [, year, month, day] = match;
-  return `${year.slice(2)}.${month}.${day}.`;
-}
-
-function assertStartedDate(value: unknown, label: string): string {
-  assertNonEmptyString(value, label);
-  formatMaintenanceStartedDate(value);
-  return value.trim();
-}
-
 function assertValidRoute(
   route: unknown,
   index: number,
@@ -145,7 +132,6 @@ function assertValidRoute(
   if (!record.path.startsWith('/')) {
     throw new Error(`maintenance.json: ${label}.path must start with /`);
   }
-  assertStartedDate(record.started, `${label}.started`);
   if (record.match !== 'exact' && record.match !== 'prefix') {
     throw new Error(
       `maintenance.json: ${label}.match must be "exact" or "prefix"`,
@@ -163,10 +149,8 @@ export function assertValidConfig(
     assertNoExtraKeys(record, ['mode'], 'root (mode=off)');
     return;
   }
-  if (record.mode === 'global') {
-    assertRequiredPresent(record, 'started', 'started');
-    assertStartedDate(record.started, 'started');
-    assertNoExtraKeys(record, ['mode', 'started'], 'root (mode=global)');
+  if (record.mode === 'global' || record.mode === 'reconstruction') {
+    assertNoExtraKeys(record, ['mode'], `root (mode=${record.mode})`);
     return;
   }
   if (record.mode === 'routes') {
@@ -184,7 +168,7 @@ export function assertValidConfig(
     return;
   }
   throw new Error(
-    'maintenance.json: mode must be "off", "global", or "routes"',
+    'maintenance.json: mode must be "off", "global", "reconstruction", or "routes"',
   );
 }
 
@@ -219,13 +203,15 @@ export function loadMaintenanceConfig(
     return { mode: 'off' };
   }
   if (config.mode === 'global') {
-    return { mode: 'global', started: config.started.trim() };
+    return { mode: 'global' };
+  }
+  if (config.mode === 'reconstruction') {
+    return { mode: 'reconstruction' };
   }
   return {
     mode: 'routes',
     routes: config.routes.map((route) => ({
       path: normalizeRoutePath(route.path),
-      started: route.started.trim(),
       match: route.match,
     })),
   };
@@ -276,8 +262,8 @@ export function resolveMaintenance(
       ? options.config
       : readMaintenanceConfigSource(options.env);
   const config = loadMaintenanceConfig(source);
-  if (config.mode === 'global') {
-    return { kind: 'global', started: config.started };
+  if (config.mode === 'global' || config.mode === 'reconstruction') {
+    return { kind: config.mode };
   }
   if (config.mode === 'off') {
     return { kind: 'none' };
@@ -290,7 +276,6 @@ export function resolveMaintenance(
     kind: 'route',
     configPath: route.path,
     displayPath: normalizeRoutePath(pathname),
-    started: route.started,
   };
 }
 
@@ -309,7 +294,7 @@ export function gateNonHomeMaintenance(
   decision: NonHomeMaintenanceDecision;
 } {
   const decision = resolveMaintenance(pathname, options);
-  if (decision.kind === 'global') {
+  if (decision.kind === 'global' || decision.kind === 'reconstruction') {
     return { redirectHome: true, decision: { kind: 'none' } };
   }
   return { redirectHome: false, decision };

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import GlobalMaintenanceNotice from '../components/GlobalMaintenanceNotice.astro';
+import ReconstructionNotice from '../components/ReconstructionNotice.astro';
 import HomeHero from '../components/HomeHero.astro';
 import {
   buildDichromHeroResponsive,
@@ -12,10 +13,9 @@ import { selectHeroScannerCandidate } from '../utils/dichrom-hero-estimate';
 import { resolveMaintenance } from '../utils/maintenance';
 
 const maintenance = resolveMaintenance(Astro.url.pathname);
-const heroBg =
-  maintenance.kind === 'global'
-    ? null
-    : buildDichromHeroResponsive(HERO_BG_STEM);
+const siteShutdown =
+  maintenance.kind === 'global' || maintenance.kind === 'reconstruction';
+const heroBg = siteShutdown ? null : buildDichromHeroResponsive(HERO_BG_STEM);
 const heroScannerCandidate = heroBg
   ? selectHeroScannerCandidate(
       parseDichromCandidates(dichromCandidateSrcset(heroBg)),
@@ -26,7 +26,11 @@ const heroInitialHref =
 ---
 
 {
-  maintenance.kind === 'global' ? (
+  maintenance.kind === 'reconstruction' ? (
+    <Layout title="Website under reconstruction" showFooter={false}>
+      <ReconstructionNotice />
+    </Layout>
+  ) : maintenance.kind === 'global' ? (
     <Layout title="Website under maintenance">
       <GlobalMaintenanceNotice />
     </Layout>

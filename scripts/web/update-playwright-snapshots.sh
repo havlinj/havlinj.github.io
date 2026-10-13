@@ -5,7 +5,8 @@
 # Usage:
 #   ./scripts/web/update-playwright-snapshots.sh
 #       → full screenshot set: hero, profile, Credits main, extreme-zoom (desktop chromium +
-#         mobile webkit), mobile Foundations reveal, maintenance Whoops panel;
+#         mobile webkit), mobile Foundations reveal, maintenance Whoops panel,
+#         reconstruction panel;
 #         PW_SERVER_MODE=preview (matches CI / integration-tests.sh).
 #   ./scripts/web/update-playwright-snapshots.sh e2e/foo.spec.ts
 #   ./scripts/web/update-playwright-snapshots.sh --update-snapshots e2e/
@@ -57,6 +58,14 @@ else
     npx playwright test -c playwright.maintenance.config.ts \
       e2e/maintenance-routes.spec.ts \
       --grep 'Whoops panel visual snapshot' \
+      --update-snapshots
+
+  echo "Updating reconstruction panel snapshot (isolated fixture build on :4322)..."
+  PW_REUSE_SERVER=0 \
+    MAINTENANCE_CONFIG_PATH=e2e/fixtures/maintenance-reconstruction.json \
+    npx playwright test -c playwright.maintenance.config.ts \
+      e2e/maintenance-reconstruction.spec.ts \
+      --grep 'reconstruction panel visual snapshot' \
       --update-snapshots
 
   if [[ "$PW_SERVER_MODE" == "preview" ]]; then

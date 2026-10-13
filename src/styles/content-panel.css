@@ -28,8 +28,13 @@
 }
 
 /*
- * Maintenance panel: no inner padding (writing/contact keep theirs in page CSS).
+ * Maintenance and reconstruction panels: no inner padding
+ * (writing/contact keep theirs in page CSS).
  */
 .route-maintenance-panel.content-panel {
+  padding: 0;
+}
+
+.reconstruction-panel.content-panel {
   padding: 0;
 }

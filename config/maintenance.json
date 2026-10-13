@@ -6,28 +6,28 @@
  *
  * 2) Whole site unavailable (home shows “Website under maintenance”;
  *    every other URL redirects to /):
- *    {
- *      "mode": "global",
- *      "started": "2026-08-07"
- *    }
+ *    { "mode": "global" }
  *
- * 3) Selected routes only (Whoops + content panel notice; header/footer stay):
+ * 3) Whole site under reconstruction (home shows a content panel with a
+ *    background photo; nav labels and the footer are omitted, but the nav
+ *    still reserves its usual line of space; every other URL redirects to /):
+ *    { "mode": "reconstruction" }
+ *
+ * 4) Selected routes only (Whoops + content panel notice; header/footer stay):
  *    {
  *      "mode": "routes",
  *      "routes": [
- *        { "path": "/writing", "started": "2026-08-07", "match": "prefix" },
- *        { "path": "/contact/form", "started": "2026-08-08", "match": "exact" }
+ *        { "path": "/writing", "match": "prefix" },
+ *        { "path": "/contact/form", "match": "exact" }
  *      ]
  *    }
  *
  * Notes:
- * - `started` must be YYYY-MM-DD (shown as YY.MM.DD.).
  * - `match`: "prefix" also covers nested paths (/contact → /contact/form);
  *   "exact" locks a single URL.
  * - Invalid or mixed shapes fail `astro build`.
  * - Comments in this file are allowed (JSONC-style).
  */
 {
-  "mode": "routes",
-  "routes": [{ "path": "/writing", "started": "2026-08-08", "match": "prefix" }]
+  "mode": "reconstruction"
 }

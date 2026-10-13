@@ -311,6 +311,10 @@ describe('layout contracts: unified content panel skeleton', () => {
       'src/components/RouteMaintenanceNotice.astro',
       'route-maintenance-panel content-panel',
     ],
+    [
+      'src/components/ReconstructionNotice.astro',
+      'reconstruction-panel content-panel',
+    ],
     ['src/content/pages/profile.md', 'profile-section content-panel'],
   ];
 
@@ -320,6 +324,7 @@ describe('layout contracts: unified content panel skeleton', () => {
     'src/components/WritingPageBody.astro',
     'src/components/ContactPageBody.astro',
     'src/components/RouteMaintenanceNotice.astro',
+    'src/components/ReconstructionNotice.astro',
   ];
 
   const ROUTE_STYLESHEETS: readonly string[] = [
@@ -725,6 +730,36 @@ describe('layout contracts: route maintenance panel look', () => {
     );
     expect(css).toMatch(
       /\.route-maintenance-panel__media--visible\s*\{[\s\S]*?opacity:\s*1;/,
+    );
+  });
+
+  it('reconstruction keeps a hidden nav line and a photo content panel', async () => {
+    const { RECONSTRUCTION_PANEL_BG_STEM } =
+      await import('../../src/constants/maintenance-panel');
+    const notice = readRepoFile('src/components/ReconstructionNotice.astro');
+    const css = readRepoFile('src/styles/pages/maintenance.css');
+    const layout = readRepoFile('src/layouts/Layout.astro');
+
+    expect(notice).toContain('site-header--reserved');
+    expect(notice).toContain('LAYOUT_NAV_ITEMS');
+    expect(notice).toContain('reconstruction-panel content-panel');
+    expect(notice).toContain('RECONSTRUCTION_PANEL_BG_STEM');
+    expect(notice).toContain('RECONSTRUCTION_HEADLINE_TAIL');
+    expect(notice).toContain('RECONSTRUCTION_RETURN_LINE');
+    expect(notice).not.toContain('page-title');
+    expect(css).toMatch(
+      /\.reconstruction-panel__copy\s*\{[^}]*top:\s*33\.333%/,
+    );
+    expect(RECONSTRUCTION_PANEL_BG_STEM).toBe(
+      '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom',
+    );
+    expect(notice).toContain('buildDichromHeroResponsive');
+    expect(css).toMatch(
+      /\.site-header--reserved\s*\{[^}]*visibility:\s*hidden/,
+    );
+    expect(layout).toContain('showFooter');
+    expect(readRepoFile('src/pages/index.astro')).toContain(
+      'showFooter={false}',
     );
   });
 });
