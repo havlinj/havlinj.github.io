@@ -62,13 +62,13 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('page-buttons-panel__media');
     expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(writing).toContain('/writing');
-    expect(writing).toContain('Thanks for your patience');
+    expect(writing).toContain('Let the mechanics work…');
     expect(writing).toContain('site-header');
     expect(writing).not.toContain('writing-category-picker');
 
     const contactExact = readDist('contact/index.html');
     expect(contactExact).toContain('Whoops');
-    expect(contactExact).toContain('Thanks for your patience');
+    expect(contactExact).toContain('Let the mechanics work…');
 
     const contactForm = readDist('contact/form/index.html');
     expect(contactForm).not.toContain('route-maintenance-page');
@@ -83,9 +83,17 @@ describe('maintenance build integration', () => {
     buildWithMaintenanceConfig(globalFixture);
 
     const home = readDist('index.html');
-    expect(home).toContain('Website under maintenance');
+    expect(home).toContain('class="page-title">Whoops');
+    expect(home).toContain('The website');
+    expect(home).toContain('is under maintenance');
     expect(home).toContain('global-maintenance-page');
-    expect(home).toContain('Thanks for your patience');
+    expect(home).toContain('page-buttons-panel__media');
+    expect(home).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
+    expect(home).toContain('Let the mechanics work…');
+    expect(home).toContain('site-footer__credits');
+    expect(home).not.toContain('site-footer__home');
+    expect(home).toContain('site-header--reserved');
+    expect(home).not.toContain('site-nav__link');
     expect(home).not.toContain('class="hero-header"');
     expect(home).not.toContain('class="page-title">Jan Havlín');
 

@@ -1,11 +1,66 @@
 ---
-import { MAINTENANCE_RETURN_LINE } from '../constants/maintenance-panel';
+import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
+import { buildDichromResponsive } from '../constants/dichrom-responsive';
+import {
+  MAINTENANCE_PANEL_BG_STEM,
+  MAINTENANCE_RETURN_LINE,
+} from '../constants/maintenance-panel';
+import { LAYOUT_NAV_ITEMS } from '../layouts/layout-nav';
 import '../styles/pages/maintenance.css';
+
+const maintenanceBg = buildDichromResponsive(MAINTENANCE_PANEL_BG_STEM);
+const headlineTail = 'is under maintenance';
 ---
 
-<article class="global-maintenance-page">
-  <h1 class="global-maintenance-page__title">Website under maintenance</h1>
-  <div class="global-maintenance-page__info">
-    <p>{MAINTENANCE_RETURN_LINE}</p>
+<div class="site-header site-header--reserved" aria-hidden="true">
+  <div class="site-header__inner">
+    {
+      LAYOUT_NAV_ITEMS.map((item) => (
+        <span class="site-header__item">{item.label}</span>
+      ))
+    }
+  </div>
+</div>
+<article class="global-maintenance-page content-panel-page">
+  <h1 class="page-title">Whoops</h1>
+  <div class="page-buttons-zone">
+    <div class="page-buttons-panel route-maintenance-panel content-panel">
+      <div
+        class="page-buttons-panel__media route-maintenance-panel__media--pending"
+        aria-hidden="true"
+      >
+        <ResponsiveDichromPicture
+          sources={maintenanceBg}
+          width={2880}
+          height={1920}
+          fetchpriority="high"
+        />
+      </div>
+      <div class="route-maintenance-panel__copy">
+        <p class="route-maintenance-panel__headline">
+          <span class="route-maintenance-panel__headline-lead">The website</span
+          >
+          <span class="route-maintenance-panel__headline-tail"
+            >{headlineTail}</span
+          >
+        </p>
+        <div class="route-maintenance-panel__info">
+          <p>{MAINTENANCE_RETURN_LINE}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </article>
+
+<noscript>
+  <style>
+    .global-maintenance-page
+      .page-buttons-panel__media.route-maintenance-panel__media--pending {
+      opacity: 1 !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  import '../scripts/maintenance-panel-edge.ts';
+</script>

@@ -11,7 +11,7 @@ export const MAINTENANCE_PANEL_BG_STEM =
 export const RECONSTRUCTION_PANEL_BG_STEM =
   '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom' as const;
 
-export const MAINTENANCE_RETURN_LINE = 'Thanks for your patience' as const;
+export const MAINTENANCE_RETURN_LINE = 'Let the mechanics work…' as const;
 
 export const RECONSTRUCTION_HEADLINE_TAIL = 'is getting a new look' as const;
 
@@ -23,8 +23,10 @@ export const MAINTENANCE_LAYOUT = {
 } as const;
 
 export const MAINTENANCE_SELECTORS = {
-  panel: '.route-maintenance-page .page-buttons-panel',
-  panelMedia: '.route-maintenance-page .page-buttons-panel__media',
+  panel:
+    '.route-maintenance-page .page-buttons-panel, .global-maintenance-page .page-buttons-panel',
+  panelMedia:
+    '.route-maintenance-page .page-buttons-panel__media, .global-maintenance-page .page-buttons-panel__media',
 } as const;
 
 export const MAINTENANCE_CLASSES = {

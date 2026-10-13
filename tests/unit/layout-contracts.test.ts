@@ -699,6 +699,12 @@ describe('layout contracts: route maintenance panel look', () => {
       await import('../../src/constants/maintenance-panel');
     const astro = readRepoFile('src/components/RouteMaintenanceNotice.astro');
     expect(astro).toContain('MAINTENANCE_PANEL_BG_STEM');
+    const globalNotice = readRepoFile(
+      'src/components/GlobalMaintenanceNotice.astro',
+    );
+    expect(globalNotice).toContain('MAINTENANCE_PANEL_BG_STEM');
+    expect(globalNotice).toContain('site-header--reserved');
+    expect(globalNotice).toContain('LAYOUT_NAV_ITEMS');
     expect(astro).toContain('page-buttons-panel__media');
     expect(astro).toContain('route-maintenance-panel__media--pending');
     expect(astro).toContain('maintenance-panel-edge.ts');
@@ -721,6 +727,9 @@ describe('layout contracts: route maintenance panel look', () => {
     );
     expect(css).toMatch(
       /\.route-maintenance-panel__copy\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*transparent;/,
+    );
+    expect(css).toMatch(
+      /\.route-maintenance-panel__copy\s*\{[^}]*top:\s*50%/,
     );
     expect(css).toMatch(
       /\.route-maintenance-panel__copy::before\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,

@@ -4,8 +4,9 @@
  * 1) Site open (default):
  *    { "mode": "off" }
  *
- * 2) Whole site unavailable (home shows “Website under maintenance”;
- *    every other URL redirects to /):
+ * 2) Whole site unavailable (home shows the Whoops panel, same photo as
+ *    route maintenance; nav labels are omitted but the nav still reserves
+ *    its usual line; the footer has no Home link; every other URL redirects to /):
  *    { "mode": "global" }
  *
  * 3) Whole site under reconstruction (home shows a content panel with a
@@ -29,5 +30,5 @@
  * - Comments in this file are allowed (JSONC-style).
  */
 {
-  "mode": "reconstruction"
+  "mode": "global"
 }

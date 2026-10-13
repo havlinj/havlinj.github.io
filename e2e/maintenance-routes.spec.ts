@@ -21,7 +21,7 @@ test.describe('maintenance routes fixture', () => {
       '/writing',
     );
     await expect(
-      page.getByText('Thanks for your patience', { exact: true }),
+      page.getByText('Let the mechanics work…', { exact: true }),
     ).toBeVisible();
 
     await expect(page.locator('.writing-category-picker')).toHaveCount(0);

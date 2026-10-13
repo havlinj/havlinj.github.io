@@ -1,6 +1,7 @@
 /* Route + global maintenance surfaces — site tokens only (#111 / #e0f7fa, Inter). */
 
 .route-maintenance-page,
+.global-maintenance-page,
 .reconstruction-page {
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
@@ -14,21 +15,26 @@
   --panel-bg-rotate: 0deg;
 }
 
-.route-maintenance-page .page-buttons-zone {
+.route-maintenance-page .page-buttons-zone,
+.global-maintenance-page .page-buttons-zone {
   flex: 0 0 auto;
 }
 
+.global-maintenance-page .page-buttons-panel.route-maintenance-panel,
 .route-maintenance-page .page-buttons-panel.route-maintenance-panel {
   background-color: var(--color-page-bg);
   --route-maintenance-panel-edge: 320px;
 }
 
 .route-maintenance-page .page-buttons-panel::before,
-.route-maintenance-page .page-buttons-panel::after {
+.route-maintenance-page .page-buttons-panel::after,
+.global-maintenance-page .page-buttons-panel::before,
+.global-maintenance-page .page-buttons-panel::after {
   content: none;
 }
 
-.route-maintenance-page .page-buttons-panel__media {
+.route-maintenance-page .page-buttons-panel__media,
+.global-maintenance-page .page-buttons-panel__media {
   position: absolute;
   z-index: 0;
   overflow: hidden;
@@ -36,22 +42,28 @@
 }
 
 .route-maintenance-page
+  .page-buttons-panel__media.route-maintenance-panel__media--pending,
+.global-maintenance-page
   .page-buttons-panel__media.route-maintenance-panel__media--pending {
   opacity: 0;
 }
 
 .route-maintenance-page
+  .page-buttons-panel__media.route-maintenance-panel__media--visible,
+.global-maintenance-page
   .page-buttons-panel__media.route-maintenance-panel__media--visible {
   opacity: 1;
 }
 
-.route-maintenance-page .page-buttons-panel__media picture {
+.route-maintenance-page .page-buttons-panel__media picture,
+.global-maintenance-page .page-buttons-panel__media picture {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.route-maintenance-page .page-buttons-panel__media img {
+.route-maintenance-page .page-buttons-panel__media img,
+.global-maintenance-page .page-buttons-panel__media img {
   position: absolute;
   display: block;
   left: calc((1 - var(--panel-bg-zoom, 1)) * 50%);
@@ -156,44 +168,6 @@
 }
 
 .route-maintenance-panel__info p + p {
-  margin-top: 0.2em;
-}
-
-.global-maintenance-page {
-  width: 100%;
-  max-width: 37.5rem;
-  margin: 0;
-  padding: 18vh 0 2rem;
-  box-sizing: border-box;
-}
-
-.global-maintenance-page__title {
-  margin: 0;
-  font-size: clamp(2.125rem, 7vw, 3.375rem);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.05em;
-  color: var(--color-ink);
-}
-
-.global-maintenance-page__info {
-  margin-top: 1.875rem;
-  max-width: 22.5rem;
-}
-
-.global-maintenance-page__info p {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.005em;
-  color: rgba(17, 17, 17, 0.68);
-  -webkit-font-smoothing: antialiased;
-  hyphens: none;
-  -webkit-hyphens: none;
-}
-
-.global-maintenance-page__info p + p {
   margin-top: 0.2em;
 }
 
@@ -354,22 +328,6 @@
 
   .route-maintenance-panel__info p,
   .reconstruction-panel__info p {
-    font-size: 0.9375rem;
-  }
-
-  .global-maintenance-page {
-    padding-top: 16vh;
-  }
-
-  .global-maintenance-page__title {
-    font-size: clamp(2rem, 10vw, 2.875rem);
-  }
-
-  .global-maintenance-page__info {
-    margin-top: 1.625rem;
-  }
-
-  .global-maintenance-page__info p {
     font-size: 0.9375rem;
   }
 }

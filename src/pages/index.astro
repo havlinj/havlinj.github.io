@@ -31,7 +31,7 @@ const heroInitialHref =
       <ReconstructionNotice />
     </Layout>
   ) : maintenance.kind === 'global' ? (
-    <Layout title="Website under maintenance">
+    <Layout title="Whoops" showFooterHome={false}>
       <GlobalMaintenanceNotice />
     </Layout>
   ) : (

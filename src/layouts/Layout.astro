@@ -17,6 +17,7 @@ const {
   activeSection,
   showHeader = false,
   showFooter = true,
+  showFooterHome = true,
   profileStylesLast = false,
 } = Astro.props;
 const pageTitle = title || 'Astro Basics';
@@ -55,7 +56,7 @@ const showSiteHeader = Boolean(activeSection || showHeader);
     <main class="content">
       {showSiteHeader && <SiteHeader activeSection={activeSection} />}
       <slot />
-      {showFooter && <SiteFooter />}
+      {showFooter && <SiteFooter showHome={showFooterHome} />}
     </main>
     <script>
       import { initDichromTierSync } from '../scripts/dichrom-tier-sync.ts';
