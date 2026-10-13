@@ -31,7 +31,37 @@ test.describe('maintenance reconstruction fixture', () => {
     await expect(
       page.getByText(RECONSTRUCTION_RETURN_LINE, { exact: true }),
     ).toBeVisible();
-    await expect(page.locator('footer.site-footer')).toHaveCount(0);
+    await expect(page.locator('footer a.site-footer__home')).toHaveCount(0);
+    const reservedHome = page.locator('footer .site-footer__home--reserved');
+    await expect(reservedHome).toBeAttached();
+    await expect(reservedHome).toBeHidden();
+    const footerSlots = await page.evaluate(() => {
+      const home = document.querySelector('.site-footer__home--reserved');
+      const credits = document.querySelector('.site-footer__credits');
+      const copyright = document.querySelector('.site-footer__copyright');
+      const inner = document.querySelector('.site-footer__inner');
+      if (
+        !(home instanceof HTMLElement) ||
+        !(credits instanceof HTMLElement) ||
+        !(copyright instanceof HTMLElement) ||
+        !(inner instanceof HTMLElement)
+      ) {
+        return null;
+      }
+      const gap = Number.parseFloat(getComputedStyle(inner).columnGap);
+      const homeBox = home.getBoundingClientRect();
+      const creditsBox = credits.getBoundingClientRect();
+      const copyrightBox = copyright.getBoundingClientRect();
+      return {
+        creditsAfterHome: creditsBox.left - homeBox.right,
+        copyrightAfterCredits: copyrightBox.left - creditsBox.right,
+        gap,
+      };
+    });
+    expect(footerSlots).not.toBeNull();
+    expect(footerSlots!.creditsAfterHome).toBeCloseTo(footerSlots!.gap, 0);
+    expect(footerSlots!.copyrightAfterCredits).toBeCloseTo(footerSlots!.gap, 0);
+    await expect(page.locator('footer .site-footer__credits')).toBeVisible();
     await expect(page.locator('.site-header--reserved')).toBeAttached();
     await expect(page.locator('.site-header--reserved')).toBeHidden();
 
@@ -50,7 +80,7 @@ test.describe('maintenance reconstruction fixture', () => {
     expect(placement!).toBeGreaterThan(0.28);
     expect(placement!).toBeLessThan(0.4);
 
-    await page.goto('/credits');
+    await page.locator('footer .site-footer__credits').click();
     await expect(page).toHaveURL(/\/credits$/);
     await expect(
       page.getByRole('heading', { name: 'Credits', level: 1 }),

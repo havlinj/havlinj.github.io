@@ -11,8 +11,9 @@
  *    { "mode": "global" }
  *
  * 3) Whole site under reconstruction (home shows a content panel with a
- *    background photo; nav labels and the footer are omitted, but the nav
- *    still reserves its usual line of space; every other URL redirects to /):
+ *    background photo; nav labels are omitted but the nav still reserves
+ *    its usual line; the footer keeps an empty Home slot so Credits and the
+ *    copyright stay put; every other URL redirects to /):
  *    { "mode": "reconstruction" }
  *
  * 4) Selected routes only (Whoops + content panel notice; header/footer stay):

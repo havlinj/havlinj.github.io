@@ -768,7 +768,7 @@ describe('layout contracts: route maintenance panel look', () => {
     );
     expect(layout).toContain('showFooter');
     expect(readRepoFile('src/pages/index.astro')).toContain(
-      'showFooter={false}',
+      'title="Website under reconstruction" showFooterHome={false}',
     );
   });
 });

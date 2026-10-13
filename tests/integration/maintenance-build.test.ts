@@ -122,7 +122,9 @@ describe('maintenance build integration', () => {
     expect(home).toContain('reconstruction-panel');
     expect(home).toContain('site-header--reserved');
     expect(home).toContain('pexels-anastasia-shuraeva-5495064_dichrom_900');
-    expect(home).not.toContain('class="site-footer"');
+    expect(home).toContain('site-footer__credits');
+    expect(home).toContain('site-footer__home--reserved');
+    expect(home).not.toMatch(/<a[^>]*site-footer__home/);
     expect(home).not.toContain('class="page-title">Jan Havlín');
     expect(home).not.toContain('>Profile</a>');
 
