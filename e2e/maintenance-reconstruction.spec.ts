@@ -50,6 +50,21 @@ test.describe('maintenance reconstruction fixture', () => {
     expect(placement!).toBeGreaterThan(0.28);
     expect(placement!).toBeLessThan(0.4);
 
+    await page.goto('/credits');
+    await expect(page).toHaveURL(/\/credits$/);
+    await expect(
+      page.getByRole('heading', { name: 'Credits', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText('Anastasia Shuraeva')).toBeVisible();
+    await expect(page.getByText('Frankie Cordoba')).toHaveCount(0);
+    await expect(page.locator('a.site-header__item')).toHaveCount(0);
+    await expect(page.locator('.site-header--reserved')).toBeHidden();
+    await page.locator('footer a.site-footer__home').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByText(RECONSTRUCTION_RETURN_LINE, { exact: true }),
+    ).toBeVisible();
+
     await page.goto('/profile');
     await expect(page).toHaveURL(/\/$/);
     await expect(

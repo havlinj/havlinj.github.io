@@ -26,13 +26,13 @@ Route maintenance:
 }
 ```
 
-Global shutdown (same Whoops panel and photo as route maintenance; nav labels omitted but the nav line is kept; footer starts at Credits):
+Global shutdown (same Whoops panel and photo as route maintenance; nav labels omitted but the nav line is kept; footer keeps the Home slot empty so Credits and the copyright stay in their usual places):
 
 ```json
 { "mode": "global" }
 ```
 
-Whole-site reconstruction (content panel + background photo; nav labels and footer omitted, nav line kept as empty space; other URLs redirect to `/`):
+Whole-site reconstruction (content panel + background photo; nav labels and footer omitted, nav line kept as empty space; other URLs redirect to `/`, except `/credits`):
 
 ```json
 { "mode": "reconstruction" }
@@ -57,7 +57,9 @@ Every required field must be present with a real value — `null` / omitted keys
 
 Per-route pages keep the normal site header/footer, use the **Whoops** page title, and show the notice inside the usual content panel (photo behind the copy). The copy band is centered on the panel. Reconstruction stays on the upper third. Global mode uses the same band as route maintenance.
 
-`mode=reconstruction` is the whole-site variant of that panel: home renders only the square content panel (photo from `public/assets/pages/reconstruction/`), the header labels are not shown but the header still occupies its usual line plus `--page-nav-margin-bottom`, and the footer is omitted. Every other URL redirects to `/`, same as `mode=global`.
+`/credits` stays available during `global` and `reconstruction`. Global credits list only the maintenance photo. Reconstruction credits list only the reconstruction photo. Those pages keep the nav line hidden. The footer Home link is visible and returns to the shutdown home. Every other non-home URL still redirects to `/`.
+
+`mode=reconstruction` is the whole-site variant of that panel: home renders only the square content panel (photo from `public/assets/pages/reconstruction/`), the header labels are not shown but the header still occupies its usual line plus `--page-nav-margin-bottom`, and the footer is omitted. Every other URL except `/credits` redirects to `/`, same as `mode=global`.
 
 ## Local development while a route is listed
 

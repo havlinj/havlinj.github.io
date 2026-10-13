@@ -253,6 +253,24 @@ describe('resolveMaintenance', () => {
 });
 
 describe('gateNonHomeMaintenance', () => {
+  it('keeps /credits open during a whole-site shutdown', () => {
+    expect(
+      gateNonHomeMaintenance('/credits', { config: globalConfig, env: {} }),
+    ).toEqual({
+      redirectHome: false,
+      decision: { kind: 'global' },
+    });
+    expect(
+      gateNonHomeMaintenance('/credits/', {
+        config: reconstructionConfig,
+        env: {},
+      }),
+    ).toEqual({
+      redirectHome: false,
+      decision: { kind: 'reconstruction' },
+    });
+  });
+
   it('signals redirect-home for global mode', () => {
     expect(
       gateNonHomeMaintenance('/writing', { config: globalConfig, env: {} }),

@@ -9,10 +9,17 @@ const { showHome = true } = Astro.props;
 <footer class="site-footer">
   <div class="site-footer__inner">
     {
-      showHome && (
+      showHome ? (
         <a href="/" class="site-footer__link site-footer__home">
           Home
         </a>
+      ) : (
+        <span
+          class="site-footer__link site-footer__home site-footer__home--reserved"
+          aria-hidden="true"
+        >
+          Home
+        </span>
       )
     }
     <a href="/credits" class="site-footer__link site-footer__credits">Credits</a

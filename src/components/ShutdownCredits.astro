@@ -1,0 +1,63 @@
+---
+interface Props {
+  mode: 'global' | 'reconstruction';
+}
+
+const { mode } = Astro.props;
+---
+
+{
+  mode === 'global' ? (
+    <>
+      <h3>Photos</h3>
+      <p>
+        All Unsplash media listed below are used according to the{' '}
+        <a href="https://unsplash.com/license">Unsplash License</a>.
+      </p>
+      <ul>
+        <li>
+          <strong>Maintenance page background image</strong>
+          <ul>
+            <li>
+              Author:{' '}
+              <a href="https://unsplash.com/@noorvoux">Frankie Cordoba</a>
+            </li>
+            <li>
+              Source:{' '}
+              <a href="https://unsplash.com/photos/s8Y5e0DNiro">Unsplash</a>
+            </li>
+            <li>Edits: dichromatic treatment, noise</li>
+          </ul>
+        </li>
+      </ul>
+    </>
+  ) : (
+    <>
+      <h3>Photos (Pexels)</h3>
+      <p>
+        All Pexels photos listed below are used according to the{' '}
+        <a href="https://www.pexels.com/license/">Pexels License</a>.
+      </p>
+      <ul>
+        <li>
+          <strong>Reconstruction page background image</strong>
+          <ul>
+            <li>
+              Author:{' '}
+              <a href="https://www.pexels.com/@anastasia-shuraeva/">
+                Anastasia Shuraeva
+              </a>
+            </li>
+            <li>
+              Source:{' '}
+              <a href="https://www.pexels.com/photo/paint-equipments-inside-the-home-5495064/">
+                Pexels
+              </a>
+            </li>
+            <li>Edits: dichromatic treatment, noise</li>
+          </ul>
+        </li>
+      </ul>
+    </>
+  )
+}

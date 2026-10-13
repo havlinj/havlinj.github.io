@@ -3,6 +3,7 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import WhyContent from '../components/WhyContent.astro';
 import RouteMaintenancePage from '../components/RouteMaintenancePage.astro';
+import ShutdownCredits from '../components/ShutdownCredits.astro';
 import { gateNonHomeMaintenance } from '../utils/maintenance';
 
 export async function getStaticPaths() {
@@ -43,6 +44,11 @@ const hasPageTitleRule =
 
 let pageTitle = 'Whoops';
 let Content: Awaited<ReturnType<typeof render>>['Content'] | null = null;
+const shutdownCreditsMode =
+  slug === 'credits' &&
+  (maintenance.kind === 'global' || maintenance.kind === 'reconstruction')
+    ? maintenance.kind
+    : null;
 
 if (maintenance.kind !== 'route') {
   const page = await getEntry('pages', slug);
@@ -62,14 +68,27 @@ if (maintenance.kind !== 'route') {
       activeSection={activeSection}
     />
   ) : (
-    <Layout title={pageTitle} activeSection={activeSection}>
+    <Layout
+      title={pageTitle}
+      activeSection={shutdownCreditsMode ? undefined : activeSection}
+      showHeader={Boolean(shutdownCreditsMode)}
+      reserveHeader={Boolean(shutdownCreditsMode)}
+    >
       <article
         class={[isWhy && 'why-page', hasPageTitleRule && 'has-page-title-rule']
           .filter(Boolean)
           .join(' ')}
       >
         <h1 class="page-title">{pageTitle}</h1>
-        {isWhy ? <WhyContent /> : Content && <Content />}
+        {
+          shutdownCreditsMode ? (
+            <ShutdownCredits mode={shutdownCreditsMode} />
+          ) : isWhy ? (
+            <WhyContent />
+          ) : (
+            Content && <Content />
+          )
+        }
       </article>
     </Layout>
   )

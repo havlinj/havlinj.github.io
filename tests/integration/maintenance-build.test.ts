@@ -91,7 +91,8 @@ describe('maintenance build integration', () => {
     expect(home).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(home).toContain('Let the mechanics work…');
     expect(home).toContain('site-footer__credits');
-    expect(home).not.toContain('site-footer__home');
+    expect(home).toContain('site-footer__home--reserved');
+    expect(home).not.toMatch(/<a[^>]*site-footer__home/);
     expect(home).toContain('site-header--reserved');
     expect(home).not.toContain('site-nav__link');
     expect(home).not.toContain('class="hero-header"');
@@ -100,6 +101,16 @@ describe('maintenance build integration', () => {
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);
     expect(profile).toContain('url=/');
+
+    const credits = readDist('credits/index.html');
+    expect(credits).toContain('Frankie Cordoba');
+    expect(credits).toContain('Maintenance page background image');
+    expect(credits).toContain('site-header--reserved');
+    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).not.toContain('site-footer__home--reserved');
+    expect(credits).not.toMatch(/<a[^>]*site-header__item/);
+    expect(credits).not.toContain('Anastasia Shuraeva');
+    expect(credits).not.toContain('vackground.com');
   }, 120_000);
 
   it('emits the reconstruction panel on home and redirects other routes', () => {
@@ -118,5 +129,15 @@ describe('maintenance build integration', () => {
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);
     expect(profile).toContain('url=/');
+
+    const credits = readDist('credits/index.html');
+    expect(credits).toContain('Anastasia Shuraeva');
+    expect(credits).toContain('Reconstruction page background image');
+    expect(credits).toContain('site-header--reserved');
+    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).not.toContain('site-footer__home--reserved');
+    expect(credits).not.toMatch(/<a[^>]*site-header__item/);
+    expect(credits).not.toContain('Frankie Cordoba');
+    expect(credits).not.toContain('vackground.com');
   }, 120_000);
 });

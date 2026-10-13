@@ -29,6 +29,10 @@
   justify-self: auto;
 }
 
+.site-footer__home--reserved {
+  visibility: hidden;
+}
+
 .site-footer__credits {
   justify-self: auto;
 }

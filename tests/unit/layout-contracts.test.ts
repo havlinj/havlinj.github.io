@@ -763,7 +763,7 @@ describe('layout contracts: route maintenance panel look', () => {
       '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom',
     );
     expect(notice).toContain('buildDichromHeroResponsive');
-    expect(css).toMatch(
+    expect(readRepoFile('src/styles/site-header.css')).toMatch(
       /\.site-header--reserved\s*\{[^}]*visibility:\s*hidden/,
     );
     expect(layout).toContain('showFooter');

@@ -291,10 +291,13 @@ export function gateNonHomeMaintenance(
   } = {},
 ): {
   redirectHome: boolean;
-  decision: NonHomeMaintenanceDecision;
+  decision: MaintenanceDecision;
 } {
   const decision = resolveMaintenance(pathname, options);
   if (decision.kind === 'global' || decision.kind === 'reconstruction') {
+    if (normalizeRoutePath(pathname) === '/credits') {
+      return { redirectHome: false, decision };
+    }
     return { redirectHome: true, decision: { kind: 'none' } };
   }
   return { redirectHome: false, decision };

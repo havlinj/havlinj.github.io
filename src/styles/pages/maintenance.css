@@ -171,10 +171,6 @@
   margin-top: 0.2em;
 }
 
-.site-header--reserved {
-  visibility: hidden;
-}
-
 .reconstruction-page .page-buttons-zone {
   flex: 0 0 auto;
 }

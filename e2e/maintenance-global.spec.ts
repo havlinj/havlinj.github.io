@@ -40,7 +40,36 @@ test.describe('maintenance global fixture', () => {
       return box.height + marginBottom;
     });
     expect(reservedHeight).toBeGreaterThan(30);
-    await expect(page.locator('footer .site-footer__home')).toHaveCount(0);
+    await expect(page.locator('footer a.site-footer__home')).toHaveCount(0);
+    const reservedHome = page.locator('footer .site-footer__home--reserved');
+    await expect(reservedHome).toBeAttached();
+    await expect(reservedHome).toBeHidden();
+    const footerSlots = await page.evaluate(() => {
+      const home = document.querySelector('.site-footer__home--reserved');
+      const credits = document.querySelector('.site-footer__credits');
+      const copyright = document.querySelector('.site-footer__copyright');
+      const inner = document.querySelector('.site-footer__inner');
+      if (
+        !(home instanceof HTMLElement) ||
+        !(credits instanceof HTMLElement) ||
+        !(copyright instanceof HTMLElement) ||
+        !(inner instanceof HTMLElement)
+      ) {
+        return null;
+      }
+      const gap = Number.parseFloat(getComputedStyle(inner).columnGap);
+      const homeBox = home.getBoundingClientRect();
+      const creditsBox = credits.getBoundingClientRect();
+      const copyrightBox = copyright.getBoundingClientRect();
+      return {
+        creditsAfterHome: creditsBox.left - homeBox.right,
+        copyrightAfterCredits: copyrightBox.left - creditsBox.right,
+        gap,
+      };
+    });
+    expect(footerSlots).not.toBeNull();
+    expect(footerSlots!.creditsAfterHome).toBeCloseTo(footerSlots!.gap, 0);
+    expect(footerSlots!.copyrightAfterCredits).toBeCloseTo(footerSlots!.gap, 0);
     await expect(page.locator('footer .site-footer__credits')).toBeVisible();
     const mediaImg = page.locator(
       '.global-maintenance-page .route-maintenance-panel__media--visible img',
@@ -51,6 +80,20 @@ test.describe('maintenance global fixture', () => {
       return img.currentSrc || img.getAttribute('src') || '';
     });
     expect(src).toContain(MAINTENANCE_PANEL_BG_STEM);
+
+    await page.locator('footer .site-footer__credits').click();
+    await expect(page).toHaveURL(/\/credits$/);
+    await expect(
+      page.getByRole('heading', { name: 'Credits', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText('Frankie Cordoba')).toBeVisible();
+    await expect(page.getByText('Anastasia Shuraeva')).toHaveCount(0);
+    await expect(page.getByText('vackground.com')).toHaveCount(0);
+    await expect(page.locator('a.site-header__item')).toHaveCount(0);
+    await expect(page.locator('.site-header--reserved')).toBeHidden();
+    await page.locator('footer a.site-footer__home').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole('heading', { name: 'Whoops' })).toBeVisible();
 
     await page.goto('/profile');
     await expect(page).toHaveURL(/\/$/);

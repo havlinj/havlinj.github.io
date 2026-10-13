@@ -42,6 +42,16 @@ All Unsplash media listed below are used according to the
   - Source: [Unsplash](https://unsplash.com/photos/s8Y5e0DNiro)
   - Edits: dichromatic treatment, noise
 
+### Photos (Pexels)
+
+All Pexels photos listed below are used according to the
+[Pexels License](https://www.pexels.com/license/).
+
+- **Reconstruction page background image**
+  - Author: [Anastasia Shuraeva](https://www.pexels.com/@anastasia-shuraeva/)
+  - Source: [Pexels](https://www.pexels.com/photo/paint-equipments-inside-the-home-5495064/)
+  - Edits: dichromatic treatment, noise
+
 ### Videos
 
 All Pexels media listed below are used according to the

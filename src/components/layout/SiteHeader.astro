@@ -4,28 +4,36 @@ import {
   type LayoutNavSection,
 } from '../../layouts/layout-nav';
 
-const { activeSection } = Astro.props as {
+const { activeSection, reserved = false } = Astro.props as {
   activeSection?: LayoutNavSection | string;
+  reserved?: boolean;
 };
 ---
 
-<header class="site-header">
+<header
+  class:list={['site-header', reserved && 'site-header--reserved']}
+  aria-hidden={reserved ? 'true' : undefined}
+>
   {
     /* No Home link: hero is welcome-only; main destinations are Profile / Writing / Contact. */
   }
   <div class="site-header__inner">
     {
-      LAYOUT_NAV_ITEMS.map((item) => (
-        <a
-          href={item.href}
-          class={
-            'site-header__item site-nav__link' +
-            (activeSection === item.section ? ' site-nav__link--active' : '')
-          }
-        >
-          {item.label}
-        </a>
-      ))
+      reserved
+        ? LAYOUT_NAV_ITEMS.map((item) => (
+            <span class="site-header__item">{item.label}</span>
+          ))
+        : LAYOUT_NAV_ITEMS.map((item) => (
+            <a
+              href={item.href}
+              class={
+                'site-header__item site-nav__link' +
+                (activeSection === item.section ? ' site-nav__link--active' : '')
+              }
+            >
+              {item.label}
+            </a>
+          ))
     }
   </div>
 </header>

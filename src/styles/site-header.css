@@ -6,6 +6,10 @@
   margin-bottom: var(--page-nav-margin-bottom);
 }
 
+.site-header--reserved {
+  visibility: hidden;
+}
+
 .site-header__inner {
   width: 100%;
   display: flex;
