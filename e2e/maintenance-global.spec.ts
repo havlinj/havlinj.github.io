@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { readCreditsFloor } from './helpers';
 import { MAINTENANCE_PANEL_BG_STEM } from '../src/constants/maintenance-panel';
 
 test.describe('maintenance global fixture', () => {
@@ -89,6 +90,13 @@ test.describe('maintenance global fixture', () => {
     await expect(page.getByText('Frankie Cordoba')).toBeVisible();
     await expect(page.getByText('Anastasia Shuraeva')).toHaveCount(0);
     await expect(page.getByText('vackground.com')).toHaveCount(0);
+    const floor = await readCreditsFloor(page);
+    expect(floor).not.toBeNull();
+    expect(floor!.floorHeight).toBeCloseTo(floor!.queryWidth, 0);
+    expect(floor!.floorBelowWords).toBeCloseTo(floor!.titleGap, 0);
+    expect(floor!.footerPastFloor).toBeGreaterThanOrEqual(-1);
+    expect(floor!.footerPastFloor).toBeLessThan(2);
+
     await expect(page.locator('a.site-header__item')).toHaveCount(0);
     await expect(page.locator('.site-header--reserved')).toBeHidden();
     await page.locator('footer a.site-footer__home').click();

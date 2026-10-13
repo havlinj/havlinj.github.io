@@ -335,6 +335,21 @@ describe('layout contracts: unified content panel skeleton', () => {
     'src/styles/pages/maintenance.css',
   ];
 
+  it('credits reserves a content-panel floor without redefining the square', () => {
+    const page = readRepoFile('src/pages/[slug].astro');
+    const css = readRepoFile('src/styles/content-panel.css');
+    expect(page).toContain('credits-page__floor');
+    expect(page).toContain('content-panel credits-page__floor');
+    expect(css).toContain('grid-area: 1 / 1');
+    expect(css).toContain('margin-top: -1px');
+    expect(css).toContain(
+      'padding-top: calc(var(--content-panel-title-gap) + 1px)',
+    );
+    const creditsRules = css.slice(css.indexOf('.credits-page__stack'));
+    expect(creditsRules).not.toContain('height:');
+    expect(creditsRules).not.toContain('aspect-ratio');
+  });
+
   it('content-panel.css owns the title gap and the square geometry', async () => {
     const { CONTENT_PANEL_CLASS, CONTENT_PANEL_PAGE_CLASS } =
       await import('../../src/constants/content-panel');
@@ -755,7 +770,10 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(notice).toContain('RECONSTRUCTION_PANEL_BG_STEM');
     expect(notice).toContain('RECONSTRUCTION_HEADLINE_TAIL');
     expect(notice).toContain('RECONSTRUCTION_RETURN_LINE');
-    expect(notice).not.toContain('page-title');
+    expect(notice).toContain('reconstruction-page__title');
+    expect(css).toMatch(
+      /\.reconstruction-page__title\s*\{[^}]*visibility:\s*hidden/,
+    );
     expect(css).toMatch(
       /\.reconstruction-panel__copy\s*\{[^}]*top:\s*33\.333%/,
     );

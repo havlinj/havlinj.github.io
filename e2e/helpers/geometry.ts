@@ -1,4 +1,4 @@
-import { expect, type Locator } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 export async function mustBox(
   locator: Locator,
@@ -76,4 +76,50 @@ export async function readContentPanelContainment(
     },
     input,
   );
+}
+
+export type CreditsFloorSnapshot = {
+  floorHeight: number;
+  queryWidth: number;
+  footerPastFloor: number;
+  floorBelowWords: number;
+  titleGap: number;
+};
+
+export async function readCreditsFloor(
+  page: Page,
+): Promise<CreditsFloorSnapshot | null> {
+  return page.evaluate(() => {
+    const floor = document.querySelector('.credits-page__floor');
+    const footer = document.querySelector('.site-footer');
+    const main = document.querySelector('main.content');
+    const title = document.querySelector('h1.page-title');
+    if (
+      !(floor instanceof HTMLElement) ||
+      !(footer instanceof HTMLElement) ||
+      !(main instanceof HTMLElement) ||
+      !(title instanceof HTMLElement)
+    ) {
+      return null;
+    }
+    const floorBox = floor.getBoundingClientRect();
+    const footerBox = footer.getBoundingClientRect();
+    const titleBox = title.getBoundingClientRect();
+    const mainStyle = getComputedStyle(main);
+    const queryWidth =
+      main.clientWidth -
+      Number.parseFloat(mainStyle.paddingLeft) -
+      Number.parseFloat(mainStyle.paddingRight);
+    const rootFont = Number.parseFloat(
+      getComputedStyle(document.documentElement).fontSize,
+    );
+    const lineHeight = Number.parseFloat(getComputedStyle(title).lineHeight);
+    return {
+      floorHeight: floorBox.height,
+      queryWidth,
+      footerPastFloor: footerBox.top - floorBox.bottom,
+      floorBelowWords: floorBox.top - titleBox.top - lineHeight,
+      titleGap: 1.35 * rootFont,
+    };
+  });
 }

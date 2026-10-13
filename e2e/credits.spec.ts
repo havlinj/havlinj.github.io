@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readCreditsFloor } from './helpers';
 
 test.describe('/credits page', () => {
   test('Credits main column matches screenshot', async ({ page }) => {
@@ -13,6 +14,12 @@ test.describe('/credits page', () => {
 
     const main = page.locator('main.content');
     await expect(main).toBeVisible();
+    const floor = await readCreditsFloor(page);
+    expect(floor).not.toBeNull();
+    expect(floor!.floorHeight).toBeCloseTo(floor!.queryWidth, 0);
+    expect(floor!.floorBelowWords).toBeCloseTo(floor!.titleGap, 0);
+    expect(floor!.footerPastFloor).toBeGreaterThanOrEqual(-1);
+
     await expect(main).toHaveScreenshot('credits-content.png', {
       animations: 'disabled',
       // Baseline matches `PW_SERVER_MODE=preview` (integration-tests.sh / CI). Dev

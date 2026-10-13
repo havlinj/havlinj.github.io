@@ -38,6 +38,7 @@ const activeSection = PROFILE_SECTION_SLUGS.has(slug)
   ? 'profile'
   : sectionBySlug[slug] || undefined;
 const isWhy = slug === 'why-this';
+const isCredits = slug === 'credits';
 /** Same 1px rule under H1 as Contact (special-typography.css --page-title-rule-gap) */
 const hasPageTitleRule =
   slug === 'credits' || slug === 'what-i-do' || slug === 'foundations';
@@ -75,14 +76,30 @@ if (maintenance.kind !== 'route') {
       reserveHeader={Boolean(shutdownCreditsMode)}
     >
       <article
-        class={[isWhy && 'why-page', hasPageTitleRule && 'has-page-title-rule']
+        class={[
+          isWhy && 'why-page',
+          isCredits && 'credits-page',
+          hasPageTitleRule && 'has-page-title-rule',
+        ]
           .filter(Boolean)
           .join(' ')}
       >
         <h1 class="page-title">{pageTitle}</h1>
         {
-          shutdownCreditsMode ? (
-            <ShutdownCredits mode={shutdownCreditsMode} />
+          isCredits ? (
+            <div class="credits-page__stack">
+              <div
+                class="content-panel credits-page__floor"
+                aria-hidden="true"
+              />
+              <div class="credits-page__copy">
+                {shutdownCreditsMode ? (
+                  <ShutdownCredits mode={shutdownCreditsMode} />
+                ) : (
+                  Content && <Content />
+                )}
+              </div>
+            </div>
           ) : isWhy ? (
             <WhyContent />
           ) : (

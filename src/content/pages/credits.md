@@ -2,7 +2,7 @@
 title: 'Credits'
 ---
 
-### Photos
+### Photos (Unsplash)
 
 All Unsplash media listed below are used according to the
 [Unsplash License](https://unsplash.com/license).

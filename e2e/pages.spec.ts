@@ -490,7 +490,7 @@ test.describe('Credits page (/credits)', () => {
   }) => {
     await page.goto('/credits');
     await expect(
-      page.getByRole('heading', { name: 'Photos', level: 3 }),
+      page.getByRole('heading', { name: 'Photos (Unsplash)', level: 3 }),
     ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Videos', level: 3 }),

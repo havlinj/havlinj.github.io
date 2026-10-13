@@ -171,6 +171,10 @@
   margin-top: 0.2em;
 }
 
+.reconstruction-page__title {
+  visibility: hidden;
+}
+
 .reconstruction-page .page-buttons-zone {
   flex: 0 0 auto;
 }

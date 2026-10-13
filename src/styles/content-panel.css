@@ -38,3 +38,31 @@
 .reconstruction-panel.content-panel {
   padding: 0;
 }
+
+.credits-page__stack {
+  display: grid;
+}
+
+article.credits-page.has-page-title-rule > h1.page-title + .credits-page__stack {
+  /* The underline lives inside the title, one title-gap below the words.
+     That line is the content panel's top edge, so the floor starts there. */
+  margin-top: -1px;
+}
+
+.credits-page__floor,
+.credits-page__copy {
+  grid-area: 1 / 1;
+}
+
+.credits-page__floor {
+  align-self: start;
+  visibility: hidden;
+}
+
+.credits-page__copy {
+  padding-top: calc(var(--content-panel-title-gap) + 1px);
+}
+
+.credits-page__copy > :first-child {
+  margin-top: 0;
+}

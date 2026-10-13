@@ -15,6 +15,7 @@ export { waitTwoFrames } from './raf';
 export {
   mustBox,
   readContentPanelContainment,
+  readCreditsFloor,
   type ContentPanelContainmentInput,
   type ContentPanelContainmentResult,
 } from './geometry';

@@ -48,11 +48,11 @@ footer.site-footer                      directly follows the panel; its own padd
 | Contact | `.contact-page .page-buttons-panel` |
 | Route maintenance | `.route-maintenance-panel` (variant on `.page-buttons-panel`) |
 | Global maintenance | `.global-maintenance-page .route-maintenance-panel` (whole-site `mode=global`; same photo as route maintenance; nav text omitted, nav line kept) |
-| Reconstruction | `.reconstruction-panel` (whole-site `mode=reconstruction` only; nav text omitted, nav line kept; footer keeps an empty Home slot so Credits and the copyright stay put) |
+| Reconstruction | `.reconstruction-panel` (whole-site `mode=reconstruction` only; nav text omitted, nav line kept; a hidden page title keeps the panel at the same height as titled routes; footer keeps an empty Home slot so Credits and the copyright stay put) |
 
 Use **content panel** in comments, tests, and cross-page layout logic. Shared selectors live in `src/constants/content-panel.ts`. Do not rename CSS classes unless migrating explicitly.
 
-**Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-text-x/y` (text positioning inside the hero panel).
+**Not** a content panel: Why page `.why-box`, contact form page, list-marker squares, hero foreground `--hero-text-x/y` (text positioning inside the hero panel). Credits is not a panel either, but every Credits page keeps an invisible `.content-panel` floor so the footer cannot start above the usual panel bottom. A longer list pushes the footer further down.
 
 ### Deliberate per-route differences
 

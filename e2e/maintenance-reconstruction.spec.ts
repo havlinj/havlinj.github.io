@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { readCreditsFloor } from './helpers';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,
   RECONSTRUCTION_RETURN_LINE,
@@ -64,6 +65,27 @@ test.describe('maintenance reconstruction fixture', () => {
     await expect(page.locator('footer .site-footer__credits')).toBeVisible();
     await expect(page.locator('.site-header--reserved')).toBeAttached();
     await expect(page.locator('.site-header--reserved')).toBeHidden();
+    const reservedTitle = page.locator('.reconstruction-page__title');
+    await expect(reservedTitle).toBeAttached();
+    await expect(reservedTitle).toBeHidden();
+    const panelOffset = await page.evaluate(() => {
+      const title = document.querySelector('.reconstruction-page__title');
+      const panel = document.querySelector('.reconstruction-panel');
+      if (!(title instanceof HTMLElement) || !(panel instanceof HTMLElement)) {
+        return null;
+      }
+      const titleBox = title.getBoundingClientRect();
+      const panelBox = panel.getBoundingClientRect();
+      const rootFont = Number.parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+      return {
+        panelBelowTitle: panelBox.top - titleBox.bottom,
+        titleGap: 1.35 * rootFont,
+      };
+    });
+    expect(panelOffset).not.toBeNull();
+    expect(panelOffset!.panelBelowTitle).toBeCloseTo(panelOffset!.titleGap, 0);
 
     const placement = await page.evaluate(() => {
       const copy = document.querySelector('.reconstruction-panel__copy');
@@ -87,6 +109,13 @@ test.describe('maintenance reconstruction fixture', () => {
     ).toBeVisible();
     await expect(page.getByText('Anastasia Shuraeva')).toBeVisible();
     await expect(page.getByText('Frankie Cordoba')).toHaveCount(0);
+    const floor = await readCreditsFloor(page);
+    expect(floor).not.toBeNull();
+    expect(floor!.floorHeight).toBeCloseTo(floor!.queryWidth, 0);
+    expect(floor!.floorBelowWords).toBeCloseTo(floor!.titleGap, 0);
+    expect(floor!.footerPastFloor).toBeGreaterThanOrEqual(-1);
+    expect(floor!.footerPastFloor).toBeLessThan(2);
+
     await expect(page.locator('a.site-header__item')).toHaveCount(0);
     await expect(page.locator('.site-header--reserved')).toBeHidden();
     await page.locator('footer a.site-footer__home').click();
