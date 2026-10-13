@@ -12,8 +12,13 @@ test.describe('maintenance routes fixture', () => {
     await page.goto('/writing');
 
     await expect(page.locator('.site-header')).toBeVisible();
+    await expect(page.locator('.site-header--reserved')).toHaveCount(0);
+    await expect(page.locator('footer a.site-footer__home')).toBeVisible();
+    await expect(page.locator('.site-footer__home--reserved')).toHaveCount(0);
     await expectNavActive(page, 'Writing');
     await expect(page.getByRole('heading', { name: 'Whoops' })).toBeVisible();
+    await expect(page.getByText('Let the painters paint…')).toHaveCount(0);
+    await expect(page.locator('.reconstruction-panel')).toHaveCount(0);
 
     const panel = page.locator('.route-maintenance-panel');
     await expect(panel).toBeVisible();
@@ -351,6 +356,35 @@ test.describe('maintenance routes fixture', () => {
     await page.goto('/contact/form');
     await expect(page.getByRole('heading', { name: 'Whoops' })).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Contact' })).toBeVisible();
+  });
+
+  test('home stays the hero and credits keeps both photo sections', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.locator('section.hero.hero--ready').waitFor({ timeout: 8000 });
+    await expect(
+      page.getByRole('heading', { name: 'Jan Havlín' }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Whoops' })).toHaveCount(0);
+    await expect(page.locator('a.site-header__item, .hero-header a')).not.toHaveCount(
+      0,
+    );
+
+    await page.goto('/credits');
+    await expect(page).toHaveURL(/\/credits$/);
+    await expect(
+      page.getByRole('heading', { name: 'Photos (Unsplash)', level: 3 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Photos (Pexels)', level: 3 }),
+    ).toBeVisible();
+    await expect(page.getByText('Frankie Cordoba')).toBeVisible();
+    await expect(page.getByText('Anastasia Shuraeva')).toBeVisible();
+    await expect(page.getByText('vackground.com')).toBeVisible();
+    await expect(page.locator('a.site-header__item')).toHaveCount(3);
+    await expect(page.locator('footer a.site-footer__home')).toBeVisible();
+    await expect(page.locator('.site-header--reserved')).toHaveCount(0);
   });
 
   test('unlisted profile route stays available', async ({ page }) => {

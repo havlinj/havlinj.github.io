@@ -56,6 +56,17 @@ describe('maintenance build integration', () => {
   it('emits Whoops route notice for listed paths and leaves others intact', () => {
     buildWithMaintenanceConfig(routesFixture);
 
+    const home = readDist('index.html');
+    expect(home).toContain('class="page-title">Jan Havlín');
+    expect(home).toContain('class="hero');
+    expect(home).not.toContain('Whoops');
+    expect(home).not.toContain('Let the mechanics work…');
+    expect(home).not.toContain('Let the painters paint…');
+    expect(home).not.toContain('site-header--reserved');
+    expect(home).not.toContain('site-footer__home--reserved');
+    expect(home).not.toContain('global-maintenance-page');
+    expect(home).not.toContain('reconstruction-panel');
+
     const writing = readDist('writing/index.html');
     expect(writing).toContain('Whoops');
     expect(writing).toContain('route-maintenance-page');
@@ -63,8 +74,14 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
     expect(writing).toContain('/writing');
     expect(writing).toContain('Let the mechanics work…');
-    expect(writing).toContain('site-header');
+    expect(writing).toContain('site-nav__link');
+    expect(writing).toContain('href="/" class="site-footer__link site-footer__home"');
     expect(writing).not.toContain('writing-category-picker');
+    expect(writing).not.toContain('site-header--reserved');
+    expect(writing).not.toContain('site-footer__home--reserved');
+    expect(writing).not.toContain('Let the painters paint…');
+    expect(writing).not.toContain('reconstruction-panel');
+    expect(writing).not.toContain('global-maintenance-page');
 
     const contactExact = readDist('contact/index.html');
     expect(contactExact).toContain('Whoops');
@@ -77,6 +94,19 @@ describe('maintenance build integration', () => {
     const profile = readDist('profile/index.html');
     expect(profile).not.toContain('route-maintenance-page');
     expect(profile).toContain('has-buttons-panel');
+
+    const credits = readDist('credits/index.html');
+    expect(credits).toContain('Photos (Unsplash)');
+    expect(credits).toContain('Photos (Pexels)');
+    expect(credits).toContain('Anastasia Shuraeva');
+    expect(credits).toContain('Frankie Cordoba');
+    expect(credits).toContain('credits-page__floor');
+    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).toContain('Hero image (homepage)');
+    expect(credits).not.toContain('>Photos</h3>');
+    expect(credits).not.toContain('site-header--reserved');
+    expect(credits).not.toContain('site-footer__home--reserved');
+    expect(credits).not.toMatch(/Redirecting|refresh/i);
   }, 120_000);
 
   it('emits global home notice and redirects other routes to /', () => {
@@ -97,20 +127,37 @@ describe('maintenance build integration', () => {
     expect(home).not.toContain('site-nav__link');
     expect(home).not.toContain('class="hero-header"');
     expect(home).not.toContain('class="page-title">Jan Havlín');
+    expect(home).not.toContain('Let the painters paint…');
+    expect(home).not.toContain('is getting a new look');
+    expect(home).not.toContain('reconstruction-panel');
+    expect(home).not.toContain('reconstruction-page__title');
+    expect(home).not.toContain('pexels-anastasia-shuraeva');
 
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);
     expect(profile).toContain('url=/');
 
+    const writing = readDist('writing/index.html');
+    expect(writing).toMatch(/Redirecting|refresh/i);
+    expect(writing).toContain('url=/');
+    expect(writing).not.toContain('route-maintenance-page');
+
     const credits = readDist('credits/index.html');
     expect(credits).toContain('Frankie Cordoba');
     expect(credits).toContain('Maintenance page background image');
+    expect(credits).toContain('>Photos</h3>');
+    expect(credits).toContain('credits-page__floor');
+    expect(credits).not.toContain('Photos (Unsplash)');
+    expect(credits).not.toContain('Photos (Pexels)');
     expect(credits).toContain('site-header--reserved');
     expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
     expect(credits).not.toContain('site-footer__home--reserved');
     expect(credits).not.toMatch(/<a[^>]*site-header__item/);
     expect(credits).not.toContain('Anastasia Shuraeva');
     expect(credits).not.toContain('vackground.com');
+    expect(credits).not.toContain('Hero image (homepage)');
+    expect(credits).not.toContain('Reconstruction page background image');
+    expect(credits).not.toMatch(/Redirecting|refresh/i);
   }, 120_000);
 
   it('emits the reconstruction panel on home and redirects other routes', () => {
@@ -124,9 +171,17 @@ describe('maintenance build integration', () => {
     expect(home).toContain('pexels-anastasia-shuraeva-5495064_dichrom_900');
     expect(home).toContain('site-footer__credits');
     expect(home).toContain('site-footer__home--reserved');
+    expect(home).toContain('reconstruction-page__title');
     expect(home).not.toMatch(/<a[^>]*site-footer__home/);
     expect(home).not.toContain('class="page-title">Jan Havlín');
     expect(home).not.toContain('>Profile</a>');
+    expect(home).not.toContain('Whoops');
+    expect(home).not.toContain('Let the mechanics work…');
+    expect(home).not.toContain('is under maintenance');
+    expect(home).not.toContain('global-maintenance-page');
+    expect(home).not.toContain('frankie-cordoba');
+    expect(home).not.toContain('site-nav__link');
+    expect(home).not.toContain('class="hero');
 
     const profile = readDist('profile/index.html');
     expect(profile).toMatch(/Redirecting|refresh/i);
@@ -135,11 +190,18 @@ describe('maintenance build integration', () => {
     const credits = readDist('credits/index.html');
     expect(credits).toContain('Anastasia Shuraeva');
     expect(credits).toContain('Reconstruction page background image');
+    expect(credits).toContain('>Photos</h3>');
+    expect(credits).toContain('credits-page__floor');
+    expect(credits).not.toContain('Photos (Unsplash)');
+    expect(credits).not.toContain('Photos (Pexels)');
     expect(credits).toContain('site-header--reserved');
     expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
     expect(credits).not.toContain('site-footer__home--reserved');
     expect(credits).not.toMatch(/<a[^>]*site-header__item/);
     expect(credits).not.toContain('Frankie Cordoba');
     expect(credits).not.toContain('vackground.com');
+    expect(credits).not.toContain('Hero image (homepage)');
+    expect(credits).not.toContain('Maintenance page background image');
+    expect(credits).not.toMatch(/Redirecting|refresh/i);
   }, 120_000);
 });

@@ -15,6 +15,11 @@ test.describe('maintenance global fixture', () => {
     await expect(
       page.getByText('Let the mechanics work…', { exact: true }),
     ).toBeVisible();
+    await expect(page.getByText('Let the painters paint…')).toHaveCount(0);
+    await expect(page.locator('.reconstruction-panel')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Jan Havlín' })).toHaveCount(
+      0,
+    );
     const placement = await page.evaluate(() => {
       const copy = document.querySelector('.route-maintenance-panel__copy');
       const panel = document.querySelector('.route-maintenance-panel');
@@ -90,6 +95,16 @@ test.describe('maintenance global fixture', () => {
     await expect(page.getByText('Frankie Cordoba')).toBeVisible();
     await expect(page.getByText('Anastasia Shuraeva')).toHaveCount(0);
     await expect(page.getByText('vackground.com')).toHaveCount(0);
+    await expect(page.getByText('Hero image (homepage)')).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: 'Photos', exact: true, level: 3 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Photos (Unsplash)', level: 3 }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: 'Photos (Pexels)', level: 3 }),
+    ).toHaveCount(0);
     const floor = await readCreditsFloor(page);
     expect(floor).not.toBeNull();
     expect(floor!.floorHeight).toBeCloseTo(floor!.queryWidth, 0);

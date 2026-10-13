@@ -32,6 +32,12 @@ test.describe('maintenance reconstruction fixture', () => {
     await expect(
       page.getByText(RECONSTRUCTION_RETURN_LINE, { exact: true }),
     ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Whoops' })).toHaveCount(0);
+    await expect(page.getByText('Let the mechanics work…')).toHaveCount(0);
+    await expect(page.locator('.route-maintenance-panel')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Jan Havlín' })).toHaveCount(
+      0,
+    );
     await expect(page.locator('footer a.site-footer__home')).toHaveCount(0);
     const reservedHome = page.locator('footer .site-footer__home--reserved');
     await expect(reservedHome).toBeAttached();
@@ -109,6 +115,13 @@ test.describe('maintenance reconstruction fixture', () => {
     ).toBeVisible();
     await expect(page.getByText('Anastasia Shuraeva')).toBeVisible();
     await expect(page.getByText('Frankie Cordoba')).toHaveCount(0);
+    await expect(page.getByText('Hero image (homepage)')).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: 'Photos', exact: true, level: 3 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Photos (Pexels)', level: 3 }),
+    ).toHaveCount(0);
     const floor = await readCreditsFloor(page);
     expect(floor).not.toBeNull();
     expect(floor!.floorHeight).toBeCloseTo(floor!.queryWidth, 0);

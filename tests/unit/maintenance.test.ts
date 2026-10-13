@@ -292,6 +292,15 @@ describe('gateNonHomeMaintenance', () => {
     });
   });
 
+  it('leaves /credits as a normal page during route maintenance', () => {
+    expect(
+      gateNonHomeMaintenance('/credits', { config: routesConfig, env: {} }),
+    ).toEqual({
+      redirectHome: false,
+      decision: { kind: 'none' },
+    });
+  });
+
   it('passes through route and none decisions', () => {
     expect(
       gateNonHomeMaintenance('/writing', { config: routesConfig, env: {} }),

@@ -493,8 +493,12 @@ test.describe('Credits page (/credits)', () => {
       page.getByRole('heading', { name: 'Photos (Unsplash)', level: 3 }),
     ).toBeVisible();
     await expect(
+      page.getByRole('heading', { name: 'Photos (Pexels)', level: 3 }),
+    ).toBeVisible();
+    await expect(
       page.getByRole('heading', { name: 'Videos', level: 3 }),
     ).toBeVisible();
+    await expect(page.getByText('Anastasia Shuraeva')).toBeVisible();
     await expect(page.getByText('vackground.com')).toBeVisible();
     await expect(page.getByText('Tommy')).toBeVisible();
     await expect(page.getByText('JieSuang Ng')).toBeVisible();

@@ -335,6 +335,20 @@ describe('layout contracts: unified content panel skeleton', () => {
     'src/styles/pages/maintenance.css',
   ];
 
+  it('shutdown credits use a plain Photos heading', () => {
+    const astro = readRepoFile('src/components/ShutdownCredits.astro');
+    expect(astro.match(/<h3>[^<]*<\/h3>/g)).toEqual([
+      '<h3>Photos</h3>',
+      '<h3>Photos</h3>',
+    ]);
+    expect(readRepoFile('src/content/pages/credits.md')).toContain(
+      '### Photos (Unsplash)',
+    );
+    expect(readRepoFile('src/content/pages/credits.md')).toContain(
+      '### Photos (Pexels)',
+    );
+  });
+
   it('credits reserves a content-panel floor without redefining the square', () => {
     const page = readRepoFile('src/pages/[slug].astro');
     const css = readRepoFile('src/styles/content-panel.css');
