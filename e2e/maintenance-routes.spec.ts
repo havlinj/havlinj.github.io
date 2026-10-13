@@ -367,9 +367,9 @@ test.describe('maintenance routes fixture', () => {
       page.getByRole('heading', { name: 'Jan Havlín' }),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Whoops' })).toHaveCount(0);
-    await expect(page.locator('a.site-header__item, .hero-header a')).not.toHaveCount(
-      0,
-    );
+    await expect(
+      page.locator('a.site-header__item, .hero-header a'),
+    ).not.toHaveCount(0);
 
     await page.goto('/credits');
     await expect(page).toHaveURL(/\/credits$/);

@@ -43,7 +43,9 @@
   display: grid;
 }
 
-article.credits-page.has-page-title-rule > h1.page-title + .credits-page__stack {
+article.credits-page.has-page-title-rule
+  > h1.page-title
+  + .credits-page__stack {
   /* The underline lives inside the title, one title-gap below the words.
      That line is the content panel's top edge, so the floor starts there. */
   margin-top: -1px;

@@ -28,7 +28,9 @@ const { activeSection, reserved = false } = Astro.props as {
               href={item.href}
               class={
                 'site-header__item site-nav__link' +
-                (activeSection === item.section ? ' site-nav__link--active' : '')
+                (activeSection === item.section
+                  ? ' site-nav__link--active'
+                  : '')
               }
             >
               {item.label}

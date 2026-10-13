@@ -85,27 +85,22 @@ if (maintenance.kind !== 'route') {
           .join(' ')}
       >
         <h1 class="page-title">{pageTitle}</h1>
-        {
-          isCredits ? (
-            <div class="credits-page__stack">
-              <div
-                class="content-panel credits-page__floor"
-                aria-hidden="true"
-              />
-              <div class="credits-page__copy">
-                {shutdownCreditsMode ? (
-                  <ShutdownCredits mode={shutdownCreditsMode} />
-                ) : (
-                  Content && <Content />
-                )}
-              </div>
+        {isCredits ? (
+          <div class="credits-page__stack">
+            <div class="content-panel credits-page__floor" aria-hidden="true" />
+            <div class="credits-page__copy">
+              {shutdownCreditsMode ? (
+                <ShutdownCredits mode={shutdownCreditsMode} />
+              ) : (
+                Content && <Content />
+              )}
             </div>
-          ) : isWhy ? (
-            <WhyContent />
-          ) : (
-            Content && <Content />
-          )
-        }
+          </div>
+        ) : isWhy ? (
+          <WhyContent />
+        ) : (
+          Content && <Content />
+        )}
       </article>
     </Layout>
   )

@@ -75,7 +75,9 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('/writing');
     expect(writing).toContain('Let the mechanics work…');
     expect(writing).toContain('site-nav__link');
-    expect(writing).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(writing).toContain(
+      'href="/" class="site-footer__link site-footer__home"',
+    );
     expect(writing).not.toContain('writing-category-picker');
     expect(writing).not.toContain('site-header--reserved');
     expect(writing).not.toContain('site-footer__home--reserved');
@@ -101,7 +103,9 @@ describe('maintenance build integration', () => {
     expect(credits).toContain('Anastasia Shuraeva');
     expect(credits).toContain('Frankie Cordoba');
     expect(credits).toContain('credits-page__floor');
-    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).toContain(
+      'href="/" class="site-footer__link site-footer__home"',
+    );
     expect(credits).toContain('Hero image (homepage)');
     expect(credits).not.toContain('>Photos</h3>');
     expect(credits).not.toContain('site-header--reserved');
@@ -150,7 +154,9 @@ describe('maintenance build integration', () => {
     expect(credits).not.toContain('Photos (Unsplash)');
     expect(credits).not.toContain('Photos (Pexels)');
     expect(credits).toContain('site-header--reserved');
-    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).toContain(
+      'href="/" class="site-footer__link site-footer__home"',
+    );
     expect(credits).not.toContain('site-footer__home--reserved');
     expect(credits).not.toMatch(/<a[^>]*site-header__item/);
     expect(credits).not.toContain('Anastasia Shuraeva');
@@ -195,7 +201,9 @@ describe('maintenance build integration', () => {
     expect(credits).not.toContain('Photos (Unsplash)');
     expect(credits).not.toContain('Photos (Pexels)');
     expect(credits).toContain('site-header--reserved');
-    expect(credits).toContain('href="/" class="site-footer__link site-footer__home"');
+    expect(credits).toContain(
+      'href="/" class="site-footer__link site-footer__home"',
+    );
     expect(credits).not.toContain('site-footer__home--reserved');
     expect(credits).not.toMatch(/<a[^>]*site-header__item/);
     expect(credits).not.toContain('Frankie Cordoba');

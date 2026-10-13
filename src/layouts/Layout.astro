@@ -55,9 +55,11 @@ const showSiteHeader = Boolean(activeSection || showHeader);
       )
     }
     <main class="content">
-      {showSiteHeader && (
-        <SiteHeader activeSection={activeSection} reserved={reserveHeader} />
-      )}
+      {
+        showSiteHeader && (
+          <SiteHeader activeSection={activeSection} reserved={reserveHeader} />
+        )
+      }
       <slot />
       {showFooter && <SiteFooter showHome={showFooterHome} />}
     </main>

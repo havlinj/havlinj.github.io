@@ -161,7 +161,8 @@ function applyDichromSnap(
   const current = readDichromSnap(img);
   if (Math.abs(next - current) < SNAP_EPSILON) return false;
   if (Math.abs(next - 1) < SNAP_EPSILON) img.style.removeProperty(SNAP_VAR);
-  else img.style.setProperty(SNAP_VAR, String(Math.round(next * 10000) / 10000));
+  else
+    img.style.setProperty(SNAP_VAR, String(Math.round(next * 10000) / 10000));
   return true;
 }
 
