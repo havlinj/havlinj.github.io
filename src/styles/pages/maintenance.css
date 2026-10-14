@@ -1,8 +1,7 @@
 /* Route + global maintenance surfaces — site tokens only (#111 / #e0f7fa, Inter). */
 
 .route-maintenance-page,
-.global-maintenance-page,
-.reconstruction-page {
+.global-maintenance-page {
   --panel-bg-pos-x: 50%;
   --panel-bg-pos-y: 50%;
   --panel-bg-layer-opacity: 1;
@@ -10,6 +9,19 @@
   --panel-bg-brightness: 1;
   --panel-bg-contrast: 1;
   --panel-bg-zoom: 1.23;
+  --panel-bg-nudge-x: 0;
+  --panel-bg-nudge-y: 0;
+  --panel-bg-rotate: 0deg;
+}
+
+.reconstruction-page {
+  --panel-bg-pos-x: 50%;
+  --panel-bg-pos-y: 50%;
+  --panel-bg-layer-opacity: 1;
+  --panel-bg-saturation: 1;
+  --panel-bg-brightness: 1;
+  --panel-bg-contrast: 1;
+  --panel-bg-zoom: 1.15;
   --panel-bg-nudge-x: 0;
   --panel-bg-nudge-y: 0;
   --panel-bg-rotate: 0deg;
@@ -182,6 +194,7 @@
 .reconstruction-page .page-buttons-panel.reconstruction-panel {
   background-color: var(--color-page-bg);
   --reconstruction-panel-edge: 320px;
+  container-type: inline-size;
 }
 
 .reconstruction-page .page-buttons-panel::before,
@@ -237,7 +250,7 @@
 }
 
 .reconstruction-panel__copy {
-  --reconstruction-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
+  --reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem);
   --reconstruction-headline-tracking: -0.03em;
   --reconstruction-headline-leading: 1.2;
   --reconstruction-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
@@ -251,7 +264,7 @@
   z-index: 1;
   box-sizing: border-box;
   width: max-content;
-  max-width: calc(100% - var(--panel-padding-left, 2rem));
+  max-width: 50%;
   min-width: 0;
   padding: var(--reconstruction-band-pad-y)
     var(--reconstruction-band-pad-x-right) var(--reconstruction-band-pad-y)

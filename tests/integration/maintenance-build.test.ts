@@ -174,7 +174,10 @@ describe('maintenance build integration', () => {
     expect(home).toContain('Let the painters paint…');
     expect(home).toContain('reconstruction-panel');
     expect(home).toContain('site-header--reserved');
-    expect(home).toContain('pexels-anastasia-shuraeva-5495064_dichrom_900');
+    expect(home).toContain(
+      'pexels-anastasia-shuraeva-5495064_dichrom_z115-1160',
+    );
+    expect(home).not.toContain('pexels-anastasia-shuraeva-5495064_dichrom_900');
     expect(home).toContain('site-footer__credits');
     expect(home).toContain('site-footer__home--reserved');
     expect(home).toContain('reconstruction-page__title');

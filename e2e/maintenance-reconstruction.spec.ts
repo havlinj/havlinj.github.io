@@ -108,6 +108,26 @@ test.describe('maintenance reconstruction fixture', () => {
     expect(placement!).toBeGreaterThan(0.28);
     expect(placement!).toBeLessThan(0.4);
 
+    await page.setViewportSize({ width: 390, height: 844 });
+    const mobileBand = await page.evaluate(() => {
+      const copy = document.querySelector('.reconstruction-panel__copy');
+      const panel = document.querySelector('.reconstruction-panel');
+      if (!(copy instanceof HTMLElement) || !(panel instanceof HTMLElement)) {
+        return null;
+      }
+      const copyBox = copy.getBoundingClientRect();
+      const panelBox = panel.getBoundingClientRect();
+      return copyBox.width / panelBox.width;
+    });
+    expect(mobileBand).not.toBeNull();
+    expect(mobileBand!).toBeLessThanOrEqual(0.5);
+
+    const candidates = await page
+      .locator('.reconstruction-panel img')
+      .getAttribute('data-dichrom-candidates');
+    expect(candidates).toContain('_z115-1160.png 1160w');
+    expect(candidates).not.toContain('_900.png');
+
     await page.locator('footer .site-footer__credits').click();
     await expect(page).toHaveURL(/\/credits$/);
     await expect(

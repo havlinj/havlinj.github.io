@@ -28,8 +28,8 @@ export const DICHROM_INTRINSIC_WIDTHS = {
 } as const;
 
 /**
- * Hero and reconstruction add a 900 tier (bitmap 2142) between 720 and 1080
- * so a phone can land near 1:1 without changing the crop.
+ * Hero adds a 900 tier (bitmap 2142) between 720 and 1080 so a phone can
+ * land near 1:1 without changing the crop.
  */
 export const DICHROM_HERO_INTRINSIC_WIDTHS = {
   w720: 1800,
@@ -54,6 +54,16 @@ export interface DichromSource {
 
 export type DichromResponsiveSet = Record<DichromTier, DichromSource>;
 export type DichromHeroResponsiveSet = Record<DichromHeroTier, DichromSource>;
+
+/**
+ * 1:1 phone extra for reconstruction `--panel-bg-zoom: 1.15`.
+ * Not a global ladder rung; do not generate this suffix for other photos.
+ */
+export const RECONSTRUCTION_Z115_1160_WIDTH = 1160;
+
+export type DichromReconstructionResponsiveSet = DichromResponsiveSet & {
+  z115: DichromSource;
+};
 
 /**
  * Smaller Bayer tiles. Filename suffix is intended display CSS px; `w` is the
@@ -111,7 +121,7 @@ export function buildDichromResponsive(
   };
 }
 
-/** Stems that include the 900 mid-tier (hero, reconstruction). */
+/** Stems that include the 900 mid-tier (hero only). */
 export function buildDichromHeroResponsive(
   stem: string,
 ): DichromHeroResponsiveSet {
@@ -139,6 +149,18 @@ export function buildDichromHeroResponsive(
     w2400: {
       href: `${stem}_2400.png`,
       w: DICHROM_HERO_INTRINSIC_WIDTHS.w2400,
+    },
+  };
+}
+
+export function buildDichromReconstructionResponsive(
+  stem: string,
+): DichromReconstructionResponsiveSet {
+  return {
+    ...buildDichromResponsive(stem),
+    z115: {
+      href: `${stem}_z115-1160.png`,
+      w: RECONSTRUCTION_Z115_1160_WIDTH,
     },
   };
 }

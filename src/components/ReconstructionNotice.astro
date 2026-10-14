@@ -1,6 +1,6 @@
 ---
 import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
-import { buildDichromHeroResponsive } from '../constants/dichrom-responsive';
+import { buildDichromReconstructionResponsive } from '../constants/dichrom-responsive';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,
   RECONSTRUCTION_PANEL_BG_STEM,
@@ -9,7 +9,7 @@ import {
 import { LAYOUT_NAV_ITEMS } from '../layouts/layout-nav';
 import '../styles/pages/maintenance.css';
 
-const reconstructionBg = buildDichromHeroResponsive(
+const reconstructionBg = buildDichromReconstructionResponsive(
   RECONSTRUCTION_PANEL_BG_STEM,
 );
 ---

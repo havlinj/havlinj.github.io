@@ -721,6 +721,44 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(cssCustomProp(css, '--panel-bg-rotate')).toBe(
       MAINTENANCE_PANEL_BG.rotate,
     );
+    expect(css).not.toMatch(
+      /\.route-maintenance-page,\s*\.global-maintenance-page,\s*\.reconstruction-page/,
+    );
+  });
+
+  it('reconstruction.css panel-bg knobs match RECONSTRUCTION_PANEL_BG', async () => {
+    const { RECONSTRUCTION_PANEL_BG } =
+      await import('../../src/constants/maintenance-panel');
+    const css = readRepoFile('src/styles/pages/maintenance.css');
+    const block = css.match(/\.reconstruction-page\s*\{([^}]+)\}/)?.[1] ?? '';
+    expect(block).toContain(
+      `--panel-bg-pos-x: ${RECONSTRUCTION_PANEL_BG.posX}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-pos-y: ${RECONSTRUCTION_PANEL_BG.posY}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-layer-opacity: ${RECONSTRUCTION_PANEL_BG.layerOpacity}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-saturation: ${RECONSTRUCTION_PANEL_BG.saturation}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-brightness: ${RECONSTRUCTION_PANEL_BG.brightness}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-contrast: ${RECONSTRUCTION_PANEL_BG.contrast}`,
+    );
+    expect(block).toContain(`--panel-bg-zoom: ${RECONSTRUCTION_PANEL_BG.zoom}`);
+    expect(block).toContain(
+      `--panel-bg-nudge-x: ${RECONSTRUCTION_PANEL_BG.nudgeX}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-nudge-y: ${RECONSTRUCTION_PANEL_BG.nudgeY}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-rotate: ${RECONSTRUCTION_PANEL_BG.rotate}`,
+    );
   });
 
   it('RouteMaintenanceNotice wires dichrom media from MAINTENANCE_PANEL_BG_STEM', async () => {
@@ -789,10 +827,17 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(css).toMatch(
       /\.reconstruction-panel__copy\s*\{[^}]*top:\s*33\.333%/,
     );
+    expect(css).toMatch(
+      /\.reconstruction-panel__copy\s*\{[^}]*max-width:\s*50%/,
+    );
+    expect(css).toContain(
+      '--reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem)',
+    );
     expect(RECONSTRUCTION_PANEL_BG_STEM).toBe(
       '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom',
     );
-    expect(notice).toContain('buildDichromHeroResponsive');
+    expect(notice).toContain('buildDichromReconstructionResponsive');
+    expect(notice).not.toContain('buildDichromHeroResponsive');
     expect(readRepoFile('src/styles/site-header.css')).toMatch(
       /\.site-header--reserved\s*\{[^}]*visibility:\s*hidden/,
     );

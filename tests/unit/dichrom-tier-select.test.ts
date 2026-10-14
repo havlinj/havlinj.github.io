@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DICHROM_HERO_INTRINSIC_WIDTHS,
   DICHROM_INTRINSIC_WIDTHS,
+  RECONSTRUCTION_Z115_1160_WIDTH,
   DICHROM_TILE_INTRINSIC_WIDTHS,
 } from '../../src/constants/dichrom-responsive';
 import { dichromHeroEarlyInlineScript } from '../../src/utils/bundle-dichrom-hero-early';
@@ -34,6 +35,11 @@ const HERO_WIDTHS = [
   DICHROM_HERO_INTRINSIC_WIDTHS.w1440,
   DICHROM_HERO_INTRINSIC_WIDTHS.w1920,
   DICHROM_HERO_INTRINSIC_WIDTHS.w2400,
+] as const;
+
+const RECONSTRUCTION_WIDTHS = [
+  ...FULL_WIDTHS,
+  RECONSTRUCTION_Z115_1160_WIDTH,
 ] as const;
 
 const TILE_WIDTHS = [
@@ -128,6 +134,12 @@ describe('dichrom tier score', () => {
       devicePx: 1188,
       widths: FULL_WIDTHS,
       chosen: DICHROM_INTRINSIC_WIDTHS.w1080,
+    },
+    {
+      name: 'reconstruction phone at zoom 1.15 picks the z115 1:1 extra',
+      devicePx: 1181,
+      widths: RECONSTRUCTION_WIDTHS,
+      chosen: RECONSTRUCTION_Z115_1160_WIDTH,
     },
     {
       name: 'desktop full-frame panel',

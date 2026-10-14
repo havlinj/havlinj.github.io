@@ -5,9 +5,6 @@
 export const MAINTENANCE_PANEL_BG_STEM =
   '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom' as const;
 
-/**
- * Includes the 900 mid-tier, so the candidate list uses the hero width table.
- */
 export const RECONSTRUCTION_PANEL_BG_STEM =
   '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom' as const;
 
@@ -55,6 +52,20 @@ export const MAINTENANCE_PANEL_BG = {
   brightness: '1',
   contrast: '1',
   zoom: '1.23',
+  nudgeX: '0',
+  nudgeY: '0',
+  rotate: '0deg',
+} as const;
+
+/** Photo knobs on `.reconstruction-page` — independent of MAINTENANCE_PANEL_BG. */
+export const RECONSTRUCTION_PANEL_BG = {
+  posX: '50%',
+  posY: '50%',
+  layerOpacity: '1',
+  saturation: '1',
+  brightness: '1',
+  contrast: '1',
+  zoom: '1.15',
   nudgeX: '0',
   nudgeY: '0',
   rotate: '0deg',
