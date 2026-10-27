@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './pw-test';
 import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
 import {
   ZOOM_FREEZE_BASELINE_STORAGE_KEY,

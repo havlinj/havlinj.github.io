@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
 import { readContentPanelContainment } from './helpers';
 

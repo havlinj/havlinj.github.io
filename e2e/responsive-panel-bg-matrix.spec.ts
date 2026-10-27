@@ -3,7 +3,7 @@
  *
  *   PW_SERVER_MODE=preview npx playwright test e2e/responsive-panel-bg-matrix.spec.ts --project=desktop-chromium
  */
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './pw-test';
 import { HERO_BG_FILE_STEM } from '../src/constants/hero-layout';
 import { PROFILE_PANEL_BG_FILE_STEM } from '../src/constants/profile-layout';
 import { expectDichromTierMatchesPaint } from './helpers/responsive-panel-bg-matrix';

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './pw-test';
 
 test.describe('List marker geometry on mobile', () => {
   test('unordered marker remains square and visible on mobile viewport', async ({

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 import {
   ZOOM_FREEZE_BASELINE_STORAGE_KEY,
   ZOOM_FREEZE_GUARD_STATE_STORAGE_KEY,

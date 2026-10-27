@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './pw-test';
 
 test.describe('Content slug routes', () => {
   test('unknown markdown slug returns 404', async ({ page }) => {

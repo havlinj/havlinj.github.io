@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './pw-test';
 import { readCreditsFloor } from './helpers';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,

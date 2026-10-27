@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './pw-test';
 import {
   LAYOUT_TOLERANCE,
   WHY_CTA_ARROW_FLOOR_OPACITY,

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import { CONTACT_LAYOUT } from '../src/constants/contact-layout';
 import { ZOOM_FREEZE_BASELINE_STORAGE_KEY } from '../src/utils/zoom-guard-storage';

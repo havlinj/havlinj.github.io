@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './pw-test';
 import { CONTENT_PANEL_SELECTORS } from '../src/constants/content-panel';
 import { readContentPanelContainment } from './helpers';
 

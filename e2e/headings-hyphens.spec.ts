@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 
 /**
  * Body uses hyphens: auto; all h1–h6 must use hyphens: none (computed).

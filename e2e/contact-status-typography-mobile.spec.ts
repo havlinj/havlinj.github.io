@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test } from './pw-test';
 import { gotoContactForm } from './helpers/contact';
 import {
   expectContactStatusTypography,

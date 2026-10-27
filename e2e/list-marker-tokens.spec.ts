@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 
 /** Must match `special-typography.css` @media (max-width: 640px) for list marker tokens */
 const LIST_MARKER_BREAKPOINT_PX = 640;

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './pw-test';
 import {
   CONTACT_API_ERROR_RESETS_TURNSTILE,
   CONTACT_ERROR_CODES,

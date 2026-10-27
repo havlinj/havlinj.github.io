@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test } from './pw-test';
 import {
   PAGE_REVEAL_SELECTORS,
   PAGE_REVEAL_OPACITY_TRANSITION,

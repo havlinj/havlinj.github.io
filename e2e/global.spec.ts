@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './pw-test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import {
   LAYOUT_TOLERANCE,

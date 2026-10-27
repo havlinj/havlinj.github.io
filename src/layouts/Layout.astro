@@ -11,6 +11,7 @@ import ProfileAppendStyles from '../components/layout/ProfileAppendStyles.astro'
 import ProfileLayoutHead from '../components/layout/ProfileLayoutHead.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import SiteHeader from '../components/layout/SiteHeader.astro';
+import { UMAMI_SCRIPT_SRC, UMAMI_WEBSITE_ID } from '../constants/analytics';
 
 const {
   title,
@@ -47,6 +48,11 @@ const showSiteHeader = Boolean(activeSection || showHeader);
       )
     }
     <slot name="head" />
+    <script
+      is:inline
+      defer
+      src={UMAMI_SCRIPT_SRC}
+      data-website-id={UMAMI_WEBSITE_ID}></script>
   </head>
   <body>
     {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 import { selectWritingCategory } from './helpers';
 
 test.describe('Blog post pages (/blog/...)', () => {

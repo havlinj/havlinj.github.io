@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './pw-test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import {
   MAINTENANCE_PANEL_BG,

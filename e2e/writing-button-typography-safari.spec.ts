@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './pw-test';
 
 async function gotoWritingReady(page: import('@playwright/test').Page) {
   await page.goto('/writing', { waitUntil: 'domcontentloaded' });

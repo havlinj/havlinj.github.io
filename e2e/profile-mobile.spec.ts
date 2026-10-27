@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './pw-test';
 import { RGB_INK } from '../src/constants/colors';
 import {
   REVEAL_RIGHT_MARGIN_FIT_EPSILON_PX,

@@ -1,5 +1,4 @@
-import { test, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import { test, expect, type Page } from './pw-test';
 import { LAYOUT_TOLERANCE } from './constants';
 import { HERO_TAGLINE_SELECTORS } from '../src/constants/hero-tagline';
 import { HERO_BG_FILE_STEM, HERO_BG_STEM } from '../src/constants/hero-layout';
