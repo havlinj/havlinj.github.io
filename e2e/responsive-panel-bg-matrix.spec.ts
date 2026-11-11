@@ -41,30 +41,6 @@ const CASES: SyncCase[] = [
     },
   },
   {
-    suiteTitle: 'Contact panel',
-    path: '/contact',
-    imgSelector: '.contact-page .page-buttons-panel__media img',
-    waitForReady: async (page) => {
-      await expect
-        .poll(
-          () =>
-            page.evaluate(() => {
-              const el = document.querySelector(
-                '.contact-page .contact-page__fit-content',
-              ) as HTMLElement | null;
-              if (!el) return false;
-              const cs = getComputedStyle(el);
-              return (
-                el.classList.contains('contact-page__fit-content--visible') &&
-                cs.opacity === '1'
-              );
-            }),
-          { timeout: 10_000 },
-        )
-        .toBe(true);
-    },
-  },
-  {
     suiteTitle: 'Profile panel',
     path: '/profile',
     imgSelector: '.profile-section__media img',

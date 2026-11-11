@@ -495,8 +495,11 @@ describe('layout contracts: unified content panel skeleton', () => {
       'scale(var(--dichrom-snap, 1))',
     );
     expect(sync).toContain('devicePxClearOfCoarseDecode');
-    expect(readRepoFile('src/components/ContactPageBody.astro')).toContain(
+    expect(readRepoFile('src/components/ContactPageBody.astro')).not.toContain(
       'ResponsiveDichromPicture',
+    );
+    expect(readRepoFile('src/components/ContactPageBody.astro')).toContain(
+      'CONTACT_PANEL_PHOTO_SRCSET',
     );
     expect(
       readRepoFile('src/components/RouteMaintenanceNotice.astro'),
@@ -585,6 +588,60 @@ describe('layout contracts: unified content panel skeleton', () => {
     expect(astro).toContain('.profile-section--loading');
     expect(astro).not.toContain('height: 100cqw');
     expect(astro).not.toContain('margin-top');
+  });
+});
+
+describe('layout contracts: contact panel photo (constants ↔ ContactPageBody)', () => {
+  it('wires full-color WebP tiers and keeps CSS panel-bg knobs aligned', async () => {
+    const {
+      CONTACT_PANEL_BG,
+      CONTACT_PANEL_PHOTO,
+      CONTACT_PANEL_PHOTO_SIZES,
+      CONTACT_PANEL_PHOTO_SRCSET,
+      CONTACT_PANEL_PHOTO_WIDTHS,
+    } = await import('../../src/constants/contact-layout');
+    const body = readRepoFile('src/components/ContactPageBody.astro');
+    const css = readRepoFile('src/styles/pages/contact.css');
+    const block = css.match(/\.contact-page\s*\{([^}]+)\}/)?.[1] ?? '';
+
+    expect(body).toContain('CONTACT_PANEL_PHOTO');
+    expect(body).toContain('CONTACT_PANEL_PHOTO_SRCSET');
+    expect(body).toContain('CONTACT_PANEL_PHOTO_SIZES');
+    expect(body).toContain('PanelFilmGrain');
+    expect(body).toContain('contact-panel-grain');
+    expect(body).not.toContain('dichrom');
+    expect(block).toContain(`--panel-bg-zoom: ${CONTACT_PANEL_BG.zoom}`);
+    expect(block).toContain(
+      `--panel-bg-saturation: ${CONTACT_PANEL_BG.saturation}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-brightness: ${CONTACT_PANEL_BG.brightness}`,
+    );
+    expect(block).toContain(
+      `--panel-bg-contrast: ${CONTACT_PANEL_BG.contrast}`,
+    );
+    expect(block).toContain(`--panel-bg-nudge-x: ${CONTACT_PANEL_BG.nudgeX}`);
+    expect(block).toContain(`--panel-bg-nudge-y: ${CONTACT_PANEL_BG.nudgeY}`);
+    expect(block).toContain(`--panel-bg-rotate: ${CONTACT_PANEL_BG.rotate}`);
+    expect(block).toContain('--panel-film-grain-opacity: 0.42');
+    expect(CONTACT_PANEL_PHOTO_SIZES).toContain(`* ${CONTACT_PANEL_BG.zoom}`);
+    expect(CONTACT_PANEL_PHOTO_SIZES).toContain('707px');
+    expect(CONTACT_PANEL_PHOTO.src).toBe(
+      '/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash-1600.webp',
+    );
+    expect(CONTACT_PANEL_PHOTO_SRCSET).toBe(
+      '/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash-960.webp 960w, /assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash-1600.webp 1600w, /assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash-2400.webp 2400w',
+    );
+    for (const width of CONTACT_PANEL_PHOTO_WIDTHS) {
+      const file = path.join(
+        repoRoot,
+        'public/assets/pages/contact',
+        `guillaume-didelet-ivuU1X9ULVk-unsplash-${width}.webp`,
+      );
+      const size = readLossyWebpSize(readFileSync(file));
+      expect(size.width, file).toBe(width);
+      expect(size.height / size.width, file).toBeCloseTo(3 / 2, 5);
+    }
   });
 });
 
@@ -866,12 +923,15 @@ describe('layout contracts: route maintenance panel look', () => {
       '--reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem)',
     );
     expect(css).toContain(`--panel-bg-zoom: ${RECONSTRUCTION_PANEL_BG.zoom}`);
-    expect(css).toContain('--reconstruction-grain-opacity: 0.42');
-    expect(css).toMatch(
-      /\.reconstruction-page\s+\.reconstruction-panel__grain\s*\{[^}]*mix-blend-mode/,
+    expect(css).toContain('--panel-film-grain-opacity: 0.42');
+    expect(notice).toContain('PanelFilmGrain');
+    expect(notice).toContain('reconstruction-panel-grain');
+    expect(readRepoFile('src/components/PanelFilmGrain.astro')).toContain(
+      'feTurbulence',
     );
-    expect(notice).toContain('reconstruction-panel__grain');
-    expect(notice).toContain('feTurbulence');
+    expect(readRepoFile('src/styles/page-buttons.css')).toContain(
+      '.panel-film-grain',
+    );
     expect(RECONSTRUCTION_PANEL_PHOTO_SIZES).toContain(
       `* ${RECONSTRUCTION_PANEL_BG.zoom}`,
     );

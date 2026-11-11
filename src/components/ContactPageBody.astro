@@ -1,12 +1,12 @@
 ---
-import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
-import { CONTACT_LAYOUT } from '../constants/contact-layout';
-import { buildDichromResponsive } from '../constants/dichrom-responsive';
+import PanelFilmGrain from './PanelFilmGrain.astro';
+import {
+  CONTACT_LAYOUT,
+  CONTACT_PANEL_PHOTO,
+  CONTACT_PANEL_PHOTO_SIZES,
+  CONTACT_PANEL_PHOTO_SRCSET,
+} from '../constants/contact-layout';
 import '../styles/pages/contact.css';
-
-const contactBg = buildDichromResponsive(
-  '/assets/pages/contact/guillaume-didelet-ivuU1X9ULVk-unsplash_rotated_slightly_dichrom',
-);
 
 const linksTopFallbackPct =
   (1 - CONTACT_LAYOUT.linksCenterFromBottomRatio) * 100;
@@ -23,12 +23,19 @@ const linksTopFallbackPct =
         class="page-buttons-panel__media contact-page__panel-media--pending"
         aria-hidden="true"
       >
-        <ResponsiveDichromPicture
-          sources={contactBg}
-          width={2880}
-          height={4332}
-          fetchpriority="high"
-        />
+        <picture>
+          <img
+            src={CONTACT_PANEL_PHOTO.src}
+            srcset={CONTACT_PANEL_PHOTO_SRCSET}
+            sizes={CONTACT_PANEL_PHOTO_SIZES}
+            width={CONTACT_PANEL_PHOTO.width}
+            height={CONTACT_PANEL_PHOTO.height}
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
+        <PanelFilmGrain filterId="contact-panel-grain" />
       </div>
       <div
         class="contact-page__fit-content contact-page__fit-content--pending"

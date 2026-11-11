@@ -1,4 +1,5 @@
 ---
+import PanelFilmGrain from './PanelFilmGrain.astro';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,
   RECONSTRUCTION_PANEL_PHOTO,
@@ -41,41 +42,7 @@ import '../styles/pages/maintenance.css';
             fetchpriority="high"
           />
         </picture>
-        <svg
-          class="reconstruction-panel__grain"
-          xmlns="http://www.w3.org/2000/svg"
-          width="100%"
-          height="100%"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <filter
-            id="reconstruction-panel-grain"
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            color-interpolation-filters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.9"
-              numOctaves="4"
-              stitchTiles="stitch"
-              result="noise"></feTurbulence>
-            <feColorMatrix in="noise" type="saturate" values="0" result="mono"
-            ></feColorMatrix>
-            <feComponentTransfer in="mono" result="grain">
-              <feFuncR type="linear" slope="2.4" intercept="-0.7"></feFuncR>
-              <feFuncG type="linear" slope="2.4" intercept="-0.7"></feFuncG>
-              <feFuncB type="linear" slope="2.4" intercept="-0.7"></feFuncB>
-            </feComponentTransfer>
-          </filter>
-          <rect
-            width="100%"
-            height="100%"
-            filter="url(#reconstruction-panel-grain)"></rect>
-        </svg>
+        <PanelFilmGrain filterId="reconstruction-panel-grain" />
       </div>
       <div class="reconstruction-panel__copy">
         <h1 class="reconstruction-panel__headline">

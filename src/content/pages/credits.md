@@ -35,7 +35,6 @@ All Unsplash media listed below are used according to the
 - **Contact page background image**
   - Author: [Guillaume Didelet](https://unsplash.com/@guillaumedidelet)
   - Source: [Unsplash](https://unsplash.com/photos/ivuU1X9ULVk)
-  - Edits: dichromatic treatment, noise
 
 - **Maintenance page background image**
   - Author: [Frankie Cordoba](https://unsplash.com/@noorvoux)

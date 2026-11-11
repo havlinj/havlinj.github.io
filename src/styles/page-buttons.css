@@ -80,6 +80,22 @@
   transform-origin: center;
 }
 
+/*
+ * Full-color panel film grain (inline SVG). Filters in CSS background data-URIs
+ * often never run; the same filter in the DOM does. Stays on the media frame,
+ * not the zoomed img.
+ */
+.panel-film-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: var(--panel-film-grain-opacity, 0.42);
+  mix-blend-mode: var(--panel-film-grain-blend-mode, soft-light);
+}
+
 /* Profile: grain overlay (clipped to panel) */
 .profile-section .page-buttons-panel::after {
   content: '';

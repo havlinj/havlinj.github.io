@@ -534,6 +534,16 @@ test.describe('Contact page (/contact)', () => {
     );
   });
 
+  test('panel photo uses full-color WebP srcset', async ({ page }) => {
+    const { CONTACT_PANEL_PHOTO_SIZES, CONTACT_PANEL_PHOTO_SRCSET } =
+      await import('../src/constants/contact-layout');
+    await page.goto('/contact');
+    const photo = page.locator('.contact-page .page-buttons-panel__media img');
+    await expect(photo).toHaveAttribute('srcset', CONTACT_PANEL_PHOTO_SRCSET);
+    await expect(photo).toHaveAttribute('sizes', CONTACT_PANEL_PHOTO_SIZES);
+    await expect(photo).not.toHaveAttribute('data-dichrom-candidates');
+  });
+
   test('shows navbar with active Contact', async ({ page }) => {
     await page.goto('/contact');
     await expect(page.locator('.site-header')).toBeVisible();
