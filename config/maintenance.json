@@ -32,5 +32,9 @@
  * - Comments in this file are allowed (JSONC-style).
  */
 {
-  "mode": "reconstruction"
+  "mode": "routes",
+  "routes": [
+      { "path": "/writing", "match": "prefix" },
+      { "path": "/profile", "match": "exact" }
+  ]
 }
