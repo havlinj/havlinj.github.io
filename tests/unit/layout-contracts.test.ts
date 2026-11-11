@@ -866,6 +866,12 @@ describe('layout contracts: route maintenance panel look', () => {
       '--reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem)',
     );
     expect(css).toContain(`--panel-bg-zoom: ${RECONSTRUCTION_PANEL_BG.zoom}`);
+    expect(css).toContain('--reconstruction-grain-opacity: 0.42');
+    expect(css).toMatch(
+      /\.reconstruction-page\s+\.reconstruction-panel__grain\s*\{[^}]*mix-blend-mode/,
+    );
+    expect(notice).toContain('reconstruction-panel__grain');
+    expect(notice).toContain('feTurbulence');
     expect(RECONSTRUCTION_PANEL_PHOTO_SIZES).toContain(
       `* ${RECONSTRUCTION_PANEL_BG.zoom}`,
     );
