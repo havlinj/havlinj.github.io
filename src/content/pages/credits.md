@@ -39,7 +39,6 @@ All Unsplash media listed below are used according to the
 - **Maintenance page background image**
   - Author: [Frankie Cordoba](https://unsplash.com/@noorvoux)
   - Source: [Unsplash](https://unsplash.com/photos/s8Y5e0DNiro)
-  - Edits: dichromatic treatment, noise
 
 ### Photos (Pexels)
 

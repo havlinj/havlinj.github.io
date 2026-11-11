@@ -1,6 +1,9 @@
 import { expect, test } from './pw-test';
 import { readCreditsFloor } from './helpers';
-import { MAINTENANCE_PANEL_BG_STEM } from '../src/constants/maintenance-panel';
+import {
+  MAINTENANCE_PANEL_PHOTO_SIZES,
+  MAINTENANCE_PANEL_PHOTO_SRCSET,
+} from '../src/constants/maintenance-panel';
 
 test.describe('maintenance global fixture', () => {
   test('home shows website maintenance and profile redirects home', async ({
@@ -85,7 +88,21 @@ test.describe('maintenance global fixture', () => {
       const img = el as HTMLImageElement;
       return img.currentSrc || img.getAttribute('src') || '';
     });
-    expect(src).toContain(MAINTENANCE_PANEL_BG_STEM);
+    expect(src).toMatch(
+      /frankie-cordoba-s8Y5e0DNiro-unsplash-\d+\.webp/,
+    );
+    await expect(mediaImg).toHaveAttribute(
+      'srcset',
+      MAINTENANCE_PANEL_PHOTO_SRCSET,
+    );
+    await expect(mediaImg).toHaveAttribute(
+      'sizes',
+      MAINTENANCE_PANEL_PHOTO_SIZES,
+    );
+    await expect(mediaImg).not.toHaveAttribute('data-dichrom-candidates');
+    await expect(
+      page.locator('.global-maintenance-page .panel-film-grain'),
+    ).toBeAttached();
 
     await page.locator('footer .site-footer__credits').click();
     await expect(page).toHaveURL(/\/credits$/);

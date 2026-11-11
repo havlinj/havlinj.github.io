@@ -503,7 +503,10 @@ describe('layout contracts: unified content panel skeleton', () => {
     );
     expect(
       readRepoFile('src/components/RouteMaintenanceNotice.astro'),
-    ).toContain('ResponsiveDichromPicture');
+    ).not.toContain('ResponsiveDichromPicture');
+    expect(
+      readRepoFile('src/components/RouteMaintenanceNotice.astro'),
+    ).toContain('MAINTENANCE_PANEL_PHOTO_SRCSET');
     expect(readRepoFile('src/components/WritingPageBody.astro')).toContain(
       'ResponsiveDichromPicture',
     );
@@ -842,26 +845,59 @@ describe('layout contracts: route maintenance panel look', () => {
     );
   });
 
-  it('RouteMaintenanceNotice wires dichrom media from MAINTENANCE_PANEL_BG_STEM', async () => {
-    const { MAINTENANCE_PANEL_BG_STEM } =
-      await import('../../src/constants/maintenance-panel');
+  it('RouteMaintenanceNotice wires full-color WebP media and shared grain', async () => {
+    const {
+      MAINTENANCE_PANEL_BG,
+      MAINTENANCE_PANEL_PHOTO,
+      MAINTENANCE_PANEL_PHOTO_SIZES,
+      MAINTENANCE_PANEL_PHOTO_SRCSET,
+      MAINTENANCE_PANEL_PHOTO_WIDTHS,
+    } = await import('../../src/constants/maintenance-panel');
     const astro = readRepoFile('src/components/RouteMaintenanceNotice.astro');
-    expect(astro).toContain('MAINTENANCE_PANEL_BG_STEM');
     const globalNotice = readRepoFile(
       'src/components/GlobalMaintenanceNotice.astro',
     );
-    expect(globalNotice).toContain('MAINTENANCE_PANEL_BG_STEM');
+    const css = readRepoFile('src/styles/pages/maintenance.css');
+    const block =
+      css.match(
+        /\.route-maintenance-page,\s*\.global-maintenance-page\s*\{([^}]+)\}/,
+      )?.[1] ?? '';
+
+    expect(astro).toContain('MAINTENANCE_PANEL_PHOTO');
+    expect(astro).toContain('MAINTENANCE_PANEL_PHOTO_SRCSET');
+    expect(astro).toContain('MAINTENANCE_PANEL_PHOTO_SIZES');
+    expect(astro).toContain('PanelFilmGrain');
+    expect(astro).toContain('route-maintenance-panel-grain');
+    expect(astro).not.toContain('dichrom');
+    expect(globalNotice).toContain('MAINTENANCE_PANEL_PHOTO_SRCSET');
+    expect(globalNotice).toContain('PanelFilmGrain');
+    expect(globalNotice).toContain('global-maintenance-panel-grain');
     expect(globalNotice).toContain('site-header--reserved');
     expect(globalNotice).toContain('LAYOUT_NAV_ITEMS');
     expect(astro).toContain('page-buttons-panel__media');
     expect(astro).toContain('route-maintenance-panel__media--pending');
     expect(astro).toContain('maintenance-panel-edge.ts');
-    expect(astro).toContain('ResponsiveDichromPicture');
-    expect(
-      readRepoFile('src/components/ResponsiveDichromPicture.astro'),
-    ).toContain('data-dichrom-candidates');
-    expect(MAINTENANCE_PANEL_BG_STEM).toContain('/assets/pages/maintenance/');
-    expect(MAINTENANCE_PANEL_BG_STEM).toMatch(/_dichrom$/);
+    expect(block).toContain(`--panel-bg-zoom: ${MAINTENANCE_PANEL_BG.zoom}`);
+    expect(block).toContain('--panel-film-grain-opacity: 0.42');
+    expect(MAINTENANCE_PANEL_PHOTO_SIZES).toContain(
+      `* ${MAINTENANCE_PANEL_BG.zoom}`,
+    );
+    expect(MAINTENANCE_PANEL_PHOTO.src).toBe(
+      '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash-1600.webp',
+    );
+    expect(MAINTENANCE_PANEL_PHOTO_SRCSET).toBe(
+      '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash-960.webp 960w, /assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash-1600.webp 1600w, /assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash-2400.webp 2400w',
+    );
+    for (const width of MAINTENANCE_PANEL_PHOTO_WIDTHS) {
+      const file = path.join(
+        repoRoot,
+        'public/assets/pages/maintenance',
+        `frankie-cordoba-s8Y5e0DNiro-unsplash-${width}.webp`,
+      );
+      const size = readLossyWebpSize(readFileSync(file));
+      expect(size.width, file).toBe(width);
+      expect(size.width / size.height, file).toBeCloseTo(3 / 2, 2);
+    }
   });
 
   it('maintenance.css uses contact-style zoom/nudge img wiring', () => {

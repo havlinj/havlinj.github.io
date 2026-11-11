@@ -1,14 +1,14 @@
 ---
-import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
-import { buildDichromResponsive } from '../constants/dichrom-responsive';
+import PanelFilmGrain from './PanelFilmGrain.astro';
 import {
-  MAINTENANCE_PANEL_BG_STEM,
+  MAINTENANCE_PANEL_PHOTO,
+  MAINTENANCE_PANEL_PHOTO_SIZES,
+  MAINTENANCE_PANEL_PHOTO_SRCSET,
   MAINTENANCE_RETURN_LINE,
 } from '../constants/maintenance-panel';
 import { LAYOUT_NAV_ITEMS } from '../layouts/layout-nav';
 import '../styles/pages/maintenance.css';
 
-const maintenanceBg = buildDichromResponsive(MAINTENANCE_PANEL_BG_STEM);
 const headlineTail = 'is under maintenance';
 ---
 
@@ -29,12 +29,19 @@ const headlineTail = 'is under maintenance';
         class="page-buttons-panel__media route-maintenance-panel__media--pending"
         aria-hidden="true"
       >
-        <ResponsiveDichromPicture
-          sources={maintenanceBg}
-          width={2880}
-          height={1920}
-          fetchpriority="high"
-        />
+        <picture>
+          <img
+            src={MAINTENANCE_PANEL_PHOTO.src}
+            srcset={MAINTENANCE_PANEL_PHOTO_SRCSET}
+            sizes={MAINTENANCE_PANEL_PHOTO_SIZES}
+            width={MAINTENANCE_PANEL_PHOTO.width}
+            height={MAINTENANCE_PANEL_PHOTO.height}
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
+        <PanelFilmGrain filterId="global-maintenance-panel-grain" />
       </div>
       <div class="route-maintenance-panel__copy">
         <p class="route-maintenance-panel__headline">

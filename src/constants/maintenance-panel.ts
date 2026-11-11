@@ -2,8 +2,22 @@
  * Route-maintenance content panel look — CSS on `.route-maintenance-page`
  * must stay aligned (see layout-contracts + maintenance e2e).
  */
-export const MAINTENANCE_PANEL_BG_STEM =
-  '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom' as const;
+const MAINTENANCE_PANEL_PHOTO_STEM =
+  '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash' as const;
+
+/** Filename number is the file's real width. The `src` is the middle tier. */
+export const MAINTENANCE_PANEL_PHOTO_WIDTHS = [960, 1600, 2400] as const;
+
+export const MAINTENANCE_PANEL_PHOTO = {
+  src: `${MAINTENANCE_PANEL_PHOTO_STEM}-1600.webp`,
+  width: 1600,
+  height: 1067,
+} as const;
+
+export const MAINTENANCE_PANEL_PHOTO_SRCSET =
+  MAINTENANCE_PANEL_PHOTO_WIDTHS.map(
+    (width) => `${MAINTENANCE_PANEL_PHOTO_STEM}-${width}.webp ${width}w`,
+  ).join(', ');
 
 const RECONSTRUCTION_PANEL_PHOTO_STEM =
   '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064' as const;
@@ -90,6 +104,8 @@ export const RECONSTRUCTION_PANEL_BG = {
  * width times `--panel-bg-zoom`. `70ch` in a sizes attribute is 0.5em, not
  * Inter's "0", so the column cap is the measured 70ch (706.56px) rounded up.
  */
-const RECONSTRUCTION_COLUMN_WIDTH = '707px';
+const PANEL_COLUMN_WIDTH = '707px';
 
-export const RECONSTRUCTION_PANEL_PHOTO_SIZES = `(max-width: 430px) calc((100vw - 2 * clamp(1.15rem, 6vw, 2rem)) * ${RECONSTRUCTION_PANEL_BG.zoom}), calc((min(100vw, ${RECONSTRUCTION_COLUMN_WIDTH}) - 4rem) * ${RECONSTRUCTION_PANEL_BG.zoom})`;
+export const MAINTENANCE_PANEL_PHOTO_SIZES = `(max-width: 430px) calc((100vw - 2 * clamp(1.15rem, 6vw, 2rem)) * ${MAINTENANCE_PANEL_BG.zoom}), calc((min(100vw, ${PANEL_COLUMN_WIDTH}) - 4rem) * ${MAINTENANCE_PANEL_BG.zoom})`;
+
+export const RECONSTRUCTION_PANEL_PHOTO_SIZES = `(max-width: 430px) calc((100vw - 2 * clamp(1.15rem, 6vw, 2rem)) * ${RECONSTRUCTION_PANEL_BG.zoom}), calc((min(100vw, ${PANEL_COLUMN_WIDTH}) - 4rem) * ${RECONSTRUCTION_PANEL_BG.zoom})`;

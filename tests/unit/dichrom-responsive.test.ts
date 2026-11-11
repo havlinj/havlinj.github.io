@@ -46,7 +46,6 @@ describe('dichrom-responsive', () => {
 
   it('full-frame descriptors match the PNG pixel widths', () => {
     const files = [
-      'public/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom',
       'public/assets/pages/writing/weichao-deng-k0JQkPtfN3s-unsplash_dichrom',
       'public/assets/pages/profile/jiesuang-ng-WKL3Q906OR4-unsplash_dichrom',
     ];

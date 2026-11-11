@@ -2,7 +2,8 @@ import { expect, test } from './pw-test';
 import { RGB_INK, RGB_PAGE_BG } from '../src/constants/colors';
 import {
   MAINTENANCE_PANEL_BG,
-  MAINTENANCE_PANEL_BG_STEM,
+  MAINTENANCE_PANEL_PHOTO_SIZES,
+  MAINTENANCE_PANEL_PHOTO_SRCSET,
 } from '../src/constants/maintenance-panel';
 
 test.describe('maintenance routes fixture', () => {
@@ -243,7 +244,7 @@ test.describe('maintenance routes fixture', () => {
     expect(edgePx).toBeGreaterThan(320);
   });
 
-  test('writing panel locks dichrom media and panel-bg knobs', async ({
+  test('writing panel locks full-color media and panel-bg knobs', async ({
     page,
   }) => {
     await page.goto('/writing');
@@ -265,7 +266,21 @@ test.describe('maintenance routes fixture', () => {
       const img = el as HTMLImageElement;
       return img.currentSrc || img.getAttribute('src') || '';
     });
-    expect(src).toContain(MAINTENANCE_PANEL_BG_STEM);
+    expect(src).toMatch(
+      /frankie-cordoba-s8Y5e0DNiro-unsplash-\d+\.webp/,
+    );
+    await expect(mediaImg).toHaveAttribute(
+      'srcset',
+      MAINTENANCE_PANEL_PHOTO_SRCSET,
+    );
+    await expect(mediaImg).toHaveAttribute(
+      'sizes',
+      MAINTENANCE_PANEL_PHOTO_SIZES,
+    );
+    await expect(mediaImg).not.toHaveAttribute('data-dichrom-candidates');
+    await expect(
+      page.locator('.route-maintenance-page .panel-film-grain'),
+    ).toBeAttached();
 
     const knobs = await page.evaluate(() => {
       const pageEl = document.querySelector('.route-maintenance-page');

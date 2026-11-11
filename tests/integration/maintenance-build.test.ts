@@ -71,7 +71,18 @@ describe('maintenance build integration', () => {
     expect(writing).toContain('Whoops');
     expect(writing).toContain('route-maintenance-page');
     expect(writing).toContain('page-buttons-panel__media');
-    expect(writing).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
+    expect(writing).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-960.webp 960w',
+    );
+    expect(writing).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-1600.webp 1600w',
+    );
+    expect(writing).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-2400.webp 2400w',
+    );
+    expect(writing).not.toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom',
+    );
     expect(writing).toContain('/writing');
     expect(writing).toContain('Let the mechanics work…');
     expect(writing).toContain('site-nav__link');
@@ -122,7 +133,18 @@ describe('maintenance build integration', () => {
     expect(home).toContain('is under maintenance');
     expect(home).toContain('global-maintenance-page');
     expect(home).toContain('page-buttons-panel__media');
-    expect(home).toContain('frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom');
+    expect(home).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-960.webp 960w',
+    );
+    expect(home).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-1600.webp 1600w',
+    );
+    expect(home).toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash-2400.webp 2400w',
+    );
+    expect(home).not.toContain(
+      'frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom',
+    );
     expect(home).toContain('Let the mechanics work…');
     expect(home).toContain('site-footer__credits');
     expect(home).toContain('site-footer__home--reserved');

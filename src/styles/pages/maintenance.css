@@ -12,6 +12,8 @@
   --panel-bg-nudge-x: 0;
   --panel-bg-nudge-y: 0;
   --panel-bg-rotate: 0deg;
+  --panel-film-grain-opacity: 0.42;
+  --panel-film-grain-blend-mode: soft-light;
 }
 
 .reconstruction-page {
