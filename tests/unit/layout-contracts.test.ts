@@ -46,6 +46,30 @@ function readRepoFile(relPath: string): string {
   return readFileSync(path.join(repoRoot, relPath), 'utf8');
 }
 
+/** Pillow's lossy WebP: a VP8 chunk, width and height in the frame header. */
+function readLossyWebpSize(data: Buffer): { width: number; height: number } {
+  if (data.subarray(0, 4).toString() !== 'RIFF') {
+    throw new Error('not a RIFF file');
+  }
+  if (data.subarray(8, 12).toString() !== 'WEBP') {
+    throw new Error('not a WebP file');
+  }
+  let offset = 12;
+  while (offset + 8 <= data.length) {
+    const tag = data.subarray(offset, offset + 4).toString();
+    const size = data.readUInt32LE(offset + 4);
+    if (tag === 'VP8 ' && size >= 10) {
+      const frame = offset + 8;
+      return {
+        width: data.readUInt16LE(frame + 6) & 0x3fff,
+        height: data.readUInt16LE(frame + 8) & 0x3fff,
+      };
+    }
+    offset += 8 + size + (size & 1);
+  }
+  throw new Error('lossy WebP frame not found');
+}
+
 function cssRuleBody(css: string, selector: string): string {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const match = css.match(
@@ -808,8 +832,13 @@ describe('layout contracts: route maintenance panel look', () => {
   });
 
   it('reconstruction keeps a hidden nav line and a photo content panel', async () => {
-    const { RECONSTRUCTION_PANEL_BG_STEM } =
-      await import('../../src/constants/maintenance-panel');
+    const {
+      RECONSTRUCTION_PANEL_BG,
+      RECONSTRUCTION_PANEL_PHOTO,
+      RECONSTRUCTION_PANEL_PHOTO_SIZES,
+      RECONSTRUCTION_PANEL_PHOTO_SRCSET,
+      RECONSTRUCTION_PANEL_PHOTO_WIDTHS,
+    } = await import('../../src/constants/maintenance-panel');
     const notice = readRepoFile('src/components/ReconstructionNotice.astro');
     const css = readRepoFile('src/styles/pages/maintenance.css');
     const layout = readRepoFile('src/layouts/Layout.astro');
@@ -817,10 +846,13 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(notice).toContain('site-header--reserved');
     expect(notice).toContain('LAYOUT_NAV_ITEMS');
     expect(notice).toContain('reconstruction-panel content-panel');
-    expect(notice).toContain('RECONSTRUCTION_PANEL_BG_STEM');
+    expect(notice).toContain('RECONSTRUCTION_PANEL_PHOTO');
+    expect(notice).toContain('RECONSTRUCTION_PANEL_PHOTO_SRCSET');
+    expect(notice).toContain('RECONSTRUCTION_PANEL_PHOTO_SIZES');
     expect(notice).toContain('RECONSTRUCTION_HEADLINE_TAIL');
     expect(notice).toContain('RECONSTRUCTION_RETURN_LINE');
     expect(notice).toContain('reconstruction-page__title');
+    expect(notice).not.toContain('dichrom');
     expect(css).toMatch(
       /\.reconstruction-page__title\s*\{[^}]*visibility:\s*hidden/,
     );
@@ -833,11 +865,29 @@ describe('layout contracts: route maintenance panel look', () => {
     expect(css).toContain(
       '--reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem)',
     );
-    expect(RECONSTRUCTION_PANEL_BG_STEM).toBe(
-      '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom',
+    expect(css).toContain(`--panel-bg-zoom: ${RECONSTRUCTION_PANEL_BG.zoom}`);
+    expect(RECONSTRUCTION_PANEL_PHOTO_SIZES).toContain(
+      `* ${RECONSTRUCTION_PANEL_BG.zoom}`,
     );
-    expect(notice).toContain('buildDichromReconstructionResponsive');
-    expect(notice).not.toContain('buildDichromHeroResponsive');
+    expect(RECONSTRUCTION_PANEL_PHOTO_SIZES).toContain('707px');
+    expect(RECONSTRUCTION_PANEL_PHOTO_SIZES).not.toContain('70ch');
+    expect(RECONSTRUCTION_PANEL_PHOTO.src).toBe(
+      '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064-1600.webp',
+    );
+    expect(RECONSTRUCTION_PANEL_PHOTO_SRCSET).toBe(
+      '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064-960.webp 960w, /assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064-1600.webp 1600w, /assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064-2400.webp 2400w',
+    );
+    for (const width of RECONSTRUCTION_PANEL_PHOTO_WIDTHS) {
+      const file = path.join(
+        repoRoot,
+        'public/assets/pages/reconstruction',
+        `pexels-anastasia-shuraeva-5495064-${width}.webp`,
+      );
+      const size = readLossyWebpSize(readFileSync(file));
+      expect(size.width, file).toBe(width);
+      expect(size.height / size.width, file).toBeCloseTo(3 / 2, 5);
+    }
+    expect(notice).not.toContain('buildDichrom');
     expect(readRepoFile('src/styles/site-header.css')).toMatch(
       /\.site-header--reserved\s*\{[^}]*visibility:\s*hidden/,
     );

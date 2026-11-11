@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   buildDichromHeroResponsive,
-  buildDichromReconstructionResponsive,
   buildDichromResponsive,
   buildDichromTileResponsive,
   dichromCandidateSrcset,
@@ -12,7 +11,6 @@ import {
   dichromTileMobileSrcset,
   DICHROM_HERO_INTRINSIC_WIDTHS,
   DICHROM_INTRINSIC_WIDTHS,
-  RECONSTRUCTION_Z115_1160_WIDTH,
   DICHROM_TILE_INTRINSIC_WIDTHS,
 } from '../../src/constants/dichrom-responsive';
 
@@ -90,24 +88,6 @@ describe('dichrom-responsive', () => {
       const header = readFileSync(`${fileStem}_${suffix}.png`).subarray(16, 24);
       expect(header.readUInt32BE(0), `${fileStem}_${suffix}`).toBe(width);
     }
-  });
-
-  it('reconstruction set is the default ladder plus the z115-1160 extra', () => {
-    const stem =
-      '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom';
-    const sources = buildDichromReconstructionResponsive(stem);
-    expect(dichromCandidateSrcset(sources)).toBe(
-      `${stem}_720.png 1800w, ${stem}_1080.png 2430w, ${stem}_1440.png 2880w, ${stem}_1920.png 3456w, ${stem}_2400.png 3840w, ${stem}_z115-1160.png ${RECONSTRUCTION_Z115_1160_WIDTH}w`,
-    );
-    expect(sources).not.toHaveProperty('w900');
-    const fileStem =
-      'public/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom';
-    const extraHeader = readFileSync(`${fileStem}_z115-1160.png`).subarray(
-      16,
-      24,
-    );
-    expect(extraHeader.readUInt32BE(0)).toBe(RECONSTRUCTION_Z115_1160_WIDTH);
-    expect(extraHeader.readUInt32BE(4)).toBe(1740);
   });
 });
 

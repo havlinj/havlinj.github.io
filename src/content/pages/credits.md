@@ -50,7 +50,6 @@ All Pexels photos listed below are used according to the
 - **Reconstruction page background image**
   - Author: [Anastasia Shuraeva](https://www.pexels.com/@anastasia-shuraeva/)
   - Source: [Pexels](https://www.pexels.com/photo/paint-equipments-inside-the-home-5495064/)
-  - Edits: dichromatic treatment, noise
 
 ### Videos
 
