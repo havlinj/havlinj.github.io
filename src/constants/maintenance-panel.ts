@@ -5,8 +5,22 @@
 export const MAINTENANCE_PANEL_BG_STEM =
   '/assets/pages/maintenance/frankie-cordoba-s8Y5e0DNiro-unsplash_dichrom' as const;
 
-export const RECONSTRUCTION_PANEL_BG_STEM =
-  '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064_dichrom' as const;
+const RECONSTRUCTION_PANEL_PHOTO_STEM =
+  '/assets/pages/reconstruction/pexels-anastasia-shuraeva-5495064' as const;
+
+/** Filename number is the file's real width. The `src` is the middle tier. */
+export const RECONSTRUCTION_PANEL_PHOTO_WIDTHS = [960, 1600, 2400] as const;
+
+export const RECONSTRUCTION_PANEL_PHOTO = {
+  src: `${RECONSTRUCTION_PANEL_PHOTO_STEM}-1600.webp`,
+  width: 1600,
+  height: 2400,
+} as const;
+
+export const RECONSTRUCTION_PANEL_PHOTO_SRCSET =
+  RECONSTRUCTION_PANEL_PHOTO_WIDTHS.map(
+    (width) => `${RECONSTRUCTION_PANEL_PHOTO_STEM}-${width}.webp ${width}w`,
+  ).join(', ');
 
 export const MAINTENANCE_RETURN_LINE = 'Let the mechanics work…' as const;
 
@@ -70,3 +84,12 @@ export const RECONSTRUCTION_PANEL_BG = {
   nudgeY: '0',
   rotate: '0deg',
 } as const;
+
+/**
+ * Slot the browser uses to pick a file. The image box is the column content
+ * width times `--panel-bg-zoom`. `70ch` in a sizes attribute is 0.5em, not
+ * Inter's "0", so the column cap is the measured 70ch (706.56px) rounded up.
+ */
+const RECONSTRUCTION_COLUMN_WIDTH = '707px';
+
+export const RECONSTRUCTION_PANEL_PHOTO_SIZES = `(max-width: 430px) calc((100vw - 2 * clamp(1.15rem, 6vw, 2rem)) * ${RECONSTRUCTION_PANEL_BG.zoom}), calc((min(100vw, ${RECONSTRUCTION_COLUMN_WIDTH}) - 4rem) * ${RECONSTRUCTION_PANEL_BG.zoom})`;

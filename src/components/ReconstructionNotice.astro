@@ -1,17 +1,13 @@
 ---
-import ResponsiveDichromPicture from './ResponsiveDichromPicture.astro';
-import { buildDichromReconstructionResponsive } from '../constants/dichrom-responsive';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,
-  RECONSTRUCTION_PANEL_BG_STEM,
+  RECONSTRUCTION_PANEL_PHOTO,
+  RECONSTRUCTION_PANEL_PHOTO_SIZES,
+  RECONSTRUCTION_PANEL_PHOTO_SRCSET,
   RECONSTRUCTION_RETURN_LINE,
 } from '../constants/maintenance-panel';
 import { LAYOUT_NAV_ITEMS } from '../layouts/layout-nav';
 import '../styles/pages/maintenance.css';
-
-const reconstructionBg = buildDichromReconstructionResponsive(
-  RECONSTRUCTION_PANEL_BG_STEM,
-);
 ---
 
 <div class="site-header site-header--reserved" aria-hidden="true">
@@ -33,12 +29,18 @@ const reconstructionBg = buildDichromReconstructionResponsive(
         class="page-buttons-panel__media reconstruction-panel__media--pending"
         aria-hidden="true"
       >
-        <ResponsiveDichromPicture
-          sources={reconstructionBg}
-          width={2880}
-          height={4320}
-          fetchpriority="high"
-        />
+        <picture>
+          <img
+            src={RECONSTRUCTION_PANEL_PHOTO.src}
+            srcset={RECONSTRUCTION_PANEL_PHOTO_SRCSET}
+            sizes={RECONSTRUCTION_PANEL_PHOTO_SIZES}
+            width={RECONSTRUCTION_PANEL_PHOTO.width}
+            height={RECONSTRUCTION_PANEL_PHOTO.height}
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
       </div>
       <div class="reconstruction-panel__copy">
         <h1 class="reconstruction-panel__headline">

@@ -2,6 +2,8 @@ import { expect, test } from './pw-test';
 import { readCreditsFloor } from './helpers';
 import {
   RECONSTRUCTION_HEADLINE_TAIL,
+  RECONSTRUCTION_PANEL_PHOTO_SIZES,
+  RECONSTRUCTION_PANEL_PHOTO_SRCSET,
   RECONSTRUCTION_RETURN_LINE,
 } from '../src/constants/maintenance-panel';
 
@@ -122,11 +124,16 @@ test.describe('maintenance reconstruction fixture', () => {
     expect(mobileBand).not.toBeNull();
     expect(mobileBand!).toBeLessThanOrEqual(0.5);
 
-    const candidates = await page
-      .locator('.reconstruction-panel img')
-      .getAttribute('data-dichrom-candidates');
-    expect(candidates).toContain('_z115-1160.png 1160w');
-    expect(candidates).not.toContain('_900.png');
+    const photo = page.locator('.reconstruction-panel img');
+    await expect(photo).toHaveAttribute(
+      'srcset',
+      RECONSTRUCTION_PANEL_PHOTO_SRCSET,
+    );
+    await expect(photo).toHaveAttribute(
+      'sizes',
+      RECONSTRUCTION_PANEL_PHOTO_SIZES,
+    );
+    await expect(photo).not.toHaveAttribute('data-dichrom-candidates');
 
     await page.locator('footer .site-footer__credits').click();
     await expect(page).toHaveURL(/\/credits$/);
