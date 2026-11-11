@@ -297,7 +297,8 @@ a:hover {
   .profile-photo-box::after,
   .profile-image-tile::after,
   .profile-gif-tile::after,
-  .profile-section .page-buttons-panel::after {
+  .profile-section .page-buttons-panel::after,
+  .reconstruction-page .reconstruction-panel__grain {
     opacity: 0 !important;
     mix-blend-mode: normal !important;
   }
