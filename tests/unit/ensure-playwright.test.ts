@@ -86,4 +86,10 @@ describe('ensure-playwright gate', () => {
     );
     expect(workflow).toContain(`image: ${expectedImage}`);
   });
+
+  it('exposes --print-docker-image for local.sh / run-in-playwright-image.sh', () => {
+    expect(playwrightDockerImage('1.65.1')).toBe(
+      'mcr.microsoft.com/playwright:v1.65.1-noble',
+    );
+  });
 });

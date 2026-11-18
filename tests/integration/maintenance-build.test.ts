@@ -49,9 +49,10 @@ function readDist(pagePath: string): string {
 }
 
 describe('maintenance build integration', () => {
+  // Same budget as the build its — restoreDefaultDist runs a full `npm run build`.
   afterAll(() => {
     restoreDefaultDist();
-  });
+  }, 120_000);
 
   it('emits Whoops route notice for listed paths and leaves others intact', () => {
     buildWithMaintenanceConfig(routesFixture);

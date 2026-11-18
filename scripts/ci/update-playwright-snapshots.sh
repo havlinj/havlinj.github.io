@@ -26,25 +26,11 @@ export PW_SERVER_MODE="${PW_SERVER_MODE:-preview}"
 export MAINTENANCE_FORCE_OFF="${MAINTENANCE_FORCE_OFF:-1}"
 
 update_mobile_webkit_in_ci_image() {
-  local version image
-  version="$(node ./scripts/ci/ensure-playwright.mjs --print-lock-version)"
-  image="$(node -e "import { playwrightDockerImage } from './scripts/ci/ensure-playwright.mjs'; console.log(playwrightDockerImage(process.argv[1]))" "$version")"
-  if ! command -v docker >/dev/null 2>&1; then
-    echo "docker is required to refresh mobile-webkit snapshots (CI image: ${image})" >&2
-    exit 1
-  fi
-  echo "Updating mobile-webkit extreme-zoom snapshots inside ${image}..."
-  docker run --rm --ipc=host \
-    -u "$(id -u):$(id -g)" \
-    -v "${ROOT}:/work" -w /work \
-    -e HOME=/tmp \
-    -e npm_config_cache=/tmp/npm-cache \
-    -e PW_SERVER_MODE=preview \
-    -e PW_SKIP_BUILD=1 \
-    -e MAINTENANCE_FORCE_OFF=1 \
-    -e PLAYWRIGHT_SKIP_OS_DEPS=1 \
-    -e PLAYWRIGHT_FORCE_TTY=1 \
-    "$image" \
+  echo "Updating mobile-webkit extreme-zoom snapshots inside Playwright CI image..."
+  PW_SERVER_MODE=preview \
+    PW_SKIP_BUILD=1 \
+    MAINTENANCE_FORCE_OFF=1 \
+    bash "$ROOT/scripts/ci/run-in-playwright-image.sh" -- \
     npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts \
       --project=mobile-webkit \
       --update-snapshots

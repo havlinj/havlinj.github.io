@@ -108,7 +108,13 @@ for _ in $(seq 1 40); do
 done
 curl -fsS --max-time 2 "$HOME_URL" >/dev/null
 
-CHROME_PATH="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
+# Lighthouse 13+ has no --chrome-path; chrome-launcher reads CHROME_PATH from the env.
+export CHROME_PATH="${CHROME_PATH:-$(node -e "console.log(require('@playwright/test').chromium.executablePath())")}"
+if [[ ! -x "$CHROME_PATH" ]]; then
+  echo "Chrome binary missing or not executable: $CHROME_PATH" >&2
+  exit 1
+fi
+echo "Using Chrome for Lighthouse: $CHROME_PATH"
 
 evaluate_report() {
   node - "$@" <<'EOF'
@@ -163,7 +169,6 @@ run_lighthouse() {
       echo "Running Lighthouse against ${url}..."
     fi
     npx lighthouse "$url" \
-      --chrome-path="$CHROME_PATH" \
       --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
       --output=json \
       --output-path="$report" \

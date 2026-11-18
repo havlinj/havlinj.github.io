@@ -85,8 +85,9 @@ jobs:
         run: npm audit --audit-level=high
         working-directory: ${{ env.BUILD_PATH }}
       - name: Ensure Playwright matches lockfile and browsers
-        # Same entry as scripts/ci/local.sh. In this container install is a no-op check
-        # (no apt); bump image tag when upgrading @playwright/test.
+        # Same ensure entry as scripts/ci/local.sh (local runs this inside the same image
+        # via scripts/ci/run-in-playwright-image.sh). Install is a no-op check here (no apt);
+        # bump image tag when upgrading @playwright/test.
         run: bash ./scripts/ci/ensure-playwright.sh
         timeout-minutes: 5
         working-directory: ${{ env.BUILD_PATH }}

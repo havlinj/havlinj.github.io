@@ -118,6 +118,12 @@ function printLockVersion() {
   process.stdout.write(`${readLockfilePlaywrightVersion()}\n`);
 }
 
+function printDockerImage() {
+  process.stdout.write(
+    `${playwrightDockerImage(readLockfilePlaywrightVersion())}\n`,
+  );
+}
+
 export function ensurePlaywright() {
   const version = assertPlaywrightMatchesLockfile();
   console.log(`${PLAYWRIGHT_PACKAGE} ${version} matches package-lock.json`);
@@ -127,6 +133,10 @@ export function ensurePlaywright() {
 function main(argv = process.argv.slice(2)) {
   if (argv.includes('--print-lock-version')) {
     printLockVersion();
+    return;
+  }
+  if (argv.includes('--print-docker-image')) {
+    printDockerImage();
     return;
   }
   ensurePlaywright();
