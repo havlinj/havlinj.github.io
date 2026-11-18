@@ -143,6 +143,9 @@ async function main() {
   console.log('npm audit: no other blocking high or critical advisories');
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   main();
 }

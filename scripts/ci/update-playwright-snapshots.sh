@@ -3,13 +3,13 @@
 # separate "update only" mode without executing those tests.
 #
 # Usage:
-#   ./scripts/web/update-playwright-snapshots.sh
+#   ./scripts/ci/update-playwright-snapshots.sh
 #       → full screenshot set: hero, profile, Credits main, extreme-zoom (desktop chromium +
 #         mobile webkit), mobile Foundations reveal, maintenance Whoops panel,
 #         reconstruction panel;
 #         PW_SERVER_MODE=preview (matches CI / integration-tests.sh).
-#   ./scripts/web/update-playwright-snapshots.sh e2e/foo.spec.ts
-#   ./scripts/web/update-playwright-snapshots.sh --update-snapshots e2e/
+#   ./scripts/ci/update-playwright-snapshots.sh e2e/foo.spec.ts
+#   ./scripts/ci/update-playwright-snapshots.sh --update-snapshots e2e/
 #       → any extra args are passed to: playwright test --update-snapshots <args...>
 #
 # PW_SERVER_MODE defaults to preview so baselines match scripts/web/integration-tests.sh and CI

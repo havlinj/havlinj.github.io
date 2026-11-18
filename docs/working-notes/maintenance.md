@@ -69,4 +69,4 @@ MAINTENANCE_FORCE_OFF=1 npm run dev
 
 CI / Playwright / Lighthouse set `MAINTENANCE_FORCE_OFF=1` so the full site is always exercised. The Pages deploy build does **not** set that flag, so production respects `maintenance.json`.
 
-Maintenance coverage: unit (`tests/unit/maintenance.test.ts`), build HTML (`tests/integration/maintenance-build.test.ts`), browser (`e2e/maintenance-routes.spec.ts` / `e2e/maintenance-global.spec.ts` / `e2e/maintenance-reconstruction.spec.ts` via `playwright.maintenance.config.ts`). The reconstruction panel screenshot is refreshed by `scripts/web/update-playwright-snapshots.sh`.
+Maintenance coverage: unit (`tests/unit/maintenance.test.ts`), build HTML (`tests/integration/maintenance-build.test.ts`), browser (`e2e/maintenance-routes.spec.ts` / `e2e/maintenance-global.spec.ts` / `e2e/maintenance-reconstruction.spec.ts` via `playwright.maintenance.config.ts`). The reconstruction panel screenshot is refreshed by `scripts/ci/update-playwright-snapshots.sh`.

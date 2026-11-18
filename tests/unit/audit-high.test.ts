@@ -29,10 +29,7 @@ describe('picomatch audit exception', () => {
   });
 
   it('fails when the advisory drops out of npm audit', () => {
-    const result = evaluateAudit(
-      { vulnerabilities: {} },
-      openException,
-    );
+    const result = evaluateAudit({ vulnerabilities: {} }, openException);
     expect(result.ok).toBe(false);
     expect(result.blocking[0]).toContain('no longer reported');
     expect(result.blocking[0]).toContain('audit-high.mjs');
