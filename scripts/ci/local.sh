@@ -17,6 +17,10 @@ echo "=== npm audit ==="
 npm audit --audit-level=high
 
 echo ""
+echo "=== Playwright (lockfile + browsers) ==="
+bash "$ROOT_DIR/scripts/ci/ensure-playwright.sh"
+
+echo ""
 echo "=== Quality gate (all.sh, full Playwright) ==="
 # Force on the child argv — do not rely only on inherited export.
 PW_SKIP_EXTREME_ZOOM_VISUAL=0 bash "$ROOT_DIR/scripts/all.sh"

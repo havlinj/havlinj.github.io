@@ -74,16 +74,16 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
       - name: Resolve Playwright version
         id: playwright
-        run: echo "version=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node ./scripts/ci/ensure-playwright.mjs --print-lock-version)" >> "$GITHUB_OUTPUT"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
-      - name: Install Playwright browsers
-        # Cache hit still needs --with-deps for OS libraries on a fresh runner.
-        run: npx playwright install --with-deps chromium webkit
+      - name: Ensure Playwright matches lockfile and install browsers
+        # Same entry as scripts/ci/local.sh (ensure-playwright.sh → .mjs).
+        run: bash ./scripts/ci/ensure-playwright.sh
         timeout-minutes: 15
         working-directory: ${{ env.BUILD_PATH }}
       - name: Verify lint, format and test tooling
