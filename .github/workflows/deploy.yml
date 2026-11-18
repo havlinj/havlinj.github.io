@@ -20,7 +20,8 @@ env:
 jobs:
   contact-worker-semgrep:
     name: Contact worker Semgrep
-    runs-on: ubuntu-latest
+    # Pin 24.04: ubuntu-latest is 26.04, and Playwright < 1.61 has no browsers for it.
+    runs-on: ubuntu-24.04
     container:
       image: semgrep/semgrep
     steps:
@@ -31,7 +32,8 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    # Pin 24.04: ubuntu-latest is 26.04, and Playwright < 1.61 has no browsers for it.
+    runs-on: ubuntu-24.04
     needs: contact-worker-semgrep
     steps:
       - name: Checkout
@@ -119,7 +121,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Deploy
     steps:
       - name: Deploy to GitHub Pages
