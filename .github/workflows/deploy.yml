@@ -31,7 +31,10 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    # Pin 24.04: mobile WebKit snapshot baselines are captured on Ubuntu 24.04.
+    # ubuntu-latest (26.04) ships a different WebKit build and shifts panel height
+    # by ~1px, which fails extreme-zoom visual diffs.
+    runs-on: ubuntu-24.04
     # Keep well under GitHub's 6h default so a stuck install fails fast.
     timeout-minutes: 90
     needs: contact-worker-semgrep

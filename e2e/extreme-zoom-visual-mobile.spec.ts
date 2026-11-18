@@ -3,7 +3,7 @@ import { applyExtremeZoom } from './helpers';
 
 /*
  * PNG baselines must match CI: astro preview (PW_SERVER_MODE=preview), not dev.
- * Regenerate:
+ * Regenerate on Ubuntu 24.04 (same OS as the CI build job):
  *   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts --project=mobile-webkit --update-snapshots
  */
 test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
@@ -16,8 +16,8 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     test.skip(browserName !== 'webkit', 'Mobile-webkit baseline only.');
     await page.goto('/');
     await page.locator('section.hero.hero--ready').waitFor({ timeout: 15_000 });
-    await applyExtremeZoom(page);
-    await page.waitForTimeout(80);
+    await applyExtremeZoom(page, { attempts: 3 });
+    await page.waitForTimeout(200);
     await expect(page.locator('.hero')).toHaveScreenshot(
       'hero-mobile-webkit.png',
       {
@@ -36,8 +36,8 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
     await expect(
       page.locator('.writing-groups.writing-groups--visible'),
     ).toBeVisible();
-    await applyExtremeZoom(page);
-    await page.waitForTimeout(80);
+    await applyExtremeZoom(page, { attempts: 3 });
+    await page.waitForTimeout(200);
     await expect(
       page.locator('.writing-page .page-buttons-panel'),
     ).toHaveScreenshot('writing-mobile-webkit.png', {
@@ -69,8 +69,8 @@ test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visu
         { timeout: 6000 },
       )
       .toBe(true);
-    await applyExtremeZoom(page);
-    await page.waitForTimeout(80);
+    await applyExtremeZoom(page, { attempts: 3 });
+    await page.waitForTimeout(200);
     await expect(
       page.locator('.contact-page .page-buttons-panel'),
     ).toHaveScreenshot('contact-mobile-webkit.png', {
