@@ -20,8 +20,7 @@ env:
 jobs:
   contact-worker-semgrep:
     name: Contact worker Semgrep
-    # Pin 24.04: ubuntu-latest is 26.04, and Playwright < 1.61 has no browsers for it.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     container:
       image: semgrep/semgrep
     steps:
@@ -32,8 +31,9 @@ jobs:
 
   build:
     name: Build
-    # Pin 24.04: ubuntu-latest is 26.04, and Playwright < 1.61 has no browsers for it.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    # Keep well under GitHub's 6h default so a stuck install fails fast.
+    timeout-minutes: 90
     needs: contact-worker-semgrep
     steps:
       - name: Checkout
@@ -70,10 +70,21 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
       - name: Audit dependencies
-        run: bash ./scripts/ci/audit.sh
+        run: npm audit --audit-level=high
         working-directory: ${{ env.BUILD_PATH }}
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('playwright-core/package.json').version")" >> "$GITHUB_OUTPUT"
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright browsers
+        # Cache hit still needs --with-deps for OS libraries on a fresh runner.
         run: npx playwright install --with-deps chromium webkit
+        timeout-minutes: 15
         working-directory: ${{ env.BUILD_PATH }}
       - name: Verify lint, format and test tooling
         run: |
@@ -121,7 +132,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     name: Deploy
     steps:
       - name: Deploy to GitHub Pages

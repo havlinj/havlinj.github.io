@@ -48,7 +48,7 @@
     "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.11.1",
     "@eslint/eslintrc": "^3.3.7",
-    "@playwright/test": "^1.49.0",
+    "@playwright/test": "^1.65.1",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
     "esbuild": "^0.28.2",
