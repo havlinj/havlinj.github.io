@@ -821,7 +821,7 @@ describe('layout contracts: route maintenance panel look', () => {
     );
     expect(css).toMatch(/\.route-maintenance-panel__copy\s*\{[^}]*top:\s*50%/);
     expect(css).toMatch(
-      /\.route-maintenance-panel__copy::before\s*\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
+      /\.route-maintenance-panel__copy::before[\s\S]*?\{[\s\S]*?right:\s*-1px;[\s\S]*?background-color:\s*var\(--color-page-bg\)/,
     );
     expect(css).toMatch(
       /\.route-maintenance-panel__media--pending\s*\{[\s\S]*?opacity:\s*0;/,

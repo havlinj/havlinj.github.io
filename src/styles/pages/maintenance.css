@@ -101,13 +101,19 @@
   transform: rotate(var(--panel-bg-rotate, 0deg)) scale(var(--dichrom-snap, 1));
 }
 
+.route-maintenance-panel__copy,
+.reconstruction-panel__copy {
+  --panel-notice-headline-tracking: -0.03em;
+  --panel-notice-headline-leading: 1.14;
+  --panel-notice-headline-gap: 0.02em;
+  --panel-notice-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
+  --panel-notice-band-pad-x-left: clamp(0.7rem, 2.4cqi, 1.1rem);
+  --panel-notice-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
+  --panel-notice-info-gap: clamp(1.2rem, 3.8cqi, 1.55rem);
+}
+
 .route-maintenance-panel__copy {
-  --route-maintenance-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
-  --route-maintenance-headline-tracking: -0.03em;
-  --route-maintenance-headline-leading: 1.2;
-  --route-maintenance-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
-  --route-maintenance-band-pad-x-left: clamp(0.7rem, 2.4cqi, 1.1rem);
-  --route-maintenance-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
+  --panel-notice-headline-size: clamp(1.35rem, 4.2cqi, 1.85rem);
   position: absolute;
   top: 50%;
   right: -1px;
@@ -118,14 +124,14 @@
   width: max-content;
   max-width: calc(100% - var(--panel-padding-left, 2rem));
   min-width: 0;
-  padding: var(--route-maintenance-band-pad-y)
-    var(--route-maintenance-band-pad-x-right)
-    var(--route-maintenance-band-pad-y) var(--route-maintenance-band-pad-x-left);
+  padding: var(--panel-notice-band-pad-y) var(--panel-notice-band-pad-x-right)
+    var(--panel-notice-band-pad-y) var(--panel-notice-band-pad-x-left);
   background-color: transparent;
   text-align: left;
 }
 
-.route-maintenance-panel__copy::before {
+.route-maintenance-panel__copy::before,
+.reconstruction-panel__copy::before {
   content: '';
   position: absolute;
   top: -1px;
@@ -137,16 +143,17 @@
   pointer-events: none;
 }
 
-.route-maintenance-panel__headline {
+.route-maintenance-panel__headline,
+.reconstruction-panel__headline {
   margin: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.12em;
-  font-size: var(--route-maintenance-headline-size);
+  gap: var(--panel-notice-headline-gap);
+  font-size: var(--panel-notice-headline-size);
   font-weight: 600;
-  line-height: var(--route-maintenance-headline-leading);
-  letter-spacing: var(--route-maintenance-headline-tracking);
+  line-height: var(--panel-notice-headline-leading);
+  letter-spacing: var(--panel-notice-headline-tracking);
   color: var(--color-ink);
   hyphens: none;
   -webkit-hyphens: none;
@@ -155,7 +162,8 @@
   word-break: normal;
 }
 
-.route-maintenance-panel__headline-tail {
+.route-maintenance-panel__headline-tail,
+.reconstruction-panel__headline-tail {
   white-space: nowrap;
 }
 
@@ -164,12 +172,14 @@
   letter-spacing: -0.02em;
 }
 
-.route-maintenance-panel__info {
-  margin-top: clamp(1.45rem, 5.5cqi, 2.05rem);
+.route-maintenance-panel__info,
+.reconstruction-panel__info {
+  margin-top: var(--panel-notice-info-gap);
   max-width: 20rem;
 }
 
-.route-maintenance-panel__info p {
+.route-maintenance-panel__info p,
+.reconstruction-panel__info p {
   margin: 0;
   font-size: clamp(0.9375rem, 2.85cqi, 1rem);
   font-weight: 400;
@@ -181,7 +191,8 @@
   -webkit-hyphens: none;
 }
 
-.route-maintenance-panel__info p + p {
+.route-maintenance-panel__info p + p,
+.reconstruction-panel__info p + p {
   margin-top: 0.2em;
 }
 
@@ -268,11 +279,7 @@
 
 .reconstruction-panel__copy {
   --reconstruction-headline-size: clamp(1rem, 4.2cqi, 1.85rem);
-  --reconstruction-headline-tracking: -0.03em;
-  --reconstruction-headline-leading: 1.2;
-  --reconstruction-band-pad-y: clamp(1.15rem, 5.5cqi, 1.85rem);
-  --reconstruction-band-pad-x-left: clamp(0.7rem, 2.4cqi, 1.1rem);
-  --reconstruction-band-pad-x-right: clamp(1.1rem, 5.5cqi, 2rem);
+  --panel-notice-headline-size: var(--reconstruction-headline-size);
   position: absolute;
   top: 33.333%;
   right: -1px;
@@ -283,77 +290,17 @@
   width: max-content;
   max-width: 50%;
   min-width: 0;
-  padding: var(--reconstruction-band-pad-y)
-    var(--reconstruction-band-pad-x-right) var(--reconstruction-band-pad-y)
-    var(--reconstruction-band-pad-x-left);
+  padding: var(--panel-notice-band-pad-y) var(--panel-notice-band-pad-x-right)
+    var(--panel-notice-band-pad-y) var(--panel-notice-band-pad-x-left);
   background-color: transparent;
   text-align: left;
 }
 
-.reconstruction-panel__copy::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  bottom: -1px;
-  left: 0;
-  z-index: -1;
-  background-color: var(--color-page-bg);
-  pointer-events: none;
-}
-
-.reconstruction-panel__headline {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.12em;
-  font-size: var(--reconstruction-headline-size);
-  font-weight: 600;
-  line-height: var(--reconstruction-headline-leading);
-  letter-spacing: var(--reconstruction-headline-tracking);
-  color: var(--color-ink);
-  hyphens: none;
-  -webkit-hyphens: none;
-  -ms-hyphens: none;
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.reconstruction-panel__headline-tail {
-  white-space: nowrap;
-}
-
-.reconstruction-panel__info {
-  margin-top: clamp(1.45rem, 5.5cqi, 2.05rem);
-  max-width: 20rem;
-}
-
-.reconstruction-panel__info p {
-  margin: 0;
-  font-size: clamp(0.9375rem, 2.85cqi, 1rem);
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.005em;
-  color: rgba(17, 17, 17, 0.68);
-  -webkit-font-smoothing: antialiased;
-  hyphens: none;
-  -webkit-hyphens: none;
-}
-
-.reconstruction-panel__info p + p {
-  margin-top: 0.2em;
-}
-
 @media (max-width: 640px) {
-  .route-maintenance-panel__copy {
-    --route-maintenance-band-pad-y: clamp(1rem, 6vw, 1.45rem);
-    --route-maintenance-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
-  }
-
+  .route-maintenance-panel__copy,
   .reconstruction-panel__copy {
-    --reconstruction-band-pad-y: clamp(1rem, 6vw, 1.45rem);
-    --reconstruction-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
+    --panel-notice-band-pad-y: clamp(1rem, 6vw, 1.45rem);
+    --panel-notice-band-pad-x-right: clamp(0.9rem, 5vw, 1.5rem);
   }
 
   .route-maintenance-panel__info p,
