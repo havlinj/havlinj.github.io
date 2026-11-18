@@ -14,7 +14,7 @@ bash "$ROOT_DIR/scripts/contact_worker/semgrep.sh"
 
 echo ""
 echo "=== npm audit ==="
-npm audit --audit-level=high
+bash "$ROOT_DIR/scripts/ci/audit.sh"
 
 echo ""
 echo "=== Quality gate (all.sh, full Playwright) ==="
