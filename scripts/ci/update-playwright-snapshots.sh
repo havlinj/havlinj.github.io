@@ -14,13 +14,41 @@
 #
 # PW_SERVER_MODE defaults to preview so baselines match scripts/web/integration-tests.sh and CI
 # (playwright.config otherwise uses astro dev, which renders differently from build + preview).
+#
+# Mobile WebKit extreme-zoom baselines are refreshed inside the Playwright noble Docker image
+# (same as Actions). Host WebKit on Ubuntu 24.04 can differ by ~1px panel height.
 
-set -e
+set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export PLAYWRIGHT_FORCE_TTY=1
 export PW_SERVER_MODE="${PW_SERVER_MODE:-preview}"
 export MAINTENANCE_FORCE_OFF="${MAINTENANCE_FORCE_OFF:-1}"
+
+update_mobile_webkit_in_ci_image() {
+  local version image
+  version="$(node ./scripts/ci/ensure-playwright.mjs --print-lock-version)"
+  image="$(node -e "import { playwrightDockerImage } from './scripts/ci/ensure-playwright.mjs'; console.log(playwrightDockerImage(process.argv[1]))" "$version")"
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "docker is required to refresh mobile-webkit snapshots (CI image: ${image})" >&2
+    exit 1
+  fi
+  echo "Updating mobile-webkit extreme-zoom snapshots inside ${image}..."
+  docker run --rm --ipc=host \
+    -u "$(id -u):$(id -g)" \
+    -v "${ROOT}:/work" -w /work \
+    -e HOME=/tmp \
+    -e npm_config_cache=/tmp/npm-cache \
+    -e PW_SERVER_MODE=preview \
+    -e PW_SKIP_BUILD=1 \
+    -e MAINTENANCE_FORCE_OFF=1 \
+    -e PLAYWRIGHT_SKIP_OS_DEPS=1 \
+    -e PLAYWRIGHT_FORCE_TTY=1 \
+    "$image" \
+    npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts \
+      --project=mobile-webkit \
+      --update-snapshots
+}
 
 # Build once so each Playwright invocation below only spins up `astro preview`
 # (otherwise the webServer command rebuilds on every run and risks exceeding
@@ -48,9 +76,7 @@ else
     --project=mobile-chromium \
     --grep 'Foundations reveal visual snapshot on mobile' \
     --update-snapshots
-  npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts \
-    --project=mobile-webkit \
-    --update-snapshots
+  update_mobile_webkit_in_ci_image
 
   echo "Updating maintenance Whoops panel snapshot (isolated fixture build on :4322)..."
   unset PW_SKIP_BUILD || true
