@@ -1,10 +1,11 @@
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   PLAYWRIGHT_PACKAGE,
   buildPlaywrightInstallArgs,
+  playwrightDockerImage,
   playwrightLockMismatchMessage,
   readInstalledPlaywrightVersion,
   readLockfilePlaywrightVersion,
@@ -52,6 +53,12 @@ describe('ensure-playwright gate', () => {
     expect(shouldInstallOsDependencies({ PLAYWRIGHT_INSTALL_DEPS: '1' })).toBe(
       true,
     );
+    expect(
+      shouldInstallOsDependencies({
+        CI: 'true',
+        PLAYWRIGHT_SKIP_OS_DEPS: '1',
+      }),
+    ).toBe(false);
     expect(buildPlaywrightInstallArgs({})).toEqual([
       'playwright',
       'install',
@@ -65,5 +72,18 @@ describe('ensure-playwright gate', () => {
       'chromium',
       'webkit',
     ]);
+    expect(
+      buildPlaywrightInstallArgs({ CI: 'true', PLAYWRIGHT_SKIP_OS_DEPS: '1' }),
+    ).toEqual(['playwright', 'install', 'chromium', 'webkit']);
+  });
+
+  it('keeps the Actions Playwright image tag aligned with package-lock', () => {
+    const lockVersion = readLockfilePlaywrightVersion();
+    const expectedImage = playwrightDockerImage(lockVersion);
+    const workflow = readFileSync(
+      join(process.cwd(), '.github/workflows/deploy.yml'),
+      'utf8',
+    );
+    expect(workflow).toContain(`image: ${expectedImage}`);
   });
 });

@@ -31,13 +31,19 @@ jobs:
 
   build:
     name: Build
-    # Pin 24.04: mobile WebKit snapshot baselines are captured on Ubuntu 24.04.
-    # ubuntu-latest (26.04) ships a different WebKit build and shifts panel height
-    # by ~1px, which fails extreme-zoom visual diffs.
-    runs-on: ubuntu-24.04
+    # Host OS only pulls the container; WebKit/Chromium run inside Playwright noble
+    # (= Ubuntu 24.04), matching local snapshot baselines. Image tag must match
+    # package-lock @playwright/test (guarded by ensure-playwright unit test).
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001 --ipc=host
     # Keep well under GitHub's 6h default so a stuck install fails fast.
     timeout-minutes: 90
     needs: contact-worker-semgrep
+    env:
+      # Image already has OS libs + browsers — skip apt --with-deps (10–15+ min).
+      PLAYWRIGHT_SKIP_OS_DEPS: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,19 +81,11 @@ jobs:
       - name: Audit dependencies
         run: npm audit --audit-level=high
         working-directory: ${{ env.BUILD_PATH }}
-      - name: Resolve Playwright version
-        id: playwright
-        run: echo "version=$(node ./scripts/ci/ensure-playwright.mjs --print-lock-version)" >> "$GITHUB_OUTPUT"
-        working-directory: ${{ env.BUILD_PATH }}
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
-      - name: Ensure Playwright matches lockfile and install browsers
-        # Same entry as scripts/ci/local.sh (ensure-playwright.sh → .mjs).
+      - name: Ensure Playwright matches lockfile and browsers
+        # Same entry as scripts/ci/local.sh. In this container install is a no-op check
+        # (no apt); bump image tag when upgrading @playwright/test.
         run: bash ./scripts/ci/ensure-playwright.sh
-        timeout-minutes: 15
+        timeout-minutes: 5
         working-directory: ${{ env.BUILD_PATH }}
       - name: Verify lint, format and test tooling
         run: |

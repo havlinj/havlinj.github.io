@@ -5,6 +5,12 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const PLAYWRIGHT_PACKAGE = '@playwright/test';
 export const PLAYWRIGHT_BROWSERS = ['chromium', 'webkit'];
+/** Distro tag on mcr.microsoft.com/playwright — keep in sync with CI container. */
+export const PLAYWRIGHT_DOCKER_DISTRO = 'noble';
+
+export function playwrightDockerImage(version) {
+  return `mcr.microsoft.com/playwright:v${version}-${PLAYWRIGHT_DOCKER_DISTRO}`;
+}
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = join(SCRIPT_DIR, '../..');
@@ -70,6 +76,14 @@ export function assertPlaywrightMatchesLockfile(paths = {}) {
 }
 
 export function shouldInstallOsDependencies(env = process.env) {
+  // Official Playwright Docker image already has OS libs + browsers; apt --with-deps
+  // on a bare runner is the slow CI path (often 10–15+ minutes).
+  if (
+    env.PLAYWRIGHT_SKIP_OS_DEPS === '1' ||
+    env.PLAYWRIGHT_SKIP_OS_DEPS === 'true'
+  ) {
+    return false;
+  }
   return env.CI === 'true' || env.PLAYWRIGHT_INSTALL_DEPS === '1';
 }
 

@@ -3,7 +3,7 @@ import { applyExtremeZoom } from './helpers';
 
 /*
  * PNG baselines must match CI: astro preview (PW_SERVER_MODE=preview), not dev.
- * Regenerate on Ubuntu 24.04 (same OS as the CI build job):
+ * Regenerate on Ubuntu 24.04 / Playwright noble (same WebKit as the CI container):
  *   PW_SERVER_MODE=preview npx playwright test e2e/extreme-zoom-visual-mobile.spec.ts --project=mobile-webkit --update-snapshots
  */
 test.describe('Extreme zoom visuals (mobile webkit baselines) @extreme-zoom-visual', () => {
